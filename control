@@ -1,0 +1,9 @@
+Package: com.shade.nougat
+Name: Nougat
+Depends: mobilesubstrate, preferenceloader, ws.hbang.common
+Version: 0.1
+Architecture: iphoneos-arm
+Description: Android NC for iOS
+Maintainer: Shade Zepheri <ziroalpha@gmail.com>
+Author: Shade Zepheri <ziroalpha@gmail.com>
+Section: Tweaks
