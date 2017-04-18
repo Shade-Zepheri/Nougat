@@ -3,6 +3,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import <version.h>
 
+#define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
+#define kScreenHeight CGRectGetMaxY([UIScreen mainScreen].bounds)
 #define NougatDarkColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
 #define NougatLightColor [UIColor colorWithRed:0.93 green:0.94 blue:0.95 alpha:1.0]
 
@@ -23,4 +25,12 @@
 @interface FBDisplayManager : NSObject
 + (instancetype)sharedInstance;
 + (id)mainDisplay;
+@end
+
+@interface SBHomeScreenWindow : UIWindow
+@end
+
+@interface SBUIController : NSObject
++ (id)sharedInstance;
+- (id)window;
 @end
