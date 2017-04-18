@@ -3,6 +3,9 @@
 #import <QuartzCore/QuartzCore.h>
 #import <version.h>
 
+#define NougatDarkColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
+#define NougatLightColor [UIColor colorWithRed:0.93 green:0.94 blue:0.95 alpha:1.0]
+
 @interface SBScreenEdgePanGestureRecognizer : UIScreenEdgePanGestureRecognizer
 - (id)initWithTarget:(id)arg1 action:(SEL)arg2;
 @end

@@ -1,5 +1,6 @@
 #import "headers.h"
 #import "NUADrawerController.h"
+#import "NUAPreferenceManager.h"
 
 %hook SpringBoard
 - (void)applicationDidFinishLaunching:(id)application {
@@ -10,3 +11,7 @@
     [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:screenEdgePan toDisplay:[%c(FBDisplayManager) mainDisplay]];
 }
 %end
+
+%ctor {
+    [NUAPreferenceManager sharedSettings];
+}

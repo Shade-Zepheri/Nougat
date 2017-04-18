@@ -21,7 +21,11 @@
 }
 
 - (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
-    HBLogDebug(@"handleShowDrawerGesture");
+    if (recognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+
+    
 }
 
 @end

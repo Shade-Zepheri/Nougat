@@ -1,10 +1,13 @@
+CFLAGS = -fobjc-arc
+
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = nougat
-nougat_FILES = NUARootListController.m
+nougat_FILES = $(wildcard *.m)
 nougat_INSTALL_PATH = /Library/PreferenceBundles
 nougat_FRAMEWORKS = UIKit
 nougat_PRIVATE_FRAMEWORKS = Preferences
+nougat_EXTRA_FRAMEWORKS = Cephei CepheiPrefs
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

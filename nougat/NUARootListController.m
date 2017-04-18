@@ -2,12 +2,12 @@
 
 @implementation NUARootListController
 
-- (NSArray *)specifiers {
-	if (!_specifiers) {
-		_specifiers = [[self loadSpecifiersFromPlistName:@"Root" target:self] retain];
-	}
++ (NSString *)hb_specifierPlist {
+    return @"Root";
+}
 
-	return _specifiers;
+- (void)sendEmail {
+		[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto:ziroalpha@gmail.com?subject=Nougat"]];
 }
 
 @end
