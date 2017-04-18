@@ -1,5 +1,6 @@
 #import "NUADrawerController.h"
 #import "NUANotificationCenterInhibitor.h"
+#import "NUAPreferenceManager.h"
 
 @implementation NUADrawerController
 
@@ -25,7 +26,7 @@
 }
 
 - (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
-    if (recognizer.state != UIGestureRecognizerStateBegan || _mainPanelVisible) {
+    if (recognizer.state != UIGestureRecognizerStateBegan || _mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;
     }
 

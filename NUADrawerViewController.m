@@ -34,7 +34,7 @@
 - (void)configureQuickToggles {
     CGFloat y = CGRectGetHeight(self.view.frame);
     self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
-    self.quickTogglesView.backgroundColor = [UIColor redColor];
+    self.quickTogglesView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)note {
@@ -49,10 +49,17 @@
 }
 
 - (void)showMainPanel {
-    self.quickTogglesView.hidden = YES;
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
     } completion:nil];
+}
+
+- (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event {
+    UITouch *touch = [touches anyObject];
+    CGPoint currentLocation = [touch locationInView:self.view];
+    CGPoint previousLocation = [touch previousLocationInView:self.view];
+    HBLogDebug(@"touchesMoved: %@ -> %@", NSStringFromCGPoint(previousLocation), NSStringFromCGPoint(currentLocation));
 }
 
 @end
