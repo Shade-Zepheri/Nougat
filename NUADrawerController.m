@@ -2,6 +2,9 @@
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAPreferenceManager.h"
 
+extern BOOL quickMenuVisible;
+extern BOOL mainPanelVisible;
+
 @implementation NUADrawerController
 
 + (instancetype)sharedInstance {
@@ -18,26 +21,21 @@
     if (self) {
         self.viewController = [[NUADrawerViewController alloc] init];
         [self.viewController view];
-        _quickMenuVisible = NO;
-        _mainPanelVisible = NO;
     }
 
     return self;
 }
 
 - (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
-    if (recognizer.state != UIGestureRecognizerStateBegan || _mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
+    if (recognizer.state != UIGestureRecognizerStateBegan || quickMenuVisible || mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;
     }
 
     [NUANotificationCenterInhibitor setInhibited:YES];
-    if (!_quickMenuVisible && !_mainPanelVisible) {
-        [self.viewController showQuickToggles:NO];
-        _quickMenuVisible = YES;
-    } else if (_quickMenuVisible && !_mainPanelVisible) {
-        [self.viewController showMainPanel];
-        _mainPanelVisible = YES;
-    }
+
+    [self.viewController showQuickToggles:NO];
+    quickMenuVisible = YES;
+
     [NUANotificationCenterInhibitor setInhibited:NO];
 }
 

@@ -1,9 +1,6 @@
 #import "NUADrawerViewController.h"
 
-@interface NUADrawerController : NSObject {
-    BOOL _quickMenuVisible;
-    BOOL _mainPanelVisible;
-}
+@interface NUADrawerController : NSObject
 @property (strong, nonatomic) NUADrawerViewController *viewController;
 + (instancetype)sharedInstance;
 @end

@@ -2,6 +2,9 @@
 #import "NUAPreferenceManager.h"
 #import "headers.h"
 
+BOOL quickMenuVisible = NO;
+BOOL mainPanelVisible = NO;
+
 @implementation NUADrawerViewController
 - (instancetype)init {
     self = [super init];
@@ -29,6 +32,9 @@
 
     SBHomeScreenWindow *homescreenWindow = [[objc_getClass("SBUIController") sharedInstance] window];
     [homescreenWindow addSubview:self.view];
+
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleHideDrawerGesture:)];
+    [self.view addGestureRecognizer:panGesture];
 }
 
 - (void)configureQuickToggles {
@@ -69,8 +75,30 @@
     } completion:nil];
 }
 
-- (void)handleHideDrawerGesture:(UIGestureRecognizer*)recognizer {
-    HBLogDebug(@"UIGestureRecognizerState: %@", recognizer);
+- (void)handleHideDrawerGesture:(UIPanGestureRecognizer*)recognizer {
+    if (recognizer.state != UIGestureRecognizerStateEnded) {
+        return;
+    }
+
+    UIView *view = (UIView*)recognizer.view;
+    CGPoint velocity = [recognizer velocityInView:view];
+
+    if (velocity.y < 0) {
+        if (!quickMenuVisible) {
+            [self showQuickToggles:YES];
+            quickMenuVisible = YES;
+            mainPanelVisible = NO;
+        } else {
+            [self dismissDrawer];
+            quickMenuVisible = NO;
+        }
+    } else {
+        if (quickMenuVisible) {
+            [self showMainPanel];
+            quickMenuVisible = NO;
+            mainPanelVisible = YES;
+        }
+    }
 }
 
 @end
