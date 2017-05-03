@@ -32,7 +32,7 @@
 
     [NUANotificationCenterInhibitor setInhibited:YES];
     if (!_quickMenuVisible && !_mainPanelVisible) {
-        [self.viewController showQuickToggles];
+        [self.viewController showQuickToggles:NO];
         _quickMenuVisible = YES;
     } else if (_quickMenuVisible && !_mainPanelVisible) {
         [self.viewController showMainPanel];

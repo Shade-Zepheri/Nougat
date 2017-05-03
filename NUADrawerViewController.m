@@ -41,10 +41,16 @@
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
 }
 
-- (void)showQuickToggles {
+- (void)showQuickToggles:(BOOL)dismiss {
+    CGFloat y = CGRectGetMidY(self.view.frame);
+    if (dismiss) {
+        y = -y;
+    }
     [self.view addSubview:self.quickTogglesView];
     [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.view.center = CGPointMake(self.view.center.x, self.view.center.y + 50);
+        self.quickTogglesView.alpha = 1;
+        CGPoint center = CGPointMake(self.view.center.x, y + 50);
+        self.view.center = center;
     } completion:nil];
 }
 
@@ -55,11 +61,16 @@
     } completion:nil];
 }
 
-- (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event {
-    UITouch *touch = [touches anyObject];
-    CGPoint currentLocation = [touch locationInView:self.view];
-    CGPoint previousLocation = [touch previousLocationInView:self.view];
-    HBLogDebug(@"touchesMoved: %@ -> %@", NSStringFromCGPoint(previousLocation), NSStringFromCGPoint(currentLocation));
+- (void)dismissDrawer {
+    CGFloat y = CGRectGetHeight(self.view.frame);
+    [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.quickTogglesView.alpha = 0;
+        self.view.frame = CGRectMake(0, -y, kScreenWidth, kScreenHeight / 1.5);
+    } completion:nil];
+}
+
+- (void)handleHideDrawerGesture:(UIGestureRecognizer*)recognizer {
+    HBLogDebug(@"UIGestureRecognizerState: %@", recognizer);
 }
 
 @end

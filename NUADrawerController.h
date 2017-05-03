@@ -4,7 +4,6 @@
     BOOL _quickMenuVisible;
     BOOL _mainPanelVisible;
 }
-@property (nonatomic, strong) NUADrawerViewController *viewController;
-
+@property (strong, nonatomic) NUADrawerViewController *viewController;
 + (instancetype)sharedInstance;
 @end

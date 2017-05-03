@@ -3,12 +3,15 @@
 #import "NUAPreferenceManager.h"
 
 %hook SpringBoard
-- (void)applicationDidFinishLaunching:(id)application {
-    %orig;
+- (instancetype)init {
+    self = %orig;
+    if (self) {
+        UIScreenEdgePanGestureRecognizer *screenEdgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:[NUADrawerController sharedInstance] action:@selector(handleShowDrawerGesture:)];
+        screenEdgePan.edges = UIRectEdgeTop;
+        [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:screenEdgePan toDisplay:[%c(FBDisplayManager) mainDisplay]];
+    }
 
-    UIScreenEdgePanGestureRecognizer *screenEdgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:[NUADrawerController sharedInstance] action:@selector(handleShowDrawerGesture:)];
-    screenEdgePan.edges = UIRectEdgeTop;
-    [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:screenEdgePan toDisplay:[%c(FBDisplayManager) mainDisplay]];
+    return self;
 }
 %end
 

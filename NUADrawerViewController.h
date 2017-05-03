@@ -4,6 +4,6 @@
 @property (strong, nonatomic) UIView *statusBar;
 @property (strong, nonatomic) UIView *quickTogglesView;
 //@property (strong, nonatomic) NUADrawerPanel *togglesPanel;
-- (void)showQuickToggles;
+- (void)showQuickToggles:(BOOL)dismiss;
 - (void)showMainPanel;
 @end
