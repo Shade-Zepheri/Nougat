@@ -9,12 +9,14 @@
 #define NougatLightColor [UIColor colorWithRed:0.93 green:0.94 blue:0.95 alpha:1.0]
 
 @interface SBScreenEdgePanGestureRecognizer : UIScreenEdgePanGestureRecognizer
-- (id)initWithTarget:(id)arg1 action:(SEL)arg2;
+- (instancetype)initWithTarget:(id)arg1 action:(SEL)arg2;
 @end
 
 @interface SBSystemGestureManager : NSObject
-+ (id)mainDisplayManager;
++ (instancetype)mainDisplayManager;
 - (void)addGestureRecognizer:(id)arg1 withType:(unsigned long long)arg2;
+- (void)_disableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;
+- (void)_enableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;
 @end
 
 @interface FBSystemGestureManager : NSObject <UIGestureRecognizerDelegate>
@@ -22,15 +24,18 @@
 - (void)addGestureRecognizer:(id)arg1 toDisplay:(id)arg2;
 @end
 
+@interface FBSDisplay : NSObject
+@end
+
 @interface FBDisplayManager : NSObject
 + (instancetype)sharedInstance;
-+ (id)mainDisplay;
++ (FBSDisplay*)mainDisplay;
 @end
 
 @interface SBHomeScreenWindow : UIWindow
 @end
 
 @interface SBUIController : NSObject
-+ (id)sharedInstance;
++ (instancetype)sharedInstance;
 - (id)window;
 @end

@@ -30,8 +30,8 @@ BOOL mainPanelVisible = NO;
     self.view.frame = CGRectMake(0, -kScreenHeight / 1.5, kScreenWidth, kScreenHeight / 1.5);
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
 
-    SBHomeScreenWindow *homescreenWindow = [[objc_getClass("SBUIController") sharedInstance] window];
-    [homescreenWindow addSubview:self.view];
+    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    [window addSubview:self.view];
 
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleHideDrawerGesture:)];
     [self.view addGestureRecognizer:panGesture];
@@ -40,7 +40,13 @@ BOOL mainPanelVisible = NO;
 - (void)configureQuickToggles {
     CGFloat y = CGRectGetHeight(self.view.frame);
     self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
-    self.quickTogglesView.backgroundColor = [UIColor clearColor];
+
+    for (int i = 0; i < 6; i++) {
+      CGFloat width = kScreenWidth / 6;
+      UIView *view = [[UIView alloc] initWithFrame:CGRectMake(i * width, 0, width, 50)];
+      view.backgroundColor = [UIColor blueColor];
+      [self.quickTogglesView addSubview:view];
+    }
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)note {
