@@ -1,12 +1,13 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger, NUAToggleType) {
-    NUAToggleTypeAirplaneMode,
+
     NUAToggleTypeWifi,
     NUAToggleTypeCellularData,
-    NUAToggleTypeTorch,
-    NUAToggleTypeRotationLock,
     NUAToggleTypeBattery,
+    NUAToggleTypeTorch,
+    NUAToggleTypeAirplaneMode,
+    NUAToggleTypeRotationLock,
     NUAToggleTypeBluetooth,
     NUAToggleTypeDoNotDisturb,
     NUAToggleTypeLocation,
@@ -17,4 +18,5 @@ typedef NS_ENUM(NSInteger, NUAToggleType) {
 }
 @property (strong, nonatomic) UIImage *toggleImage;
 @property (readonly, nonatomic) NUAToggleType toggleType;
+- (instancetype)initWithFrame:(CGRect)frame withType:(NUAToggleType)type;
 @end

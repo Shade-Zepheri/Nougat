@@ -1,5 +1,6 @@
 #import "NUADrawerViewController.h"
 #import "NUAPreferenceManager.h"
+#import "NUADrawerPanelButton.h"
 #import "headers.h"
 
 BOOL quickMenuVisible = NO;
@@ -43,8 +44,7 @@ BOOL mainPanelVisible = NO;
 
     for (int i = 0; i < 6; i++) {
       CGFloat width = kScreenWidth / 6;
-      UIView *view = [[UIView alloc] initWithFrame:CGRectMake(i * width, 0, width, 50)];
-      view.backgroundColor = [UIColor blueColor];
+      UIView *view = [[NUADrawerPanelButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) withType:i];
       [self.quickTogglesView addSubview:view];
     }
 }
