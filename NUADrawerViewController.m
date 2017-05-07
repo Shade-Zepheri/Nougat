@@ -12,6 +12,9 @@ BOOL mainPanelVisible = NO;
     if (self) {
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
+
+        //Eventually array will come from user decided prefs
+        _testArray = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
     }
 
     return self;
@@ -42,9 +45,9 @@ BOOL mainPanelVisible = NO;
     CGFloat y = CGRectGetHeight(self.view.frame);
     self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
 
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < _testArray.count; i++) {
       CGFloat width = kScreenWidth / 6;
-      UIView *view = [[NUADrawerPanelButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) withType:i];
+      UIView *view = [[NUADrawerPanelButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) andSwitchIdentifier:_testArray[i]];
       [self.quickTogglesView addSubview:view];
     }
 }

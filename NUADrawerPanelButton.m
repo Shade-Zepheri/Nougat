@@ -3,53 +3,40 @@
 
 @implementation NUADrawerPanelButton
 
-- (instancetype)initWithFrame:(CGRect)frame withType:(NUAToggleType)type {
+- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString*)identifier {
     self = [super initWithFrame:frame];
     if (self) {
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleWasTapped:)];
         [self addGestureRecognizer:tapGesture];
 
-        if (type == NUAToggleTypeWifi) {
-            self.backgroundColor = [UIColor redColor];
-        }
+        self.switchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", identifier];
 
-        _toggleType = type;
+        if ([identifier isEqualToString:@"wifi"]) {
+          self.backgroundColor = [UIColor blueColor];
+        } else {
+          self.backgroundColor = [UIColor greenColor];
+        }
     }
 
     return self;
 }
 
-- (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
-    if (_toggled) {
-        _toggled = NO;
-    } else {
-        _toggled = YES;
-    }
+- (void)toggleSwitch:(BOOL)value {
+    NSString *switchIdentifier = self.switchIdentifier;
+    HBLogDebug(@"%@", switchIdentifier);
 
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
-    switch (self.toggleType) {
-      case NUAToggleTypeAirplaneMode:
-          break;
-      case NUAToggleTypeWifi: {
-          NSString *switchIdentifier = @"com.a3tweaks.switch.wifi";
-          [switchPanel setState:_toggled ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:switchIdentifier];
-          [switchPanel applyActionForSwitchIdentifier:switchIdentifier];
-          break;
-      }
-      case NUAToggleTypeCellularData:
-          break;
-      case NUAToggleTypeTorch:
-          break;
-      case NUAToggleTypeRotationLock:
-          break;
-      case NUAToggleTypeBattery:
-          break;
-      case NUAToggleTypeBluetooth:
-          break;
-      case NUAToggleTypeDoNotDisturb:
-          break;
-      case NUAToggleTypeLocation:
-          break;
+    [switchPanel setState:value ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:switchIdentifier];
+    [switchPanel applyActionForSwitchIdentifier:switchIdentifier];
+}
+
+- (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
+    if (_toggled) {
+        [self toggleSwitch:NO];
+        _toggled = NO;
+    } else {
+        [self toggleSwitch:YES];
+        _toggled = YES;
     }
 }
 
