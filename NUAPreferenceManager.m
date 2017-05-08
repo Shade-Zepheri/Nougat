@@ -38,7 +38,7 @@ void reloadSettings() {
         BOOL failed = NO;
 
         if (keyList) {
-            _settings = (NSDictionary*)CFBridgingRelease(CFPreferencesCopyMultiple(keyList, appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost));
+            _settings = (__bridge NSDictionary*)CFPreferencesCopyMultiple(keyList, appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
             CFRelease(keyList);
 
             if (!_settings) {

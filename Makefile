@@ -11,7 +11,11 @@ Nougat_FILES = $(wildcard *.x) $(wildcard *.m)
 Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_LIBRARIES = flipswitch
 
+BUNDLE_NAME = Nougat-Resources
+Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
+
 SUBPROJECTS = nougat
 
 include $(THEOS_MAKE_PATH)/tweak.mk
+include $(THEOS)/makefiles/bundle.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk

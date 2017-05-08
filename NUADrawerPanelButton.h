@@ -1,9 +1,9 @@
 #import <UIKit/UIKit.h>
 
 @interface NUADrawerPanelButton : UIView {
-  BOOL _toggled;
+    NSBundle *_imageBundle;
 }
-@property (strong, nonatomic) UIImage *toggleImage;
+@property (strong, nonatomic) UIImageView *imageView;
 @property (copy, nonatomic) NSString *switchIdentifier;
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString*)identifier;
 @end

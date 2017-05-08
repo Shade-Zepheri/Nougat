@@ -11,33 +11,38 @@
 
         self.switchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", identifier];
 
-        if ([identifier isEqualToString:@"wifi"]) {
-          self.backgroundColor = [UIColor blueColor];
-        } else {
-          self.backgroundColor = [UIColor greenColor];
-        }
+        self.imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 28, 28)];
+        self.imageView.center = CGPointMake(frame.size.width / 2, frame.size.height / 2);
+
+        FSSwitchState state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
+        _imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+        NSString *imageName = [NSString stringWithFormat:@"%@-%@", identifier, state == FSSwitchStateOff ? @"off" : @"on"];
+        self.imageView.image = [UIImage imageWithContentsOfFile:[_imageBundle pathForResource:imageName ofType:@"png"]];
+
+        [self addSubview:self.imageView];
+
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
     }
 
     return self;
 }
 
-- (void)toggleSwitch:(BOOL)value {
+- (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
+    HBLogDebug(@"toggleWasTapped");
     NSString *switchIdentifier = self.switchIdentifier;
-    HBLogDebug(@"%@", switchIdentifier);
-
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
-    [switchPanel setState:value ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:switchIdentifier];
+
+    FSSwitchState state = [switchPanel stateForSwitchIdentifier:switchIdentifier];
+    //cuz off means on and on means off?
+    [switchPanel setState:state == FSSwitchStateOff ? FSSwitchStateOff : FSSwitchStateOn forSwitchIdentifier:switchIdentifier];
     [switchPanel applyActionForSwitchIdentifier:switchIdentifier];
 }
 
-- (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
-    if (_toggled) {
-        [self toggleSwitch:NO];
-        _toggled = NO;
-    } else {
-        [self toggleSwitch:YES];
-        _toggled = YES;
-    }
+- (void)switchesChangedState:(NSNotification *)note {
+    FSSwitchState state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
+    NSString *imageName = [NSString stringWithFormat:@"%@-%@", [self.switchIdentifier substringFromIndex:20], state == FSSwitchStateOff ? @"off" : @"on"];
+    self.imageView.image = [UIImage imageWithContentsOfFile:[_imageBundle pathForResource:imageName ofType:@"png"]];
 }
 
 @end
