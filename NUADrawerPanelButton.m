@@ -29,7 +29,6 @@
 }
 
 - (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
-    HBLogDebug(@"toggleWasTapped");
     NSString *switchIdentifier = self.switchIdentifier;
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
