@@ -31,6 +31,7 @@ void reloadSettings() {
         if (_settings) {
             _settings = nil;
         }
+
         CFPreferencesAppSynchronize(CFSTR("com.shade.nougat"));
         CFStringRef appID = CFSTR("com.shade.nougat");
         CFArrayRef keyList = CFPreferencesCopyKeyList(appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
@@ -47,6 +48,7 @@ void reloadSettings() {
         } else {
             failed = YES;
         }
+        
         CFRelease(appID);
 
         if (failed) {

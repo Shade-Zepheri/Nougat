@@ -34,6 +34,10 @@ BOOL mainPanelVisible = NO;
     self.view.frame = CGRectMake(0, -kScreenHeight / 1.5, kScreenWidth, kScreenHeight / 1.5);
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
 
+    CGFloat y = CGRectGetHeight(self.view.frame);
+    self.statusBar = [[NUAStatusBar alloc] initWithFrame:CGRectMake(0, y - 100, kScreenWidth, 32)];
+    [self.view addSubview:self.statusBar];
+
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.view];
 
@@ -64,13 +68,16 @@ BOOL mainPanelVisible = NO;
     [self.view addSubview:self.quickTogglesView];
     [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.quickTogglesView.alpha = 1;
-        CGPoint center = CGPointMake(self.view.center.x, y + 50);
+        CGPoint center = CGPointMake(self.view.center.x, y + 100);
         self.view.center = center;
+
+        self.statusBar.center = CGPointMake(kScreenWidth / 2, self.view.frame.size.height - 84);
     } completion:nil];
 }
 
 - (void)showMainPanel {
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
     } completion:nil];
