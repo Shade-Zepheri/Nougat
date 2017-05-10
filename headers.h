@@ -39,3 +39,7 @@
 + (instancetype)sharedInstance;
 - (id)window;
 @end
+
+@interface UIApplication (Private)
+- (void)launchApplicationWithIdentifier:(NSString*)identifier suspended:(BOOL)suspended;
+@end

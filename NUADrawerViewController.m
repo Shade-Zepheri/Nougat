@@ -24,8 +24,8 @@ BOOL mainPanelVisible = NO;
     [super viewDidLoad];
     [self configureView];
     [self configureQuickToggles];
+    [self configureMainToggles];
     /*
-    [self configureMainView];
     [self loadToggles];
     */
 }
@@ -56,8 +56,15 @@ BOOL mainPanelVisible = NO;
     }
 }
 
+- (void)configureMainToggles {
+    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 100, kScreenWidth - 100)];
+    self.togglesPanel.center = self.view.center;
+    [self.view addSubview:self.togglesPanel];
+}
+
 - (void)backgroundColorDidChange:(NSNotification *)note {
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+    [self.statusBar updateTextColor];
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {
