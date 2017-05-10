@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface NUADrawerPanelButton : UIView {
+@interface NUAQuickToggleButton : UIView {
     NSBundle *_imageBundle;
 }
 @property (strong, nonatomic) UIImageView *imageView;

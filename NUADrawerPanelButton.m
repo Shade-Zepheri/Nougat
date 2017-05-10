@@ -1,7 +1,7 @@
-#import "NUADrawerPanelButton.h"
+#import "NUAQuickToggleButton.h"
 #import <Flipswitch/Flipswitch.h>
 
-@implementation NUADrawerPanelButton
+@implementation NUAQuickToggleButton
 
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString*)identifier {
     self = [super initWithFrame:frame];

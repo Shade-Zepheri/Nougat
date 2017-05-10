@@ -1,6 +1,6 @@
 #import "NUADrawerViewController.h"
 #import "NUAPreferenceManager.h"
-#import "NUADrawerPanelButton.h"
+#import "NUAQuickToggleButton.h"
 #import "headers.h"
 
 BOOL quickMenuVisible = NO;
@@ -51,14 +51,17 @@ BOOL mainPanelVisible = NO;
 
     for (int i = 0; i < _testArray.count; i++) {
       CGFloat width = kScreenWidth / 6;
-      UIView *view = [[NUADrawerPanelButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) andSwitchIdentifier:_testArray[i]];
+      UIView *view = [[NUAQuickToggleButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) andSwitchIdentifier:_testArray[i]];
       [self.quickTogglesView addSubview:view];
     }
 }
 
 - (void)configureMainToggles {
-    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 100, kScreenWidth - 100)];
-    self.togglesPanel.center = self.view.center;
+    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, kScreenWidth - 50)];
+    self.togglesPanel.alpha = 0;
+
+    CGSize size = self.view.frame.size;
+    self.togglesPanel.center = CGPointMake(size.width / 2, size.height / 2);
     [self.view addSubview:self.togglesPanel];
 }
 
@@ -79,6 +82,7 @@ BOOL mainPanelVisible = NO;
         self.view.center = center;
 
         self.statusBar.center = CGPointMake(kScreenWidth / 2, self.view.frame.size.height - 84);
+        self.togglesPanel.alpha = 0;
     } completion:nil];
 }
 
@@ -87,6 +91,8 @@ BOOL mainPanelVisible = NO;
         self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
+
+        self.togglesPanel.alpha = 1;
     } completion:nil];
 }
 

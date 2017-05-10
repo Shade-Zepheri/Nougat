@@ -9,7 +9,7 @@
     if (self) {
         _imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
 
-        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, frame.size.width / 2, frame.size.height)];
+        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame.size.width / 2, frame.size.height)];
         self.dateLabel.font = [UIFont systemFontOfSize:14];
         self.dateLabel.textColor = [UIColor whiteColor];
         self.dateLabel.backgroundColor = [UIColor clearColor];
