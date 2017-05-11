@@ -9,8 +9,6 @@
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleWasTapped:)];
         [self addGestureRecognizer:tapGesture];
 
-        self.backgroundColor = [UIColor blueColor];
-
         self.switchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", identifier];
 
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 32, 32)];

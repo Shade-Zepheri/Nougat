@@ -10,6 +10,7 @@ TWEAK_NAME = Nougat
 Nougat_FILES = $(wildcard *.x) $(wildcard *.m)
 Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_LIBRARIES = flipswitch
+#TODO: add NEHotspotHelper entitlement to get signal strength and network name
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
