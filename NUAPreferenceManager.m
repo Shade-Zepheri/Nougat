@@ -1,3 +1,4 @@
+#import <SystemConfiguration/CaptiveNetwork.h>
 #import "headers.h"
 #import "NUAPreferenceManager.h"
 
@@ -48,7 +49,7 @@ void reloadSettings() {
         } else {
             failed = YES;
         }
-        
+
         CFRelease(appID);
 
         if (failed) {
@@ -66,5 +67,22 @@ void reloadSettings() {
         [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil];
     }
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
++ (NSString*)currentWifiSSID {
+    NSString *ssid = nil;
+    NSArray *interFaceNames = (__bridge_transfer id)CNCopySupportedInterfaces();
+
+    for (NSString *name in interFaceNames) {
+        NSDictionary *info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)name);
+
+        if (info[@"SSID"]) {
+            ssid = info[@"SSID"];
+        }
+    }
+    return ssid;
+}
+#pragma GCC diagnostic pop
 
 @end

@@ -61,7 +61,7 @@ BOOL mainPanelVisible = NO;
     self.togglesPanel.alpha = 0;
 
     CGSize size = self.view.frame.size;
-    self.togglesPanel.center = CGPointMake(size.width / 2, size.height / 2);
+    self.togglesPanel.center = CGPointMake(size.width / 2, (size.height / 2) + 30);
     [self.view addSubview:self.togglesPanel];
 }
 

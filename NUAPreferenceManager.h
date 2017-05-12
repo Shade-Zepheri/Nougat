@@ -5,4 +5,5 @@
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 + (instancetype)sharedSettings;
 - (void)reloadSettings;
++ (NSString*)currentWifiSSID;
 @end
