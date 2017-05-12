@@ -32,13 +32,13 @@
 				<key>PostNotification</key>
 				<string>com.shade.nougat/ReloadPrefs</string>
 				<key>key</key>
-				<string>lightOrDark</string>
+				<string>darkVariant</string>
 				<key>label</key>
-				<string>Background Color</string>
+				<string>Drawer Style</string>
 				<key>validTitles</key>
 				<array>
-					<string>Dark</string>
-					<string>Light</string>
+					<string>Nexus</string>
+					<string>Pixel</string>
 				</array>
 				<key>validValues</key>
 				<array>

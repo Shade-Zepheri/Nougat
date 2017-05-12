@@ -5,9 +5,10 @@
 
 #define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
 #define kScreenHeight CGRectGetMaxY([UIScreen mainScreen].bounds)
-#define NougatDarkColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
+#define NexusDarkColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
+#define PixelDarkColor [UIColor colorWithRed:0.13 green:0.13 blue:0.13 alpha:1.0]
 #define NougatLabelColor [UIColor colorWithRed:0.33 green:0.43 blue:0.48 alpha:1.0]
-#define NougatLightColor [UIColor colorWithRed:0.93 green:0.94 blue:0.95 alpha:1.0]
+
 
 @interface SBScreenEdgePanGestureRecognizer : UIScreenEdgePanGestureRecognizer
 - (instancetype)initWithTarget:(id)arg1 action:(SEL)arg2;

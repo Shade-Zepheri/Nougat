@@ -61,8 +61,8 @@ void reloadSettings() {
         }
 
         _enabled = ![_settings objectForKey:@"enabled"] ? YES : [[_settings objectForKey:@"enabled"] boolValue];
-        NSInteger colorTag = ![_settings objectForKey:@"lightOrDark"] ? 1 : [[_settings objectForKey:@"lightOrDark"] intValue];
-        _backgroundColor = colorTag == 1 ? NougatDarkColor : NougatLightColor;
+        NSInteger colorTag = ![_settings objectForKey:@"darkVariant"] ? 1 : [[_settings objectForKey:@"darkVariant"] intValue];
+        _backgroundColor = colorTag == 1 ? NexusDarkColor : PixelDarkColor;
 
         [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil];
     }

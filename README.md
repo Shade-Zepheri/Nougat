@@ -1,2 +1,2 @@
 # Nougat
-The Android notifcation drawer for iOS
+The Android Notification drawer for iOS
