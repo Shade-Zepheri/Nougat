@@ -31,8 +31,8 @@
     [self addSubview:self.brightnessSlider];
 }
 
-- (void)updateTintColor {
-    self.brightnessSlider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
+- (void)updateTintTo:(UIColor*)color {
+    self.brightnessSlider.minimumTrackTintColor = color;
 }
 
 - (void)setBrighness:(CGFloat)value {

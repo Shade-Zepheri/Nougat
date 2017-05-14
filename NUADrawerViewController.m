@@ -71,8 +71,9 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)note {
-    self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
-    [self.togglesPanel updateTintColor];
+    NSDictionary *colorInfo = [note userInfo];
+    self.view.backgroundColor = colorInfo[@"backgroundColor"];
+    [self.togglesPanel updateTintTo:colorInfo[@"tintColor"]];
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {

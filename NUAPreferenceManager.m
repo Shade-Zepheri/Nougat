@@ -65,7 +65,8 @@ void reloadSettings() {
         _backgroundColor = colorTag == 1 ? NexusDarkColor : PixelDarkColor;
         _highlightColor = colorTag == 1 ? NexusTintColor : PixelTintColor;
 
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil];
+        NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil userInfo:colorInfo];
     }
 }
 
