@@ -57,17 +57,16 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)configureMainToggles {
-    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, kScreenWidth - 50)];
+    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, kScreenWidth - 20)];
     self.togglesPanel.alpha = 0;
 
     CGSize size = self.view.frame.size;
-    self.togglesPanel.center = CGPointMake(size.width / 2, (size.height / 2) + 30);
+    self.togglesPanel.center = CGPointMake(size.width / 2, (size.height / 2) + 10);
     [self.view addSubview:self.togglesPanel];
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)note {
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
-    [self.statusBar updateTextColor];
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {

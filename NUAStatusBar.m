@@ -49,13 +49,4 @@
     self.dateLabel.text = dateString;
 }
 
-- (void)updateTextColor {
-    UIColor *backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
-    if ([backgroundColor isEqual:NougatDarkColor]) {
-        self.dateLabel.textColor = [UIColor whiteColor];
-    } else {
-        self.dateLabel.textColor = [UIColor blackColor];
-    }
-}
-
 @end

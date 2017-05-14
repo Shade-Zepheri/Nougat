@@ -1,6 +1,7 @@
 #import <objc/runtime.h>
 #import <UIKit/UIKit.h>
 #import <QuartzCore/QuartzCore.h>
+#import <BackBoardServices/BKSDisplayBrightness.h>
 #import <version.h>
 
 #define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
@@ -8,7 +9,6 @@
 #define NexusDarkColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
 #define PixelDarkColor [UIColor colorWithRed:0.13 green:0.13 blue:0.13 alpha:1.0]
 #define NougatLabelColor [UIColor colorWithRed:0.33 green:0.43 blue:0.48 alpha:1.0]
-
 
 @interface SBScreenEdgePanGestureRecognizer : UIScreenEdgePanGestureRecognizer
 - (instancetype)initWithTarget:(id)arg1 action:(SEL)arg2;

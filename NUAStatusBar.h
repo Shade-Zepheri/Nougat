@@ -5,5 +5,4 @@
 }
 @property (strong, nonatomic) NSDateFormatter *dateFormatter;
 @property (strong, nonatomic) UILabel *dateLabel;
-- (void)updateTextColor;
 @end
