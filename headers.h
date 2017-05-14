@@ -48,3 +48,7 @@
 @interface UIApplication (Private)
 - (void)launchApplicationWithIdentifier:(NSString*)identifier suspended:(BOOL)suspended;
 @end
+
+@interface _UIBackdropView : UIView
+- (instancetype)initWithPrivateStyle:(long long)arg1;
+@end

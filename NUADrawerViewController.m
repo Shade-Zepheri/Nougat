@@ -30,11 +30,6 @@ BOOL mainPanelVisible = NO;
     */
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    HBLogDebug(@"viewDidAppear");
-}
-
 - (void)configureView {
     self.view.frame = CGRectMake(0, -kScreenHeight / 1.5, kScreenWidth, kScreenHeight / 1.5);
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
@@ -43,8 +38,13 @@ BOOL mainPanelVisible = NO;
     self.statusBar = [[NUAStatusBar alloc] initWithFrame:CGRectMake(0, y - 100, kScreenWidth, 32)];
     [self.view addSubview:self.statusBar];
 
+    self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithPrivateStyle:2030];
+    self.backdropView.frame = [UIScreen mainScreen].bounds;
+    self.backdropView.alpha = 0;
+
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     [window addSubview:self.view];
+    [window insertSubview:self.backdropView belowSubview:self.view];
 
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleHideDrawerGesture:)];
     [self.view addGestureRecognizer:panGesture];
@@ -83,6 +83,7 @@ BOOL mainPanelVisible = NO;
     }
     [self.view addSubview:self.quickTogglesView];
     [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.backdropView.alpha = 1;
         self.quickTogglesView.alpha = 1;
         CGPoint center = CGPointMake(self.view.center.x, y + 100);
         self.view.center = center;
@@ -105,6 +106,7 @@ BOOL mainPanelVisible = NO;
 - (void)dismissDrawer {
     CGFloat y = CGRectGetHeight(self.view.frame);
     [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.backdropView.alpha = 0;
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, -y, kScreenWidth, kScreenHeight / 1.5);
     } completion:nil];
