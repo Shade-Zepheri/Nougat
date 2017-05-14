@@ -3,6 +3,7 @@
 }
 @property (assign, readonly, nonatomic) BOOL enabled;
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
+@property (strong, readonly, nonatomic) UIColor *highlightColor;
 + (instancetype)sharedSettings;
 - (void)reloadSettings;
 + (NSString*)currentWifiSSID;

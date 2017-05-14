@@ -7,7 +7,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+        self.resourceBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
 
         self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame.size.width / 2, frame.size.height)];
         self.dateLabel.font = [UIFont systemFontOfSize:14];
@@ -33,7 +33,7 @@
 - (void)loadRight {
     UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     settingsButton.frame = CGRectMake(kScreenWidth / 1.3, 10, 20, 20);
-    UIImage *settingsCog = [UIImage imageWithContentsOfFile:[_imageBundle pathForResource:@"settings" ofType:@"png"]];
+    UIImage *settingsCog = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:@"settings" ofType:@"png"]];
     [settingsButton setImage:settingsCog forState:UIControlStateNormal];
     [settingsButton addTarget:self action:@selector(settingsButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:settingsButton];

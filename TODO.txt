@@ -1,0 +1,11 @@
+Features:
+- Finish StatusBar
+- Make Home button/lock dismiss
+- Add dropshadow
+- Finish Prefs
+
+Misc:
+- Review overall structure
+- Verify colors
+- Improve performance
+- Verify iOS compatibility

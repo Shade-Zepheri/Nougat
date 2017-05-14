@@ -22,12 +22,17 @@
     self.brightnessSlider.continuous = YES;
     self.brightnessSlider.minimumValue = 0;
     self.brightnessSlider.maximumValue = 1;
+    self.brightnessSlider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
     [self.brightnessSlider setValue:[UIScreen mainScreen].brightness animated:NO];
 
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
     UIImage *thumbImage = [UIImage imageWithContentsOfFile:[imageBundle pathForResource:@"brightness" ofType:@"png"]];
     [self.brightnessSlider setThumbImage:thumbImage forState:UIControlStateNormal];
     [self addSubview:self.brightnessSlider];
+}
+
+- (void)updateTintColor {
+    self.brightnessSlider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
 }
 
 - (void)setBrighness:(CGFloat)value {

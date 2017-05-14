@@ -30,6 +30,11 @@ BOOL mainPanelVisible = NO;
     */
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    HBLogDebug(@"viewDidAppear");
+}
+
 - (void)configureView {
     self.view.frame = CGRectMake(0, -kScreenHeight / 1.5, kScreenWidth, kScreenHeight / 1.5);
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
@@ -67,6 +72,7 @@ BOOL mainPanelVisible = NO;
 
 - (void)backgroundColorDidChange:(NSNotification *)note {
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+    [self.togglesPanel updateTintColor];
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {
