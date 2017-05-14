@@ -10,4 +10,5 @@
 @property (strong, nonatomic) NUADrawerPanel *togglesPanel;
 - (void)showQuickToggles:(BOOL)dismiss;
 - (void)showMainPanel;
+- (void)dismissDrawer;
 @end

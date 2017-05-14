@@ -26,6 +26,10 @@ extern BOOL mainPanelVisible;
     return self;
 }
 
+- (void)dismissDrawer {
+    [self.viewController dismissDrawer];
+}
+
 - (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
     if (recognizer.state != UIGestureRecognizerStateBegan || quickMenuVisible || mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;

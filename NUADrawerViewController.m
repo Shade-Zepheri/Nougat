@@ -107,6 +107,8 @@ BOOL mainPanelVisible = NO;
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, -y, kScreenWidth, kScreenHeight / 1.5);
     } completion:nil];
+    quickMenuVisible = NO;
+    mainPanelVisible = NO;
 }
 
 - (void)handleHideDrawerGesture:(UIPanGestureRecognizer*)recognizer {
@@ -124,7 +126,6 @@ BOOL mainPanelVisible = NO;
             mainPanelVisible = NO;
         } else {
             [self dismissDrawer];
-            quickMenuVisible = NO;
         }
     } else {
         if (quickMenuVisible) {

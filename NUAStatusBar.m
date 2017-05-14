@@ -1,4 +1,5 @@
 #import "headers.h"
+#import "NUADrawerController.h"
 #import "NUAStatusBar.h"
 #import "NUAPreferenceManager.h"
 
@@ -41,6 +42,7 @@
 }
 
 - (void)settingsButtonTapped:(id)sender {
+    [[NUADrawerController sharedInstance] dismissDrawer];
     [[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
 }
 
