@@ -51,6 +51,20 @@
 				<string>PSGroupCell</string>
 			</dict>
 			<dict>
+				<key>cell</key>
+				<string>PSLinkCell</string>
+				<key>detail</key>
+				<string>NUASortOrderController</string>
+				<key>isController</key>
+				<true/>
+				<key>label</key>
+				<string>Sort Order</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSGroupCell</string>
+			</dict>
+			<dict>
 				<key>big</key>
 				<true/>
 				<key>height</key>

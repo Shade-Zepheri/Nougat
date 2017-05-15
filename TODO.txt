@@ -3,6 +3,7 @@ Features:
 - Finish Prefs
 
 Misc:
+- Is the full statusbar worth it?
 - Review overall structure
 - Verify colors
 - Improve performance
