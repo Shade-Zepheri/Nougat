@@ -39,11 +39,32 @@
     [settingsButton addTarget:self action:@selector(settingsButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:settingsButton];
 
+    self.toggleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    self.toggleButton.frame = CGRectMake(kScreenWidth / 1.1, 10, 20, 20);
+    UIImage *arrow = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:@"showMain" ofType:@"png"]];
+    [self.toggleButton setImage:arrow forState:UIControlStateNormal];
+    [self.toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:self.toggleButton];
+
 }
 
 - (void)settingsButtonTapped:(id)sender {
     [[NUADrawerController sharedInstance] dismissDrawer];
     [[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
+}
+
+- (void)toggleButtonTapped:(id)sender {
+    if ([[NUADrawerController sharedInstance] mainTogglesVisible]) {
+        [[NUADrawerController sharedInstance] showQuickToggles];
+    } else {
+        [[NUADrawerController sharedInstance] showMainToggles];
+    }
+}
+
+- (void)updateToggle:(BOOL)toggled {
+    NSString *arrowName = toggled ? @"dismissMain" : @"showMain";
+    UIImage *arrow = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:arrowName ofType:@"png"]];
+    [self.toggleButton setImage:arrow forState:UIControlStateNormal];
 }
 
 - (void)updateTime:(NSTimer*)timer {

@@ -92,6 +92,7 @@ BOOL mainPanelVisible = NO;
         self.statusBar.center = CGPointMake(kScreenWidth / 2, self.view.frame.size.height - 84);
         self.togglesPanel.alpha = 0;
     } completion:nil];
+    [self.statusBar updateToggle:NO];
 }
 
 - (void)showMainPanel {
@@ -102,6 +103,7 @@ BOOL mainPanelVisible = NO;
 
         self.togglesPanel.alpha = 1;
     } completion:nil];
+    [self.statusBar updateToggle:YES];
 }
 
 - (void)dismissDrawer {

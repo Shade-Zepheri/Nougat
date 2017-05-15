@@ -30,6 +30,18 @@ extern BOOL mainPanelVisible;
     [self.viewController dismissDrawer];
 }
 
+- (void)showQuickToggles {
+    [self.viewController showQuickToggles:YES];
+}
+
+- (void)showMainToggles {
+    [self.viewController showMainPanel];
+}
+
+- (BOOL)mainTogglesVisible {
+    return mainPanelVisible;
+}
+
 - (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
     if (recognizer.state != UIGestureRecognizerStateBegan || quickMenuVisible || mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;
