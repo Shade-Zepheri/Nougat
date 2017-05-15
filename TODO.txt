@@ -1,6 +1,5 @@
 Features:
 - Finish StatusBar
-- Add dropshadow
 - Finish Prefs
 
 Misc:
