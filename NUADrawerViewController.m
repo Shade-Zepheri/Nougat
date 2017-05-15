@@ -40,6 +40,7 @@ BOOL mainPanelVisible = NO;
 
     self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithPrivateStyle:2030];
     self.backdropView.frame = [UIScreen mainScreen].bounds;
+    self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
