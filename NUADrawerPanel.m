@@ -31,6 +31,10 @@
     [self addSubview:self.brightnessSlider];
 }
 
+- (void)updateSliderValue {
+    [self.brightnessSlider setValue:[UIScreen mainScreen].brightness animated:NO];
+}
+
 - (void)updateTintTo:(UIColor*)color {
     self.brightnessSlider.minimumTrackTintColor = color;
 }

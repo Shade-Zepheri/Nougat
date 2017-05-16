@@ -8,4 +8,5 @@
 @property (strong, nonatomic) NSArray *togglesArray;
 @property (strong, nonatomic) UISlider *brightnessSlider;
 - (void)updateTintTo:(UIColor*)color;
+- (void)updateSliderValue;
 @end
