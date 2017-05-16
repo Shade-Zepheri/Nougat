@@ -3,9 +3,7 @@
 #import "NUAStatusBar.h"
 #import "NUADrawerPanel.h"
 
-@interface NUADrawerViewController : UIViewController {
-  NSArray *_testArray;
-}
+@interface NUADrawerViewController : UIViewController
 @property (strong, nonatomic) UIView *quickTogglesView;
 @property (strong, nonatomic) _UIBackdropView *backdropView;
 @property (strong, nonatomic) NUAStatusBar *statusBar;

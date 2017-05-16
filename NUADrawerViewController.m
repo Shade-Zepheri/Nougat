@@ -12,9 +12,6 @@ BOOL mainPanelVisible = NO;
     if (self) {
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
-
-        //Eventually array will come from user decided prefs
-        _testArray = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
     }
 
     return self;
@@ -25,9 +22,6 @@ BOOL mainPanelVisible = NO;
     [self configureView];
     [self configureQuickToggles];
     [self configureMainToggles];
-    /*
-    [self loadToggles];
-    */
 }
 
 - (void)configureView {
@@ -37,6 +31,8 @@ BOOL mainPanelVisible = NO;
     CGFloat y = CGRectGetHeight(self.view.frame);
     self.statusBar = [[NUAStatusBar alloc] initWithFrame:CGRectMake(0, y - 100, kScreenWidth, 32)];
     [self.view addSubview:self.statusBar];
+
+    self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
 
     self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithPrivateStyle:2030];
     self.backdropView.frame = [UIScreen mainScreen].bounds;
@@ -52,12 +48,10 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)configureQuickToggles {
-    CGFloat y = CGRectGetHeight(self.view.frame);
-    self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
-
-    for (int i = 0; i < _testArray.count; i++) {
+    NSArray *toggleOrder = [NUAPreferenceManager sharedSettings].quickToggleOrder;
+    for (int i = 0; i < toggleOrder.count; i++) {
       CGFloat width = kScreenWidth / 6;
-      UIView *view = [[NUAQuickToggleButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) andSwitchIdentifier:_testArray[i]];
+      UIView *view = [[NUAQuickToggleButton alloc] initWithFrame:CGRectMake(i * width, 0, width, 50) andSwitchIdentifier:toggleOrder[i]];
       [self.quickTogglesView addSubview:view];
     }
 }
@@ -75,6 +69,9 @@ BOOL mainPanelVisible = NO;
     NSDictionary *colorInfo = [note userInfo];
     self.view.backgroundColor = colorInfo[@"backgroundColor"];
     [self.togglesPanel updateTintTo:colorInfo[@"tintColor"]];
+
+    [self.quickTogglesView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [self configureQuickToggles];
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {
@@ -93,9 +90,12 @@ BOOL mainPanelVisible = NO;
         self.togglesPanel.alpha = 0;
     } completion:nil];
     [self.statusBar updateToggle:NO];
+    quickMenuVisible = YES;
+    mainPanelVisible = NO;
 }
 
 - (void)showMainPanel {
+    [self.togglesPanel updateSliderValue];
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
         self.quickTogglesView.alpha = 0;
@@ -104,6 +104,8 @@ BOOL mainPanelVisible = NO;
         self.togglesPanel.alpha = 1;
     } completion:nil];
     [self.statusBar updateToggle:YES];
+    quickMenuVisible = NO;
+    mainPanelVisible = YES;
 }
 
 - (void)dismissDrawer {
@@ -128,16 +130,12 @@ BOOL mainPanelVisible = NO;
     if (velocity.y < 0) {
         if (!quickMenuVisible) {
             [self showQuickToggles:YES];
-            quickMenuVisible = YES;
-            mainPanelVisible = NO;
         } else {
             [self dismissDrawer];
         }
     } else {
         if (quickMenuVisible) {
             [self showMainPanel];
-            quickMenuVisible = NO;
-            mainPanelVisible = YES;
         }
     }
 }
