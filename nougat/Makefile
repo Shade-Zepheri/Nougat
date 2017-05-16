@@ -3,7 +3,7 @@ CFLAGS = -fobjc-arc
 include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = nougat
-nougat_FILES = $(wildcard *.m)
+nougat_FILES = $(wildcard *.m) ../NUAPreferenceManager.m
 nougat_INSTALL_PATH = /Library/PreferenceBundles
 nougat_FRAMEWORKS = UIKit
 nougat_PRIVATE_FRAMEWORKS = Preferences

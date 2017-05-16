@@ -1,4 +1,5 @@
 #import "NUASortOrderController.h"
+#import "../NUAPreferenceManager.h"
 
 @implementation NUASortOrderController
 
@@ -13,6 +14,12 @@
         self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.tableView.delegate = self;
         self.tableView.dataSource = self;
+        self.tableView.editing = YES;
+        self.tableView.allowsSelection = YES;
+        self.tableView.allowsSelectionDuringEditing = YES;
+
+        self.quickToggleArray = [[NUAPreferenceManager sharedSettings].quickToggleOrder mutableCopy];
+        self.mainToggleArray = [[NUAPreferenceManager sharedSettings].mainPanelOrder mutableCopy];
     }
 
     return self;
@@ -45,10 +52,10 @@
     NSInteger rows;
     switch (section) {
       case 0:
-          rows = 6;
+          rows = [self.quickToggleArray count];
           break;
       case 1:
-          rows = 9;
+          rows = [self.mainToggleArray count];
           break;
     }
 
@@ -71,14 +78,39 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
 
-    cell.textLabel.text = @"Test Label";
+    NSMutableArray *titleArray = nil;
+    if (indexPath.section == 0) {
+        titleArray = self.quickToggleArray;
+    } else {
+        titleArray = self.mainToggleArray;
+    }
+
+    cell.textLabel.text = titleArray[indexPath.row];
 
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    HBLogDebug(@"didSelectRowAtIndexPath %zd", indexPath.row);
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    NSMutableArray *array = sourceIndexPath == 0 ? self.quickToggleArray : self.mainToggleArray;
+    NSString *string = [array objectAtIndex:sourceIndexPath.row];
+
+    [array removeObjectAtIndex:sourceIndexPath.row];
+    [array insertObject:string atIndex:destinationIndexPath.row];
+    [self setPreferenceValue:[array copy] forKey:sourceIndexPath == 0 ? @"quickToggleOrder" : @"mainPanelOrder"];
+}
+
+
+- (void)setPreferenceValue:(id)value forKey:(NSString*)key {
+    HBLogDebug(@"setPreferenceValue:forKey:%@", key);
+    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
+    [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath]];
+    [defaults setObject:value forKey:key];
+    [defaults writeToFile:NUAPreferencePath atomically:YES];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 @end
