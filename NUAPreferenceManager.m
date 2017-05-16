@@ -2,7 +2,7 @@
 #import "headers.h"
 #import "NUAPreferenceManager.h"
 
-void reloadSettings() {
+void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     [[NUAPreferenceManager sharedSettings] reloadSettings];
 }
 
@@ -20,7 +20,7 @@ void reloadSettings() {
 - (instancetype)init {
     self = [super init];
     if (self) {
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadSettings, CFSTR("com.shade.nougat/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorCoalesce);
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, reloadSettings, CFSTR("com.shade.nougat/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorCoalesce);
         [self reloadSettings];
     }
 
@@ -29,36 +29,7 @@ void reloadSettings() {
 
 - (void)reloadSettings {
     @autoreleasepool {
-        if (_settings) {
-            _settings = nil;
-        }
-
-        CFPreferencesAppSynchronize(CFSTR("com.shade.nougat"));
-        CFStringRef appID = CFSTR("com.shade.nougat");
-        CFArrayRef keyList = CFPreferencesCopyKeyList(appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-
-        BOOL failed = NO;
-
-        if (keyList) {
-            _settings = (__bridge NSDictionary*)CFPreferencesCopyMultiple(keyList, appID, kCFPreferencesCurrentUser, kCFPreferencesAnyHost);
-            CFRelease(keyList);
-
-            if (!_settings) {
-                failed = YES;
-            }
-        } else {
-            failed = YES;
-        }
-
-        CFRelease(appID);
-
-        if (failed) {
-            _settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.shade.nougat.plist"];
-        }
-
-        if (!_settings) {
-            HBLogError(@"could not load settings from CFPreferences or NSDictionary");
-        }
+        _settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.shade.nougat.plist"];
 
         NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
         NSArray *defaultMainOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];

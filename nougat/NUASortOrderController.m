@@ -1,4 +1,5 @@
 #import "NUASortOrderController.h"
+#include "NUARootListController.h"
 #import "../NUAPreferenceManager.h"
 
 @implementation NUASortOrderController
@@ -90,22 +91,26 @@
     return cell;
 }
 
+- (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return UITableViewCellEditingStyleNone;
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSMutableArray *array = sourceIndexPath == 0 ? self.quickToggleArray : self.mainToggleArray;
+    NSMutableArray *array = sourceIndexPath.section == 0 ? self.quickToggleArray : self.mainToggleArray;
     NSString *string = [array objectAtIndex:sourceIndexPath.row];
 
     [array removeObjectAtIndex:sourceIndexPath.row];
     [array insertObject:string atIndex:destinationIndexPath.row];
-    [self setPreferenceValue:[array copy] forKey:sourceIndexPath == 0 ? @"quickToggleOrder" : @"mainPanelOrder"];
+    [self setPreferenceValue:[array copy] forKey:sourceIndexPath.section == 0 ? @"quickToggleOrder" : @"mainPanelOrder"];
+    [[NUAPreferenceManager sharedSettings] reloadSettings];
 }
 
 
 - (void)setPreferenceValue:(id)value forKey:(NSString*)key {
-    HBLogDebug(@"setPreferenceValue:forKey:%@", key);
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
     [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath]];
     [defaults setObject:value forKey:key];
