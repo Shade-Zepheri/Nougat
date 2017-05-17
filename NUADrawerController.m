@@ -1,3 +1,4 @@
+#import "headers.h"
 #import "NUADrawerController.h"
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAPreferenceManager.h"
@@ -47,10 +48,19 @@ extern BOOL mainPanelVisible;
         return;
     }
 
+    CGPoint touchLocation = [recognizer locationInView:self.viewController.view];
+    if (touchLocation.x < kScreenWidth / 3) {
+        return;
+    }
+
     [NUANotificationCenterInhibitor setInhibited:YES];
 
-    [self.viewController showQuickToggles:NO];
-    quickMenuVisible = YES;
+    if (touchLocation.x > kScreenWidth / 1.5) {
+        [self.viewController showMainPanel];
+    } else {
+        [self.viewController showQuickToggles:NO];
+    }
+
 
     [NUANotificationCenterInhibitor setInhibited:NO];
 }
