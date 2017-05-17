@@ -98,6 +98,7 @@ BOOL mainPanelVisible = NO;
 - (void)showMainPanel {
     [self.togglesPanel updateSliderValue];
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.backdropView.alpha = 1;
         self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
