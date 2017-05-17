@@ -8,7 +8,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.togglesArray = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
+        self.toggleArray = [NSMutableArray array];
         [self loadToggles];
         [self loadBrightnessSlider];
     }
@@ -50,8 +50,16 @@
     [self setBrighness:self.brightnessSlider.value];
 }
 
+- (void)refreshTogglePanel {
+    for (NUAMainToggleButton *view in self.toggleArray) {
+        [view removeFromSuperview];
+    }
+    [self.toggleArray removeAllObjects];
+    [self loadToggles];
+}
+
 - (void)loadToggles {
-    NSArray *togglesArray = self.togglesArray;
+    NSArray *togglesArray = [NUAPreferenceManager sharedSettings].mainPanelOrder;
     NSInteger toggleNumber = 0;
     NSInteger currentRow = 0;
     CGFloat width = self.frame.size.width / 3;
@@ -68,7 +76,8 @@
         }
 
         CGRect frame = CGRectMake(x, y + 30, width, width);
-        UIView *view = [[NUAMainToggleButton alloc] initWithFrame:frame andSwitchIdentifier:togglesArray[i]];
+        NUAMainToggleButton *view = [[NUAMainToggleButton alloc] initWithFrame:frame andSwitchIdentifier:togglesArray[i]];
+        [self.toggleArray addObject:view];
         [self addSubview:view];
     }
 }

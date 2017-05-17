@@ -70,6 +70,7 @@ BOOL mainPanelVisible = NO;
     self.view.backgroundColor = colorInfo[@"backgroundColor"];
     [self.togglesPanel updateTintTo:colorInfo[@"tintColor"]];
 
+    [self.togglesPanel refreshTogglePanel];
     [self.quickTogglesView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self configureQuickToggles];
 }
