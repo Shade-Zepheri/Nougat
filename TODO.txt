@@ -10,3 +10,4 @@ Misc:
 - Verify colors
 - Improve performance
 - Verify iOS compatibility
+- Use constraints

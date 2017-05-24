@@ -1,4 +1,3 @@
-#import <SystemConfiguration/CaptiveNetwork.h>
 #import "headers.h"
 #import "NUAPreferenceManager.h"
 
@@ -47,21 +46,8 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
     }
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 + (NSString*)currentWifiSSID {
-    NSString *ssid = nil;
-    NSArray *interFaceNames = (__bridge_transfer id)CNCopySupportedInterfaces();
-
-    for (NSString *name in interFaceNames) {
-        NSDictionary *info = (__bridge_transfer id)CNCopyCurrentNetworkInfo((__bridge CFStringRef)name);
-
-        if (info[@"SSID"]) {
-            ssid = info[@"SSID"];
-        }
-    }
-    return ssid;
+    return [[objc_getClass("SBWiFiManager") sharedInstance] currentNetworkName];
 }
-#pragma GCC diagnostic pop
 
 @end

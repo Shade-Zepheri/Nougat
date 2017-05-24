@@ -24,6 +24,10 @@
 - (void)_enableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;
 @end
 
+@interface SBWiFiManager : NSObject
+- (NSString*)currentNetworkName;
+@end
+
 @interface FBSystemGestureManager : NSObject <UIGestureRecognizerDelegate>
 + (instancetype)sharedInstance;
 - (void)addGestureRecognizer:(id)arg1 toDisplay:(id)arg2;
