@@ -1,6 +1,4 @@
 Features:
-- Split gesture area into 3rds
-  - 1/3 original NC, 1/3 Straight to Main Panel
 - Finish StatusBar
 - Finish Prefs
 
@@ -10,4 +8,4 @@ Misc:
 - Verify colors
 - Improve performance
 - Verify iOS compatibility
-- Use constraints
+- Use constraints (NSLayoutConstraint/CompactConstraint)
