@@ -18,6 +18,7 @@
 @end
 
 @interface SBSystemGestureManager : NSObject
+@property (assign,getter=areSystemGesturesDisabledForAccessibility,nonatomic) BOOL systemGesturesDisabledForAccessibility;
 + (instancetype)mainDisplayManager;
 - (void)addGestureRecognizer:(id)arg1 withType:(unsigned long long)arg2;
 - (void)_disableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;

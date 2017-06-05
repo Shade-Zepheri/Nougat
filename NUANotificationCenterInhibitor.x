@@ -1,5 +1,5 @@
 #import "NUANotificationCenterInhibitor.h"
-#import <UIKit/UIKit.h>
+#import "headers.h"
 
 @implementation NUANotificationCenterInhibitor
 
@@ -8,7 +8,7 @@
 }
 
 + (BOOL)isInhibited {
-    [[%c(SBSystemGestureManager) mainDisplayManager] areSystemGesturesDisabledForAccessibility];
+    return [[%c(SBSystemGestureManager) mainDisplayManager] areSystemGesturesDisabledForAccessibility];
 }
 
 @end
