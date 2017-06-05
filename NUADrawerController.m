@@ -60,9 +60,6 @@ extern BOOL mainPanelVisible;
     } else {
         [self.viewController showQuickToggles:NO];
     }
-
-
-    [NUANotificationCenterInhibitor setInhibited:NO];
 }
 
 @end

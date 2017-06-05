@@ -1,6 +1,7 @@
 #import "NUADrawerViewController.h"
 #import "NUAPreferenceManager.h"
 #import "NUAQuickToggleButton.h"
+#import "NUANotificationCenterInhibitor.h"
 #import "headers.h"
 
 BOOL quickMenuVisible = NO;
@@ -116,9 +117,11 @@ BOOL mainPanelVisible = NO;
         self.backdropView.alpha = 0;
         self.quickTogglesView.alpha = 0;
         self.view.frame = CGRectMake(0, -y, kScreenWidth, kScreenHeight / 1.5);
-    } completion:nil];
-    quickMenuVisible = NO;
-    mainPanelVisible = NO;
+    } completion:^(BOOL finished){
+        quickMenuVisible = NO;
+        mainPanelVisible = NO;
+        [NUANotificationCenterInhibitor setInhibited:NO];
+    }];
 }
 
 - (void)handleHideDrawerGesture:(UIPanGestureRecognizer*)recognizer {
