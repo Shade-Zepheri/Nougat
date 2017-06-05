@@ -3,6 +3,11 @@
 #import "NUAPreferenceManager.h"
 
 %hook SBUIController
+- (BOOL)clickedMenuButton {
+  [[NUADrawerController sharedInstance] dismissDrawer];
+  return %orig;
+}
+
 - (BOOL)handleHomeButtonSinglePressUp {
     [[NUADrawerController sharedInstance] dismissDrawer];
     return %orig;
