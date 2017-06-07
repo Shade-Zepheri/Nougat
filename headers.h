@@ -57,3 +57,7 @@
 @interface _UIBackdropView : UIView
 - (instancetype)initWithPrivateStyle:(long long)arg1;
 @end
+
+@interface UIWindow (Private)
+- (void)_setSecure:(BOOL)secure;
+@end

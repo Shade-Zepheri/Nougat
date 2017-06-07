@@ -40,9 +40,9 @@ BOOL mainPanelVisible = NO;
     self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 
-    UIWindow *window = [[objc_getClass("SBUIController") sharedInstance] window];
-    [window addSubview:self.view];
-    [window insertSubview:self.backdropView belowSubview:self.view];
+    self.window = [[NUAWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.window addSubview:self.view];
+    [self.window insertSubview:self.backdropView belowSubview:self.view];
 
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleHideDrawerGesture:)];
     [self.view addGestureRecognizer:panGesture];
