@@ -31,7 +31,7 @@
         self.toggleLabel.backgroundColor = [UIColor clearColor];
         self.toggleLabel.textAlignment = NSTextAlignmentCenter;
         if ([identifier isEqualToString:@"wifi"]) {
-            self.toggleLabel.text = [NUAPreferenceManager currentWifiSSID];
+            self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? @"Wi-Fi" : [NUAPreferenceManager currentWifiSSID];
         } else {
             self.toggleLabel.text = [self.resourceBundle localizedStringForKey:identifier value:identifier table:nil];
         }
@@ -64,6 +64,10 @@
     FSSwitchState state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
     NSString *imageName = [NSString stringWithFormat:@"%@-%@", [self.switchIdentifier substringFromIndex:20], state == FSSwitchStateOff ? @"off" : @"on"];
     self.imageView.image = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:imageName ofType:@"png"]];
+
+    if ([self.switchIdentifier isEqualToString:@"wifi"]) {
+        self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? @"Wi-Fi" : [NUAPreferenceManager currentWifiSSID];
+    }
 }
 
 @end
