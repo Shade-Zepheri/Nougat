@@ -4,8 +4,8 @@
 
 %hook SBUIController
 - (BOOL)clickedMenuButton {
-  [[NUADrawerController sharedInstance] dismissDrawer];
-  return %orig;
+    [[NUADrawerController sharedInstance] dismissDrawer];
+    return %orig;
 }
 
 - (BOOL)handleHomeButtonSinglePressUp {

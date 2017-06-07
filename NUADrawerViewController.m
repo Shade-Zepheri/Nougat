@@ -40,7 +40,7 @@ BOOL mainPanelVisible = NO;
     self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+    UIWindow *window = [[objc_getClass("SBUIController") sharedInstance] window];
     [window addSubview:self.view];
     [window insertSubview:self.backdropView belowSubview:self.view];
 
