@@ -121,6 +121,7 @@ BOOL mainPanelVisible = NO;
         quickMenuVisible = NO;
         mainPanelVisible = NO;
         [NUANotificationCenterInhibitor setInhibited:NO];
+        [[UIApplication sharedApplication] setStatusBarHidden:NO];
     }];
 }
 

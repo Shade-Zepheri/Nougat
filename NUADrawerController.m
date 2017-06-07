@@ -60,6 +60,8 @@ extern BOOL mainPanelVisible;
     } else {
         [self.viewController showQuickToggles:NO];
     }
+
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
 }
 
 @end

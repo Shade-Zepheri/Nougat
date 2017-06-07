@@ -1,6 +1,6 @@
 export TARGET = iphone:9.2
 
-CFLAGS = -fobjc-arc
+CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 INSTALL_TARGET_PROCESSES = Preferences
 
