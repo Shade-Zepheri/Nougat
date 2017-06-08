@@ -90,10 +90,11 @@ BOOL mainPanelVisible = NO;
 
         self.statusBar.center = CGPointMake(kScreenWidth / 2, self.view.frame.size.height - 84);
         self.togglesPanel.alpha = 0;
-    } completion:nil];
-    [self.statusBar updateToggle:NO];
-    quickMenuVisible = YES;
-    mainPanelVisible = NO;
+    } completion:^(BOOL finished){
+        [self.statusBar updateToggle:NO];
+        quickMenuVisible = YES;
+        mainPanelVisible = NO;
+    }];
 }
 
 - (void)showMainPanel {
@@ -105,10 +106,11 @@ BOOL mainPanelVisible = NO;
         self.view.frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
 
         self.togglesPanel.alpha = 1;
-    } completion:nil];
-    [self.statusBar updateToggle:YES];
-    quickMenuVisible = NO;
-    mainPanelVisible = YES;
+    } completion:^(BOOL finished){
+        [self.statusBar updateToggle:YES];
+        quickMenuVisible = NO;
+        mainPanelVisible = YES;
+    }];
 }
 
 - (void)dismissDrawer {
