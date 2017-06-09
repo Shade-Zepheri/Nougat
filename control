@@ -4,6 +4,7 @@ Depends: mobilesubstrate, preferenceloader, com.a3tweaks.flipswitch, ws.hbang.co
 Version: 0.1
 Architecture: iphoneos-arm
 Description: Android NC for iOS
+Depiction: http://shade-zepheri.github.io/depic/index.html?p=com.shade.nougat
 Maintainer: Shade Zepheri <ziroalpha@gmail.com>
 Author: Shade Zepheri <ziroalpha@gmail.com>
 Section: Tweaks
