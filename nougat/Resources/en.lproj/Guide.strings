@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>HOW_TO</key>
+	<string>How To Use</string>
+
+	<key>HOW_TO_USE_TEXT</key>
+	<string>The gesture is split into 1/3rds and is shown by quickly flicking down from the Top of the Screen. Swipe down from the left 1/3rds to pull down the native Notification Center. Swipe down from the middle 1/3rds to show a row of Quick Toggles. Flick down from the Quick Toggles view to reveal the Main Toggle pane. A quick shortcut to the Main Toggles Pane is to swipe down from the right 1/3rds. In the Status Bar you can find a settings cog to take you quickly to the Settings app and an Arrow to Toggle between the Quick Toggle and Main View. Dismiss the Drawer by Flicking up from the Quick Toggles View.</string>
+</dict>
+</plist>

@@ -20,7 +20,7 @@
 				<key>key</key>
 				<string>enabled</string>
 				<key>label</key>
-				<string>Enabled</string>
+				<string>ENABLE</string>
 			</dict>
 			<dict>
 				<key>cell</key>
@@ -37,8 +37,8 @@
 				<string>Drawer Style</string>
 				<key>validTitles</key>
 				<array>
-					<string>Nexus</string>
-					<string>Pixel</string>
+					<string>NEXUS</string>
+					<string>PIXEL</string>
 				</array>
 				<key>validValues</key>
 				<array>
@@ -53,12 +53,24 @@
 			<dict>
 				<key>cell</key>
 				<string>PSLinkCell</string>
+				<key>label</key>
+				<string>User Guide</string>
+				<key>detail</key>
+				<string>NUAUserGuideController</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSGroupCell</string>
+			</dict>
+			<dict>
+				<key>cell</key>
+				<string>PSLinkCell</string>
 				<key>detail</key>
 				<string>NUASortOrderController</string>
 				<key>isController</key>
 				<true/>
 				<key>label</key>
-				<string>Sort Order</string>
+				<string>SORT_ORDER</string>
 			</dict>
 			<dict>
 				<key>cell</key>
