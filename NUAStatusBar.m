@@ -50,7 +50,7 @@
 
 - (void)settingsButtonTapped:(id)sender {
     [[NUADrawerController sharedInstance] dismissDrawer];
-    [[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
+    [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
 }
 
 - (void)toggleButtonTapped:(id)sender {

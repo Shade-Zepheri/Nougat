@@ -35,8 +35,8 @@ BOOL mainPanelVisible = NO;
 
     self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
 
-    self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithPrivateStyle:2030];
-    self.backdropView.frame = [UIScreen mainScreen].bounds;
+    _UIBackdropViewSettings *blurSettings = [_UIBackdropViewSettings settingsForStyle:2030 graphicsQuality:100];
+    self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithFrame:[UIScreen mainScreen].bounds autosizesToFitSuperview:NO settings:blurSettings];
     self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 
