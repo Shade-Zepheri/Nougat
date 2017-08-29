@@ -7,8 +7,9 @@
 #import <SpringBoard/SBUIController.h>
 #import <SpringBoard/SBWiFiManager.h>
 #import <SpringBoard/SpringBoard.h>
-#import <UIKit/UIKit.h>
+#import <UIKit/_UIBackdropViewSettings.h>
 #import <UIKit/_UIBackdropView.h>
+#import <UIKit/UIKit.h>
 #import <version.h>
 
 #define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
@@ -28,10 +29,6 @@
 @property (assign,getter=areSystemGesturesDisabledForAccessibility,nonatomic) BOOL systemGesturesDisabledForAccessibility;
 - (void)_disableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
 - (void)_enableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
-@end
-
-@interface _UIBackdropView : UIView
-- (instancetype)initWithPrivateStyle:(NSUInteger)style;
 @end
 
 @interface UIWindow (Private)
