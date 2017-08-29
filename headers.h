@@ -1,7 +1,12 @@
 #import <objc/runtime.h>
-#import <UIKit/UIKit.h>
-#import <QuartzCore/QuartzCore.h>
 #import <BackBoardServices/BKSDisplayBrightness.h>
+#import <QuartzCore/QuartzCore.h>
+#import <SpringBoard/SBNotificationCenterController.h>
+#import <SpringBoard/SBMainDisplaySystemGestureManager.h>
+#import <SpringBoard/SBScreenEdgePanGestureRecognizer.h>
+#import <SpringBoard/SBUIController.h>
+#import <SpringBoard/SBWiFiManager.h>
+#import <UIKit/UIKit.h>
 #import <version.h>
 
 #define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
@@ -13,49 +18,22 @@
 #define PixelTintColor [UIColor colorWithRed:0.27 green:0.54 blue:1.00 alpha:1.0]
 #define NougatLabelColor [UIColor colorWithRed:0.33 green:0.43 blue:0.48 alpha:1.0]
 
-@interface SBScreenEdgePanGestureRecognizer : UIScreenEdgePanGestureRecognizer
-- (instancetype)initWithTarget:(id)arg1 action:(SEL)arg2;
+@interface SBScreenEdgePanGestureRecognizer ()
+- (instancetype)initWithTarget:()target action:(SEL)action;
 @end
 
-@interface SBSystemGestureManager : NSObject
+@interface SBSystemGestureManager ()
 @property (assign,getter=areSystemGesturesDisabledForAccessibility,nonatomic) BOOL systemGesturesDisabledForAccessibility;
-+ (instancetype)mainDisplayManager;
-- (void)addGestureRecognizer:(id)arg1 withType:(unsigned long long)arg2;
-- (void)_disableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;
-- (void)_enableSystemGesture:(id)arg1 withType:(unsigned long long)arg2 ;
-@end
-
-@interface SBWiFiManager : NSObject
-- (NSString*)currentNetworkName;
-@end
-
-@interface FBSystemGestureManager : NSObject <UIGestureRecognizerDelegate>
-+ (instancetype)sharedInstance;
-- (void)addGestureRecognizer:(id)arg1 toDisplay:(id)arg2;
-@end
-
-@interface FBSDisplay : NSObject
-@end
-
-@interface FBDisplayManager : NSObject
-+ (instancetype)sharedInstance;
-+ (FBSDisplay*)mainDisplay;
-@end
-
-@interface SBHomeScreenWindow : UIWindow
-@end
-
-@interface SBUIController : NSObject
-+ (instancetype)sharedInstance;
-- (id)window;
+- (void)_disableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
+- (void)_enableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
 @end
 
 @interface UIApplication (Private)
-- (void)launchApplicationWithIdentifier:(NSString*)identifier suspended:(BOOL)suspended;
+- (void)launchApplicationWithIdentifier:(NSString *)identifier suspended:(BOOL)suspended;
 @end
 
 @interface _UIBackdropView : UIView
-- (instancetype)initWithPrivateStyle:(long long)arg1;
+- (instancetype)initWithPrivateStyle:(NSUInteger)style;
 @end
 
 @interface UIWindow (Private)
