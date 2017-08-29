@@ -50,6 +50,7 @@ extern BOOL mainPanelVisible;
 
     CGPoint touchLocation = [recognizer locationInView:self.viewController.view];
     if (touchLocation.x < kScreenWidth / 3) {
+        [[objc_getClass("SBNotificationCenterController") sharedInstance] presentAnimated:YES completion:nil];
         return;
     }
 

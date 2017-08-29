@@ -19,9 +19,9 @@ static inline void dismissForLock(CFNotificationCenterRef center, void *observer
 }
 
 static inline void initializeTweak(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    UIScreenEdgePanGestureRecognizer *screenEdgePan = [[UIScreenEdgePanGestureRecognizer alloc] initWithTarget:[NUADrawerController sharedInstance] action:@selector(handleShowDrawerGesture:)];
-    screenEdgePan.edges = UIRectEdgeTop;
-    [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:screenEdgePan toDisplay:[%c(FBDisplayManager) mainDisplay]];
+    SBScreenEdgePanGestureRecognizer *recognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:[NUADrawerController sharedInstance] action:@selector(handleShowDrawerGesture:) type:SBSystemGestureTypeShowNotificationCenter];
+    recognizer.edges = UIRectEdgeTop;
+    [[%c(SBSystemGestureManager) mainDisplayManager] addGestureRecognizer:recognizer withType:50];
 }
 
 %ctor {

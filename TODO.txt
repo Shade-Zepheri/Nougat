@@ -8,5 +8,4 @@ Misc:
 - Is the full statusbar worth it?
 - Review overall structure
 - Improve performance
-- Verify iOS compatibility
 - Use constraints (NSLayoutConstraint/CompactConstraint)
