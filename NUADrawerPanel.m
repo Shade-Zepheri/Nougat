@@ -18,7 +18,10 @@
 
 - (void)loadBrightnessSlider {
     self.brightnessSlider = [[UISlider alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 20)];
-    [self.brightnessSlider addTarget:self action:@selector(sliderDidChange:) forControlEvents:UIControlEventValueChanged];
+    [self.brightnessSlider addTarget:self action:@selector(sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
+    [self.brightnessSlider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchCancel];
+    [self.brightnessSlider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchUpInside];
+    [self.brightnessSlider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchUpOutside];
     self.brightnessSlider.continuous = YES;
     self.brightnessSlider.minimumValue = 0;
     self.brightnessSlider.maximumValue = 1;
@@ -43,11 +46,20 @@
     BKSDisplayBrightnessSet(value, 1);
 }
 
-- (void)sliderDidChange:(id)sender {
+- (void)sliderValueDidChange:(UISlider *)sender {
     if (!_brightnessTransaction) {
         self->_brightnessTransaction = BKSDisplayBrightnessTransactionCreate(kCFAllocatorDefault);
     }
     [self setBrighness:self.brightnessSlider.value];
+}
+
+- (void)sliderDidEndTracking:(UISlider *)sender {
+    BKSDisplayBrightnessTransactionRef brightnessTransaction = self->_brightnessTransaction;
+
+    if (brightnessTransaction) {
+        CFRelease(brightnessTransaction);
+        self->_brightnessTransaction = nil;
+    }
 }
 
 - (void)refreshTogglePanel {
@@ -79,6 +91,14 @@
         NUAMainToggleButton *view = [[NUAMainToggleButton alloc] initWithFrame:frame andSwitchIdentifier:togglesArray[i]];
         [self.toggleArray addObject:view];
         [self addSubview:view];
+    }
+}
+
+- (void)dealloc {
+    BKSDisplayBrightnessTransactionRef brightnessTransaction = self->_brightnessTransaction;
+
+    if (brightnessTransaction) {
+        CFRelease(brightnessTransaction);
     }
 }
 
