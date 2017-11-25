@@ -1,6 +1,4 @@
-export TARGET = iphone:9.2
-
-CFLAGS = -fobjc-arc -Wno-deprecated-declarations
+export TARGET = iphone:9.3
 
 INSTALL_TARGET_PROCESSES = Preferences
 
@@ -16,6 +14,7 @@ Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_PRIVATE_FRAMEWORKS = BackBoardServices
 Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
+Nougat_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/

@@ -6,10 +6,11 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.windowLevel = UIWindowLevelAlert + 1.0;
-        [self _setSecure:YES];
+        self._secure = YES;
+
         [self makeKeyAndVisible];
     }
-    
+
     return self;
 }
 
@@ -18,6 +19,7 @@
     if (hitTestView == self) {
         hitTestView = nil;
     }
+
     return hitTestView;
 }
 

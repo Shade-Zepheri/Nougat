@@ -21,16 +21,6 @@
 #define PixelTintColor [UIColor colorWithRed:0.27 green:0.54 blue:1.00 alpha:1.0]
 #define NougatLabelColor [UIColor colorWithRed:0.33 green:0.43 blue:0.48 alpha:1.0]
 
-@interface SBScreenEdgePanGestureRecognizer ()
-- (instancetype)initWithTarget:()target action:(SEL)action;
-@end
-
-@interface SBSystemGestureManager ()
-@property (assign,getter=areSystemGesturesDisabledForAccessibility,nonatomic) BOOL systemGesturesDisabledForAccessibility;
-- (void)_disableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
-- (void)_enableSystemGesture:(UIGestureRecognizer *)gesture withType:(SBSystemGestureType)type;
-@end
-
 @interface UIWindow (Private)
-- (void)_setSecure:(BOOL)secure;
+@property (getter=_isSecure, setter=_setSecure:) BOOL _secure;
 @end
