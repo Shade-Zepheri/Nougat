@@ -11,9 +11,15 @@
         self.toggleArray = [NSMutableArray array];
         [self loadToggles];
         [self loadBrightnessSlider];
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:@"UIScreenBrightnessDidChangeNotification" object:nil];
     }
 
     return self;
+}
+
+- (float)backlightLevel {
+    return BKSDisplayBrightnessGetCurrent();
 }
 
 - (void)loadBrightnessSlider {
@@ -26,7 +32,8 @@
     self.brightnessSlider.minimumValue = 0;
     self.brightnessSlider.maximumValue = 1;
     self.brightnessSlider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
-    [self.brightnessSlider setValue:[UIScreen mainScreen].brightness animated:NO];
+
+    [self updateSliderValue];
 
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
     UIImage *thumbImage = [UIImage imageWithContentsOfFile:[imageBundle pathForResource:@"brightness" ofType:@"png"]];
@@ -35,22 +42,19 @@
 }
 
 - (void)updateSliderValue {
-    [self.brightnessSlider setValue:[UIScreen mainScreen].brightness animated:NO];
+    [self.brightnessSlider setValue:[self backlightLevel] animated:NO];
 }
 
-- (void)updateTintTo:(UIColor*)color {
+- (void)updateTintTo:(UIColor *)color {
     self.brightnessSlider.minimumTrackTintColor = color;
-}
-
-- (void)setBrighness:(CGFloat)value {
-    BKSDisplayBrightnessSet(value, 1);
 }
 
 - (void)sliderValueDidChange:(UISlider *)sender {
     if (!_brightnessTransaction) {
         self->_brightnessTransaction = BKSDisplayBrightnessTransactionCreate(kCFAllocatorDefault);
     }
-    [self setBrighness:self.brightnessSlider.value];
+
+    BKSDisplayBrightnessSet(sender.value, 1);
 }
 
 - (void)sliderDidEndTracking:(UISlider *)sender {
@@ -60,6 +64,14 @@
         CFRelease(brightnessTransaction);
         self->_brightnessTransaction = nil;
     }
+}
+
+- (void)_noteScreenBrightnessDidChange:(NSNotification *)note {
+    if (self.brightnessSlider.tracking) {
+        return;
+    }
+
+    [self updateSliderValue];
 }
 
 - (void)refreshTogglePanel {
