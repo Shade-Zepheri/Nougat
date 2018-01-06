@@ -3,7 +3,7 @@
 
 @implementation NUAQuickToggleButton
 
-- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString*)identifier {
+- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
     self = [super initWithFrame:frame];
     if (self) {
         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleWasTapped:)];
@@ -17,7 +17,7 @@
         FSSwitchState state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
         _imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
         NSString *imageName = [NSString stringWithFormat:@"%@-%@", identifier, state == FSSwitchStateOff ? @"off" : @"on"];
-        self.imageView.image = [UIImage imageWithContentsOfFile:[_imageBundle pathForResource:imageName ofType:@"png"]];
+        self.imageView.image = [UIImage imageNamed:imageName inBundle:_imageBundle compatibleWithTraitCollection:nil];
 
         [self addSubview:self.imageView];
 
@@ -28,20 +28,22 @@
     return self;
 }
 
-- (void)toggleWasTapped:(UITapGestureRecognizer*)recognizer {
-    NSString *switchIdentifier = self.switchIdentifier;
+- (void)toggleWasTapped:(UITapGestureRecognizer *)recognizer {
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
-    FSSwitchState state = [switchPanel stateForSwitchIdentifier:switchIdentifier];
-    //cuz off means on and on means off?
-    [switchPanel setState:state == FSSwitchStateOff ? FSSwitchStateOff : FSSwitchStateOn forSwitchIdentifier:switchIdentifier];
-    [switchPanel applyActionForSwitchIdentifier:switchIdentifier];
+    FSSwitchState state = [switchPanel stateForSwitchIdentifier:self.switchIdentifier];
+    [switchPanel setState:state == FSSwitchStateOff ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:self.switchIdentifier];
 }
 
-- (void)switchesChangedState:(NSNotification *)note {
+- (void)switchesChangedState:(NSNotification *)notification {
+    NSString *changedSwitch = [notification.userInfo objectForKey:FSSwitchPanelSwitchIdentifierKey];
+    if (![changedSwitch isEqualToString:_switchIdentifier] && changedSwitch) {
+        return;
+    }
+
     FSSwitchState state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
     NSString *imageName = [NSString stringWithFormat:@"%@-%@", [self.switchIdentifier substringFromIndex:20], state == FSSwitchStateOff ? @"off" : @"on"];
-    self.imageView.image = [UIImage imageWithContentsOfFile:[_imageBundle pathForResource:imageName ofType:@"png"]];
+    self.imageView.image = [UIImage imageNamed:imageName inBundle:_imageBundle compatibleWithTraitCollection:nil];
 }
 
 @end
