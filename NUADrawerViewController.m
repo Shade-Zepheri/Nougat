@@ -20,6 +20,7 @@ BOOL mainPanelVisible = NO;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
     [self configureView];
     [self configureQuickToggles];
     [self configureMainToggles];

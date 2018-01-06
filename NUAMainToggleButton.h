@@ -1,12 +1,7 @@
-#import <UIKit/UIKit.h>
+#import "NUAQuickToggleButton.h"
 
-//TODO: temporary until i can combine both toggle classes
-@interface NUAMainToggleButton : UIView
-@property (strong, nonatomic) UIImageView *imageView;
-@property (strong, nonatomic) NSBundle *resourceBundle;
-@property (readonly, nonatomic) NSString *switchIdentifier;
-@property (strong, nonatomic) UILabel *toggleLabel;
+@interface NUAMainToggleButton : NUAQuickToggleButton
 
-- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier;
+@property (strong, readonly, nonatomic) UILabel *toggleLabel;
 
 @end
