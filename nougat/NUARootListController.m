@@ -10,7 +10,7 @@
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto:ziroalpha@gmail.com?subject=Nougat"]];
 }
 
-- (id)readPreferenceValue:(PSSpecifier*)specifier {
+- (id)readPreferenceValue:(PSSpecifier *)specifier {
     NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath];
     if (!settings[specifier.properties[@"key"]]) {
         return specifier.properties[@"default"];
@@ -18,7 +18,7 @@
     return settings[specifier.properties[@"key"]];
 }
 
-- (void)setPreferenceValue:(id)value specifier:(PSSpecifier*)specifier {
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
     [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath]];
     [defaults setObject:value forKey:specifier.properties[@"key"]];

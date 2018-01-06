@@ -43,7 +43,7 @@ extern BOOL mainPanelVisible;
     return mainPanelVisible;
 }
 
-- (void)handleShowDrawerGesture:(UIGestureRecognizer*)recognizer {
+- (void)handleShowDrawerGesture:(UIGestureRecognizer *)recognizer {
     if (recognizer.state != UIGestureRecognizerStateBegan || quickMenuVisible || mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;
     }

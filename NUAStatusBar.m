@@ -63,11 +63,11 @@
 
 - (void)updateToggle:(BOOL)toggled {
     NSString *arrowName = toggled ? @"dismissMain" : @"showMain";
-    UIImage *arrow = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:arrowName ofType:@"png"]];
+    UIImage *arrow = [UIImage imageNamed:arrowName inBundle:self.resourceBundle compatibleWithTraitCollection:nil];
     [self.toggleButton setImage:arrow forState:UIControlStateNormal];
 }
 
-- (void)updateTime:(NSTimer*)timer {
+- (void)updateTime:(NSTimer *)timer {
     NSString *dateString = [self.dateFormatter stringFromDate:[NSDate date]];
     self.dateLabel.text = dateString;
 }

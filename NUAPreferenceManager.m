@@ -46,7 +46,7 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
     }
 }
 
-+ (NSString*)currentWifiSSID {
++ (NSString *)currentWifiSSID {
     return [[objc_getClass("SBWiFiManager") sharedInstance] currentNetworkName];
 }
 

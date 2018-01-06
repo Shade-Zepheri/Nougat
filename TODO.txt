@@ -9,4 +9,4 @@ Misc:
 - Review overall structure
 - Improve performance
 - Use constraints (NSLayoutConstraint/CompactConstraint)
-- Probably needs major overhaul with some more VCs
+- Needs major overhaul with some more VCs (whole setup can be so much better)

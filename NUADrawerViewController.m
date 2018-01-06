@@ -127,7 +127,7 @@ BOOL mainPanelVisible = NO;
     }];
 }
 
-- (void)handleHideDrawerGesture:(UIPanGestureRecognizer*)recognizer {
+- (void)handleHideDrawerGesture:(UIPanGestureRecognizer *)recognizer {
     if (recognizer.state != UIGestureRecognizerStateEnded) {
         return;
     }

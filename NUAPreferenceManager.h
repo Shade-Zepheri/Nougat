@@ -8,5 +8,5 @@
 @property (strong, nonatomic) NSArray *mainPanelOrder;
 + (instancetype)sharedSettings;
 - (void)reloadSettings;
-+ (NSString*)currentWifiSSID;
++ (NSString *)currentWifiSSID;
 @end
