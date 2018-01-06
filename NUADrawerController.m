@@ -20,7 +20,7 @@ extern BOOL mainPanelVisible;
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.viewController = [[NUADrawerViewController alloc] init];
+        _viewController = [[NUADrawerViewController alloc] init];
         [self.viewController view];
     }
 

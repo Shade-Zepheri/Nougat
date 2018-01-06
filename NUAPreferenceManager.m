@@ -33,8 +33,8 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
         NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
         NSArray *defaultMainOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
 
-        self.quickToggleOrder = ![_settings objectForKey:@"quickToggleOrder"] ? defaultQuickOrder : [_settings objectForKey:@"quickToggleOrder"];
-        self.mainPanelOrder = ![_settings objectForKey:@"mainPanelOrder"] ? defaultMainOrder : [_settings objectForKey:@"mainPanelOrder"];
+        _quickToggleOrder = ![_settings objectForKey:@"quickToggleOrder"] ? defaultQuickOrder : [_settings objectForKey:@"quickToggleOrder"];
+        _mainPanelOrder = ![_settings objectForKey:@"mainPanelOrder"] ? defaultMainOrder : [_settings objectForKey:@"mainPanelOrder"];
 
         _enabled = ![_settings objectForKey:@"enabled"] ? YES : [[_settings objectForKey:@"enabled"] boolValue];
         NSInteger colorTag = ![_settings objectForKey:@"darkVariant"] ? 1 : [[_settings objectForKey:@"darkVariant"] intValue];

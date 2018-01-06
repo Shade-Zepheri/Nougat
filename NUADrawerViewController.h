@@ -5,12 +5,15 @@
 #import "NUAWindow.h"
 
 @interface NUADrawerViewController : UIViewController
-@property (strong, nonatomic) UIView *quickTogglesView;
-@property (strong, nonatomic) _UIBackdropView *backdropView;
-@property (strong, nonatomic) NUAStatusBar *statusBar;
-@property (strong, nonatomic) NUADrawerPanel *togglesPanel;
-@property (strong, nonatomic) NUAWindow *window;
+
+@property (strong, readonly, nonatomic) UIView *quickTogglesView;
+@property (strong, readonly, nonatomic) _UIBackdropView *backdropView;
+@property (strong, readonly, nonatomic) NUAStatusBar *statusBar;
+@property (strong, readonly, nonatomic) NUADrawerPanel *togglesPanel;
+@property (strong, readonly, nonatomic) NUAWindow *window;
+
 - (void)showQuickToggles:(BOOL)dismiss;
 - (void)showMainPanel;
 - (void)dismissDrawer;
+
 @end

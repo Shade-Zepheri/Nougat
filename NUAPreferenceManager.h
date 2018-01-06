@@ -4,9 +4,12 @@
 @property (assign, readonly, nonatomic) BOOL enabled;
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
-@property (strong, nonatomic) NSArray *quickToggleOrder;
-@property (strong, nonatomic) NSArray *mainPanelOrder;
+@property (strong, readonly, nonatomic) NSArray *quickToggleOrder;
+@property (strong, readonly, nonatomic) NSArray *mainPanelOrder;
+
 + (instancetype)sharedSettings;
 - (void)reloadSettings;
+
 + (NSString *)currentWifiSSID;
+
 @end

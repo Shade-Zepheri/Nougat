@@ -11,7 +11,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
+        _tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
         self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.tableView.delegate = self;
         self.tableView.dataSource = self;
@@ -19,8 +19,8 @@
         self.tableView.allowsSelection = YES;
         self.tableView.allowsSelectionDuringEditing = YES;
 
-        self.quickToggleArray = [[NUAPreferenceManager sharedSettings].quickToggleOrder mutableCopy];
-        self.mainToggleArray = [[NUAPreferenceManager sharedSettings].mainPanelOrder mutableCopy];
+        _quickToggleArray = [[NUAPreferenceManager sharedSettings].quickToggleOrder mutableCopy];
+        _mainToggleArray = [[NUAPreferenceManager sharedSettings].mainPanelOrder mutableCopy];
     }
 
     return self;

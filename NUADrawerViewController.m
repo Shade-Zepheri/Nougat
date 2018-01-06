@@ -31,17 +31,17 @@ BOOL mainPanelVisible = NO;
     self.view.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
 
     CGFloat y = CGRectGetHeight(self.view.frame);
-    self.statusBar = [[NUAStatusBar alloc] initWithFrame:CGRectMake(0, y - 100, kScreenWidth, 32)];
+    _statusBar = [[NUAStatusBar alloc] initWithFrame:CGRectMake(0, y - 100, kScreenWidth, 32)];
     [self.view addSubview:self.statusBar];
 
-    self.quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
+    _quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
 
     _UIBackdropViewSettings *blurSettings = [_UIBackdropViewSettings settingsForStyle:2030 graphicsQuality:100];
-    self.backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithFrame:[UIScreen mainScreen].bounds autosizesToFitSuperview:NO settings:blurSettings];
+    _backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithFrame:[UIScreen mainScreen].bounds autosizesToFitSuperview:NO settings:blurSettings];
     self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 
-    self.window = [[NUAWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    _window = [[NUAWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     [self.window addSubview:self.view];
     [self.window insertSubview:self.backdropView belowSubview:self.view];
 
@@ -59,7 +59,7 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)configureMainToggles {
-    self.togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, kScreenWidth - 20)];
+    _togglesPanel = [[NUADrawerPanel alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, kScreenWidth - 20)];
     self.togglesPanel.alpha = 0;
 
     CGSize size = self.view.frame.size;

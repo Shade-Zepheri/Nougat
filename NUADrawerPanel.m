@@ -8,7 +8,7 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.toggleArray = [NSMutableArray array];
+        _toggleArray = [NSMutableArray array];
         [self loadToggles];
         [self loadBrightnessSlider];
 
@@ -23,7 +23,7 @@
 }
 
 - (void)loadBrightnessSlider {
-    self.brightnessSlider = [[UISlider alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 20)];
+    _brightnessSlider = [[UISlider alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 20)];
     [self.brightnessSlider addTarget:self action:@selector(sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.brightnessSlider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchCancel];
     [self.brightnessSlider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchUpInside];

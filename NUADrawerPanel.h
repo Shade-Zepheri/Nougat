@@ -5,8 +5,10 @@
 @interface NUADrawerPanel : UIView {
     BKSDisplayBrightnessTransactionRef _brightnessTransaction;
 }
-@property (strong, nonatomic) UISlider *brightnessSlider;
-@property (strong, nonatomic) NSMutableArray *toggleArray;
+
+@property (strong, readonly, nonatomic) UISlider *brightnessSlider;
+@property (strong, readonly, nonatomic) NSMutableArray *toggleArray;
+
 - (void)updateTintTo:(UIColor *)color;
 - (void)updateSliderValue;
 - (void)refreshTogglePanel;

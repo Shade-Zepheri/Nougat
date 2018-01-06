@@ -8,16 +8,16 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.resourceBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+        _resourceBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
 
-        self.dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame.size.width / 2, frame.size.height)];
+        _dateLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 0, frame.size.width / 2, frame.size.height)];
         self.dateLabel.font = [UIFont systemFontOfSize:14];
         self.dateLabel.textColor = [UIColor whiteColor];
         self.dateLabel.backgroundColor = [UIColor clearColor];
         self.dateLabel.textAlignment = NSTextAlignmentLeft;
         [self addSubview:self.dateLabel];
 
-        self.dateFormatter = [[NSDateFormatter alloc] init];
+        _dateFormatter = [[NSDateFormatter alloc] init];
         self.dateFormatter.dateFormat = @"h:mm a - EEE, MMM d";
 
         NSString *dateString = [self.dateFormatter stringFromDate:[NSDate date]];
@@ -39,7 +39,7 @@
     [settingsButton addTarget:self action:@selector(settingsButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:settingsButton];
 
-    self.toggleButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    _toggleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.toggleButton.frame = CGRectMake(kScreenWidth / 1.1, 10, 20, 20);
     UIImage *arrow = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:@"showMain" ofType:@"png"]];
     [self.toggleButton setImage:arrow forState:UIControlStateNormal];
