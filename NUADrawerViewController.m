@@ -70,7 +70,6 @@ BOOL mainPanelVisible = NO;
 - (void)backgroundColorDidChange:(NSNotification *)note {
     NSDictionary *colorInfo = [note userInfo];
     self.view.backgroundColor = colorInfo[@"backgroundColor"];
-    [self.togglesPanel updateTintTo:colorInfo[@"tintColor"]];
 
     [self.togglesPanel refreshTogglePanel];
     [self.quickTogglesView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -99,7 +98,6 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)showMainPanel {
-    [self.togglesPanel updateSliderValue];
     [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.backdropView.alpha = 1;
         self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
