@@ -1,12 +1,13 @@
-Features:
-- Finish StatusBar
-- Finish Prefs
-- Add More Toggle Options
-- Long Hold / 3D Touch Gestures?
+TODO:
+- Needs major overhaul with some more VCs (whole setup can be so much better)
+- Add Oreo style
 
 Misc:
+- Relook at prefs
+- Long Hold / 3D Touch Gestures?
+- Add More Toggle Options
+- Finish StatusBar
 - Is the full statusbar worth it?
 - Review overall structure
 - Improve performance
 - Use constraints (NSLayoutConstraint/CompactConstraint)
-- Needs major overhaul with some more VCs (whole setup can be so much better)

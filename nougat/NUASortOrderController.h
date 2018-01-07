@@ -1,5 +1,6 @@
-#import <UIKit/UIKit.h>
+#import <Preferences/PSSpecifier.h>
 #import <Preferences/PSViewController.h>
+#import <UIKit/UIKit.h>
 
 @interface NUASortOrderController : PSViewController <UITableViewDelegate, UITableViewDataSource>
 

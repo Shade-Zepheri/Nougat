@@ -1,5 +1,5 @@
-#import <Preferences/PSListController.h>
+#import <CepheiPrefs/HBListController.h>
 
-@interface NUAUserGuideController : PSListController
+@interface NUAUserGuideController : HBListController
 
 @end

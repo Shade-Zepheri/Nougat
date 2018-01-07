@@ -9,7 +9,8 @@
   <string>Nexus</string>
   <key>PIXEL</key>
   <string>Pixel</string>
-
+  <key>OREO</key>
+  <string>Oreo</string>
 
   <key>SORT_ORDER</key>
   <string>Sort Order</string>

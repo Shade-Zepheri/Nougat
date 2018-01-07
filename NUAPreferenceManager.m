@@ -37,9 +37,22 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
         _mainPanelOrder = ![_settings objectForKey:@"mainPanelOrder"] ? defaultMainOrder : [_settings objectForKey:@"mainPanelOrder"];
 
         _enabled = ![_settings objectForKey:@"enabled"] ? YES : [[_settings objectForKey:@"enabled"] boolValue];
-        NSInteger colorTag = ![_settings objectForKey:@"darkVariant"] ? 1 : [[_settings objectForKey:@"darkVariant"] intValue];
-        _backgroundColor = colorTag == 1 ? NexusDarkColor : PixelDarkColor;
-        _highlightColor = colorTag == 1 ? NexusTintColor : PixelTintColor;
+        NSInteger colorTag = ![_settings objectForKey:@"darkVariant"] ? 0 : [[_settings objectForKey:@"darkVariant"] intValue];
+
+        switch ((NUADrawerTheme)colorTag) {
+            case NUADrawerThemeNexus:
+                _backgroundColor = NexusBackgroundColor;
+                _highlightColor = NexusTintColor;
+                break;
+            case NUADrawerThemePixel:
+                _backgroundColor = PixelBackgroundColor;
+                _highlightColor = PixelTintColor;
+                break;
+            case NUADrawerThemeOreo:
+                _backgroundColor = OreoBackgroundColor;
+                _highlightColor = OreoTintColor;
+                break;
+        }
 
         NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
         [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil userInfo:colorInfo];

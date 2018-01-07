@@ -4,7 +4,7 @@
 
 @implementation NUASortOrderController
 
-- (NSArray*)specifiers {
+- (NSArray *)specifiers {
     return nil;
 }
 
@@ -106,11 +106,10 @@
     [array removeObjectAtIndex:sourceIndexPath.row];
     [array insertObject:string atIndex:destinationIndexPath.row];
     [self setPreferenceValue:[array copy] forKey:sourceIndexPath.section == 0 ? @"quickToggleOrder" : @"mainPanelOrder"];
-    [[NUAPreferenceManager sharedSettings] reloadSettings];
 }
 
 
-- (void)setPreferenceValue:(id)value forKey:(NSString*)key {
+- (void)setPreferenceValue:(id)value forKey:(NSString *)key {
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
     [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath]];
     [defaults setObject:value forKey:key];
