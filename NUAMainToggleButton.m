@@ -12,14 +12,6 @@
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
     self = [super initWithFrame:frame andSwitchIdentifier:identifier];
     if (self) {
-        NSArray *array = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb"];
-        if ([array containsObject:identifier]) {
-            //Only these toggles have an underline in Nougat;
-            UIView *underline = [[UIView alloc] initWithFrame:CGRectMake(15, frame.size.height - 30, frame.size.width - 30, 1)];
-            underline.backgroundColor = NougatLabelColor;
-            [self addSubview:underline];
-        }
-
         self.imageView.center = CGPointMake(frame.size.width / 2, frame.size.height / 2.5);
 
         _toggleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, frame.size.height - 20, frame.size.width - 20, 12)];

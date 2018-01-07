@@ -26,8 +26,6 @@
 #define OreoBackgroundColor [UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.0]
 #define OreoTintColor PixelTintColor
 
-#define NougatLabelColor [UIColor colorWithRed:0.33 green:0.43 blue:0.48 alpha:1.0]
-
 @interface UIWindow (Private)
 @property (getter=_isSecure, setter=_setSecure:) BOOL _secure;
 @end
