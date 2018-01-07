@@ -33,7 +33,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:@"UIScreenBrightnessDidChangeNotification" object:nil];
+    [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:@"UIScreenBrightnessDidChangeNotification" object:[UIScreen mainScreen]];
     [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
 
     [self.slider setValue:[self backlightLevel] animated:NO];
