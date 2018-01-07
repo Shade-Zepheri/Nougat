@@ -12,7 +12,7 @@
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
     self = [super initWithFrame:frame andSwitchIdentifier:identifier];
     if (self) {
-        _toggleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, frame.size.height - 20, frame.size.width - 20, 12)];
+        _toggleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, frame.size.height - 20, frame.size.width - 20, 14)];
         self.toggleLabel.font = [UIFont systemFontOfSize:12];
         self.toggleLabel.textColor = [UIColor whiteColor];
         self.toggleLabel.backgroundColor = [UIColor clearColor];
@@ -37,7 +37,8 @@
     [super switchesChangedState:notification];
 
     if ([self.switchIdentifier isEqualToString:@"wifi"]) {
-        self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? @"Wi-Fi" : [NUAPreferenceManager currentWifiSSID];
+        NSString *labelText = [self.resourceBundle localizedStringForKey:self.switchIdentifier value:self.switchIdentifier table:nil];
+        self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? labelText : [NUAPreferenceManager currentWifiSSID];
     }
 }
 
