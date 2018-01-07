@@ -18,5 +18,6 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
 - (void)reloadSettings;
 
 + (NSString *)currentWifiSSID;
++ (NSString *)carrierName;
 
 @end

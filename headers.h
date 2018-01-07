@@ -29,3 +29,17 @@
 @interface UIWindow (Private)
 @property (getter=_isSecure, setter=_setSecure:) BOOL _secure;
 @end
+
+@interface SBExternalCarrierDefaults : NSObject
+@property (readonly, nonatomic) NSString *carrierName;
+@end
+
+@interface SBExternalDefaults : NSObject
+@property (readonly, retain, nonatomic) SBExternalCarrierDefaults *carrierDefaults;
+@end
+
+@interface SBDefaults : NSObject
+
++ (SBExternalDefaults *)externalDefaults;
+
+@end

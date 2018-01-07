@@ -12,18 +12,21 @@
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
     self = [super initWithFrame:frame andSwitchIdentifier:identifier];
     if (self) {
-        self.imageView.center = CGPointMake(frame.size.width / 2, frame.size.height / 2.5);
-
         _toggleLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, frame.size.height - 20, frame.size.width - 20, 12)];
         self.toggleLabel.font = [UIFont systemFontOfSize:12];
         self.toggleLabel.textColor = [UIColor whiteColor];
         self.toggleLabel.backgroundColor = [UIColor clearColor];
         self.toggleLabel.textAlignment = NSTextAlignmentCenter;
+
+        NSString *labelText = [self.resourceBundle localizedStringForKey:identifier value:identifier table:nil];
         if ([identifier isEqualToString:@"wifi"]) {
-            self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? @"Wi-Fi" : [NUAPreferenceManager currentWifiSSID];
+            self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? labelText : [NUAPreferenceManager currentWifiSSID];
+        } else if ([identifier isEqualToString:@"cellular-data"]) {
+            self.toggleLabel.text = ![NUAPreferenceManager carrierName] ? labelText : [NUAPreferenceManager carrierName];
         } else {
-            self.toggleLabel.text = [self.resourceBundle localizedStringForKey:identifier value:identifier table:nil];
+            self.toggleLabel.text = labelText;
         }
+
         [self addSubview:self.toggleLabel];
     }
 

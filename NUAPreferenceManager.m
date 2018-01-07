@@ -63,4 +63,12 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
     return [[objc_getClass("SBWiFiManager") sharedInstance] currentNetworkName];
 }
 
++ (NSString *)carrierName {
+    //Could use CoreTelephony but lets use SB methods
+    SBExternalDefaults *externalDefaults = [objc_getClass("SBDefaults") externalDefaults];
+    SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
+
+    return carrierDefaults.carrierName;
+}
+
 @end

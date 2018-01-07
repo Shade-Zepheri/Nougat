@@ -1,6 +1,7 @@
 TODO:
 - Needs major overhaul with some more VCs (whole setup can be so much better)
 - Add Oreo style
+- "Remove" backdrop view when changing brightness like CC
 
 Misc:
 - Relook at prefs
