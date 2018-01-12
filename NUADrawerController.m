@@ -22,12 +22,40 @@ extern BOOL mainPanelVisible;
     if (self) {
         _viewController = [[NUADrawerViewController alloc] init];
         [self.viewController view];
+
+        // Registering for same notifications that NC does
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
+        [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
     }
 
     return self;
 }
 
-- (void)dismissDrawer {
+- (void)_handleBacklightFadeFinished:(NSNotification *)notification {
+    BOOL screenIsOn = [[objc_getClass("SBBacklightController") sharedInstance] screenIsOn];
+
+    if (!screenIsOn) {
+        [self dismissDrawer:NO];
+    }
+}
+
+- (void)_handleUIDidLock:(NSNotification *)notification {
+    BOOL screenIsOn = [[objc_getClass("SBBacklightController") sharedInstance] screenIsOn];
+
+    if (screenIsOn) {
+        [self dismissDrawer:YES];
+    }
+}
+
+- (void)dismissDrawer:(BOOL)animated {
+    if (!animated) {
+        [UIView performWithoutAnimation:^{
+            [self.viewController dismissDrawer];
+        }];
+        return;
+    }
+
     [self.viewController dismissDrawer];
 }
 

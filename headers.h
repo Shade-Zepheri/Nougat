@@ -43,3 +43,10 @@
 + (SBExternalDefaults *)externalDefaults;
 
 @end
+
+@interface SBBacklightController : NSObject
+@property (readonly, nonatomic) BOOL screenIsOn;
+
++ (SBBacklightController *)sharedInstance;
+
+@end

@@ -6,7 +6,8 @@
 
 + (instancetype)sharedInstance;
 
-- (void)dismissDrawer;
+- (void)dismissDrawer:(BOOL)animated;
+
 - (void)showMainToggles;
 - (void)showQuickToggles;
 - (BOOL)mainTogglesVisible;

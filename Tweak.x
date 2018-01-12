@@ -4,19 +4,15 @@
 
 %hook SBUIController
 - (BOOL)clickedMenuButton {
-    [[NUADrawerController sharedInstance] dismissDrawer];
+    [[NUADrawerController sharedInstance] dismissDrawer:YES];
     return %orig;
 }
 
 - (BOOL)handleHomeButtonSinglePressUp {
-    [[NUADrawerController sharedInstance] dismissDrawer];
+    [[NUADrawerController sharedInstance] dismissDrawer:YES];
     return %orig;
 }
 %end
-
-static inline void dismissForLock(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    [[NUADrawerController sharedInstance] dismissDrawer];
-}
 
 static inline void initializeTweak(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     SBScreenEdgePanGestureRecognizer *recognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:[NUADrawerController sharedInstance] action:@selector(handleShowDrawerGesture:) type:SBSystemGestureTypeShowNotificationCenter];
@@ -26,6 +22,5 @@ static inline void initializeTweak(CFNotificationCenterRef center, void *observe
 
 %ctor {
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, &initializeTweak, CFSTR("SBSpringBoardDidLaunchNotification"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, &dismissForLock, CFSTR("com.apple.springboard.lockcomplete"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
     [NUAPreferenceManager sharedSettings];
 }

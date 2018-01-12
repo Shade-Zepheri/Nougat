@@ -48,12 +48,12 @@
 
 }
 
-- (void)settingsButtonTapped:(id)sender {
-    [[NUADrawerController sharedInstance] dismissDrawer];
+- (void)settingsButtonTapped:(UIButton *)sender {
+    [[NUADrawerController sharedInstance] dismissDrawer:YES];
     [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
 }
 
-- (void)toggleButtonTapped:(id)sender {
+- (void)toggleButtonTapped:(UIButton *)sender {
     if ([[NUADrawerController sharedInstance] mainTogglesVisible]) {
         [[NUADrawerController sharedInstance] showQuickToggles];
     } else {
