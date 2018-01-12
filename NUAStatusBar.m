@@ -34,14 +34,14 @@
 - (void)loadRight {
     UIButton *settingsButton = [UIButton buttonWithType:UIButtonTypeCustom];
     settingsButton.frame = CGRectMake(kScreenWidth / 1.3, 10, 20, 20);
-    UIImage *settingsCog = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:@"settings" ofType:@"png"]];
+    UIImage *settingsCog = [UIImage imageNamed:@"settings" inBundle:self.resourceBundle compatibleWithTraitCollection:nil];
     [settingsButton setImage:settingsCog forState:UIControlStateNormal];
     [settingsButton addTarget:self action:@selector(settingsButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:settingsButton];
 
     _toggleButton = [UIButton buttonWithType:UIButtonTypeCustom];
     self.toggleButton.frame = CGRectMake(kScreenWidth / 1.1, 10, 20, 20);
-    UIImage *arrow = [UIImage imageWithContentsOfFile:[self.resourceBundle pathForResource:@"showMain" ofType:@"png"]];
+    UIImage *arrow = [UIImage imageNamed:@"showMain" inBundle:self.resourceBundle compatibleWithTraitCollection:nil];
     [self.toggleButton setImage:arrow forState:UIControlStateNormal];
     [self.toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:self.toggleButton];
