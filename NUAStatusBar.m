@@ -1,5 +1,5 @@
 #import "headers.h"
-#import "NUADrawerController.h"
+#import "NUANotificationShadeController.h"
 #import "NUAStatusBar.h"
 #import "NUAPreferenceManager.h"
 
@@ -49,15 +49,15 @@
 }
 
 - (void)settingsButtonTapped:(UIButton *)sender {
-    [[NUADrawerController sharedInstance] dismissDrawer:YES];
+    [[NUANotificationShadeController defaultNotifcationShade] dismissDrawer:YES];
     [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:@"com.apple.Preferences" suspended:NO];
 }
 
 - (void)toggleButtonTapped:(UIButton *)sender {
-    if ([[NUADrawerController sharedInstance] mainTogglesVisible]) {
-        [[NUADrawerController sharedInstance] showQuickToggles];
+    if ([[NUANotificationShadeController defaultNotifcationShade] mainTogglesVisible]) {
+        [[NUANotificationShadeController defaultNotifcationShade] showQuickToggles];
     } else {
-        [[NUADrawerController sharedInstance] showMainToggles];
+        [[NUANotificationShadeController defaultNotifcationShade] showMainToggles];
     }
 }
 

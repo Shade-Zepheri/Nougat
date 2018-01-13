@@ -1,10 +1,10 @@
 #import "NUADrawerViewController.h"
 
-@interface NUADrawerController : NSObject
+@interface NUANotificationShadeController : NSObject
 
 @property (strong, readonly, nonatomic) NUADrawerViewController *viewController;
 
-+ (instancetype)sharedInstance;
++ (instancetype)defaultNotifcationShade;
 
 - (void)dismissDrawer:(BOOL)animated;
 

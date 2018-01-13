@@ -1,15 +1,15 @@
 #import "headers.h"
-#import "NUADrawerController.h"
+#import "NUANotificationShadeController.h"
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAPreferenceManager.h"
 
 extern BOOL quickMenuVisible;
 extern BOOL mainPanelVisible;
 
-@implementation NUADrawerController
+@implementation NUANotificationShadeController
 
-+ (instancetype)sharedInstance {
-    static NUADrawerController *sharedInstance = nil;
++ (instancetype)defaultNotifcationShade {
+    static NUANotificationShadeController *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
@@ -27,13 +27,17 @@ extern BOOL mainPanelVisible;
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
         [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
+
+        SBScreenEdgePanGestureRecognizer *recognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(handleShowDrawerGesture:) type:SBSystemGestureTypeShowNotificationCenter];
+        recognizer.edges = UIRectEdgeTop;
+        [[%c(SBSystemGestureManager) mainDisplayManager] addGestureRecognizer:recognizer withType:50];
     }
 
     return self;
 }
 
 - (void)_handleBacklightFadeFinished:(NSNotification *)notification {
-    BOOL screenIsOn = [[objc_getClass("SBBacklightController") sharedInstance] screenIsOn];
+    BOOL screenIsOn = [[%c(SBBacklightController) sharedInstance] screenIsOn];
 
     if (!screenIsOn) {
         [self dismissDrawer:NO];
@@ -41,7 +45,7 @@ extern BOOL mainPanelVisible;
 }
 
 - (void)_handleUIDidLock:(NSNotification *)notification {
-    BOOL screenIsOn = [[objc_getClass("SBBacklightController") sharedInstance] screenIsOn];
+    BOOL screenIsOn = [[%c(SBBacklightController) sharedInstance] screenIsOn];
 
     if (screenIsOn) {
         [self dismissDrawer:YES];
@@ -71,18 +75,19 @@ extern BOOL mainPanelVisible;
     return mainPanelVisible;
 }
 
-- (void)handleShowDrawerGesture:(UIGestureRecognizer *)recognizer {
+- (void)handleShowDrawerGesture:(SBScreenEdgePanGestureRecognizer *)recognizer {
+    //TODO rework whole gesture 
     if (recognizer.state != UIGestureRecognizerStateBegan || quickMenuVisible || mainPanelVisible || ![NUAPreferenceManager sharedSettings].enabled) {
         return;
     }
 
     CGPoint touchLocation = [recognizer locationInView:self.viewController.view];
     if (touchLocation.x < kScreenWidth / 3) {
-        [[objc_getClass("SBNotificationCenterController") sharedInstance] presentAnimated:YES completion:nil];
+        [[%c(SBNotificationCenterController) sharedInstance] presentAnimated:YES completion:nil];
         return;
     }
 
-    [NUANotificationCenterInhibitor setInhibited:YES];
+    NUANotificationCenterInhibitor.inhibited = YES;
 
     if (touchLocation.x > kScreenWidth / 1.5) {
         [self.viewController showMainPanel];
