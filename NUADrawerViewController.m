@@ -8,11 +8,26 @@ BOOL quickMenuVisible = NO;
 BOOL mainPanelVisible = NO;
 
 @implementation NUADrawerViewController
+
++ (void)notifyNotificationShade:(NSString *)message didActivate:(BOOL)activated {
+    if (!message) {
+        return;
+    }
+
+    NSString *notificationName = activated ? @"NUANotificationShadeDidActivate" : @"NUANotificationShadeDidDeactivate";
+    NSDictionary *userInfo = @{@"NUANotificationShadeControlName" : message};
+
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:notificationName object:nil userInfo:userInfo];
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
+        [center addObserver:self selector:@selector(_noteNotificationShadeControlDidActivate:) name:@"NUANotificationShadeDidActivate" object:nil];
+        [center addObserver:self selector:@selector(_noteNotificationShadeControlDidDeactivate:) name:@"NUANotificationShadeDidDeactivate" object:nil];
     }
 
     return self;
@@ -67,13 +82,35 @@ BOOL mainPanelVisible = NO;
     [self.view addSubview:self.togglesPanel];
 }
 
-- (void)backgroundColorDidChange:(NSNotification *)note {
-    NSDictionary *colorInfo = [note userInfo];
+- (void)backgroundColorDidChange:(NSNotification *)notification {
+    NSDictionary *colorInfo = notification.userInfo;
     self.view.backgroundColor = colorInfo[@"backgroundColor"];
 
     [self.togglesPanel refreshTogglePanel];
     [self.quickTogglesView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
     [self configureQuickToggles];
+}
+
+- (void)_noteNotificationShadeControlDidActivate:(NSNotification *)notification {
+    NSDictionary *info = notification.userInfo;
+    NSString *message = info[@"NUANotificationShadeControlName"];
+
+    if ([message isEqualToString:@"brightness"]) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.backdropView.alpha = 0;
+        }];
+    }
+}
+
+- (void)_noteNotificationShadeControlDidDeactivate:(NSNotification *)notification {
+    NSDictionary *info = notification.userInfo;
+    NSString *message = info[@"NUANotificationShadeControlName"];
+
+    if ([message isEqualToString:@"brightness"]) {
+        [UIView animateWithDuration:0.25 animations:^{
+            self.backdropView.alpha = 1;
+        }];
+    }
 }
 
 - (void)showQuickToggles:(BOOL)dismiss {
@@ -98,7 +135,7 @@ BOOL mainPanelVisible = NO;
 }
 
 - (void)showMainPanel {
-    [UIView animateWithDuration:0.7 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.backdropView.alpha = 1;
         self.statusBar.center = CGPointMake(kScreenWidth / 2, 16);
         self.quickTogglesView.alpha = 0;
@@ -121,7 +158,7 @@ BOOL mainPanelVisible = NO;
     } completion:^(BOOL finished){
         quickMenuVisible = NO;
         mainPanelVisible = NO;
-        [NUANotificationCenterInhibitor setInhibited:NO];
+        NUANotificationCenterInhibitor.inhibited = NO;
         [[UIApplication sharedApplication] setStatusBarHidden:NO];
     }];
 }

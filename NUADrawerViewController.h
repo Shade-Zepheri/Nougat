@@ -12,6 +12,8 @@
 @property (strong, readonly, nonatomic) NUADrawerPanel *togglesPanel;
 @property (strong, readonly, nonatomic) NUAWindow *window;
 
++ (void)notifyNotificationShade:(NSString *)message didActivate:(BOOL)activated;
+
 - (void)showQuickToggles:(BOOL)dismiss;
 - (void)showMainPanel;
 - (void)dismissDrawer;

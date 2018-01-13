@@ -1,4 +1,5 @@
 #import "NUABrightnessSectionController.h"
+#import "NUADrawerViewController.h"
 #import "NUAPreferenceManager.h"
 
 @implementation NUABrightnessSectionController
@@ -17,6 +18,7 @@
 
     _slider = [[UISlider alloc] initWithFrame:self.view.bounds];
     [self.slider addTarget:self action:@selector(sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
+    [self.slider addTarget:self action:@selector(sliderDidBeginTracking:) forControlEvents:UIControlEventTouchDown];
     [self.slider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchCancel];
     [self.slider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchUpInside];
     [self.slider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchUpOutside];
@@ -33,7 +35,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:@"UIScreenBrightnessDidChangeNotification" object:[UIScreen mainScreen]];
+    [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:UIScreenBrightnessDidChangeNotification object:[UIScreen mainScreen]];
     [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
 
     [self.slider setValue:[self backlightLevel] animated:NO];
@@ -52,6 +54,10 @@
     [super viewDidDisappear:animated];
 }
 
+- (void)sliderDidBeginTracking:(UISlider *)slider {
+    [NUADrawerViewController notifyNotificationShade:@"brightness" didActivate:YES];
+}
+
 - (void)sliderValueDidChange:(UISlider *)slider {
     if (!_brightnessTransaction) {
         _brightnessTransaction = BKSDisplayBrightnessTransactionCreate(kCFAllocatorDefault);
@@ -66,6 +72,7 @@
     if (brightnessTransaction) {
         CFRelease(brightnessTransaction);
         _brightnessTransaction = nil;
+        [NUADrawerViewController notifyNotificationShade:@"brightness" didActivate:NO];
     }
 }
 
