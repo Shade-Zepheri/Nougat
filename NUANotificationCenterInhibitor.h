@@ -1,4 +1,4 @@
 @interface NUANotificationCenterInhibitor : NSObject
-+ (void)setInhibited:(BOOL)value;
-+ (BOOL)isInhibited;
+@property (class, assign, nonatomic) BOOL inhibited;
+
 @end

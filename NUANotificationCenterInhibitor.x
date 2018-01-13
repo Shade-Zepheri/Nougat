@@ -1,23 +1,23 @@
 #import "NUANotificationCenterInhibitor.h"
 #import "headers.h"
 
-static BOOL inhibited = NO;
+static BOOL _inhibited = NO;
 
 @implementation NUANotificationCenterInhibitor
 
-+ (void)setInhibited:(BOOL)value {
-    inhibited = value;
++ (void)setInhibited:(BOOL)inhibited {
+    _inhibited = inhibited;
 }
 
-+ (BOOL)isInhibited {
-    return inhibited;
++ (BOOL)inhibited {
+    return _inhibited;
 }
 
 @end
 
 %hook SBNotificationCenterController
 - (void)beginPresentationWithTouchLocation:(CGPoint)location presentationBegunHandler:(void(^)())handler {
-    if (inhibited) {
+    if (_inhibited) {
         return;
     }
 
@@ -25,7 +25,7 @@ static BOOL inhibited = NO;
 }
 
 - (void)_showNotificationCenterGestureBeganWithGestureRecognizer:(UIGestureRecognizer *)recognier {
-    if (inhibited) {
+    if (_inhibited) {
         return;
     }
 
