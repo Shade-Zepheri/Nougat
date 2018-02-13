@@ -2,19 +2,21 @@
 #import "NUAPreferenceManager.h"
 
 %hook SBUIController
+
 - (BOOL)clickedMenuButton {
-    [[NUANotificationShadeController defaultNotifcationShade] dismissDrawer:YES];
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
     return %orig;
 }
 
 - (BOOL)handleHomeButtonSinglePressUp {
-    [[NUANotificationShadeController defaultNotifcationShade] dismissDrawer:YES];
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
     return %orig;
 }
+
 %end
 
 static inline void initializeTweak(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    [NUANotificationShadeController defaultNotifcationShade];
+    [NUANotificationShadeController defaultNotificationShade];
 }
 
 %ctor {

@@ -4,7 +4,7 @@
 
 @property (strong, readonly, nonatomic) NUADrawerViewController *viewController;
 
-+ (instancetype)defaultNotifcationShade;
++ (instancetype)defaultNotificationShade;
 
 - (void)dismissDrawer:(BOOL)animated;
 

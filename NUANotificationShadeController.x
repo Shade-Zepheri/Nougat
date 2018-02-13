@@ -11,7 +11,7 @@ extern BOOL mainPanelVisible;
 
 @implementation NUANotificationShadeController
 
-+ (instancetype)defaultNotifcationShade {
++ (instancetype)defaultNotificationShade {
     static NUANotificationShadeController *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
