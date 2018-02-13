@@ -2,7 +2,8 @@
 #import "NUAPreferenceManager.h"
 #import "NUAQuickToggleButton.h"
 #import "NUANotificationCenterInhibitor.h"
-#import "headers.h"
+#import "Macros.h"
+#import <UIKit/_UIBackdropViewSettings.h>
 
 BOOL quickMenuVisible = NO;
 BOOL mainPanelVisible = NO;
@@ -52,7 +53,7 @@ BOOL mainPanelVisible = NO;
     _quickTogglesView = [[UIView alloc] initWithFrame:CGRectMake(0, y - 50, kScreenWidth, 50)];
 
     _UIBackdropViewSettings *blurSettings = [_UIBackdropViewSettings settingsForStyle:2030 graphicsQuality:100];
-    _backdropView = [[objc_getClass("_UIBackdropView") alloc] initWithFrame:[UIScreen mainScreen].bounds autosizesToFitSuperview:NO settings:blurSettings];
+    _backdropView = [[NSClassFromString(@"_UIBackdropView") alloc] initWithFrame:[UIScreen mainScreen].bounds autosizesToFitSuperview:NO settings:blurSettings];
     self.backdropView.userInteractionEnabled = YES;
     self.backdropView.alpha = 0;
 

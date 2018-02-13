@@ -1,6 +1,6 @@
 #import "NUASortOrderController.h"
-#include "NUARootListController.h"
-#import "../NUAPreferenceManager.h"
+#import "NUARootListController.h"
+#import "NUAPreferenceManager.h"
 
 @implementation NUASortOrderController
 

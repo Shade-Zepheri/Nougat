@@ -1,4 +1,3 @@
-#import "headers.h"
 #import "NUAMainToggleButton.h"
 #import "NUAPreferenceManager.h"
 #import <Flipswitch/Flipswitch.h>
@@ -38,7 +37,7 @@
 
     if ([self.switchIdentifier isEqualToString:@"wifi"]) {
         NSString *labelText = [self.resourceBundle localizedStringForKey:self.switchIdentifier value:self.switchIdentifier table:nil];
-        self.toggleLabel.text = ![NUAPreferenceManager currentWifiSSID] ? labelText : [NUAPreferenceManager currentWifiSSID];
+        self.toggleLabel.text = [NUAPreferenceManager currentWifiSSID] ?: labelText;
     }
 }
 

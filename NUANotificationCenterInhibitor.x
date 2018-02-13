@@ -1,5 +1,5 @@
 #import "NUANotificationCenterInhibitor.h"
-#import "headers.h"
+#import <SpringBoard/SBSystemGestureManager+Private.h>
 
 static BOOL _inhibited = NO;
 
@@ -7,6 +7,7 @@ static BOOL _inhibited = NO;
 
 + (void)setInhibited:(BOOL)inhibited {
     _inhibited = inhibited;
+    [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = inhibited;
 }
 
 + (BOOL)inhibited {
@@ -16,6 +17,7 @@ static BOOL _inhibited = NO;
 @end
 
 %hook SBNotificationCenterController
+
 - (void)beginPresentationWithTouchLocation:(CGPoint)location presentationBegunHandler:(void(^)())handler {
     if (_inhibited) {
         return;
@@ -31,4 +33,5 @@ static BOOL _inhibited = NO;
 
     %orig;
 }
+
 %end

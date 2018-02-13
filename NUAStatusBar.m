@@ -1,7 +1,8 @@
-#import "headers.h"
 #import "NUANotificationShadeController.h"
 #import "NUAStatusBar.h"
 #import "NUAPreferenceManager.h"
+#import "Macros.h"
+#import <SpringBoard/SpringBoard.h>
 
 @implementation NUAStatusBar
 

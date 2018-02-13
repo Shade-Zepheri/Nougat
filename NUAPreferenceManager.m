@@ -1,7 +1,11 @@
-#import "headers.h"
 #import "NUAPreferenceManager.h"
+#import "Macros.h"
+#import <SpringBoard/SBDefaults.h>
+#import <SpringBoard/SBExternalCarrierDefaults.h>
+#import <SpringBoard/SBExternalDefaults.h>
+#import <SpringBoard/SBWiFiManager.h>
 
-void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+static inline void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
     [[NUAPreferenceManager sharedSettings] reloadSettings];
 }
 
@@ -60,12 +64,12 @@ void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef 
 }
 
 + (NSString *)currentWifiSSID {
-    return [[objc_getClass("SBWiFiManager") sharedInstance] currentNetworkName];
+    return [[NSClassFromString(@"SBWiFiManager") sharedInstance] currentNetworkName];
 }
 
 + (NSString *)carrierName {
     //Could use CoreTelephony but lets use SB methods
-    SBExternalDefaults *externalDefaults = [objc_getClass("SBDefaults") externalDefaults];
+    SBExternalDefaults *externalDefaults = [NSClassFromString(@"SBDefaults") externalDefaults];
     SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
 
     return carrierDefaults.carrierName;

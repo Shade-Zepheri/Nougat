@@ -1,6 +1,7 @@
 #import "NUABrightnessSectionController.h"
 #import "NUADrawerViewController.h"
 #import "NUAPreferenceManager.h"
+#import "Macros.h"
 
 @implementation NUABrightnessSectionController
 

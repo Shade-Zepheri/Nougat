@@ -1,4 +1,4 @@
-#import "headers.h"
+#import <UIKit/UIWindow+Internal.h>
 
 @interface NUAWindow : UIWindow
 

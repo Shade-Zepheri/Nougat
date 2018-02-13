@@ -1,10 +1,13 @@
-#import "headers.h"
 #import "NUANotificationShadeController.h"
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAPreferenceManager.h"
 
 extern BOOL quickMenuVisible;
 extern BOOL mainPanelVisible;
+#import "Macros.h"
+#import <FrontBoard/FBDisplayManager.h>
+#import <FrontBoard/FBSystemGestureManager.h>
+#import <SpringBoard/SBBacklightController.h>
 
 @implementation NUANotificationShadeController
 

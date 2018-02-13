@@ -11,8 +11,8 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
 @property (assign, readonly, nonatomic) BOOL enabled;
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
-@property (copy, readonly, nonatomic) NSArray *quickToggleOrder;
-@property (copy, readonly, nonatomic) NSArray *mainPanelOrder;
+@property (copy, readonly, nonatomic) NSArray <NSString *> *quickToggleOrder;
+@property (copy, readonly, nonatomic) NSArray <NSString *> *mainPanelOrder;
 
 + (instancetype)sharedSettings;
 - (void)reloadSettings;

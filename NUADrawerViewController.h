@@ -1,8 +1,7 @@
-#import <UIKit/UIKit.h>
-#import "headers.h"
 #import "NUAStatusBar.h"
 #import "NUADrawerPanel.h"
 #import "NUAWindow.h"
+#import <UIKit/_UIBackdropView.h>
 
 @interface NUADrawerViewController : UIViewController
 
