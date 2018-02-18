@@ -134,9 +134,7 @@
 }
 
 - (void)updateTimeWithDate:(NSDate *)date {
-    NUALogCurrentMethod;
-
-    NSString *dateString = [self.dateFormatter stringFromDate:[NSDate date]];
+    NSString *dateString = [self.dateFormatter stringFromDate:date];
     self.dateLabel.text = dateString;
 }
 
