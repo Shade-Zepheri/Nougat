@@ -1,6 +1,6 @@
 Package: com.shade.nougat
 Name: Nougat
-Depends: mobilesubstrate, preferenceloader, com.a3tweaks.flipswitch
+Depends: mobilesubstrate, preferenceloader, ws.hbang.common, com.a3tweaks.flipswitch
 Version: 0.1
 Architecture: iphoneos-arm
 Description: Android NC for iOS
