@@ -1,7 +1,7 @@
 #import <BackBoardServices/BKSDisplayBrightness.h>
 #import <UIKit/UIKit.h>
 
-@interface NUABrightnessSectionController : UIViewController {
+@interface NUABrightnessModuleController : UIViewController {
     BKSDisplayBrightnessTransactionRef _brightnessTransaction;
 }
 

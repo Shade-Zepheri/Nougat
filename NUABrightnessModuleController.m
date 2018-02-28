@@ -1,9 +1,9 @@
-#import "NUABrightnessSectionController.h"
-#import "NUADrawerViewController.h"
+#import "NUABrightnessModuleController.h"
+#import "NUANotificationShadeController.h"
 #import "NUAPreferenceManager.h"
 #import "Macros.h"
 
-@implementation NUABrightnessSectionController
+@implementation NUABrightnessModuleController
 
 - (float)backlightLevel {
     return BKSDisplayBrightnessGetCurrent();
@@ -37,7 +37,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:UIScreenBrightnessDidChangeNotification object:[UIScreen mainScreen]];
-    [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"Nougat/BackgroundColorChange" object:nil];
+    [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
 
     [self.slider setValue:[self backlightLevel] animated:NO];
 
@@ -45,6 +45,10 @@
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self name:UIScreenBrightnessDidChangeNotification object:nil];
+    [center removeObserver:self name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+
     BKSDisplayBrightnessTransactionRef brightnessTransaction = _brightnessTransaction;
 
     if (brightnessTransaction) {
@@ -56,7 +60,7 @@
 }
 
 - (void)sliderDidBeginTracking:(UISlider *)slider {
-    [NUADrawerViewController notifyNotificationShade:@"brightness" didActivate:YES];
+    [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:YES];
 }
 
 - (void)sliderValueDidChange:(UISlider *)slider {
@@ -73,7 +77,7 @@
     if (brightnessTransaction) {
         CFRelease(brightnessTransaction);
         _brightnessTransaction = nil;
-        [NUADrawerViewController notifyNotificationShade:@"brightness" didActivate:NO];
+        [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:NO];
     }
 }
 
@@ -91,6 +95,9 @@
 }
 
 - (void)dealloc {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self];
+
     BKSDisplayBrightnessTransactionRef brightnessTransaction = _brightnessTransaction;
 
     if (brightnessTransaction) {
