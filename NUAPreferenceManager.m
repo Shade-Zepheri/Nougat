@@ -1,15 +1,24 @@
 #import "NUAPreferenceManager.h"
 #import "Macros.h"
+#import <Cephei/HBPreferences.h>
 #import <SpringBoard/SBDefaults.h>
 #import <SpringBoard/SBExternalCarrierDefaults.h>
 #import <SpringBoard/SBExternalDefaults.h>
 #import <SpringBoard/SBWiFiManager.h>
 
-static inline void reloadSettings(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
-    [[NUAPreferenceManager sharedSettings] reloadSettings];
-}
+// Settings keys
+static NSString *const NUAPreferencesEnabledKey = @"enabled";
 
-@implementation NUAPreferenceManager
+static NSString *const NUAPreferencesQuickPanelOrderKey = @"quickToggleOrder";
+static NSString *const NUAPreferencesMainPanelOrderKey = @"mainPanelOrder";
+
+static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
+
+@implementation NUAPreferenceManager {
+    HBPreferences *_preferences;
+
+    NUADrawerTheme _currentTheme;
+}
 
 + (instancetype)sharedSettings {
     static NUAPreferenceManager *sharedInstance = nil;
@@ -24,45 +33,51 @@ static inline void reloadSettings(CFNotificationCenterRef center, void *observer
 - (instancetype)init {
     self = [super init];
     if (self) {
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, reloadSettings, CFSTR("com.shade.nougat/ReloadPrefs"), NULL, CFNotificationSuspensionBehaviorCoalesce);
-        [self reloadSettings];
+        _preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
+
+        [_preferences registerBool:&_enabled default:YES forKey:VLYPreferencesEnabledKey];
+        [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
+
+        NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
+        NSArray *defaultMainOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
+
+        [_preferences registerObject:&_quickToggleOrder default:defaultQuickOrder forKey:NUAPreferencesQuickPanelOrderKey];
+        [_preferences registerObject:&_mainPanelOrder default:defaultMainOrder forKey:NUAPreferencesMainPanelOrderKey];
+
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(preferencesWereUpdated) name:HBPreferencesDidChangeNotification object:nil];
+        [self preferencesWereUpdated];
     }
 
     return self;
 }
 
-- (void)reloadSettings {
-    @autoreleasepool {
-        _settings = [NSDictionary dictionaryWithContentsOfFile:@"/var/mobile/Library/Preferences/com.shade.nougat.plist"];
+#pragma mark - Callbacks
 
-        NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
-        NSArray *defaultMainOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
-
-        _quickToggleOrder = ![_settings objectForKey:@"quickToggleOrder"] ? defaultQuickOrder : [_settings objectForKey:@"quickToggleOrder"];
-        _mainPanelOrder = ![_settings objectForKey:@"mainPanelOrder"] ? defaultMainOrder : [_settings objectForKey:@"mainPanelOrder"];
-
-        _enabled = ![_settings objectForKey:@"enabled"] ? YES : [[_settings objectForKey:@"enabled"] boolValue];
-        NSInteger colorTag = ![_settings objectForKey:@"darkVariant"] ? 0 : [[_settings objectForKey:@"darkVariant"] intValue];
-
-        switch ((NUADrawerTheme)colorTag) {
-            case NUADrawerThemeNexus:
-                _backgroundColor = NexusBackgroundColor;
-                _highlightColor = NexusTintColor;
-                break;
-            case NUADrawerThemePixel:
-                _backgroundColor = PixelBackgroundColor;
-                _highlightColor = PixelTintColor;
-                break;
-            case NUADrawerThemeOreo:
-                _backgroundColor = OreoBackgroundColor;
-                _highlightColor = OreoTintColor;
-                break;
+- (void)preferencesWereUpdated {
+    switch ((NUADrawerTheme)colorTag) {
+        case NUADrawerThemeNexus: {
+            _backgroundColor = NexusBackgroundColor;
+            _highlightColor = NexusTintColor;
+            break;
         }
-
-        NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
+        case NUADrawerThemePixel: {
+            _backgroundColor = PixelBackgroundColor;
+            _highlightColor = PixelTintColor;
+            break;
+        }
+        case NUADrawerThemeOreo: {
+            _backgroundColor = OreoBackgroundColor;
+            _highlightColor = OreoTintColor;
+            break;
+        }
     }
+
+    NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
+
+#pragma mark - Convenient Methods
 
 + (NSString *)currentWifiSSID {
     return [[NSClassFromString(@"SBWiFiManager") sharedInstance] currentNetworkName];

@@ -4,9 +4,7 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
 		NUADrawerThemeOreo
 };
 
-@interface NUAPreferenceManager : NSObject {
-    NSDictionary *_settings;
-}
+@interface NUAPreferenceManager : NSObject
 
 @property (assign, readonly, nonatomic) BOOL enabled;
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
@@ -15,7 +13,6 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
 @property (copy, readonly, nonatomic) NSArray <NSString *> *mainPanelOrder;
 
 + (instancetype)sharedSettings;
-- (void)reloadSettings;
 
 + (NSString *)currentWifiSSID;
 + (NSString *)carrierName;

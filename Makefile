@@ -12,6 +12,7 @@ TWEAK_NAME = Nougat
 Nougat_FILES = $(wildcard *.x) $(wildcard *.m)
 Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_PRIVATE_FRAMEWORKS = BackBoardServices FrontBoard
+Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
 Nougat_CFLAGS = -fobjc-arc -IHeaders -Wno-deprecated-declarations
 
