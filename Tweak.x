@@ -26,36 +26,6 @@
 }
 
 %end
-
-
-%hook SBControlCenterController
-
-- (void)endTransitionWithVelocity:(CGPoint)arg1 wasCancelled:(BOOL)arg2 completion:(/*^block*/id)arg3 {
-    %orig;
-    NUALogCurrentMethod;
-}
-
-- (void)endTransitionWithVelocity:(CGPoint)arg1 completion:(/*^block*/id)arg2 {
-    %orig;
-    NUALogCurrentMethod;
-}
-
-- (void)_endTransitionWithVelocity:(CGPoint)arg1 completion:(/*^block*/id)arg2 {
-    %orig;
-    NUALogCurrentMethod;
-}
-
-- (void)_endPresentation {
-    %orig;
-    NUALogCurrentMethod;
-}
-
-- (void)_finishPresenting:(BOOL)arg1 completion:(/*^block*/id)arg2 {
-    %orig;
-    NUALogCurrentMethod;
-}
-
-%end
 %end
 
 #pragma mark - Notifications
