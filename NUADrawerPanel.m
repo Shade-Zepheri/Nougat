@@ -10,7 +10,7 @@
         _toggleArray = [NSMutableArray array];
         [self loadToggles];
 
-        _brightnessSection = [[NUABrightnessSectionController alloc] init];
+        _brightnessSection = [[NUABrightnessModuleController alloc] init];
         [self addSubview:_brightnessSection.view];
     }
 

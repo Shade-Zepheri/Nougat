@@ -15,23 +15,3 @@ static BOOL _inhibited = NO;
 }
 
 @end
-
-%hook SBNotificationCenterController
-
-- (void)beginPresentationWithTouchLocation:(CGPoint)location presentationBegunHandler:(void(^)())handler {
-    if (_inhibited) {
-        return;
-    }
-
-    %orig;
-}
-
-- (void)_showNotificationCenterGestureBeganWithGestureRecognizer:(UIGestureRecognizer *)recognier {
-    if (_inhibited) {
-        return;
-    }
-
-    %orig;
-}
-
-%end

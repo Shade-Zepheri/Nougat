@@ -1,8 +1,8 @@
-#import "NUABrightnessSectionController.h"
+#import "NUABrightnessModuleController.h"
 
 //TODO: make UIScrollView for more than one page of toggles?
 @interface NUADrawerPanel : UIView {
-    NUABrightnessSectionController *_brightnessSection;
+    NUABrightnessModuleController *_brightnessSection;
 }
 
 @property (strong, readonly, nonatomic) NSMutableArray *toggleArray;

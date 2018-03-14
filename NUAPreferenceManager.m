@@ -17,6 +17,7 @@ static inline void reloadSettings(CFNotificationCenterRef center, void *observer
     dispatch_once(&onceToken, ^{
         sharedInstance = [[self alloc] init];
     });
+
     return sharedInstance;
 }
 
@@ -59,7 +60,7 @@ static inline void reloadSettings(CFNotificationCenterRef center, void *observer
         }
 
         NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"Nougat/BackgroundColorChange" object:nil userInfo:colorInfo];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
     }
 }
 
