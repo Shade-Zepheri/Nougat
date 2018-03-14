@@ -30,16 +30,22 @@
 
 #pragma mark - Notifications
 
-static inline void initializeTweak(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo) {
+void (^loadTweak)(NSNotification *) = ^(NSNotification *nsNotification) {
+    // Simply create singleton
     [NUANotificationShadeController defaultNotificationShade];
-}
+};
 
 #pragma mark - Constructor
 
 %ctor {
-    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, &initializeTweak, CFSTR("SBSpringBoardDidLaunchNotification"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+    // Create our singleton
     [NUAPreferenceManager sharedSettings];
 
+    // Register to tweak loads when springboard done launching
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:loadTweak];
+
+    // Init hooks
     if (%c(SBHomeHardwareButtonActions)) {
         %init(iOS10);
     } else {
