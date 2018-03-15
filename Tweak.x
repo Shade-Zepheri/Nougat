@@ -14,19 +14,6 @@
 %end
 %end
 
-%group iOS10
-%hook SBHomeHardwareButtonActions
-
-- (void)performSinglePressUpActions {
-    %orig;
-
-    // Receive home button events where the rest of SB does
-    [[NUANotificationShadeController defaultNotificationShade] handleMenuButtonTap];
-}
-
-%end
-%end
-
 #pragma mark - Notifications
 
 void (^loadTweak)(NSNotification *) = ^(NSNotification *nsNotification) {
@@ -45,9 +32,7 @@ void (^loadTweak)(NSNotification *) = ^(NSNotification *nsNotification) {
     [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:loadTweak];
 
     // Init hooks
-    if (%c(SBHomeHardwareButtonActions)) {
-        %init(iOS10);
-    } else {
+    if (!%c(SBHomeHardwareButtonActions)) {
         %init(iOS9);
     }
 }

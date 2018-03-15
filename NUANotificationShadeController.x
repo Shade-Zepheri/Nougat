@@ -46,6 +46,7 @@
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
         [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
+        [center addObserver:self selector:@selector(handleMenuButtonTap) name:@"SBMenuButtonPressedNotification" object:nil];
 
         //Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
@@ -244,18 +245,13 @@
     }
 }
 
-#pragma mark - Callback
-
-- (BOOL)handleMenuButtonTap {
-    // Dont need to return bool but fits nicely with similar methods
+- (void)handleMenuButtonTap {
     if (!self.visible) {
-        return NO;
+        return;
     }
 
     // Dismiss drawer for home button tap
     [self dismissAnimated:YES];
-
-    return YES;
 }
 
 #pragma mark - Presentation
