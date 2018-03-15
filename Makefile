@@ -19,7 +19,7 @@ Nougat_CFLAGS = -fobjc-arc -IHeaders
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
 
-SUBPROJECTS = nougat
+SUBPROJECTS = Settings
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS)/makefiles/bundle.mk

@@ -43,8 +43,8 @@
 
     return sectionTitle;
 }
-
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+
     return 2;
 }
 
