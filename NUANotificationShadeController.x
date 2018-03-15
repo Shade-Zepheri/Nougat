@@ -5,6 +5,7 @@
 #import <FrontBoard/FBDisplayManager.h>
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
+#import <SpringBoard/SBBulletinWindowController.h>
 #import <SpringBoard/SBIconController+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
@@ -366,6 +367,13 @@
     [[%c(SBWindowHidingManager) sharedInstance] setAlpha:1.0 forWindow:_window];
 
     // Set presented (cuz apparently presented)
+    if (self.presented || self.animating) {
+        return;
+    }
+
+    [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
+    [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
+
     self.presented = YES;
 
     // Add child view controller
@@ -394,18 +402,27 @@
 }
 
 - (void)_finishAnimation:(BOOL)presented {
+    self.animating = NO;
+
     if (!self.presented) {
         return;
     }
 
-    //CGFloat percentage = presented ? 1.0 : 0.0;
+    CGFloat percentage = presented ? 1.0 : 0.0
+    [self _updateToRevealPercentage:percentage];
+
+    [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
+    [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 
     if (!presented) {
+        // Dismissing
         self.view.hidden = YES;
+        self.presented = NO;
+        [self _endAnimation];
     }
 }
 
-- (void)_endDismissal {
+- (void)_endAnimation {
     // Hide the window if dismissing
     if (self.presented || _window.hidden) {
         return;

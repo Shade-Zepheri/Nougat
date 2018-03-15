@@ -4,4 +4,6 @@
 
 @property (readonly, nonatomic) BOOL screenIsOn;
 
+- (void)setIdleTimerDisabled:(BOOL)disabled forReason:(NSString *)reason;
+
 @end
