@@ -1,9 +1,9 @@
-export TARGET = iphone:10.1
+export TARGET = iphone:11.2:9.0
 
 INSTALL_TARGET_PROCESSES = Preferences
 
 ifneq ($(RESPRING),0)
-		INSTALL_TARGET_PROCESSES += SpringBoard
+    INSTALL_TARGET_PROCESSES += SpringBoard
 endif
 
 include $(THEOS)/makefiles/common.mk
@@ -14,7 +14,7 @@ Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_PRIVATE_FRAMEWORKS = BackBoardServices FrontBoard
 Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
-Nougat_CFLAGS = -fobjc-arc -IHeaders -Wno-deprecated-declarations
+Nougat_CFLAGS = -fobjc-arc -IHeaders
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
