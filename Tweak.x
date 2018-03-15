@@ -16,7 +16,7 @@
 
 #pragma mark - Notifications
 
-void (^loadTweak)(NSNotification *) = ^(NSNotification *nsNotification) {
+void (^createNotificationShade)(NSNotification *) = ^(NSNotification *notification) {
     // Simply create singleton
     [NUANotificationShadeController defaultNotificationShade];
 };
@@ -29,7 +29,7 @@ void (^loadTweak)(NSNotification *) = ^(NSNotification *nsNotification) {
 
     // Register to tweak loads when springboard done launching
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:loadTweak];
+    [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:createNotificationShade];
 
     // Init hooks
     if (!%c(SBHomeHardwareButtonActions)) {
