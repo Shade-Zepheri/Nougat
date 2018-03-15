@@ -84,6 +84,11 @@
 
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // Dont do anything if not enabled
+    if (![NUAPreferenceManager sharedSettings].enabled) {
+        return NO;
+    }
+
     // Use SBHomeScreenWindow to get location
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [gestureRecognizer locationInView:window];
@@ -94,10 +99,6 @@
 
 - (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)recognizer {
     // Stealing stuff from SB's implementation of CC and NC and mashing them into a CCNC
-    if (![NUAPreferenceManager sharedSettings].enabled) {
-        return;
-    }
-
     switch (recognizer.state) {
         case UIGestureRecognizerStatePossible:
             break;
@@ -190,25 +191,22 @@
 }
 
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture {
-    // Defer to use presentation methods
+    // Defer to use presentation methods (Note handles expanding further and dismissing)
     switch (panGesture.state) {
         case UIGestureRecognizerStatePossible:
             break;
         case UIGestureRecognizerStateBegan: {
-            // Begin dismissal
             CGPoint location = [panGesture locationInView:self.view];
             [self beginAnimationWithLocation:location];
             break;
         }
         case UIGestureRecognizerStateChanged: {
-            // Update dismissal
             CGPoint location = [panGesture locationInView:self.view];
             CGPoint velocity = [panGesture velocityInView:self.view];
             [self updateAnimationWithLocation:location andVelocity:velocity];
             break;
         }
         case UIGestureRecognizerStateEnded: {
-            // End dismissal
             CGPoint velocity = [panGesture velocityInView:self.view];
             [self endAnimationWithVelocity:velocity wasCancelled:NO];
             break;
@@ -329,7 +327,7 @@
 
 
     // End presentation
-    [self _endPresentation];
+    //[self _endPresentation];
 
     // Reset ivars
     [self _resetPanGestureStates];
@@ -404,7 +402,7 @@
         return;
     }
 
-    CGFloat percentage = presented ? 1.0 : 0.0;
+    //CGFloat percentage = presented ? 1.0 : 0.0;
 
     if (!presented) {
         self.view.hidden = YES;
