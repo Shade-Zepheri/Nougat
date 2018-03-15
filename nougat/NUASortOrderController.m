@@ -1,5 +1,4 @@
 #import "NUASortOrderController.h"
-#import "NUARootListController.h"
 #import "NUAPreferenceManager.h"
 
 @implementation NUASortOrderController
@@ -111,9 +110,9 @@
 
 - (void)setPreferenceValue:(id)value forKey:(NSString *)key {
     NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
-    [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencePath]];
+    [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencesPath]];
     [defaults setObject:value forKey:key];
-    [defaults writeToFile:NUAPreferencePath atomically:YES];
+    [defaults writeToFile:NUAPreferencesPath atomically:YES];
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 

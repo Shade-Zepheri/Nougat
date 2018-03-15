@@ -1,6 +1,5 @@
 #import "NUANotificationShadeController.h"
 #import "NUAPreferenceManager.h"
-#import "Macros.h"
 
 #pragma mark - Hooks
 

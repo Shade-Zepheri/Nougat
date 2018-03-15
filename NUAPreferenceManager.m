@@ -35,7 +35,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
     if (self) {
         _preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
 
-        [_preferences registerBool:&_enabled default:YES forKey:VLYPreferencesEnabledKey];
+        [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
 
         NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
@@ -55,7 +55,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 #pragma mark - Callbacks
 
 - (void)preferencesWereUpdated {
-    switch ((NUADrawerTheme)colorTag) {
+    switch (_currentTheme) {
         case NUADrawerThemeNexus: {
             _backgroundColor = NexusBackgroundColor;
             _highlightColor = NexusTintColor;
