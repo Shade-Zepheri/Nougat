@@ -6,8 +6,4 @@
     return @"Root";
 }
 
-- (void)sendEmail {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"mailto:ziroalpha@gmail.com?subject=Nougat"]];
-}
-
 @end
