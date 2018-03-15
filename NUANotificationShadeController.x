@@ -262,13 +262,25 @@
 }
 
 - (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely {
-    // Animate view.center accordingly
-
-
-    if (completely) {
-        self.presentedState = NUANotificationShadePresentedStateNone;
+    // Animate
+    if (!self.presented) {
+        return;
     }
-}
+
+    // Uninhibit NC if was
+    NUANotificationCenterInhibitor.inhibited = NO;
+    self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
+
+    self.animating = YES;
+
+    CGFloat duration  = animated ? 0.4 : 0.0;
+    [UIView animateWithDuration:duration animations:^{
+        CGFloat height = [self _yValueForDismissed];
+        [self _presentViewToHeight:height];
+    } completion:^(BOOL finished) {
+        [self _finishAnimation:NO completion:nil];
+    }];
+    }
 
 - (void)presentAnimated:(BOOL)animated {
     [self presentAnimated:animated showQuickSettings:YES];
@@ -277,10 +289,17 @@
 - (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings {
     // Do setup
     [self _beginPresentation];
-
-
-
     self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
+
+    self.animating = YES;
+
+    CGFloat duration = animated ? 0.4 : 0.0;
+    [UIView animateWithDuration:duration animations:^{
+        CGFloat height = [self _yValueForPresented];
+        [self _presentViewToHeight:height];
+    } completion:^(BOOL finished) {
+        [self _finishAnimation:YES completion:nil];
+    }];
 }
 
 #pragma mark - Animation helpers
@@ -366,7 +385,7 @@
     _window.hidden = NO;
     [[%c(SBWindowHidingManager) sharedInstance] setAlpha:1.0 forWindow:_window];
 
-    // Set presented (cuz apparently presented)
+    // Dont do anything if already presenting or animating
     if (self.presented || self.animating) {
         return;
     }
