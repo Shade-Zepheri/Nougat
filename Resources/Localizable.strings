@@ -2,23 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-		<key>wifi</key>
-		<string>Wi-Fi</string>
-		<key>cellular-data</key>
-		<string>Cellular Data</string>
-		<key>bluetooth</key>
-		<string>Bluetooth</string>
-		<key>do-not-disturb</key>
-		<string>Do not disturb</string>
-		<key>flashlight</key>
-		<string>Flashlight</string>
-		<key>rotation-lock</key>
-		<string>Rotation Lock</string>
-		<key>low-power</key>
-		<string>Battery Saver</string>
-		<key>location</key>
-		<string>Location</string>
-		<key>airplane-mode</key>
-		<string>Airplane mode</string>
+    <key>wifi</key>
+    <string>Wi-Fi</string>
+    <key>cellular-data</key>
+    <string>Cellular Data</string>
+    <key>bluetooth</key>
+    <string>Bluetooth</string>
+    <key>do-not-disturb</key>
+    <string>Do not disturb</string>
+    <key>flashlight</key>
+    <string>Flashlight</string>
+    <key>rotation-lock</key>
+    <string>Rotation Lock</string>
+    <key>low-power</key>
+    <string>Battery Saver</string>
+    <key>location</key>
+    <string>Location</string>
+    <key>airplane-mode</key>
+    <string>Airplane mode</string>
 </dict>
 </plist>
