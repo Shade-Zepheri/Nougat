@@ -5,8 +5,8 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
 
-    [self textLabel].numberOfLines = 0;
-    [self textLabel].lineBreakMode = NSLineBreakByWordWrapping;
+    self.textLabel.numberOfLines = 0;
+    self.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
 }
 
 - (CGFloat)preferredHeightForWidth:(CGFloat)width {

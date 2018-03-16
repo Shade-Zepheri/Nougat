@@ -1,9 +1,19 @@
 #import "NUARootListController.h"
 #import <CepheiPrefs/HBAppearanceSettings.h>
+#import <CepheiPrefs/HBSupportController.h>
+#import <TechSupport/TSContactViewController.h>
 
 @implementation NUARootListController
 
 #pragma mark - HBListController
+
++ (NSString *)hb_shareText {
+	return [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"SHARE_TEXT", @"Root", [NSBundle bundleForClass:self], @"Default text for sharing the tweak. %@ is the device type (ie, iPhone)."), [UIDevice currentDevice].localizedModel];
+}
+
++ (NSURL *)hb_shareURL {
+    return [NSURL URLWithString:@"https://shade-zepheri.github.io/"];
+}
 
 + (NSString *)hb_specifierPlist {
     return @"Root";
@@ -25,6 +35,13 @@
     }
 
     return self;
+}
+
+#pragma mark - Support
+
+- (void)showSupportEmailController {
+	TSContactViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
+	[self.navigationController pushViewController:supportController animated:YES];
 }
 
 @end

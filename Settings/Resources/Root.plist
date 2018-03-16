@@ -91,6 +91,16 @@
             <string>ShadeZepheri</string>
         </dict>
         <dict>
+			<key>cell</key>
+			<string>PSLinkCell</string>
+            <key>cellClass</key>
+            <string>HBTintedTableCell</string>
+			<key>label</key>
+			<string>SUPPORT</string>
+			<key>action</key>
+		    <string>showSupportEmailController</string>
+		</dict>
+        <dict>
             <key>cellClass</key>
             <string>HBLinkTableCell</string>
             <key>icon</key>

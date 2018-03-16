@@ -18,6 +18,12 @@
     <key>SORT_ORDER</key>
     <string>Sort Order</string>
 
+    <key>SHARE_TEXT</key>
+    <string>Check out Nougat by Shade Zepheri. I can use the Android notification shade without using android!</string>
+
+    <key>SUPPORT</key>
+    <string>Support</string>
+
     <key>SOURCE_CODE</key>
     <string>Source Code</string>
 </dict>
