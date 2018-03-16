@@ -169,7 +169,9 @@
 
     // Defer
     CGPoint velocity = FBSystemGestureVelocityInView(gestureRecognizer, self.view);
-    [self endAnimationWithVelocity:velocity wasCancelled:NO];
+    [self endAnimationWithVelocity:velocity wasCancelled:NO completion:^{
+        [self _endAnimation];
+    }];
 }
 
 - (void)_showNotificationShadeGestureCancelled {
@@ -210,7 +212,7 @@
         }
         case UIGestureRecognizerStateEnded: {
             CGPoint velocity = [panGesture velocityInView:self.view];
-            [self endAnimationWithVelocity:velocity wasCancelled:NO];
+            [self endAnimationWithVelocity:velocity wasCancelled:NO completion:nil];
             break;
         }
         case UIGestureRecognizerStateCancelled:
@@ -267,8 +269,6 @@
         return;
     }
 
-    // Uninhibit NC if was
-    NUANotificationCenterInhibitor.inhibited = NO;
     self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
 
     self.animating = YES;
@@ -280,7 +280,7 @@
     } completion:^(BOOL finished) {
         [self _finishAnimation:NO completion:nil];
     }];
-    }
+}
 
 - (void)presentAnimated:(BOOL)animated {
     [self presentAnimated:animated showQuickSettings:YES];
@@ -293,6 +293,7 @@
 
     self.animating = YES;
 
+    // Animate in 
     CGFloat duration = animated ? 0.4 : 0.0;
     [UIView animateWithDuration:duration animations:^{
         CGFloat height = [self _yValueForPresented];
@@ -311,6 +312,7 @@
 
     // Setup view controller
     [self _beginPresentation];
+    self.animating = YES;
 
     // Slide to height of touch location
     if (_isPresenting) {
@@ -325,32 +327,27 @@
 - (void)updateAnimationWithLocation:(CGPoint)location andVelocity:(CGPoint)velocity {
     // Make sure visible before continue
     if (!self.presented || !self.visible) {
+        HBLogDebug(@"returning updateAnimation");
         return;
-    }
-
-    if (_isDismissing) {
-        // Do some stuff
     }
 
     CGFloat height = location.y;
     [self _presentViewToHeight:height];
 }
 
-- (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled {
-    if (!self.presented || !self.visible || _isDismissing) {
-        return;
+- (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
+    if (self.presented && self.visible && self.animating && !_isDismissing) {
+        [self _finishAnimation:YES completion:completion];
+    } else if (completion) {
+        completion();
     }
-
-
-    // End presentation
-    //[self _endPresentation];
 
     // Reset ivars
     [self _resetPanGestureStates];
 }
 
 - (BOOL)isVisible {
-    return !_window.hidden;;
+    return !_window.hidden ?: NO;
 }
 
 - (CGFloat)_yValueForPresented {
@@ -420,24 +417,26 @@
     _viewController.revealPercentage = percentage;
 }
 
-- (void)_finishAnimation:(BOOL)presented {
+- (void)_finishAnimation:(BOOL)presented completion:(void(^)(void))completion {
     self.animating = NO;
 
-    if (!self.presented) {
-        return;
+    if (self.presented) {
+        CGFloat percentage = presented ? 1.0 : 0.0;
+        [self _updateToRevealPercentage:percentage];
+
+        [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
+        [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
+
+        if (!presented) {
+            // Dismissing
+            _viewController.view.hidden = YES;
+            self.presented = NO;
+            [self _endAnimation];
+        }
     }
 
-    CGFloat percentage = presented ? 1.0 : 0.0
-    [self _updateToRevealPercentage:percentage];
-
-    [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
-    [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
-
-    if (!presented) {
-        // Dismissing
-        self.view.hidden = YES;
-        self.presented = NO;
-        [self _endAnimation];
+    if (completion) {
+        completion();
     }
 }
 
