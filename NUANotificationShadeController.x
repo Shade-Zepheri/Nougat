@@ -295,8 +295,7 @@
     [self _beginPresentation];
     self.animating = YES;
 
-    CGFloat viewHeight = CGRectGetHeight(self.view.bounds);
-    _panHasGoneBelowTopEdge = location.y > viewHeight - [self _yValueForPresented];
+    _panHasGoneBelowTopEdge = location.y < [self _yValueForPresented];
 
     // Slide to height of touch location
     if (_isPresenting) {
@@ -312,6 +311,10 @@
     // Make sure visible before continue
     if (!self.presented || !self.visible) {
         return;
+    }
+
+    if (_isDismissing && !_panHasGoneBelowTopEdge) {
+        _panHasGoneBelowTopEdge = location.y < [self _yValueForPresented];
     }
 
     CGFloat height = location.y;
