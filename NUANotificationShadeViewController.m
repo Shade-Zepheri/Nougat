@@ -42,6 +42,7 @@
     // create gesture recognizer
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     _panGesture.maximumNumberOfTouches = 1;
+    _panGesture.delegate = self;
 
     // Not sure what these do but Apple uses them so why not
     [_panGesture setValue:@NO forKey:@"failsPastMaxTouches"];

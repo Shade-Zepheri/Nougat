@@ -159,11 +159,6 @@
 }
 
 - (void)_showNotificationShadeGestureEndedWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
-    // Some condition with viewForSystemGestureRecognizer and FBSystemGestureLocationInView
-    if (!self.visible) {
-        [self _beginAnimationWithGestureRecognizer:gestureRecognizer];
-    }
-
     // Uninhibit NC
     NUANotificationCenterInhibitor.inhibited = NO;
 
@@ -314,6 +309,9 @@
     [self _beginPresentation];
     self.animating = YES;
 
+    CGFloat viewHeight = CGRectGetHeight(self.view.bounds);
+    _panHasGoneBelowTopEdge = location.y > viewHeight - [self _yValueForPresented];
+
     // Slide to height of touch location
     if (_isPresenting) {
         [UIView animateWithDuration:0.2 animations:^{
@@ -327,7 +325,6 @@
 - (void)updateAnimationWithLocation:(CGPoint)location andVelocity:(CGPoint)velocity {
     // Make sure visible before continue
     if (!self.presented || !self.visible) {
-        HBLogDebug(@"returning updateAnimation");
         return;
     }
 
@@ -336,8 +333,26 @@
 }
 
 - (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
-    if (self.presented && self.visible && self.animating && !_isDismissing) {
-        [self _finishAnimation:YES completion:completion];
+    if (self.presented && self.visible && self.animating && (_isPresenting || _panHasGoneBelowTopEdge)) {
+        // Really complex logic
+        BOOL shouldPresent;
+        if (velocity.x >= 0) {
+            shouldPresent = YES;
+        } else {
+            shouldPresent = (-velocity.x / [self _yValueForPresented]) > -1.0;
+            if (_viewController.revealPercentage < 1.0) {
+                shouldPresent = NO;
+            }
+        }
+
+        BOOL present;
+        if (fabs(velocity.x) <= 300.0) {
+            present = _viewController.revealPercentage >= 0.25;
+        } else {
+            present = shouldPresent;
+        }
+
+        [self _finishAnimation:present completion:completion];
     } else if (completion) {
         completion();
     }
@@ -461,6 +476,7 @@
 - (void)_resetPanGestureStates {
     _isPresenting = NO;
     _isDismissing = NO;
+    _panHasGoneBelowTopEdge = NO;
 }
 
 @end

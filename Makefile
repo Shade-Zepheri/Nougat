@@ -2,6 +2,10 @@ export TARGET = iphone:11.2:9.0
 
 INSTALL_TARGET_PROCESSES = Preferences
 
+ifneq ($(RESPRING),0)
+	INSTALL_TARGET_PROCESSES += SpringBoard
+endif
+
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Nougat
@@ -22,8 +26,6 @@ include $(THEOS)/makefiles/bundle.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::
-ifneq ($(RESPRING),0)
-	install.exec "spring 'prefs:root=Nougat'"
-else
-	install.exec "uiopen 'prefs:root=Nougat'"
+ifeq ($(RESPRING),0)
+	install.exec "uiopen 'prefs:root=Opener'"
 endif

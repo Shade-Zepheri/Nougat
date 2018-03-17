@@ -15,6 +15,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     NUANotificationShadeViewController *_viewController;
     BOOL _isPresenting;
     BOOL _isDismissing;
+    BOOL _panHasGoneBelowTopEdge;
 }
 
 @property (nonatomic) NUANotificationShadePresentedState presentedState;
