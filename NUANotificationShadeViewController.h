@@ -7,7 +7,6 @@
 @required
 
 - (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller;
-- (BOOL)notificationShadeViewControllerShouldShowQuickToggles:(NUANotificationShadeViewController *)controller;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture;
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
 

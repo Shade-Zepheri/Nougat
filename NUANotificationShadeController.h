@@ -3,12 +3,6 @@
 #import <SpringBoard/SBScreenEdgePanGestureRecognizer+Private.h>
 #import <SpringBoard/SBSystemGestureRecognizerDelegate.h>
 
-typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
-    NUANotificationShadePresentedStateNone,
-    NUANotificationShadePresentedStateQuickToggles,
-    NUANotificationShadePresentedStateMainPanel,
-};
-
 @interface NUANotificationShadeController : UIViewController <SBSystemGestureRecognizerDelegate, NUANotificationShadeViewControllerDelegate> {
     SBWindow *_window;
     SBScreenEdgePanGestureRecognizer *_presentationGestureRecognizer;
@@ -18,7 +12,6 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     BOOL _panHasGoneBelowTopEdge;
 }
 
-@property (nonatomic) NUANotificationShadePresentedState presentedState;
 @property (getter=isVisible, readonly, nonatomic) BOOL visible;
 @property (getter=isPresented, nonatomic) BOOL presented;
 @property (getter=isAnimating, nonatomic) BOOL animating;

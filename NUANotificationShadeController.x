@@ -40,9 +40,6 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // set defaults
-        self.presentedState = NUANotificationShadePresentedStateNone;
-
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
@@ -137,11 +134,8 @@
     // Create view
     [self _setupViewForPresentation];
 
-    // Decide if go to quick or full toggles
-    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
-    self.presentedState = (location.x > (kScreenWidth / 1.5)) ? NUANotificationShadePresentedStateMainPanel : NUANotificationShadePresentedStateQuickToggles;
-
     // Begin presentation
+    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
     [self beginAnimationWithLocation:location];
 }
 
@@ -182,11 +176,6 @@
 
 - (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller {
     [self dismissAnimated:YES];
-}
-
-- (BOOL)notificationShadeViewControllerShouldShowQuickToggles:(NUANotificationShadeViewController *)controller {
-    // Let the VC know to show quick toggles
-    return self.presentedState == NUANotificationShadePresentedStateQuickToggles;
 }
 
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture {
@@ -264,8 +253,6 @@
         return;
     }
 
-    self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
-
     self.animating = YES;
 
     CGFloat duration  = animated ? 0.4 : 0.0;
@@ -284,7 +271,6 @@
 - (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings {
     // Do setup
     [self _beginPresentation];
-    self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
 
     self.animating = YES;
 
@@ -366,10 +352,7 @@
 }
 
 - (CGFloat)_yValueForPresented {
-    // Use current state to calculate yval
-    CGFloat quickHeight = kScreenHeight / 5;
-    CGFloat fullHeight = kScreenHeight / 1.5;
-    return (self.presentedState == NUANotificationShadePresentedStateQuickToggles) ? quickHeight : fullHeight;
+    return kScreenHeight / 5;
 }
 
 - (CGFloat)_yValueForDismissed {
