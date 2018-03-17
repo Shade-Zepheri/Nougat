@@ -1,4 +1,5 @@
 #import "NUANotificationShadeContainerView.h"
+#import "Macros.h"
 #import <UIKit/_UIBackdropViewSettings.h>
 
 @implementation NUANotificationShadeContainerView
@@ -17,11 +18,11 @@
     return self;
 }
 
-- (void)setRevealPercentage:(CGFloat)percentage {
-    _revealPercentage = percentage;
+- (void)setPresentedHeight:(CGFloat)height {
+    _presentedHeight = height;
 
-    // Change alpha on backdrop
-    _backdropView.alpha = percentage;
+    // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
+    _backdropView.alpha = height / (kScreenHeight / 5);
 
     // Force relayout of the subviews (private methods)
     [self setNeedsLayout];

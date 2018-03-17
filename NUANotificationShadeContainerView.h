@@ -7,7 +7,7 @@
 }
 
 @property (weak, nonatomic) UIView *drawerView;
-@property (nonatomic) CGFloat revealPercentage;
+@property (nonatomic) CGFloat presentedHeight;
 @property (nonatomic) BOOL changingBrightness;
 
 @end

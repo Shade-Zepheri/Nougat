@@ -19,6 +19,6 @@
 }
 
 @property (weak, nonatomic) id<NUANotificationShadeViewControllerDelegate> delegate;
-@property (nonatomic) CGFloat revealPercentage;
+@property (nonatomic) CGFloat presentedHeight;
 
 @end

@@ -62,10 +62,10 @@
     _containerView.drawerView = _modulesViewController.view;
 }
 
-- (void)setRevealPercentage:(CGFloat)percentage {
+- (void)setPresentedHeight:(CGFloat)height {
     // This is where all the animating is done actually
-    _revealPercentage = percentage;
-    _containerView.revealPercentage = percentage;
+    _presentedHeight = height;
+    _containerView.presentedHeight = height;
 }
 
 #pragma mark - Notifications

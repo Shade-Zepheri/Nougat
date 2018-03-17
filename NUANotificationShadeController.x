@@ -324,19 +324,21 @@
 - (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
     if (self.presented && self.visible && self.animating && (_isPresenting || _panHasGoneBelowTopEdge)) {
         // Really complex logic
+        CGFloat fullHeight = [self _yValueForPresented];
+
         BOOL shouldPresent;
-        if (velocity.x >= 0) {
+        if (velocity.y >= 0) {
             shouldPresent = YES;
         } else {
-            shouldPresent = (-velocity.x / [self _yValueForPresented]) > -1.0;
-            if (_viewController.revealPercentage < 1.0) {
+            shouldPresent = (-velocity.y / fullHeight) > -1.0;
+            if (_viewController.presentedHeight < fullHeight) {
                 shouldPresent = NO;
             }
         }
 
         BOOL present;
-        if (fabs(velocity.x) <= 300.0) {
-            present = _viewController.revealPercentage >= 0.25;
+        if (fabs(velocity.y) <= 300.0) {
+            present = _viewController.presentedHeight >= (fullHeight / 4);
         } else {
             present = shouldPresent;
         }
@@ -355,6 +357,7 @@
 }
 
 - (CGFloat)_yValueForPresented {
+    // Height of the quick toggles view
     return kScreenHeight / 5;
 }
 
@@ -407,23 +410,16 @@
 }
 
 - (void)_presentViewToHeight:(CGFloat)height {
-    // Calculate percentage
-    //CGFloat closedYValue = [self _yValueForDismissed];
-    CGFloat openYValue = [self _yValueForPresented];
-    CGFloat percentage = height / openYValue;
-    [self _updateToRevealPercentage:percentage];
-}
-
-- (void)_updateToRevealPercentage:(CGFloat)percentage {
-    _viewController.revealPercentage = percentage;
+    // Pass height to VC
+    _viewController.presentedHeight = height;
 }
 
 - (void)_finishAnimation:(BOOL)presented completion:(void(^)(void))completion {
     self.animating = NO;
 
     if (self.presented) {
-        CGFloat percentage = presented ? 1.0 : 0.0;
-        [self _updateToRevealPercentage:percentage];
+        CGFloat height = presented ? [self _yValueForPresented] : [self _yValueForDismissed];
+        [self _presentViewToHeight:height];
 
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
         [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
