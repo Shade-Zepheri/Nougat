@@ -10,6 +10,7 @@
     BOOL _isPresenting;
     BOOL _isDismissing;
     BOOL _panHasGoneBelowTopEdge;
+    CGPoint _initalTouchLocation;
 }
 
 @property (getter=isVisible, readonly, nonatomic) BOOL visible;

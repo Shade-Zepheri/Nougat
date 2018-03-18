@@ -295,7 +295,7 @@
     [self _beginPresentation];
     self.animating = YES;
 
-    _panHasGoneBelowTopEdge = location.y < [self _yValueForPresented];
+    _initalTouchLocation = location;
 
     // Slide to height of touch location
     if (_isPresenting) {
@@ -315,9 +315,12 @@
 
     if (_isDismissing && !_panHasGoneBelowTopEdge) {
         _panHasGoneBelowTopEdge = location.y < [self _yValueForPresented];
+        if (_panHasGoneBelowTopEdge) {
+            _initalTouchLocation = location;
+        }
     }
 
-    CGFloat height = location.y;
+    CGFloat height = [self _notificationShadeHeightForLocation:location initalLocation:_initalTouchLocation];
     [self _presentViewToHeight:height];
 }
 
@@ -356,14 +359,29 @@
     return !_window.hidden ?: NO;
 }
 
+- (CGFloat)_yValueForDismissed {
+    // Do we really need this method?
+    return 0;
+}
+
 - (CGFloat)_yValueForPresented {
     // Height of the quick toggles view
     return kScreenHeight / 5;
 }
 
-- (CGFloat)_yValueForDismissed {
-    // Do we really need this method?
-    return 0;
+- (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
+    // Makes the transition more elegant
+    if (_isPresenting) {
+        return location.y;
+    }
+
+    // When dismissing, pad the the height so it looks like we're dragging the panel down
+    if (_panHasGoneBelowTopEdge) {
+        return location.y - initalLocation.y + [self _yValueForCurrentState];
+    }
+
+    // return fully open height as fallback
+    return [self _yValueForPresented];
 }
 
 - (void)_setupViewForPresentation {
@@ -458,6 +476,7 @@
 - (void)_resetPanGestureStates {
     _isPresenting = NO;
     _isDismissing = NO;
+    _initalTouchLocation = CGPointZero;
     _panHasGoneBelowTopEdge = NO;
 }
 
