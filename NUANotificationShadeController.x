@@ -50,7 +50,7 @@
         [center addObserver:self selector:@selector(handleMenuButtonTap) name:@"SBMenuButtonPressedNotification" object:nil];
 
         //Create and add gesture
-        _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
+        _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
         [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
         _presentationGestureRecognizer.delegate = self;
