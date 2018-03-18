@@ -47,6 +47,7 @@
 
     // TODO: figure out the voodoo that goes on
     // Update frames
+    self.drawerView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), self.presentedHeight);
 }
 
 @end

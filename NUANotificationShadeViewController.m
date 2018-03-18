@@ -25,8 +25,6 @@
 #pragma mark - View management
 
 - (void)loadView {
-    [super loadView];
-
     // Just like SB (create container view and make it self.view)
     _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -37,7 +35,7 @@
     [super viewDidLoad];
 
     // create and add modules container
-    //[self _loadModulesContainer];
+    [self _loadModulesContainer];
 
     // create gesture recognizer
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
@@ -60,11 +58,15 @@
 
     // Give container view a reference to the view (TODO: better way to do this??)
     _containerView.drawerView = _modulesViewController.view;
+    [_containerView setNeedsLayout];
+}
+
+- (CGFloat)presentedHeight {
+    return _containerView.presentedHeight;
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
     // This is where all the animating is done actually
-    _presentedHeight = height;
     _containerView.presentedHeight = height;
 }
 
@@ -105,8 +107,8 @@
     [self.delegate notificationShadeViewController:self handlePan:recognizer];
 }
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    // Only start if visible
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    // Temporary
     return [self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer];
 }
 

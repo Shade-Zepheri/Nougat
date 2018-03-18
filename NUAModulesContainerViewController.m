@@ -21,8 +21,7 @@
 
 - (void)loadView {
     // Create drawer container view
-    CGRect frame = CGRectMake(0, 0, kScreenWidth, kScreenHeight / 1.5);
-    UIView *container = [[UIView alloc] initWithFrame:frame];
+    UIView *container = [[UIView alloc] initWithFrame:CGRectZero];
     container.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
     self.view = container;
 

@@ -6,7 +6,7 @@
     _UIBackdropView *_backdropView;
 }
 
-@property (weak, nonatomic) UIView *drawerView;
+@property (strong, nonatomic) UIView *drawerView;
 @property (nonatomic) CGFloat presentedHeight;
 @property (nonatomic) BOOL changingBrightness;
 
