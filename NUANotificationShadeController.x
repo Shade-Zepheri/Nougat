@@ -40,6 +40,9 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Set defaults
+        self.presentedState = NUANotificationShadePresentedStateNone;
+
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
@@ -244,23 +247,20 @@
 #pragma mark - Presentation
 
 - (void)dismissAnimated:(BOOL)animated {
-    [self dismissAnimated:animated completely:YES];
-}
-
-- (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely {
-    // Animate
+    // ALways going to dismiss completely
     if (!self.presented) {
         return;
     }
 
     self.animating = YES;
+    self.presentedState = NUANotificationShadePresentedStateNone;
 
     CGFloat duration  = animated ? 0.4 : 0.0;
     [UIView animateWithDuration:duration animations:^{
         CGFloat height = [self _yValueForDismissed];
         [self _presentViewToHeight:height];
     } completion:^(BOOL finished) {
-        [self _finishAnimation:NO completion:nil];
+        [self _finishAnimationWithCompletion:nil];
     }];
 }
 
@@ -269,22 +269,27 @@
 }
 
 - (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings {
-    // Do setup
+    // Dont start if already present
+    if (self.presentedState != NUANotificationShadePresentedStateNone) {
+        return;
+    }
+
     [self _beginPresentation];
 
     self.animating = YES;
+    self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
 
     // Animate in 
     CGFloat duration = animated ? 0.4 : 0.0;
     [UIView animateWithDuration:duration animations:^{
-        CGFloat height = [self _yValueForPresented];
+        CGFloat height = [self _yValueForCurrentState];
         [self _presentViewToHeight:height];
     } completion:^(BOOL finished) {
-        [self _finishAnimation:YES completion:nil];
+        [self _finishAnimationWithCompletion:nil];
     }];
 }
 
-#pragma mark - Animation helpers
+#pragma mark - Second stage animation helpers
 
 - (void)beginAnimationWithLocation:(CGPoint)location {
     // Set if is presenting or dismissing
@@ -295,6 +300,7 @@
     [self _beginPresentation];
     self.animating = YES;
 
+    _panHasGoneBelowTopEdge = location.y < [self _yValueForCurrentState];
     _initalTouchLocation = location;
 
     // Slide to height of touch location
@@ -314,7 +320,7 @@
     }
 
     if (_isDismissing && !_panHasGoneBelowTopEdge) {
-        _panHasGoneBelowTopEdge = location.y < [self _yValueForPresented];
+        _panHasGoneBelowTopEdge = location.y < [self _yValueForCurrentState];
         if (_panHasGoneBelowTopEdge) {
             _initalTouchLocation = location;
         }
@@ -326,27 +332,28 @@
 
 - (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
     if (self.presented && self.visible && self.animating && (_isPresenting || _panHasGoneBelowTopEdge)) {
-        // Really complex logic
-        CGFloat fullHeight = [self _yValueForPresented];
+        // Calculate presentedState 
+        CGFloat quickHeight = [self _yValueForPresented];
+        // CGFloat fullHeight = [self _yValueForFullyPresented];
 
         BOOL shouldPresent;
         if (velocity.y >= 0) {
             shouldPresent = YES;
         } else {
-            shouldPresent = (-velocity.y / fullHeight) > -1.0;
-            if (_viewController.presentedHeight < fullHeight) {
+            shouldPresent = (-velocity.y / quickHeight) > -1.0;
+            if (_viewController.presentedHeight < quickHeight) {
                 shouldPresent = NO;
             }
         }
 
         BOOL present;
         if (fabs(velocity.y) <= 300.0) {
-            present = _viewController.presentedHeight >= (fullHeight / 4);
+            present = _viewController.presentedHeight >= (quickHeight / 4);
         } else {
             present = shouldPresent;
         }
 
-        [self _finishAnimation:present completion:completion];
+        [self _finishAnimationWithCompletion:completion];
     } else if (completion) {
         completion();
     }
@@ -354,6 +361,8 @@
     // Reset ivars
     [self _resetPanGestureStates];
 }
+
+#pragma mark - Convenience methods
 
 - (BOOL)isVisible {
     return !_window.hidden ?: NO;
@@ -367,6 +376,19 @@
 - (CGFloat)_yValueForPresented {
     // Height of the quick toggles view
     return kScreenHeight / 5;
+}
+
+- (CGFloat)_yValueForFullyPresented {
+    // Height of the quick toggles view
+    return kScreenHeight / 1.5;
+}
+
+- (BOOL)_shouldShowMainPanel {
+    return self.presentedState == NUANotificationShadePresentedStateMainPanel;
+}
+
+- (CGFloat)_yValueForCurrentState {
+    return [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
 }
 
 - (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
@@ -383,6 +405,8 @@
     // return fully open height as fallback
     return [self _yValueForPresented];
 }
+
+#pragma mark - Third stage animation helpers
 
 - (void)_setupViewForPresentation {
     // Create window if necessary
@@ -432,17 +456,25 @@
     _viewController.presentedHeight = height;
 }
 
-- (void)_finishAnimation:(BOOL)presented completion:(void(^)(void))completion {
+- (void)_finishAnimationWithCompletion:(void(^)(void))completion {
     self.animating = NO;
 
     if (self.presented) {
-        CGFloat height = presented ? [self _yValueForPresented] : [self _yValueForDismissed];
+        BOOL dismissed = self.presentedState == NUANotificationShadePresentedStateNone;
+
+        CGFloat height;
+        if (dismissed) {
+            height = [self _yValueForDismissed];
+        } else {
+            height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
+        }
+
         [self _presentViewToHeight:height];
 
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
         [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 
-        if (!presented) {
+        if (dismissed) {
             // Dismissing
             _viewController.view.hidden = YES;
             self.presented = NO;
@@ -462,6 +494,7 @@
     }
 
     _window.hidden = YES;
+    self.presentedState = NUANotificationShadePresentedStateNone;
 }
 
 - (void)_cancelAnimation {
@@ -471,6 +504,7 @@
     // Dismiss animated and reset
     [self dismissAnimated:self.visible];
     [self _resetPanGestureStates];
+    self.presentedState = NUANotificationShadePresentedStateNone;
 }
 
 - (void)_resetPanGestureStates {
