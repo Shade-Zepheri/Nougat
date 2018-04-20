@@ -10,6 +10,20 @@ void (^createNotificationShade)(NSNotification *) = ^(NSNotification *notificati
 
 #pragma mark - Hooks
 
+%group iOS9
+%hook SpringBoard
+
+- (void)_handleMenuButtonEvent {
+    if ([[NUANotificationShadeController defaultNotificationShade] handleMenuButtonTap]) {
+        return;
+    }
+
+    %orig;
+}
+
+%end
+%end
+
 %group iOS10
 %hook SBHomeHardwareButtonActions
 
@@ -27,9 +41,11 @@ void (^createNotificationShade)(NSNotification *) = ^(NSNotification *notificati
 #pragma mark - Constructor
 
 %ctor {
-    // Init hooks TODO: find adequate method for iOS 9
+    // Init hooks
     if (%c(SBHomeHardwareButtonActions)) {
         %init(iOS10);
+    } else {
+        %init(iOS9);
     }
 
     // Create our singleton
