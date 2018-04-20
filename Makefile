@@ -27,5 +27,5 @@ include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::
 ifeq ($(RESPRING),0)
-	install.exec "uiopen 'prefs:root=Opener'"
+	install.exec "uiopen 'prefs:root=Nougat'"
 endif

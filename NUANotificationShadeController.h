@@ -28,7 +28,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
 
 + (instancetype)defaultNotificationShade;
 
-- (void)handleMenuButtonTap;
+- (BOOL)handleMenuButtonTap;
 
 - (void)dismissAnimated:(BOOL)animated;
 
