@@ -1,3 +1,5 @@
+#import <HBLog.h>
+
 #define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
 #define kScreenHeight CGRectGetMaxY([UIScreen mainScreen].bounds)
 

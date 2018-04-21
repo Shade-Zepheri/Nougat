@@ -1,3 +1,4 @@
+#import <UIKit/UIKit.h>
 #import "NUANotificationShadeViewController.h"
 #import <SpringBoard/SBIgnoredForAutorotationSecureWindow.h>
 #import <SpringBoard/SBScreenEdgePanGestureRecognizer+Private.h>

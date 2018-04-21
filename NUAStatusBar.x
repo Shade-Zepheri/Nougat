@@ -121,7 +121,7 @@
 
 - (void)toggleButtonTapped:(UIButton *)sender {
     if ([NUANotificationShadeController defaultNotificationShade].presentedState == NUANotificationShadePresentedStateMainPanel) {
-        [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES completely:NO];
+        [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
     } else {
         [[NUANotificationShadeController defaultNotificationShade] presentAnimated:YES showQuickSettings:NO];
     }

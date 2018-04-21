@@ -6,6 +6,8 @@ ifneq ($(RESPRING),0)
 	INSTALL_TARGET_PROCESSES += SpringBoard
 endif
 
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN
+
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Nougat
