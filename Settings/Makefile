@@ -6,7 +6,7 @@ Nougat_INSTALL_PATH = /Library/PreferenceBundles
 Nougat_FRAMEWORKS = UIKit
 Nougat_PRIVATE_FRAMEWORKS = Preferences
 Nougat_EXTRA_FRAMEWORKS = Cephei CepheiPrefs
-Nougat_CFLAGS = -fobjc-arc -I../Headers -I../
+Nougat_CFLAGS = -I../Headers -I../
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

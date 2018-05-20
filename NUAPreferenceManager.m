@@ -6,21 +6,13 @@
 #import <SpringBoard/SBExternalDefaults.h>
 #import <SpringBoard/SBWiFiManager.h>
 
-// Settings keys
-static NSString *const NUAPreferencesEnabledKey = @"enabled";
-
-static NSString *const NUAPreferencesQuickPanelOrderKey = @"quickToggleOrder";
-static NSString *const NUAPreferencesMainPanelOrderKey = @"mainPanelOrder";
-
-static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
-
 @implementation NUAPreferenceManager {
     HBPreferences *_preferences;
 
     NUADrawerTheme _currentTheme;
 }
 
-+ (instancetype)sharedSettings {
++ (NUAPreferenceManager *)sharedSettings {
     static NUAPreferenceManager *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -38,11 +30,8 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
 
-        NSArray *defaultQuickOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock"];
-        NSArray *defaultMainOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
-
-        [_preferences registerObject:&_quickToggleOrder default:defaultQuickOrder forKey:NUAPreferencesQuickPanelOrderKey];
-        [_preferences registerObject:&_mainPanelOrder default:defaultMainOrder forKey:NUAPreferencesMainPanelOrderKey];
+        NSArray<NSString *> *defaultToggleOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
+        [_preferences registerObject:&_togglesList default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(preferencesWereUpdated) name:HBPreferencesDidChangeNotification object:nil];
@@ -73,11 +62,11 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
         }
     }
 
-    NSDictionary *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
+    NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
 
-#pragma mark - Convenient Methods
+#pragma mark - Convenience Methods
 
 + (NSString *)currentWifiSSID {
     return [[NSClassFromString(@"SBWiFiManager") sharedInstance] currentNetworkName];

@@ -40,8 +40,8 @@
 #pragma mark - Support
 
 - (void)showSupportEmailController {
-	TSContactViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
-	[self.navigationController pushViewController:supportController animated:YES];
+    TSContactViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
+    [self.navigationController pushViewController:supportController animated:YES];
 }
 
 @end

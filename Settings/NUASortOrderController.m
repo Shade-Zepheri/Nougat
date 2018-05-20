@@ -1,5 +1,6 @@
 #import "NUASortOrderController.h"
 #import "NUAPreferenceManager.h"
+#import <Cephei/HBPreferences.h>
 
 @implementation NUASortOrderController
 
@@ -18,8 +19,7 @@
         self.tableView.allowsSelection = YES;
         self.tableView.allowsSelectionDuringEditing = YES;
 
-        _quickToggleArray = [[NUAPreferenceManager sharedSettings].quickToggleOrder mutableCopy];
-        _mainToggleArray = [[NUAPreferenceManager sharedSettings].mainPanelOrder mutableCopy];
+        _togglesList = [NUAPreferenceManager sharedSettings].togglesList;
     }
 
     return self;
@@ -31,35 +31,15 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSString *sectionTitle = nil;
-    switch (section) {
-      case 0:
-          sectionTitle = @"Quick Toggle Order";
-          break;
-      case 1:
-          sectionTitle = @"Main Panel Order";
-          break;
-    }
-
-    return sectionTitle;
+    return @"Toggles order";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    NSInteger rows;
-    switch (section) {
-      case 0:
-          rows = [self.quickToggleArray count];
-          break;
-      case 1:
-          rows = [self.mainToggleArray count];
-          break;
-    }
-
-    return rows;
+    return [self.togglesList count];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -78,14 +58,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
 
-    NSMutableArray *titleArray = nil;
-    if (indexPath.section == 0) {
-        titleArray = self.quickToggleArray;
-    } else {
-        titleArray = self.mainToggleArray;
-    }
-
-    cell.textLabel.text = titleArray[indexPath.row];
+    cell.textLabel.text = self.togglesList[indexPath.row];
 
     return cell;
 }
@@ -99,12 +72,12 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSMutableArray *array = sourceIndexPath.section == 0 ? self.quickToggleArray : self.mainToggleArray;
-    NSString *string = [array objectAtIndex:sourceIndexPath.row];
+    NSMutableArray *array = [self.togglesList mutableCopy];
+    NSString *string = array[sourceIndexPath.row];
 
     [array removeObjectAtIndex:sourceIndexPath.row];
     [array insertObject:string atIndex:destinationIndexPath.row];
-    [self setPreferenceValue:[array copy] forKey:sourceIndexPath.section == 0 ? @"quickToggleOrder" : @"mainPanelOrder"];
+    [self setPreferenceValue:[array copy] forKey:NUAPreferencesTogglesListKey];
 }
 
 
