@@ -109,10 +109,9 @@
 
 
 - (void)setPreferenceValue:(id)value forKey:(NSString *)key {
-    NSMutableDictionary *defaults = [NSMutableDictionary dictionary];
-    [defaults addEntriesFromDictionary:[NSDictionary dictionaryWithContentsOfFile:NUAPreferencesPath]];
-    [defaults setObject:value forKey:key];
-    [defaults writeToFile:NUAPreferencesPath atomically:YES];
+    HBPreferences *preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
+    [preferences setObject:value forKey:key];
+
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
