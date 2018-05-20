@@ -101,8 +101,6 @@
 #pragma mark - Gesture
 
 - (void)_handlePanGesture:(UIPanGestureRecognizer *)recognizer {
-    NUALogCurrentMethod;
-
     // Defer the gesture to the main controller
     [self.delegate notificationShadeViewController:self handlePan:recognizer];
 }

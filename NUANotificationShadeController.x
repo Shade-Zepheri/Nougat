@@ -326,31 +326,32 @@
         }
     }
 
+    // Apply slow down here?
+
     CGFloat height = [self _notificationShadeHeightForLocation:location initalLocation:_initalTouchLocation];
     [self _presentViewToHeight:height];
 }
 
 - (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
-    if (self.presented && self.visible && self.animating && (_isPresenting || _panHasGoneBelowTopEdge)) {
-        // Calculate presentedState 
-        CGFloat quickHeight = [self _yValueForPresented];
-        // CGFloat fullHeight = [self _yValueForFullyPresented];
-
-        BOOL shouldPresent;
-        if (velocity.y >= 0) {
-            shouldPresent = YES;
-        } else {
-            shouldPresent = (-velocity.y / quickHeight) > -1.0;
-            if (_viewController.presentedHeight < quickHeight) {
-                shouldPresent = NO;
+    if (self.presented && self.visible && self.animating) {
+        if (_isPresenting) {
+            // Simply show Quick toggles if presenting from none
+            self.presentedState = NUANotificationShadePresentedStateQuickToggles;
+        } else if (_panHasGoneBelowTopEdge) {
+            CGFloat currentHeight = _viewController.presentedHeight;
+            if (velocity.y >= 0) {
+                // Presenting
+                if (self.presentedState == NUANotificationShadePresentedStateQuickToggles && (currentHeight + velocity.y) >= [self _yValueForFullyPresented]) {
+                    self.presentedState = NUANotificationShadePresentedStateMainPanel;
+                }
+            } else {
+                // Dismissing
+                if ((currentHeight <= 64.0 || velocity.y <= -1500) && ![self _shouldShowMainPanel]) {
+                    self.presentedState = NUANotificationShadePresentedStateNone;
+                } else if ((currentHeight + velocity.y) <= [self _yValueForPresented]) {
+                    self.presentedState = NUANotificationShadePresentedStateQuickToggles;
+                }
             }
-        }
-
-        BOOL present;
-        if (fabs(velocity.y) <= 300.0) {
-            present = _viewController.presentedHeight >= (quickHeight / 4);
-        } else {
-            present = shouldPresent;
         }
 
         [self _finishAnimationWithCompletion:completion];
@@ -379,7 +380,7 @@
 }
 
 - (CGFloat)_yValueForFullyPresented {
-    // Height of the quick toggles view
+    // Height of the main panel
     return kScreenHeight / 1.5;
 }
 
@@ -433,6 +434,7 @@
         return;
     }
 
+    // Stop the Idle timer and banners while presenting
     [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
 
@@ -471,6 +473,7 @@
 
         [self _presentViewToHeight:height];
 
+        // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
         [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 

@@ -5,7 +5,7 @@
     <key>wifi</key>
     <string>Wi-Fi</string>
     <key>cellular-data</key>
-    <string>Cellular Data</string>
+    <string>Mobile data</string>
     <key>bluetooth</key>
     <string>Bluetooth</string>
     <key>do-not-disturb</key>

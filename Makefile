@@ -6,7 +6,7 @@ ifneq ($(RESPRING),0)
 	INSTALL_TARGET_PROCESSES += SpringBoard
 endif
 
-export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
 
 include $(THEOS)/makefiles/common.mk
 
@@ -16,7 +16,7 @@ Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_PRIVATE_FRAMEWORKS = BackBoardServices FrontBoard
 Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
-Nougat_CFLAGS = -fobjc-arc -IHeaders
+Nougat_CFLAGS = -IHeaders
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
