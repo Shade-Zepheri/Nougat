@@ -47,7 +47,8 @@
 
     // TODO: figure out the voodoo that goes on
     // Update frames
-    self.drawerView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), self.presentedHeight);
+    UIView *drawerView = [self.delegate notificationShadeForContainerView:self];
+    drawerView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), self.presentedHeight);
 }
 
 @end

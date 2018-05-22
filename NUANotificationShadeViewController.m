@@ -28,6 +28,7 @@
     // Just like SB (create container view and make it self.view)
     _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:[UIScreen mainScreen].bounds];
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _containerView.delegate = self;
     self.view = _containerView;
 }
 
@@ -55,10 +56,6 @@
     [self addChildViewController:_modulesViewController];
     [self.view addSubview:_modulesViewController.view];
     [_modulesViewController didMoveToParentViewController:self];
-
-    // Give container view a reference to the view (TODO: better way to do this??)
-    _containerView.drawerView = _modulesViewController.view;
-    [_containerView setNeedsLayout];
 }
 
 - (CGFloat)presentedHeight {
@@ -96,6 +93,12 @@
 
     // If is brightness message, restore alpha
     _containerView.changingBrightness = NO;
+}
+
+#pragma mark - Container view delegate
+
+- (UIView *)notificationShadeForContainerView:(NUANotificationShadeContainerView *)containerView {
+    return _modulesViewController.view;
 }
 
 #pragma mark - Gesture
