@@ -1,7 +1,8 @@
 #import "NUANotificationShadeViewController.h"
+#import "NUANotificationCenterInhibitor.h"
+#import "NUAModulesContainerViewController.h"
 #import "NUAPreferenceManager.h"
 #import "NUAQuickToggleButton.h"
-#import "NUANotificationCenterInhibitor.h"
 #import "Macros.h"
 #import <UIKit/UIPanGestureRecognizer+Private.h>
 
@@ -26,9 +27,8 @@
 
 - (void)loadView {
     // Just like SB (create container view and make it self.view)
-    _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:CGRectZero andDelegate:self];
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _containerView.delegate = self;
     self.view = _containerView;
 }
 
@@ -41,21 +41,28 @@
     // create gesture recognizer
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     _panGesture.maximumNumberOfTouches = 1;
-    _panGesture.delegate = self;
 
     // Not sure what these do but Apple uses them so why not
-    [_panGesture setValue:@NO forKey:@"failsPastMaxTouches"];
-    [_panGesture _setHysteresis:20];
+    // Breaks things [_panGesture setValue:@(NO) forKey:@"failsPastMaxTouches"];
+    _panGesture._hysteresis = 20;
 
     [self.view addGestureRecognizer:_panGesture];
+    _panGesture.delegate = self;
 }
 
 - (void)_loadModulesContainer {
-    _modulesViewController = [[NUAModulesContainerViewController alloc] init];
+    NUAModulesContainerViewController *modulesViewController = [[NUAModulesContainerViewController alloc] initWithNibName:nil bundle:nil];
+    _containerViewController = [[NUANotificationShadePageContainerViewController alloc] initWithContentViewController:modulesViewController];
 
-    [self addChildViewController:_modulesViewController];
-    [self.view addSubview:_modulesViewController.view];
-    [_modulesViewController didMoveToParentViewController:self];
+    if ([self.childViewControllers containsObject:_containerViewController]) {
+        return;
+    }
+
+    [self addChildViewController:_containerViewController];
+    [self.view addSubview:_containerViewController.view];
+    [_containerViewController didMoveToParentViewController:self];
+
+    [self.view setNeedsLayout];
 }
 
 - (CGFloat)presentedHeight {
@@ -65,6 +72,7 @@
 - (void)setPresentedHeight:(CGFloat)height {
     // This is where all the animating is done actually
     _containerView.presentedHeight = height;
+    _containerViewController.presentedHeight = height;
 }
 
 #pragma mark - Notifications
@@ -97,8 +105,8 @@
 
 #pragma mark - Container view delegate
 
-- (UIView *)notificationShadeForContainerView:(NUANotificationShadeContainerView *)containerView {
-    return _modulesViewController.view;
+- (UIView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView {
+    return [_containerViewController _panelView];
 }
 
 #pragma mark - Gesture

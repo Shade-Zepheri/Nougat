@@ -307,7 +307,7 @@
     if (_isPresenting) {
         [UIView animateWithDuration:0.2 animations:^{
             // Touch location is the height
-            CGFloat height = location.y;
+            CGFloat height = [self _notificationShadeHeightForLocation:location initalLocation:_initalTouchLocation];
             [self _presentViewToHeight:height];
         }];
     }
@@ -354,6 +354,8 @@
             }
         }
 
+        // TODO: do some nifty UIDynamicAnimator things
+
         [self _finishAnimationWithCompletion:completion];
     } else if (completion) {
         completion();
@@ -376,12 +378,13 @@
 
 - (CGFloat)_yValueForPresented {
     // Height of the quick toggles view
-    return kScreenHeight / 5;
+    // Need to note somewhere: EACH SECTION SHALL BE 50 tall 
+    return 150.0;
 }
 
 - (CGFloat)_yValueForFullyPresented {
     // Height of the main panel
-    return kScreenHeight / 1.5;
+    return 500.0;
 }
 
 - (BOOL)_shouldShowMainPanel {
@@ -454,6 +457,14 @@
 }
 
 - (void)_presentViewToHeight:(CGFloat)height {
+    // TODO: apply slowdown
+
+
+    // Update the height
+    [self _updatePresentedHeight:height];
+}
+
+- (void)_updatePresentedHeight:(CGFloat)height {
     // Pass height to VC
     _viewController.presentedHeight = height;
 }
@@ -471,7 +482,7 @@
             height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
         }
 
-        [self _presentViewToHeight:height];
+        [self _updatePresentedHeight:height];
 
         // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];

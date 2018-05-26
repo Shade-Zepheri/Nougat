@@ -1,5 +1,6 @@
-#import "NUAModulesContainerViewController.h"
+#import <UIKit/UIKit.h>
 #import "NUANotificationShadeContainerView.h"
+#import "NUANotificationShadePageContainerViewController.h"
 
 @class NUANotificationShadeViewController;
 
@@ -13,7 +14,7 @@
 @end
 
 @interface NUANotificationShadeViewController : UIViewController <NUANotificationShadeContainerViewDelegate, UIGestureRecognizerDelegate> {
-    NUAModulesContainerViewController *_modulesViewController;
+    NUANotificationShadePageContainerViewController *_containerViewController;
     NUANotificationShadeContainerView *_containerView;
     UIPanGestureRecognizer *_panGesture;
 }

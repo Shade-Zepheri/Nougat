@@ -4,15 +4,19 @@
 
 @implementation NUANotificationShadeContainerView
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame andDelegate:(id<NUANotificationShadeContainerViewDelegate>)delegate {
     self = [super initWithFrame:frame];
     if (self) {
+        self.delegate = delegate;
+
         // Create backdrop view
         _UIBackdropViewSettings *blurSettings = [_UIBackdropViewSettings settingsForStyle:2030 graphicsQuality:100];
         _backdropView = [[NSClassFromString(@"_UIBackdropView") alloc] initWithFrame:frame autosizesToFitSuperview:NO settings:blurSettings];
         _backdropView.userInteractionEnabled = YES;
         _backdropView.alpha = 0;
         [self addSubview:_backdropView];
+
+        [self _updateMasks];
     }
 
     return self;
@@ -22,7 +26,7 @@
     _presentedHeight = height;
 
     // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
-    _backdropView.alpha = height / (kScreenHeight / 5);
+    _backdropView.alpha = height / 150;
 
     // Force relayout of the subviews (private methods)
     [self setNeedsLayout];
@@ -39,16 +43,22 @@
 }
 
 - (void)layoutSubviews {
-    [self _updateContentViewMasks];
+    [self _updateContentFrame];
+    [self _updateMasks];
 }
 
-- (void)_updateContentViewMasks {
+- (void)_updateContentFrame {
+    _backdropView.frame = self.bounds;
+}
+
+- (void)_updateMasks {
     // Heres where the magic happens
 
     // TODO: figure out the voodoo that goes on
-    // Update frames
-    UIView *drawerView = [self.delegate notificationShadeForContainerView:self];
-    drawerView.frame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), self.presentedHeight);
+
+    // Defer expansion to view
+    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
+    [panelView expandHeight:self.presentedHeight];
 }
 
 @end

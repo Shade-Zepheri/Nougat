@@ -1,4 +1,5 @@
 #import "NUAModulesContainerViewController.h"
+#import "NUANotificationShadePanelView.h"
 #import <UIKit/UIView+Internal.h>
 #import <UIKit/_UIBackdropView.h>
 
@@ -7,7 +8,7 @@
 @protocol NUANotificationShadeContainerViewDelegate <NSObject>
 @required
 
-- (UIView *)notificationShadeForContainerView:(NUANotificationShadeContainerView *)containerView;
+- (NUANotificationShadePanelView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView;
 
 @end
 
@@ -17,6 +18,8 @@
 
 @property (weak, nonatomic) id<NUANotificationShadeContainerViewDelegate> delegate;
 @property (nonatomic) CGFloat presentedHeight;
-@property (nonatomic) BOOL changingBrightness;
+@property (getter=isChangingBrightness, nonatomic) BOOL changingBrightness;
+
+- (instancetype)initWithFrame:(CGRect)frame andDelegate:(id<NUANotificationShadeContainerViewDelegate>)delegate;
 
 @end
