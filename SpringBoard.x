@@ -1,13 +1,6 @@
 #import "NUANotificationShadeController.h"
 #import "NUAPreferenceManager.h"
 
-#pragma mark - Notifications
-
-void (^createNotificationShade)(NSNotification *) = ^(NSNotification *notification) {
-    // Simply create singleton
-    [NUANotificationShadeController defaultNotificationShade];
-};
-
 #pragma mark - Hooks
 
 %group iOS9
@@ -52,6 +45,12 @@ void (^createNotificationShade)(NSNotification *) = ^(NSNotification *notificati
     [NUAPreferenceManager sharedSettings];
 
     // Register to tweak loads when springboard done launching
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:createNotificationShade];
+    NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
+    id __block token = [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+        // Simply create singleton
+        [NUANotificationShadeController defaultNotificationShade];
+
+        // Deregister as only created once
+        [center removeObserver:token];
+    }];
 }
