@@ -326,8 +326,7 @@
         }
     }
 
-    // Apply slow down here?
-
+    // Calculate height and reveal to it
     CGFloat height = [self _notificationShadeHeightForLocation:location initalLocation:_initalTouchLocation];
     [self _presentViewToHeight:height];
 }
@@ -457,8 +456,35 @@
 }
 
 - (void)_presentViewToHeight:(CGFloat)height {
-    // TODO: apply slowdown
+    // Find when to trigger slowdowns
+    CGFloat maxTriggerHeight = 0;
+    CGFloat minTriggerHeight = 0;
+    switch (self.presentedState) {
+        case NUANotificationShadePresentedStateNone: {
+            // Max Height: Quick toggles
+            maxTriggerHeight = [self _yValueForPresented];
+            break;
+        }
+        case NUANotificationShadePresentedStateQuickToggles: {
+            // Max Height: Main Panel
+            maxTriggerHeight = [self _yValueForFullyPresented];
+            break;
+        }
+        case NUANotificationShadePresentedStateMainPanel: {
+            // Max Height: self
+            // Min Height: Quick toggles
+            maxTriggerHeight = [self _yValueForFullyPresented];
+            minTriggerHeight = [self _yValueForPresented];
+            break;
+        }
+    }
 
+    // Apply slowdowns
+    if (height > maxTriggerHeight) {
+        height = maxTriggerHeight + (height - maxTriggerHeight) * 0.1;
+    } else if (height < minTriggerHeight) {
+        height = minTriggerHeight - (minTriggerHeight - height) * 0.1;
+    }
 
     // Update the height
     [self _updatePresentedHeight:height];

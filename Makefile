@@ -11,7 +11,7 @@ export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
 include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Nougat
-Nougat_FILES = $(wildcard *.x) $(wildcard *.m)
+Nougat_FILES = $(wildcard *.[xm])
 Nougat_FRAMEWORKS = UIKit QuartzCore
 Nougat_PRIVATE_FRAMEWORKS = BackBoardServices FrontBoard
 Nougat_EXTRA_FRAMEWORKS = Cephei
