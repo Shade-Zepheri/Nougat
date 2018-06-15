@@ -12,7 +12,7 @@
     NUADrawerTheme _currentTheme;
 }
 
-+ (NUAPreferenceManager *)sharedSettings {
++ (instancetype)sharedSettings {
     static NUAPreferenceManager *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

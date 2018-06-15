@@ -1,6 +1,6 @@
 #import "NUANotificationShadeContainerView.h"
 #import "Macros.h"
-#import <UIKit/_UIBackdropViewSettings.h>
+#import <UIKit/_UIBackdropViewSettings+Private.h>
 
 @implementation NUANotificationShadeContainerView
 

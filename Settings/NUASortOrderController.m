@@ -4,7 +4,7 @@
 
 @implementation NUASortOrderController
 
-- (NSArray *)specifiers {
+- (NSMutableArray <PSSpecifier *> *)specifiers {
     return nil;
 }
 

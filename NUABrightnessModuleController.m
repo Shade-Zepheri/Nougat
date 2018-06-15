@@ -49,11 +49,9 @@
     [center removeObserver:self name:UIScreenBrightnessDidChangeNotification object:nil];
     [center removeObserver:self name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
 
-    BKSDisplayBrightnessTransactionRef brightnessTransaction = _brightnessTransaction;
-
-    if (brightnessTransaction) {
-        CFRelease(brightnessTransaction);
-        brightnessTransaction = nil;
+    if (_brightnessTransaction) {
+        CFRelease(_brightnessTransaction);
+        _brightnessTransaction = nil;
     }
 
     [super viewDidDisappear:animated];
@@ -72,13 +70,13 @@
 }
 
 - (void)sliderDidEndTracking:(UISlider *)slider {
-    BKSDisplayBrightnessTransactionRef brightnessTransaction = _brightnessTransaction;
-
-    if (brightnessTransaction) {
-        CFRelease(brightnessTransaction);
-        _brightnessTransaction = nil;
-        [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:NO];
+    if (!_brightnessTransaction) {
+        return;
     }
+
+    CFRelease(_brightnessTransaction);
+    _brightnessTransaction = nil;
+    [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:NO];
 }
 
 - (void)_noteScreenBrightnessDidChange:(NSNotification *)notification {
@@ -98,10 +96,8 @@
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self];
 
-    BKSDisplayBrightnessTransactionRef brightnessTransaction = _brightnessTransaction;
-
-    if (brightnessTransaction) {
-        CFRelease(brightnessTransaction);
+    if (_brightnessTransaction) {
+        CFRelease(_brightnessTransaction);
     }
 }
 
