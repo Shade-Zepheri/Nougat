@@ -297,8 +297,7 @@
     _isDismissing = self.presented;
 
     // Setup view controller
-    [self _beginPresentation];
-    self.animating = YES;
+    [self _prepareForPresentation];
 
     _panHasGoneBelowTopEdge = location.y < [self _yValueForCurrentState];
     _initalTouchLocation = location;
@@ -354,7 +353,6 @@
         }
 
         // TODO: do some nifty UIDynamicAnimator things
-
         [self _finishAnimationWithCompletion:completion];
     } else if (completion) {
         completion();
@@ -391,7 +389,14 @@
 }
 
 - (CGFloat)_yValueForCurrentState {
-    return [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
+    switch (self.presentedState) {
+        case NUANotificationShadePresentedStateNone:
+            return [self _yValueForDismissed];
+        case NUANotificationShadePresentedStateQuickToggles:
+            return [self _yValueForPresented];
+        case NUANotificationShadePresentedStateMainPanel: 
+            return [self _yValueForFullyPresented];
+    }
 }
 
 - (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
@@ -410,6 +415,11 @@
 }
 
 #pragma mark - Third stage animation helpers
+
+- (void)_prepareForPresentation {
+    [self _beginPresentation];
+    self.animating = YES;
+}
 
 - (void)_setupViewForPresentation {
     // Create window if necessary
@@ -508,7 +518,9 @@
             height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
         }
 
-        [self _updatePresentedHeight:height];
+        [UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+            [self _updatePresentedHeight:height];
+        } completion:nil];
 
         // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
