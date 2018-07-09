@@ -25,7 +25,6 @@
     [self _panelView].contentView = self.contentViewController.view;
     [self.contentViewController didMoveToParentViewController:self];
 
-
     [super viewDidLoad];
 }
 

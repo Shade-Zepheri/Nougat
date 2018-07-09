@@ -65,7 +65,18 @@
 
     [self addSubview:contentView];
 
-    // Some constraint logic here
+    // Constraints
+    self.contentView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    _topMargin = [self.contentView.topAnchor constraintEqualToAnchor:self.topAnchor];
+    _bottomMargin = [self.contentView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor];
+    _leadingMargin = [self.contentView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor];
+    _trailingMargin = [self.contentView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor];
+
+    _topMargin.active = YES;
+    _bottomMargin.active = YES;
+    _leadingMargin.active = YES;
+    _trailingMargin.active = YES;
 }
 
 @end
