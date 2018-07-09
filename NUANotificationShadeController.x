@@ -7,6 +7,7 @@
 #import <SpringBoard/SBBacklightController.h>
 #import <SpringBoard/SBBulletinWindowController.h>
 #import <SpringBoard/SBIconController+Private.h>
+#import <SpringBoard/SBNotificationCenterController+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
 
@@ -83,10 +84,9 @@
     return self.view;
 }
 
-
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
-    if (![NUAPreferenceManager sharedSettings].enabled) {
+    if (![NUAPreferenceManager sharedSettings].enabled || [[%c(SBNotificationCenterController) sharedInstance] isVisible]) {
         return NO;
     }
 
