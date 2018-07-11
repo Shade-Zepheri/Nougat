@@ -38,7 +38,7 @@
 
     // Animate view alpha
     [UIView animateWithDuration:0.25 animations:^{
-        _backdropView.alpha = changingBrightness ? 1.0 : 0.0;
+        _backdropView.alpha = changingBrightness ? 0.0 : 1.0;
     }];
 }
 
