@@ -6,22 +6,72 @@
 #pragma mark - View management
 
 - (void)loadView {
-    [super loadView];
+    _moduleList = [NSMutableArray array];
+
     // Create stackview
+    _verticalStackView = [[UIStackView alloc] initWithFrame:CGRectZero];
+    _verticalStackView.axis = UILayoutConstraintAxisVertical;
+    _verticalStackView.alignment = UIStackViewAlignmentFill;
+    _verticalStackView.distribution = UIStackViewDistributionEqualSpacing;
+    _verticalStackView.spacing = 0.0;
+    _verticalStackView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Create modules
+    _statusBarModule = [[NUAStatusBarModuleController alloc] init];
+    [_moduleList addObject:_statusBarModule];
+
+    _brightnessModule = [[NUABrightnessModuleController alloc] init];
+    [_moduleList addObject:_brightnessModule];
+
+    _togglesModule = [[NUATogglesModuleController alloc] init];
+    [_moduleList addObject:_togglesModule];
+
+    _settingsModule = [[NUASettingsModuleController alloc] init];
+    [_moduleList addObject:_settingsModule];
+
+    // Create view
+    UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
+    [view addSubview:_verticalStackView];
+    self.view = view;
+
+    // Create constraints
+    [_verticalStackView.topAnchor constraintEqualToAnchor:view.topAnchor].active = YES;
+    [_verticalStackView.bottomAnchor constraintEqualToAnchor:view.bottomAnchor].active = YES;
+    [_verticalStackView.leadingAnchor constraintEqualToAnchor:view.leadingAnchor].active = YES;
+    [_verticalStackView.trailingAnchor constraintEqualToAnchor:view.trailingAnchor].active = YES;
 
     // Load modules
-    _brightnessModule = [[NUABrightnessModuleController alloc] init];
+    [self _updateModules];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
 
+    [self _updateModules];
+}
+
+- (void)_updateModules {
+    if (_verticalStackView.arrangedSubviews.count > 0) {
+        return;
+    }
+
+    for (NUAModulesContainerViewController *moduleController in _moduleList) {
+        [self addChildViewController:moduleController];
+        [_verticalStackView addArrangedSubview:moduleController.view];
+        [moduleController didMoveToParentViewController:self];
+    }
+
+    _brightnessModule.presentedHeight = 150.0;
 }
 
 #pragma mark - Delegate
 
 - (void)setPresentedHeight:(CGFloat)height {
-    // TODO: Use to expand to be "Expandable collection view"
     _presentedHeight = height;
+
+    // Pass height to toggles
+    _brightnessModule.presentedHeight = height;
+    _togglesModule.presentedHeight = height;
 }
 
 @end

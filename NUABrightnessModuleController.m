@@ -5,19 +5,18 @@
 
 @implementation NUABrightnessModuleController
 
-- (float)backlightLevel {
-    return BKSDisplayBrightnessGetCurrent();
+- (NSString *)moduleIdentifier {
+    return @"com.shade.nougat.brightness";
 }
 
-- (void)loadView {
-    // Still needs refactoring, but beginning of rewrite
-    self.view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, kScreenWidth - 50, 20)];
+- (float)backlightLevel {
+    return BKSDisplayBrightnessGetCurrent();
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    _slider = [[UISlider alloc] initWithFrame:self.view.bounds];
+    _slider = [[UISlider alloc] initWithFrame:CGRectZero];
     [self.slider addTarget:self action:@selector(sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.slider addTarget:self action:@selector(sliderDidBeginTracking:) forControlEvents:UIControlEventTouchDown];
     [self.slider addTarget:self action:@selector(sliderDidEndTracking:) forControlEvents:UIControlEventTouchCancel];
@@ -27,6 +26,7 @@
     self.slider.minimumValue = 0;
     self.slider.maximumValue = 1;
     self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
+    self.slider.alpha = 0.0;
 
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
     UIImage *thumbImage = [UIImage imageNamed:@"brightness" inBundle:imageBundle compatibleWithTraitCollection:nil];
@@ -55,6 +55,28 @@
     }
 
     [super viewDidDisappear:animated];
+}
+
+- (void)viewDidLayoutSubviews {
+    self.slider.frame = self.view.bounds;
+
+    [super viewDidLayoutSubviews];
+}
+
+- (void)setPresentedHeight:(CGFloat)height {
+    _presentedHeight = height;
+
+    // Dont do anything if in first stage
+    if (height < 150) {
+        return;
+    }
+
+    // Slowly present to full height
+    CGFloat newConstant = (height - 150) / 7;
+    _heightConstraint.constant = newConstant;
+
+    // Update slider alpha
+    self.slider.alpha = newConstant / 50;
 }
 
 - (void)sliderDidBeginTracking:(UISlider *)slider {

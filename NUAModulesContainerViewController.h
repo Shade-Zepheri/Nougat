@@ -1,16 +1,19 @@
 #import <UIKit/UIKit.h>
 #import "NUANotificationShadePageContentProvider.h"
+#import "NUAStatusBarModuleController.h"
 #import "NUABrightnessModuleController.h"
-#import "NUAStatusBarSectionController.h"
-#import "NUATogglesSectionController.h"
+#import "NUATogglesModuleController.h"
+#import "NUASettingsModuleController.h"
 
 @interface NUAModulesContainerViewController : UIViewController <NUANotificationShadePageContentProvider> {
+    NSMutableArray<NUANotificationShadeModuleViewController *> *_moduleList;
     UIStackView *_verticalStackView;
+    NUAStatusBarModuleController *_statusBarModule;
     NUABrightnessModuleController *_brightnessModule;
-    //NUAStatusBarSectionController *_statusBarSection;
-    //NUATogglesSectionController *_togglesSection;
+    NUATogglesModuleController *_togglesModule;
+    NUASettingsModuleController *_settingsModule;
 }
 
-@property (nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat presentedHeight;
 
 @end

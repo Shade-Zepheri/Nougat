@@ -1,10 +1,12 @@
-#import <UIKit/UIKit.h>
+#import "NUANotificationShadeModuleViewController.h"
+#import "NUANotificationShadePageContentProvider.h"
 #import <BackBoardServices/BKSDisplayBrightness.h>
 
-@interface NUABrightnessModuleController : UIViewController {
+@interface NUABrightnessModuleController : NUANotificationShadeModuleViewController <NUANotificationShadePageContentProvider> {
     BKSDisplayBrightnessTransactionRef _brightnessTransaction;
 }
 
 @property (strong, readonly, nonatomic) UISlider *slider;
+@property (assign, nonatomic) CGFloat presentedHeight;
 
 @end
