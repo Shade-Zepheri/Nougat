@@ -77,6 +77,64 @@
     [_viewController view];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+
+    if (!_viewController.view.superview) {
+        return;
+    }
+
+    [_viewController beginAppearanceTransition:YES animated:animated];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    if (!_viewController.view.superview) {
+        return;
+    }
+
+    [_viewController endAppearanceTransition];
+
+    [super viewDidAppear:animated];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+
+    if (!_viewController.view.superview) {
+        return;
+    }
+
+    [_viewController beginAppearanceTransition:NO animated:animated];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    if (!_viewController.view.superview) {
+        return;
+    }
+
+    [_viewController endAppearanceTransition];
+
+    [super viewDidDisappear:animated];
+}
+
+#pragma mark - UIViewController
+
+- (BOOL)wantsFullScreenLayout {
+    return YES;
+}
+
+- (BOOL)shouldAutomaticallyForwardAppearanceMethods {
+    return NO;
+}
+
+- (BOOL)shouldAutomaticallyForwardRotationMethods {
+    return YES;
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
+}
+
 #pragma mark - Gesture management
 
 - (UIView *)viewForSystemGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
@@ -462,7 +520,9 @@
         [_viewController didMoveToParentViewController:self];
     }
 
+    [_viewController beginAppearanceTransition:YES animated:NO];
     _viewController.view.hidden = NO;
+    [_viewController endAppearanceTransition];
 }
 
 - (void)_presentViewToHeight:(CGFloat)height {
@@ -528,7 +588,10 @@
 
         if (dismissed) {
             // Dismissing
+            [_viewController beginAppearanceTransition:NO animated:NO];
             _viewController.view.hidden = YES;
+            [_viewController endAppearanceTransition];
+
             self.presented = NO;
             [self _endAnimation];
         }
