@@ -1,11 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface NUANotificationShadePanelView : UIView {
-    NSLayoutConstraint *_topMargin;
-    NSLayoutConstraint *_bottomMargin;
-    NSLayoutConstraint *_leadingMargin;
-    NSLayoutConstraint *_trailingMargin;
-}
+@interface NUANotificationShadePanelView : UIView
 
 @property (strong, nonatomic) UIView *contentView;
 
