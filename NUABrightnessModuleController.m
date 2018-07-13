@@ -1,7 +1,7 @@
 #import "NUABrightnessModuleController.h"
 #import "NUANotificationShadeController.h"
 #import "NUAPreferenceManager.h"
-#import "Macros.h"
+#import <UIKit/UIImage+Private.h>
 
 @implementation NUABrightnessModuleController
 
@@ -29,9 +29,17 @@
     self.slider.alpha = 0.0;
 
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
-    UIImage *thumbImage = [UIImage imageNamed:@"brightness" inBundle:imageBundle compatibleWithTraitCollection:nil];
+    UIImage *thumbImage = [UIImage imageNamed:@"brightness" inBundle:imageBundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
     [self.view addSubview:self.slider];
+
+    // Constraints
+    self.slider.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.slider.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [self.slider.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [self.slider.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:35.0].active = YES;
+    [self.slider.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-35.0].active = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -55,12 +63,6 @@
     }
 
     [super viewDidDisappear:animated];
-}
-
-- (void)viewDidLayoutSubviews {
-    self.slider.frame = self.view.bounds;
-
-    [super viewDidLayoutSubviews];
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
