@@ -48,21 +48,24 @@
         case NUADrawerThemeNexus: {
             _backgroundColor = NexusBackgroundColor;
             _highlightColor = NexusTintColor;
+            _textColor = [UIColor whiteColor];
             break;
         }
         case NUADrawerThemePixel: {
             _backgroundColor = PixelBackgroundColor;
             _highlightColor = PixelTintColor;
+            _textColor = [UIColor whiteColor];
             break;
         }
         case NUADrawerThemeOreo: {
             _backgroundColor = OreoBackgroundColor;
             _highlightColor = OreoTintColor;
+            _textColor = [UIColor blackColor];
             break;
         }
     }
 
-    NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor};
+    NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor, @"textColor": _textColor};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
 

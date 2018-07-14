@@ -3,8 +3,15 @@
 
 #pragma mark - Hooks
 
-%group iOS9
 %hook SpringBoard
+
+- (void)batteryStatusDidChange:(NSDictionary *)info {
+    %orig;
+
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
+}
+
+%group iOS9
 
 - (void)_handleMenuButtonEvent {
     if ([[NUANotificationShadeController defaultNotificationShade] handleMenuButtonTap]) {
@@ -35,6 +42,8 @@
 
 %ctor {
     // Init hooks
+    %init;
+
     if (%c(SBHomeHardwareButtonActions)) {
         %init(iOS10);
     } else {
