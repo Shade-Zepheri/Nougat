@@ -54,7 +54,7 @@
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
         [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
         _presentationGestureRecognizer.delegate = self;
-        [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
+        [[FBSystemGestureManager sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
 
         // CC calls this in init so we will too
         [self view];
