@@ -16,6 +16,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Register for notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+
     _slider = [[UISlider alloc] initWithFrame:CGRectZero];
     [self.slider addTarget:self action:@selector(sliderValueDidChange:) forControlEvents:UIControlEventValueChanged];
     [self.slider addTarget:self action:@selector(sliderDidBeginTracking:) forControlEvents:UIControlEventTouchDown];
@@ -28,8 +31,10 @@
     self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
     self.slider.alpha = 0.0;
 
+    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
+    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", useDark ? @"black" : @"white"];
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
-    UIImage *thumbImage = [UIImage imageNamed:@"brightness" inBundle:imageBundle];
+    UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:imageBundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
     [self.view addSubview:self.slider];
 
@@ -43,9 +48,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:UIScreenBrightnessDidChangeNotification object:[UIScreen mainScreen]];
-    [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+    // Register for notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_noteScreenBrightnessDidChange:) name:UIScreenBrightnessDidChangeNotification object:[UIScreen mainScreen]];
 
     [self.slider setValue:[self backlightLevel] animated:NO];
 
@@ -53,9 +57,8 @@
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self name:UIScreenBrightnessDidChangeNotification object:nil];
-    [center removeObserver:self name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+    // Deregister for notifications
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIScreenBrightnessDidChangeNotification object:nil];
 
     if (_brightnessTransaction) {
         CFRelease(_brightnessTransaction);
@@ -112,8 +115,15 @@
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
-    NSDictionary *colorInfo = notification.userInfo;
+    NSDictionary<NSString *, UIColor *> *colorInfo = notification.userInfo;
+
     self.slider.minimumTrackTintColor = colorInfo[@"tintColor"];
+
+    BOOL useDark = [colorInfo[@"textColor"] isEqual:[UIColor blackColor]];
+    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", useDark ? @"black" : @"white"];
+    NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+    UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:imageBundle];
+    [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
 }
 
 - (void)dealloc {
