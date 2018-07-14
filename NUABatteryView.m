@@ -35,6 +35,13 @@
     [self _updateImageForPercent:currentPercent];
 }
 
+- (void)setCharging:(BOOL)isCharging {
+    _charging = isCharging;
+
+    // Force update view
+    [self _updateImageForPercent:self.currentPercent];
+}
+
 #pragma mark - Image management
 
 - (NSString *)_imageNameForPercent:(CGFloat)percent {
@@ -66,7 +73,10 @@
     NSString *imageStyle = useDark ? @"black" : @"white";
     name = [name stringByAppendingString:imageStyle];
 
-    // Get charging state to show charging
+    if (self.charging) {
+        name = [name stringByAppendingString:@"_charging"];
+    }
+
     return name;
 }
 

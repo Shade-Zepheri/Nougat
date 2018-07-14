@@ -2,6 +2,7 @@
 #import "NUAStatusBarContentView.h"
 #import <SpringBoard/SBDateTimeController.h>
 #import <SpringBoard/SBPreciseClockTimer.h>
+#import <SpringBoard/SBUIController+Private.h>
 
 @implementation NUAStatusBarModuleController
 
@@ -47,6 +48,13 @@
 
     SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
     [self statusBarView].date = controller.currentDate;
+
+    // Update Battery label
+    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel] * 100;
+    [self statusBarView].currentPercent = currentPercent;
+
+    BOOL isCharging = [[%c(SBUIController) sharedInstance] isBatteryCharging];
+    [self statusBarView].charging = isCharging;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -152,12 +160,14 @@
 
 - (void)_updateBatteryState:(NSNotification *)notification {
     NSDictionary<NSString *, NSNumber *> *userInfo = notification.userInfo;
-    
+
+    BOOL isCharging = userInfo[@"IsCharging"].boolValue;
     CGFloat currentCapacity = userInfo[@"CurrentCapacity"].floatValue;
     CGFloat maxCapacity = userInfo[@"MaxCapacity"].floatValue;
     CGFloat currentPercent = (currentCapacity / maxCapacity) * 100;
 
     [self statusBarView].currentPercent = currentPercent;
+    [self statusBarView].charging = isCharging;
 }
 
 @end

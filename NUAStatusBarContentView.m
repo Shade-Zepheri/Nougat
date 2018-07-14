@@ -42,10 +42,6 @@
     self.batteryLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
     self.batteryLabel.textAlignment = NSTextAlignmentLeft;
     self.batteryLabel.font = [UIFont systemFontOfSize:15];
-
-    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel] * 100;
-    self.batteryLabel.text = [NSString stringWithFormat:@"%g%%", currentPercent];
-
     [self addSubview:self.batteryLabel];
 
     // Constraints
@@ -98,6 +94,13 @@
     self.batteryView.currentPercent = currentPercent;
 }
 
+- (void)setCharging:(BOOL)isCharging {
+    _charging = isCharging;
+
+    // Pass to batteryView
+    self.batteryView.charging = isCharging;
+}
+
 #pragma mark - Time management
 
 - (void)updateFormat {
@@ -112,6 +115,7 @@
 
     self.carrierLabel.textColor = textColor;
     self.batteryLabel.textColor = textColor;
+    self.dateLabel.textColor = textColor;
 }
 
 @end
