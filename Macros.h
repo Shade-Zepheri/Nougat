@@ -11,5 +11,5 @@
 #define PixelBackgroundColor [UIColor colorWithRed:0.13 green:0.13 blue:0.13 alpha:1.0]
 #define PixelTintColor [UIColor colorWithRed:0.27 green:0.54 blue:1.00 alpha:1.0]
 
-#define OreoBackgroundColor [UIColor colorWithRed:0.81 green:0.85 blue:0.86 alpha:1.0]
+#define OreoBackgroundColor [UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.0]
 #define OreoTintColor PixelTintColor
