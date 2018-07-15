@@ -71,8 +71,11 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
-    // Dont do anything if in first stage
-    if (height < 150) {
+    if (height == 0.0) {
+        // Reset on 0.0;
+        height = 150.0;
+    } else if (height < 150) {
+        // Dont do anything if in first stage
         return;
     }
 
