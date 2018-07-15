@@ -61,7 +61,9 @@
         [moduleController didMoveToParentViewController:self];
     }
 
+    // Set default height to modules
     _brightnessModule.presentedHeight = 150.0;
+    _settingsModule.presentedHeight = 150.0;
 }
 
 #pragma mark - Delegate
@@ -72,6 +74,7 @@
     // Pass height to toggles
     _brightnessModule.presentedHeight = height;
     _togglesModule.presentedHeight = height;
+    _settingsModule.presentedHeight = height;
 }
 
 @end

@@ -10,6 +10,7 @@
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
 
+        // Create views
         [self _createCarrierLabel];
         [self _createDateLabel];
         [self _createBatteryView];

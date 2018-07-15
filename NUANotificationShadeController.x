@@ -433,7 +433,6 @@
 
 - (CGFloat)_yValueForPresented {
     // Height of the quick toggles view
-    // Need to note somewhere: EACH SECTION SHALL BE 50 tall 
     return 150.0;
 }
 
