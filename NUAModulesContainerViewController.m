@@ -18,15 +18,19 @@
 
     // Create modules
     _statusBarModule = [[NUAStatusBarModuleController alloc] init];
+    _statusBarModule.delegate = self;
     [_moduleList addObject:_statusBarModule];
 
     _brightnessModule = [[NUABrightnessModuleController alloc] init];
+    _brightnessModule.delegate = self;
     [_moduleList addObject:_brightnessModule];
 
     _togglesModule = [[NUATogglesModuleController alloc] init];
+    _togglesModule.delegate = self;
     [_moduleList addObject:_togglesModule];
 
     _settingsModule = [[NUASettingsModuleController alloc] init];
+    _settingsModule.delegate = self;
     [_moduleList addObject:_settingsModule];
 
     // Create view
@@ -67,6 +71,10 @@
 }
 
 #pragma mark - Delegate
+
+- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module {
+    [self.delegate contentViewControllerWantsDismissal:self];
+}
 
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;

@@ -52,7 +52,7 @@
 
 - (void)_loadModulesContainer {
     NUAModulesContainerViewController *modulesViewController = [[NUAModulesContainerViewController alloc] initWithNibName:nil bundle:nil];
-    _containerViewController = [[NUANotificationShadePageContainerViewController alloc] initWithContentViewController:modulesViewController];
+    _containerViewController = [[NUANotificationShadePageContainerViewController alloc] initWithContentViewController:modulesViewController andDelegate:self];
 
     if ([self.childViewControllers containsObject:_containerViewController]) {
         return;
@@ -107,6 +107,12 @@
 
 - (UIView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView {
     return [_containerViewController _panelView];
+}
+
+#pragma mark - Page container view controller delegate
+
+- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController {
+    [self.delegate notificationShadeViewControllerWantsDismissal:self];
 }
 
 #pragma mark - Gesture

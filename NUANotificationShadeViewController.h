@@ -13,7 +13,7 @@
 
 @end
 
-@interface NUANotificationShadeViewController : UIViewController <NUANotificationShadeContainerViewDelegate, UIGestureRecognizerDelegate> {
+@interface NUANotificationShadeViewController : UIViewController <NUANotificationShadeContainerViewDelegate, NUANotificationShadePageContainerViewControllerDelegate, UIGestureRecognizerDelegate> {
     NUANotificationShadePageContainerViewController *_containerViewController;
     NUANotificationShadeContainerView *_containerView;
     UIPanGestureRecognizer *_panGesture;

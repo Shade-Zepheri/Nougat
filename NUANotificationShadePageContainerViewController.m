@@ -4,10 +4,13 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController {
+- (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
         _contentViewController = viewController;
+        _contentViewController.delegate = self;
+
+        self.delegate = delegate;
     }
 
     return self;
@@ -41,6 +44,10 @@
 - (void)setPresentedHeight:(CGFloat)height {
     // Pass on to content vc
     self.contentViewController.presentedHeight = height;
+}
+
+- (void)contentViewControllerWantsDismissal:(UIViewController<NUANotificationShadePageContentProvider> *)contentViewController {
+    [self.delegate containerViewControllerWantsDismissal:self];
 }
 
 @end

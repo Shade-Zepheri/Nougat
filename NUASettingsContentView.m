@@ -72,22 +72,25 @@
 
     _accountView = [self _imageViewForImageName:@"account"];
     self.accountView.alpha = 0.0;
-    self.accountView.hidden = YES;
+    self.accountView.tag = 1; // Use to identify which view tapped
     _accountConstraint = [self.accountView.widthAnchor constraintEqualToConstant:0.0];
     _accountConstraint.active = YES;
     [horizontalStackView addArrangedSubview:self.accountView];
 
     _nougatView = [self _imageViewForImageName:@"edit"];
     self.nougatView.alpha = 0.0;
+    self.nougatView.tag = 2; // Use to identify which view tapped
     _preferencesConstraint = [self.nougatView.widthAnchor constraintEqualToConstant:0.0];
     _preferencesConstraint.active = YES;
     [horizontalStackView addArrangedSubview:self.nougatView];
 
     _settingsView = [self _imageViewForImageName:@"settings"];
+    self.settingsView.tag = 3; // Use to identify which view tapped
     [self.settingsView.widthAnchor constraintEqualToConstant:20.0].active = YES;
     [horizontalStackView addArrangedSubview:self.settingsView];
 
     _arrowView = [self _imageViewForImageName:@"arrow"];
+    self.arrowView.tag = 4; // Use to identify which view tapped
     [self.arrowView.widthAnchor constraintEqualToConstant:20.0].active = YES;
     [horizontalStackView addArrangedSubview:self.arrowView];
 }
@@ -97,7 +100,13 @@
 - (UIImageView *)_imageViewForImageName:(NSString *)imageName {
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.userInteractionEnabled = YES;
     imageView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Add gesture
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTap:)];
+    tapGesture.numberOfTapsRequired = 1;
+    [imageView addGestureRecognizer:tapGesture];
 
     BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
     NSString *imageStyle = useDark ? @"_black" : @"_white";
@@ -108,6 +117,42 @@
     imageView.image = image;
 
     return imageView;
+}
+
+#pragma mark - Gesture
+
+- (void)handleTap:(UITapGestureRecognizer *)gestureRecognizer {
+    if (!gestureRecognizer.view) {
+        return;
+    }
+
+    if (gestureRecognizer.view.tag == 4) {
+        // Do something else
+        return;
+    }
+
+    NSString *URLString = @"prefs:root=";
+    switch (gestureRecognizer.view.tag) {
+        case 1:
+            URLString = [URLString stringByAppendingString:@"iCloud"];
+            break;
+        case 2:
+            URLString = [URLString stringByAppendingString:@"Nougat"];
+            break;
+        case 3:
+            URLString = [URLString stringByAppendingString:@"Settings"];
+            break;
+        default:
+            break;
+    }
+
+    NSURL *URL = [NSURL URLWithString:URLString];
+    if (![[UIApplication sharedApplication] openURL:URL]) {
+        // Failed
+        return;
+    }
+
+    [self.delegate contentViewWantsNotificationShadeDismissal:self];
 }
 
 #pragma mark - Properties
@@ -121,8 +166,6 @@
 
 - (void)setExpandedPercent:(CGFloat)percent {
     _expandedPercent = percent;
-
-    self.accountView.hidden = (percent == 0.0);
 
     // Update constraints
     _accountConstraint.constant = 20 * percent;

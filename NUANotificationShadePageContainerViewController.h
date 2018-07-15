@@ -2,11 +2,21 @@
 #import "NUANotificationShadePageContentProvider.h"
 #import "NUANotificationShadePanelView.h"
 
-@interface NUANotificationShadePageContainerViewController : UIViewController
+@class NUANotificationShadePageContainerViewController;
+
+@protocol NUANotificationShadePageContainerViewControllerDelegate <NSObject>
+@required
+
+- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController;
+
+@end
+
+@interface NUANotificationShadePageContainerViewController : UIViewController <NUANotificationShadePageContentViewControllerDelegate>
+@property (weak, nonatomic) id<NUANotificationShadePageContainerViewControllerDelegate> delegate;
 @property (readonly, nonatomic) UIViewController<NUANotificationShadePageContentProvider> *contentViewController;
 @property (nonatomic) CGFloat presentedHeight;
 
-- (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController;
+- (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;
 
 - (NUANotificationShadePanelView *)_panelView;
 

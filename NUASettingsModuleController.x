@@ -1,5 +1,4 @@
 #import "NUASettingsModuleController.h"
-#import "NUASettingsContentView.h"
 #import <SpringBoard/SBDateTimeController.h>
 #import <SpringBoard/SBPreciseClockTimer.h>
 
@@ -17,6 +16,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // Register as delegate
+    [self _settingsView].delegate = self;
 
     // Register for time updates    
     SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
@@ -66,6 +68,12 @@
 
     CGFloat percentage = (0.002857 * presentedHeight) - 0.428571;
     [self _settingsView].expandedPercent = percentage;
+}
+
+#pragma mark - delegate
+
+- (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView {
+    [self.delegate moduleWantsNotificationShadeDismissal:self];
 }
 
 #pragma mark - View management

@@ -5,7 +5,7 @@
 #import "NUATogglesModuleController.h"
 #import "NUASettingsModuleController.h"
 
-@interface NUAModulesContainerViewController : UIViewController <NUANotificationShadePageContentProvider> {
+@interface NUAModulesContainerViewController : UIViewController <NUANotificationShadeModuleViewControllerDelegate, NUANotificationShadePageContentProvider> {
     NSMutableArray<NUANotificationShadeModuleViewController *> *_moduleList;
     UIStackView *_verticalStackView;
     NUAStatusBarModuleController *_statusBarModule;
@@ -14,6 +14,9 @@
     NUASettingsModuleController *_settingsModule;
 }
 
+@property (weak, nonatomic) id<NUANotificationShadePageContentViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
+
+- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module;
 
 @end

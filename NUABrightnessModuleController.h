@@ -2,7 +2,7 @@
 #import "NUANotificationShadePageContentProvider.h"
 #import <BackBoardServices/BKSDisplayBrightness.h>
 
-@interface NUABrightnessModuleController : NUANotificationShadeModuleViewController <NUANotificationShadePageContentProvider> {
+@interface NUABrightnessModuleController : NUANotificationShadeModuleViewController {
     BKSDisplayBrightnessTransactionRef _brightnessTransaction;
 }
 
