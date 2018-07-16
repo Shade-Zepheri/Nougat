@@ -152,7 +152,7 @@
         return;
     }
 
-    [self.delegate contentViewWantsNotificationShadeDismissal:self];
+    [self.delegate contentViewWantsNotificationShadeDismissal:self completely:YES];
 }
 
 #pragma mark - Properties

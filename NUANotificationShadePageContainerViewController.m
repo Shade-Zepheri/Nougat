@@ -46,8 +46,12 @@
     self.contentViewController.presentedHeight = height;
 }
 
-- (void)contentViewControllerWantsDismissal:(UIViewController<NUANotificationShadePageContentProvider> *)contentViewController {
-    [self.delegate containerViewControllerWantsDismissal:self];
+- (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely {
+    [self.delegate containerViewControllerWantsDismissal:self completely:completely];
+}
+
+- (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController {
+    [self.delegate containerViewControllerWantsExpansion:self];
 }
 
 @end

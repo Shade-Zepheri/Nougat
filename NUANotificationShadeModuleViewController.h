@@ -5,7 +5,8 @@
 @protocol NUANotificationShadeModuleViewControllerDelegate <NSObject>
 @required
 
-- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module;
+- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module completely:(BOOL)completely;
+- (void)moduleWantsNotificationShadeExpansion:(NUANotificationShadeModuleViewController *)module;
 
 @end
 

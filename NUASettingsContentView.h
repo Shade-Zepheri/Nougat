@@ -4,7 +4,8 @@
 
 @protocol NUASettingsContentViewDelegate <NSObject>
 
-- (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView;
+- (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView completely:(BOOL)completely;
+- (void)contentViewWantsNotificationShadeExpansion:(NUASettingsContentView *)contentView;
 
 @end
 

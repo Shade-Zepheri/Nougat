@@ -234,8 +234,13 @@
 
 #pragma mark - Notification shade delegate
 
-- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller {
-    [self dismissAnimated:YES];
+- (void)notificationShadeViewControllerWantsExpansion:(NUANotificationShadeViewController *)controller {
+    // Since expanding, show main panel
+    [self presentAnimated:YES showQuickSettings:NO];
+}
+
+- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller completely:(BOOL)completely {
+    [self dismissAnimated:YES completely:completely];
 }
 
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture {
@@ -305,17 +310,22 @@
 #pragma mark - Presentation
 
 - (void)dismissAnimated:(BOOL)animated {
+    // Default to dismiss completely
+    [self dismissAnimated:animated completely:YES];
+}
+
+- (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely {
     // ALways going to dismiss completely
     if (!self.presented) {
         return;
     }
 
     self.animating = YES;
-    self.presentedState = NUANotificationShadePresentedStateNone;
+    self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
 
     CGFloat duration  = animated ? 0.4 : 0.0;
     [UIView animateWithDuration:duration animations:^{
-        CGFloat height = [self _yValueForDismissed];
+        CGFloat height = [self _yValueForCurrentState];
         [self _presentViewToHeight:height];
     } completion:^(BOOL finished) {
         [self _finishAnimationWithCompletion:nil];

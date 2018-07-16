@@ -72,8 +72,12 @@
 
 #pragma mark - Delegate
 
-- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module {
-    [self.delegate contentViewControllerWantsDismissal:self];
+- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module completely:(BOOL)completely {
+    [self.delegate contentViewControllerWantsDismissal:self completely:completely];
+}
+
+- (void)moduleWantsNotificationShadeExpansion:(NUANotificationShadeModuleViewController *)module {
+    [self.delegate contentViewControllerWantsExpansion:self];
 }
 
 - (void)setPresentedHeight:(CGFloat)height {

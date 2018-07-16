@@ -3,7 +3,8 @@
 @protocol NUANotificationShadePageContentViewControllerDelegate <NSObject>
 @required
 
-- (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController;
+- (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely;
+- (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController;
 
 @end
 

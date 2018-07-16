@@ -76,8 +76,12 @@
 
 #pragma mark - delegate
 
-- (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView {
-    [self.delegate moduleWantsNotificationShadeDismissal:self];
+- (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView completely:(BOOL)completely {
+    [self.delegate moduleWantsNotificationShadeDismissal:self completely:completely];
+}
+
+- (void)contentViewWantsNotificationShadeExpansion:(NUASettingsContentView *)contentView {
+    [self.delegate moduleWantsNotificationShadeExpansion:self];
 }
 
 #pragma mark - View management
