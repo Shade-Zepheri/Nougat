@@ -2,6 +2,7 @@
 #import "NUAPreferenceManager.h"
 #import "Macros.h"
 #import <UIKit/UIImage+Private.h>
+#import <version.h>
 
 @implementation NUASettingsContentView
 
@@ -134,14 +135,19 @@
 
     NSString *URLString = @"prefs:root=";
     switch (gestureRecognizer.view.tag) {
-        case 1:
-            URLString = [URLString stringByAppendingString:@"iCloud"];
+        case 1: {
+            // Go to iCloud settings
+            NSString *iCloudURL = IS_IOS_OR_NEWER(iOS_10_3) ? @"APPLE_ACCOUNT" : @"CASTLE"; // On 10.3 the iCloud banner was added, changing the URL
+            URLString = [URLString stringByAppendingString:iCloudURL];
             break;
+        }
         case 2:
+            // Go to Prefs pane
             URLString = [URLString stringByAppendingString:@"Nougat"];
             break;
         case 3:
-            URLString = [URLString stringByAppendingString:@"Settings"];
+            // Go to settings root
+            URLString = [URLString stringByAppendingString:@"ROOT"];
             break;
         default:
             break;
