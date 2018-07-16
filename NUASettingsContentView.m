@@ -128,6 +128,7 @@
 
     if (gestureRecognizer.view.tag == 4) {
         // Do something else
+        [self _toggleNotificationShadeState];
         return;
     }
 
@@ -153,6 +154,16 @@
     }
 
     [self.delegate contentViewWantsNotificationShadeDismissal:self completely:YES];
+}
+
+- (void)_toggleNotificationShadeState {
+    if (self.expandedPercent == 1.0) {
+        // Collapse to quick view
+        [self.delegate contentViewWantsNotificationShadeDismissal:self completely:NO];
+    } else if (self.expandedPercent == 0.0) {
+        // Show full panel
+        [self.delegate contentViewWantsNotificationShadeExpansion:self];
+    }
 }
 
 #pragma mark - Properties
