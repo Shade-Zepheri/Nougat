@@ -28,7 +28,8 @@
 
 - (void)_createDivider {
     _dividerView = [[UIView alloc] initWithFrame:CGRectZero];
-    _dividerView.backgroundColor = OreoDividerColor;
+    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
+    _dividerView.backgroundColor = useDark ? OreoDividerColor : [UIColor clearColor];
     [self addSubview:_dividerView];
 
     // Constraints
