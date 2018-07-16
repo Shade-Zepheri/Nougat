@@ -207,6 +207,22 @@
 
     BOOL useDark = [textColor isEqual:[UIColor blackColor]];
     _dividerView.backgroundColor = useDark ? OreoDividerColor : [UIColor clearColor];
+
+    // Update imageView images
+    NSString *imageStyle = useDark ? @"_black" : @"_white";
+    NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+
+    NSString *accountImage = [@"account" stringByAppendingString:imageStyle];
+    self.accountView.image = [UIImage imageNamed:accountImage inBundle:imageBundle];
+
+    NSString *nougatImage = [@"edit" stringByAppendingString:imageStyle];
+    self.nougatView.image = [UIImage imageNamed:nougatImage inBundle:imageBundle];
+
+    NSString *settingsImage = [@"settings" stringByAppendingString:imageStyle];
+    self.settingsView.image = [UIImage imageNamed:settingsImage inBundle:imageBundle];
+
+    NSString *arrowImage = [@"arrow" stringByAppendingString:imageStyle];
+    self.arrowView.image = [UIImage imageNamed:arrowImage inBundle:imageBundle];
 }
 
 @end
