@@ -185,6 +185,10 @@
     // Update alpha
     self.accountView.alpha = percent;
     self.nougatView.alpha = percent;
+
+    // Rotate arrow
+    CGFloat angle = M_PI * percent;
+    self.arrowView.transform = CGAffineTransformMakeRotation(angle);
 }
 
 #pragma mark - Notifications
