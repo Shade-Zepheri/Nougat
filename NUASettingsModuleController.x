@@ -70,7 +70,7 @@
         return;
     }
 
-    CGFloat percentage = (0.002857 * presentedHeight) - 0.428571;
+    CGFloat percentage = (presentedHeight - 150) / 350;
     [self _settingsView].expandedPercent = percentage;
 }
 
