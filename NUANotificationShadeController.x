@@ -337,8 +337,8 @@
 }
 
 - (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings {
-    // Dont start if already present
-    if (self.presentedState != NUANotificationShadePresentedStateNone) {
+    // Dont start if at main panel
+    if (self.presentedState == NUANotificationShadePresentedStateMainPanel) {
         return;
     }
 
