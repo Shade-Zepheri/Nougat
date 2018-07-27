@@ -34,7 +34,7 @@
             <key>key</key>
             <string>darkVariant</string>
             <key>label</key>
-            <string>Drawer Style</string>
+            <string>DRAWER_STYLE</string>
             <key>validTitles</key>
             <array>
                 <string>NEXUS</string>
@@ -56,7 +56,7 @@
             <key>cell</key>
             <string>PSLinkCell</string>
             <key>label</key>
-            <string>User Guide</string>
+            <string>USER_GUIDE</string>
             <key>detail</key>
             <string>NUAUserGuideController</string>
         </dict>
