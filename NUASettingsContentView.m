@@ -128,12 +128,6 @@
         return;
     }
 
-    if (gestureRecognizer.view.tag == 4) {
-        // Do something else
-        [self _toggleNotificationShadeState];
-        return;
-    }
-
     NSString *URLString = @"prefs:root=";
     switch (gestureRecognizer.view.tag) {
         case 1: {
@@ -150,6 +144,10 @@
             // Go to settings root
             URLString = [URLString stringByAppendingString:@"ROOT"];
             break;
+        case 4:
+            // Switcher
+            [self _toggleNotificationShadeState];
+            return;
         default:
             break;
     }
