@@ -18,7 +18,7 @@
         return;
     }
 
-    //Get if activated or not and send message
+    // Determine if activated or not and send message
     NSString *notificationName = activated ? @"NUANotificationShadeDidActivate" : @"NUANotificationShadeDidDeactivate";
     NSDictionary *userInfo = @{@"NUANotificationShadeControlName" : message};
 
@@ -228,7 +228,7 @@
 }
 
 - (void)_showNotificationShadeGestureFailed {
-    //Cancel transition
+    // Cancel transition
     [self _cancelAnimation];
 }
 
@@ -315,7 +315,7 @@
 }
 
 - (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely {
-    // ALways going to dismiss completely
+    // Always going to dismiss completely
     if (!self.presented) {
         return;
     }
