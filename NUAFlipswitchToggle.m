@@ -24,7 +24,7 @@
 
         _displayName = [[UILabel alloc] initWithFrame:CGRectZero];
         self.displayName.translatesAutoresizingMaskIntoConstraints = NO;
-        self.displayName.alpha = 0.0;
+        self.displayName.alpha = 1.0;
         self.displayName.font = [UIFont systemFontOfSize:12];
         self.displayName.textColor = [NUAPreferenceManager sharedSettings].textColor;
         self.displayName.backgroundColor = [UIColor clearColor];
@@ -38,13 +38,14 @@
         // Create imageView
         _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:self.imageView];
 
         // Constraints
-        [self.imageView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-        [self.imageView.bottomAnchor constraintEqualToAnchor:self.displayName.topAnchor].active = YES;
-        [self.imageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.imageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+        [self.imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+        [self.imageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+        [self.imageView.widthAnchor constraintEqualToConstant:28].active = YES;
+        [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
 
         self.switchIdentifier = identifier;
 
@@ -106,9 +107,9 @@
         imageName = [imageName stringByAppendingString:imageStyle];
     } 
 
-    // animate transition
-    CGFloat duration = animated ? 0.2 : 0.0;
-    [UIView transitionWithView:self.imageView duration:duration options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionTransitionCrossDissolve animations:^{
+    // Animate transition
+    CGFloat duration = animated ? 0.4 : 0.0;
+    [UIView transitionWithView:self.imageView duration:duration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
         self.imageView.image = [UIImage imageNamed:imageName inBundle:self.resourceBundle];
     } completion:nil];
 }
@@ -127,7 +128,11 @@
 
     if ([self.switchIdentifier isEqualToString:@"wifi"]) {
         NSString *labelText = [self.resourceBundle localizedStringForKey:self.switchIdentifier value:self.switchIdentifier table:nil];
-        self.displayName.text = [NUAPreferenceManager currentWifiSSID] ?: labelText;
+
+        // Animate change
+        [UIView transitionWithView:self.displayName duration:0.25 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+            self.displayName.text = [NUAPreferenceManager currentWifiSSID] ?: labelText;
+        } completion:nil];
     }
 }
 
