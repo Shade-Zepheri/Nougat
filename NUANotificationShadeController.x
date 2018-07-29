@@ -587,7 +587,8 @@
             height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
         }
 
-        [UIView animateWithDuration:0.1 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        // TODO: Change this to gradually increment to height instead of UIView.animate
+        [UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
             [self _updatePresentedHeight:height];
         } completion:nil];
 
