@@ -1,6 +1,5 @@
 #import "NUATogglesContentView.h"
 #import "NUAPreferenceManager.h"
-#import <HBLog.h>
 
 @implementation NUATogglesContentView
 
@@ -81,7 +80,6 @@
 #pragma mark - Rearrangement
 
 - (void)rearrangeForPercent:(CGFloat)percent {
-    HBLogDebug(@"percent: %f", percent);
     CGFloat newWidth = _startingWidth + (_widthDifference * percent);
     CGFloat newHeight = 50 + (50 * percent);
 
