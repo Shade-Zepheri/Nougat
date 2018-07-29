@@ -574,6 +574,23 @@
     _viewController.presentedHeight = height;
 }
 
+- (void)_updatePresentedHeightGradually:(CGFloat)targetHeight increment:(CGFloat)increment {
+    // TODO: Apply easing??
+    __block NSInteger fireTimes = 0; // Hacky way to stop timer when done
+    __block NSTimer *gradualIncreaseTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer *timer) {
+        if (fireTimes == 15) {
+            [self _updatePresentedHeight:targetHeight];
+            [gradualIncreaseTimer invalidate];
+            return;
+        }
+
+        // Round so dealing with exacts
+        CGFloat newHeight = _viewController.presentedHeight + increment;
+        [self _updatePresentedHeight:newHeight];
+        fireTimes++;
+    }];
+}
+
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {
     self.animating = NO;
 
@@ -587,10 +604,10 @@
             height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
         }
 
-        // TODO: Change this to gradually increment to height instead of UIView.animate
-        [UIView animateWithDuration:0.4 delay:0.0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-            [self _updatePresentedHeight:height];
-        } completion:nil];
+        // UIView.animate does weird things so manually apply height
+        CGFloat heightDifference = height - _viewController.presentedHeight;
+        CGFloat heightIncrement = heightDifference / 15.0;
+        [self _updatePresentedHeightGradually:height increment:heightIncrement];
 
         // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
