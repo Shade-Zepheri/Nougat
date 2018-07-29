@@ -83,31 +83,23 @@
     CGFloat newWidth = _startingWidth + (_widthDifference * percent);
     CGFloat newHeight = 50 + (50 * percent);
 
-    // Update size for first 6
-    for (int i = 0; i < 6; i++) {
-        NUAFlipswitchToggle *toggle = self.togglesArray[i];
-        CGRect oldFrame = toggle.frame;
-        toggle.frame = CGRectMake(oldFrame.origin.x, oldFrame.origin.y, newWidth, newHeight);
-    }
-
     // Update first row
     for (int i = 0; i < _topRow.count; i++) {
         NUAFlipswitchToggle *toggle = _topRow[i];
         CGRect oldFrame = toggle.frame;
         CGFloat newX = (i * newWidth) + (35 * percent);
-        toggle.frame = CGRectMake(newX, oldFrame.origin.y, CGRectGetWidth(oldFrame), CGRectGetHeight(oldFrame));
+        toggle.frame = CGRectMake(newX, CGRectGetMinY(oldFrame), newWidth, newHeight);
     }
 
     // Shift middle row
     for (int i = 0; i < _middleRow.count; i++) {
         NUAFlipswitchToggle *toggle = _middleRow[i];
 
-        CGRect oldFrame = toggle.frame;
         CGFloat originalX = _startingWidth * (i + 3);
         CGFloat targetX = (i * newWidth) + (35 * percent);
         CGFloat newX = originalX - ((originalX - targetX) * percent);
         CGFloat newY = 100 * percent;
-        toggle.frame = CGRectMake(newX, newY, CGRectGetWidth(oldFrame), CGRectGetHeight(oldFrame));
+        toggle.frame = CGRectMake(newX, newY, newHeight, newHeight);
     }
 
     // Update bottom row
@@ -117,7 +109,7 @@
         CGFloat height = 100 * percent;
 
         toggle.alpha = percent;
-        toggle.frame = CGRectMake(oldFrame.origin.x, newY, CGRectGetWidth(oldFrame), height);
+        toggle.frame = CGRectMake(CGRectGetMinX(oldFrame), newY, CGRectGetWidth(oldFrame), height);
     }
 }
 
