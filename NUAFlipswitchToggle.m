@@ -24,7 +24,7 @@
 
         _displayName = [[UILabel alloc] initWithFrame:CGRectZero];
         self.displayName.translatesAutoresizingMaskIntoConstraints = NO;
-        self.displayName.alpha = 1.0;
+        self.displayName.alpha = 0.0;
         self.displayName.font = [UIFont systemFontOfSize:12];
         self.displayName.textColor = [NUAPreferenceManager sharedSettings].textColor;
         self.displayName.backgroundColor = [UIColor clearColor];
