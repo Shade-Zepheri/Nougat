@@ -323,13 +323,18 @@
     self.animating = YES;
     self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
 
-    CGFloat duration  = animated ? 0.4 : 0.0;
-    [UIView animateWithDuration:duration animations:^{
+    // Animate out
         CGFloat height = [self _yValueForCurrentState];
-        [self _presentViewToHeight:height];
-    } completion:^(BOOL finished) {
+    if (animated) {
+        CGFloat heightDifference = height - _viewController.presentedHeight;
+        CGFloat heightIncrement = heightDifference / 15.0;
+        [self _updatePresentedHeightGradually:height increment:heightIncrement completion:^{
         [self _finishAnimationWithCompletion:nil];
     }];
+    } else {
+        [self _presentViewToHeight:height];
+        [self _finishAnimationWithCompletion:nil];
+}
 }
 
 - (void)presentAnimated:(BOOL)animated {
@@ -348,13 +353,17 @@
     self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
 
     // Animate in 
-    CGFloat duration = animated ? 0.4 : 0.0;
-    [UIView animateWithDuration:duration animations:^{
         CGFloat height = [self _yValueForCurrentState];
+    if (animated) {
+        CGFloat heightDifference = height - _viewController.presentedHeight;
+        CGFloat heightIncrement = heightDifference / 15.0;
+        [self _updatePresentedHeightGradually:height increment:heightIncrement completion:^{
+            [self _finishAnimationWithCompletion:nil];
+        }];
+    } else {
         [self _presentViewToHeight:height];
-    } completion:^(BOOL finished) {
         [self _finishAnimationWithCompletion:nil];
-    }];
+    }
 }
 
 #pragma mark - Second stage animation helpers
