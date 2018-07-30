@@ -328,9 +328,8 @@
     // Animate out
     CGFloat height = [self _yValueForCurrentState];
     if (animated) {
-        CGFloat heightDifference = height - _viewController.presentedHeight;
-        CGFloat heightIncrement = heightDifference / 15.0;
-        [self _updatePresentedHeightGradually:height increment:heightIncrement completion:^{
+        CGFloat baseHeight = _viewController.presentedHeight;
+        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
             [self _finishAnimationWithCompletion:nil];
         }];
     } else {
@@ -357,9 +356,8 @@
     // Animate in
     CGFloat height = [self _yValueForCurrentState];
     if (animated) {
-        CGFloat heightDifference = height - _viewController.presentedHeight;
-        CGFloat heightIncrement = heightDifference / 15.0;
-        [self _updatePresentedHeightGradually:height increment:heightIncrement completion:^{
+        CGFloat baseHeight = _viewController.presentedHeight;
+        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
             [self _finishAnimationWithCompletion:nil];
         }];
     } else {
@@ -592,13 +590,18 @@
     _viewController.presentedHeight = height;
 }
 
-- (void)_updatePresentedHeightGradually:(CGFloat)targetHeight increment:(CGFloat)increment completion:(void(^)(void))completion{
-    // TODO: Apply easing??
+CGFloat multiplerAdjustedForEasing(CGFloat t) {
+    // TODO: Maybe use material design standard?
+    return (t < .5) ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+}
+
+- (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     __block NSInteger fireTimes = 0; // Hacky way to stop timer when done
+    __block CGFloat difference = targetHeight - baseHeight;
     __block NSTimer *gradualIncreaseTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer *timer) {
         if (fireTimes == 15) {
-            [self _updatePresentedHeight:targetHeight];
             [gradualIncreaseTimer invalidate];
+            [self _updatePresentedHeight:targetHeight];
 
             if (completion) {
                 completion();
@@ -606,10 +609,13 @@
             return;
         }
 
-        // Update height
-        CGFloat newHeight = _viewController.presentedHeight + increment;
-        [self _updatePresentedHeight:newHeight];
         fireTimes++;
+        CGFloat t = fireTimes / 15.0;
+        CGFloat multiplier = multiplerAdjustedForEasing(t);
+
+        // Update height
+        CGFloat newHeight = baseHeight + (difference * multiplier);
+        [self _updatePresentedHeight:newHeight];
     }];
 }
 
@@ -627,9 +633,8 @@
         }
 
         // UIView.animate does weird things so manually apply height
-        CGFloat heightDifference = height - _viewController.presentedHeight;
-        CGFloat heightIncrement = heightDifference / 15.0;
-        [self _updatePresentedHeightGradually:height increment:heightIncrement completion:nil];
+        CGFloat baseHeight = _viewController.presentedHeight;
+        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:nil];
 
         // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
