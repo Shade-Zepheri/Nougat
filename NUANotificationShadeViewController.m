@@ -2,7 +2,6 @@
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAModulesContainerViewController.h"
 #import "NUAPreferenceManager.h"
-#import "NUAQuickToggleButton.h"
 #import "Macros.h"
 #import <UIKit/UIPanGestureRecognizer+Private.h>
 
