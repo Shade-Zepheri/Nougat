@@ -218,7 +218,8 @@
 
     // Defer
     CGPoint velocity = FBSystemGestureVelocityInView(gestureRecognizer, self.view);
-    [self endAnimationWithVelocity:velocity wasCancelled:NO completion:^{
+    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
+    [self endAnimationWithVelocity:velocity location:location wasCancelled:NO completion:^{
         [self _endAnimation];
     }];
 }
@@ -260,8 +261,9 @@
             break;
         }
         case UIGestureRecognizerStateEnded: {
+            CGPoint location = [panGesture locationInView:self.view];
             CGPoint velocity = [panGesture velocityInView:self.view];
-            [self endAnimationWithVelocity:velocity wasCancelled:NO completion:nil];
+            [self endAnimationWithVelocity:velocity location:location wasCancelled:NO completion:nil];
             break;
         }
         case UIGestureRecognizerStateCancelled:
@@ -324,17 +326,17 @@
     self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
 
     // Animate out
-        CGFloat height = [self _yValueForCurrentState];
+    CGFloat height = [self _yValueForCurrentState];
     if (animated) {
         CGFloat heightDifference = height - _viewController.presentedHeight;
         CGFloat heightIncrement = heightDifference / 15.0;
         [self _updatePresentedHeightGradually:height increment:heightIncrement completion:^{
-        [self _finishAnimationWithCompletion:nil];
-    }];
+            [self _finishAnimationWithCompletion:nil];
+        }];
     } else {
         [self _presentViewToHeight:height];
         [self _finishAnimationWithCompletion:nil];
-}
+    }
 }
 
 - (void)presentAnimated:(BOOL)animated {
@@ -352,8 +354,8 @@
     self.animating = YES;
     self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
 
-    // Animate in 
-        CGFloat height = [self _yValueForCurrentState];
+    // Animate in
+    CGFloat height = [self _yValueForCurrentState];
     if (animated) {
         CGFloat heightDifference = height - _viewController.presentedHeight;
         CGFloat heightIncrement = heightDifference / 15.0;
@@ -407,29 +409,31 @@
     [self _presentViewToHeight:height];
 }
 
-- (void)endAnimationWithVelocity:(CGPoint)velocity wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
+- (void)endAnimationWithVelocity:(CGPoint)velocity location:(CGPoint)location wasCancelled:(BOOL)cancelled completion:(void(^)(void))completion {
+    // Use project to calculate final position and check if within percent of targeted height
     if (self.presented && self.visible && self.animating) {
+        CGFloat projectedY = location.y + [self project:velocity.y decelerationRate:0.998];
         if (_isPresenting) {
-            // Simply show Quick toggles if presenting from none
-            self.presentedState = NUANotificationShadePresentedStateQuickToggles;
+            // Check if within range to present
+            CGFloat targetY = [self _yValueForPresented] * 0.85;
+            self.presentedState = (projectedY >= targetY) ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateNone; 
         } else if (_panHasGoneBelowTopEdge) {
-            CGFloat currentHeight = _viewController.presentedHeight;
-            if (velocity.y >= 0) {
-                // Presenting
-                if (self.presentedState == NUANotificationShadePresentedStateQuickToggles && (currentHeight + velocity.y) >= [self _yValueForFullyPresented]) {
+            if (self.presentedState == NUANotificationShadePresentedStateQuickToggles) {
+                // Decide if dismiss or fully present
+                CGFloat targetMainY = [self _yValueForFullyPresented] * 0.7;
+                CGFloat targetCloseY = [self _yValueForPresented] * 0.4;
+                if (projectedY >= targetMainY) {
                     self.presentedState = NUANotificationShadePresentedStateMainPanel;
-                }
-            } else {
-                // Dismissing
-                if ((currentHeight <= 64.0 || velocity.y <= -1500) && ![self _shouldShowMainPanel]) {
+                } else if (projectedY <= targetCloseY) {
                     self.presentedState = NUANotificationShadePresentedStateNone;
-                } else if ((currentHeight + velocity.y) <= [self _yValueForPresented]) {
-                    self.presentedState = NUANotificationShadePresentedStateQuickToggles;
                 }
+            } else if (self.presentedState == NUANotificationShadePresentedStateMainPanel) {
+                // Decide if collapse
+                CGFloat targetCollapseY = [self _yValueForFullyPresented] * 0.45;
+                self.presentedState = (projectedY <= targetCollapseY) ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
             }
         }
 
-        // TODO: do some nifty UIDynamicAnimator things
         [self _finishAnimationWithCompletion:completion];
     } else if (completion) {
         completion();
@@ -488,6 +492,11 @@
 
     // return fully open height as fallback
     return [self _yValueForPresented];
+}
+
+- (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
+    // From WWDC (UIScrollView.decelerationRate = 0.998)
+    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate);
 }
 
 #pragma mark - Third stage animation helpers
@@ -597,7 +606,7 @@
             return;
         }
 
-        // Round so dealing with exacts
+        // Update height
         CGFloat newHeight = _viewController.presentedHeight + increment;
         [self _updatePresentedHeight:newHeight];
         fireTimes++;
