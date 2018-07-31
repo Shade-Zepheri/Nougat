@@ -2,6 +2,7 @@
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAPreferenceManager.h"
 #import "Macros.h"
+#import "CADisplayLink+Blocks.h"
 #import <FrontBoard/FBDisplayManager.h>
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
@@ -596,11 +597,11 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 }
 
 - (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
-    __block NSInteger fireTimes = 0; // Hacky way to stop timer when done
+    __block NSInteger fireTimes = 0;
     __block CGFloat difference = targetHeight - baseHeight;
-    __block NSTimer *gradualIncreaseTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer *timer) {
-        if (fireTimes == 15) {
-            [gradualIncreaseTimer invalidate];
+    CADisplayLink *displayLink = [CADisplayLink displayLinkWithBlock:^(CADisplayLink *link) {
+        if (fireTimes == 19) {
+            [link invalidate];
             [self _updatePresentedHeight:targetHeight];
 
             if (completion) {
@@ -609,14 +610,16 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
             return;
         }
 
+        
         fireTimes++;
-        CGFloat t = fireTimes / 15.0;
-        CGFloat multiplier = multiplerAdjustedForEasing(t);
+        CGFloat t = fireTimes / 20.0;
+        CGFloat multiplier = t;// multiplerAdjustedForEasing(t);
 
         // Update height
         CGFloat newHeight = baseHeight + (difference * multiplier);
         [self _updatePresentedHeight:newHeight];
     }];
+    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {
