@@ -433,7 +433,11 @@
             }
         }
 
-        [self _finishAnimationWithCompletion:completion];
+        // Animate to finished height
+        CGFloat height = [self _yValueForCurrentState];
+        [self _updatePresentedHeightGradually:height baseHeight:_viewController.presentedHeight completion:^{
+            [self _finishAnimationWithCompletion:completion];
+        }];
     } else if (completion) {
         completion();
     }
@@ -630,16 +634,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     if (self.presented) {
         BOOL dismissed = self.presentedState == NUANotificationShadePresentedStateNone;
 
-        CGFloat height;
-        if (dismissed) {
-            height = [self _yValueForDismissed];
-        } else {
-            height = [self _shouldShowMainPanel] ? [self _yValueForFullyPresented] : [self _yValueForPresented];
-        }
-
-        // UIView.animate does weird things so manually apply height
-        CGFloat baseHeight = _viewController.presentedHeight;
-        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:nil];
+        // Make sure at right height
+        CGFloat height = [self _yValueForCurrentState];
+        [self _updatePresentedHeight:height];
 
         // Resume idle timer and banners
         [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
