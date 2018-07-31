@@ -592,8 +592,10 @@
 }
 
 CGFloat multiplerAdjustedForEasing(CGFloat t) {
-    // TODO: Maybe use material design standard?
-    return (t < .5) ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+    // Use material design spec bezier curve to get multiplier
+    CGFloat xForT = (0.6 * (1 - t) * t * t) + (1.2 * (1 - t) * (1 - t) * t) + ((1 - t) * (1 - t) * (1 - t));
+    CGFloat yForX = (3 * xForT * xForT * (1 - xForT)) + (xForT * xForT * xForT);
+    return 1 - yForX;
 }
 
 - (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
@@ -613,7 +615,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         
         fireTimes++;
         CGFloat t = fireTimes / 20.0;
-        CGFloat multiplier = t;// multiplerAdjustedForEasing(t);
+        CGFloat multiplier = multiplerAdjustedForEasing(t);
 
         // Update height
         CGFloat newHeight = baseHeight + (difference * multiplier);
