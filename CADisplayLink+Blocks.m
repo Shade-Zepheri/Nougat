@@ -11,7 +11,7 @@ CADisplayLinkFireBlock fireBlock;
 + (instancetype)displayLinkWithBlock:(CADisplayLinkFireBlock)block {
     fireBlock = [block copy];
 
-    return [self displayLinkWithTarget:self selector:@selector(NUA_fireBlock:)];;
+    return [self displayLinkWithTarget:self selector:@selector(NUA_fireBlock:)];
 }
 
 #pragma mark - Block execution
