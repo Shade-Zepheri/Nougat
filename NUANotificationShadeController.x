@@ -467,10 +467,6 @@
     return 500.0;
 }
 
-- (BOOL)_shouldShowMainPanel {
-    return self.presentedState == NUANotificationShadePresentedStateMainPanel;
-}
-
 - (CGFloat)_yValueForCurrentState {
     switch (self.presentedState) {
         case NUANotificationShadePresentedStateNone:
