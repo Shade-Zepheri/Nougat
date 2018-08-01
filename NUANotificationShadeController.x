@@ -184,7 +184,7 @@
     // Disable icon editing
     [[%c(SBIconController) sharedInstance] setIsEditing:NO withFeedbackBehavior:nil];
 
-    // Disable NC gesture
+    // Inhibit system gestures
     NUANotificationCenterInhibitor.inhibited = YES;
 
     // Begin presentation
@@ -214,9 +214,6 @@
 }
 
 - (void)_showNotificationShadeGestureEndedWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
-    // Uninhibit NC
-    NUANotificationCenterInhibitor.inhibited = NO;
-
     // Defer
     CGPoint velocity = FBSystemGestureVelocityInView(gestureRecognizer, self.view);
     CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
@@ -334,7 +331,7 @@
             [self _finishAnimationWithCompletion:nil];
         }];
     } else {
-        [self _presentViewToHeight:height];
+        [self _updatePresentedHeight:height];
         [self _finishAnimationWithCompletion:nil];
     }
 }
@@ -362,7 +359,7 @@
             [self _finishAnimationWithCompletion:nil];
         }];
     } else {
-        [self _presentViewToHeight:height];
+        [self _updatePresentedHeight:height];
         [self _finishAnimationWithCompletion:nil];
     }
 }
@@ -659,6 +656,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     if (self.presented || _window.hidden) {
         return;
     }
+
+    // Uninhibit system gestures
+    NUANotificationCenterInhibitor.inhibited = NO;
 
     _window.hidden = YES;
     self.presentedState = NUANotificationShadePresentedStateNone;
