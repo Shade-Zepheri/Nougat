@@ -49,32 +49,59 @@
         return;
     }
 
+    // Create containers
     CGFloat viewWidth = CGRectGetWidth(self.bounds);
-    CGFloat smallWidth = viewWidth / 6;
-    CGFloat fullWidth = ((viewWidth - 70) / 3);
+    CGFloat containerWidth = viewWidth / 2;
+    CGFloat bottomWidth = (viewWidth - 70);
+
+    _topContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, containerWidth, CGRectGetHeight(self.bounds))];
+    [self addSubview:_topContainerView];
+    _middleContainerView = [[UIView alloc] initWithFrame:CGRectMake(containerWidth, 0, containerWidth, CGRectGetHeight(self.bounds))];
+    [self addSubview:_middleContainerView];
+    _bottomContainerView = [[UIView alloc] initWithFrame:CGRectMake(35, CGRectGetHeight(self.bounds), bottomWidth, 0)];
+    _bottomContainerView.alpha = 0.0;
+    [self addSubview:_bottomContainerView];
+
+    UIStackView *topStackView = [self _createHorizontalStackViewForView:_topContainerView];
+    UIStackView *middleStackView = [self _createHorizontalStackViewForView:_middleContainerView];
+    UIStackView *bottomStackView = [self _createHorizontalStackViewForView:_bottomContainerView];
 
     // Layout quick toggles view
-    for (int i = 0; i < 6; i++) {
-        NUAFlipswitchToggle *toggle = self.togglesArray[i];
-        [self addSubview:toggle];
-        
-        CGFloat width = smallWidth;
-        CGFloat x = width * i;
-        toggle.frame = CGRectMake(x, 0, width, CGRectGetHeight(self.bounds));
+    for (NUAFlipswitchToggle *toggle in _topRow) {
+        [topStackView addArrangedSubview:toggle];
+    }
+    
+    for (NUAFlipswitchToggle *toggle in _middleRow) {
+        [middleStackView addArrangedSubview:toggle];
     }
 
-    // Layout bottom row
-    for (int i = 0; i < _bottomRow.count; i++) {
-        NUAFlipswitchToggle *toggle = _bottomRow[i];
-        [self addSubview:toggle];
-
-        CGFloat x = (fullWidth * i) + 35;
-        toggle.alpha = 0.0;
-        toggle.frame = CGRectMake(x, CGRectGetHeight(self.frame), fullWidth, 0);
+    for (NUAFlipswitchToggle *toggle in _bottomRow) {
+        [bottomStackView addArrangedSubview:toggle];
     }
 
-    _startingWidth = smallWidth;
-    _widthDifference = fullWidth - _startingWidth;
+    _startingWidth = containerWidth;
+    _widthDifference = bottomWidth - containerWidth;
+}
+
+#pragma mark - View creation
+
+- (UIStackView *)_createHorizontalStackViewForView:(UIView *)superView {
+    UIStackView *stackView = [[UIStackView alloc] initWithFrame:CGRectZero];
+    stackView.axis = UILayoutConstraintAxisHorizontal;
+    stackView.alignment = UIStackViewAlignmentFill;
+    stackView.distribution = UIStackViewDistributionFillEqually;
+    stackView.spacing = 0.0;
+    [superView addSubview:stackView];
+
+    // Constraints
+    stackView.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [stackView.topAnchor constraintEqualToAnchor:superView.topAnchor].active = YES;
+    [stackView.bottomAnchor constraintEqualToAnchor:superView.bottomAnchor].active = YES;
+    [stackView.leadingAnchor constraintEqualToAnchor:superView.leadingAnchor].active = YES;
+    [stackView.trailingAnchor constraintEqualToAnchor:superView.trailingAnchor].active = YES;
+
+    return stackView;
 }
 
 #pragma mark - Rearrangement
@@ -84,33 +111,19 @@
     CGFloat newHeight = 50 + (50 * percent);
 
     // Update first row
-    for (int i = 0; i < _topRow.count; i++) {
-        NUAFlipswitchToggle *toggle = _topRow[i];
-        CGRect oldFrame = toggle.frame;
-        CGFloat newX = (i * newWidth) + (35 * percent);
-        toggle.frame = CGRectMake(newX, CGRectGetMinY(oldFrame), newWidth, newHeight);
-    }
+    _topContainerView.frame = CGRectMake(35 * percent, 0, newWidth, newHeight);
 
     // Shift middle row
-    for (int i = 0; i < _middleRow.count; i++) {
-        NUAFlipswitchToggle *toggle = _middleRow[i];
-
-        CGFloat originalX = _startingWidth * (i + 3);
-        CGFloat targetX = (i * newWidth) + (35 * percent);
-        CGFloat newX = originalX - ((originalX - targetX) * percent);
-        CGFloat newY = 100 * percent;
-        toggle.frame = CGRectMake(newX, newY, newHeight, newHeight);
-    }
+    CGFloat originalX = _startingWidth;
+    CGFloat targetX = (35 * percent);
+    CGFloat newX = originalX - ((originalX - targetX) * percent);
+    _middleContainerView.frame = CGRectMake(newX, 100 * percent, newWidth, newHeight);
 
     // Update bottom row
-    for (NUAFlipswitchToggle *toggle in _bottomRow) {
-        CGRect oldFrame = toggle.frame;
-        CGFloat newY = ((CGRectGetHeight(self.frame) - (50 * percent)) / 3)  * 2;
-        CGFloat height = 100 * percent;
-
-        toggle.alpha = percent;
-        toggle.frame = CGRectMake(CGRectGetMinX(oldFrame), newY, CGRectGetWidth(oldFrame), height);
-    }
+    CGRect oldFrame = _bottomContainerView.frame;
+    CGFloat newY = ((CGRectGetHeight(self.frame) - (50 * percent)) / 3)  * 2;
+    _bottomContainerView.alpha = percent;
+    _bottomContainerView.frame = CGRectMake(35, newY, CGRectGetWidth(oldFrame), 100 * percent);
 }
 
 #pragma mark - Properties

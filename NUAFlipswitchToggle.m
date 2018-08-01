@@ -57,6 +57,10 @@
     return self;
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p; switchIdentifier = %@>", self.class, self, self.switchIdentifier];
+}
+
 - (void)toggleWasTapped:(UITapGestureRecognizer *)recognizer {
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
