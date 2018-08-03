@@ -18,6 +18,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     BOOL _isDismissing;
     BOOL _panHasGoneBelowTopEdge;
     CGPoint _initalTouchLocation;
+    CADisplayLink *_animationTimer;
 }
 
 @property (nonatomic) NUANotificationShadePresentedState presentedState;

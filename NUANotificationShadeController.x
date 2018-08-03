@@ -498,6 +498,11 @@
 #pragma mark - Third stage animation helpers
 
 - (void)_prepareForPresentation {
+    if (_animationTimer) {
+        [_animationTimer invalidate];
+        _animationTimer = nil;
+    }
+
     [self _beginPresentation];
     self.animating = YES;
 }
@@ -598,7 +603,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 - (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     __block NSInteger fireTimes = 0;
     __block CGFloat difference = targetHeight - baseHeight;
-    CADisplayLink *displayLink = [CADisplayLink displayLinkWithBlock:^(CADisplayLink *link) {
+    _animationTimer = [CADisplayLink displayLinkWithBlock:^(CADisplayLink *link) {
         if (fireTimes == 19) {
             [link invalidate];
             [self _updatePresentedHeight:targetHeight];
@@ -618,7 +623,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         CGFloat newHeight = baseHeight + (difference * multiplier);
         [self _updatePresentedHeight:newHeight];
     }];
-    [displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
+    [_animationTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
 
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {
