@@ -48,7 +48,7 @@
 
     // Set new height (don't ask about func, line of best fit / lazy);
     CGFloat multiplier = height - 150.0;
-    CGFloat newConstant = (0.857143 * multiplier) + 50;
+    CGFloat newConstant = (multiplier * 6) / 7 + 50;
     _heightConstraint.constant = newConstant;
 
     // Pass to view
