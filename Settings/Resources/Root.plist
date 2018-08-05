@@ -5,8 +5,14 @@
     <key>items</key>
     <array>
         <dict>
-            <key>cell</key>
+        <key>cell</key>
             <string>PSGroupCell</string>
+            <key>headerCellClass</key>
+            <string>HBImageTableCell</string>
+            <key>height</key>
+            <integer>174</integer>
+            <key>icon</key>
+            <string>Header.png</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -112,6 +118,6 @@
         </dict>
     </array>
     <key>title</key>
-    <string>NOUGAT</string>
+    <string></string>
 </dict>
 </plist>
