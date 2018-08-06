@@ -25,11 +25,11 @@
     self = [super init];
     if (self) {
         HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
-        appearanceSettings.tintColor = [UIColor colorWithRed:0.32 green:0.18 blue:0.66 alpha:1.0];
-        appearanceSettings.navigationBarTintColor = [UIColor whiteColor];
+        appearanceSettings.tintColor = [UIColor colorWithRed:0.57 green:0.71 blue:0.89 alpha:1.0];
+        appearanceSettings.navigationBarTintColor = [UIColor colorWithRed:0.83 green:0.90 blue:0.99 alpha:1.0];
         appearanceSettings.navigationBarTitleColor = [UIColor whiteColor];
-        appearanceSettings.navigationBarBackgroundColor = [UIColor colorWithRed:0.32 green:0.18 blue:0.66 alpha:1.0];
-        appearanceSettings.statusBarTintColor = [UIColor whiteColor];
+        appearanceSettings.navigationBarBackgroundColor = [UIColor colorWithRed:0.57 green:0.71 blue:0.89 alpha:1.0];
+        appearanceSettings.statusBarTintColor = [UIColor blackColor];
         appearanceSettings.translucentNavigationBar = NO;
         self.hb_appearanceSettings = appearanceSettings;
     }
