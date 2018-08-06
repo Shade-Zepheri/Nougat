@@ -5,7 +5,7 @@
     <key>items</key>
     <array>
         <dict>
-        <key>cell</key>
+            <key>cell</key>
             <string>PSGroupCell</string>
             <key>headerCellClass</key>
             <string>HBImageTableCell</string>
@@ -21,12 +21,14 @@
             <false/>
             <key>defaults</key>
             <string>com.shade.nougat</string>
-            <key>PostNotification</key>
-            <string>com.shade.nougat/ReloadPrefs</string>
             <key>key</key>
             <string>enabled</string>
+            <key>icon</key>
+			<string>enable.png</string>
             <key>label</key>
             <string>ENABLE</string>
+            <key>PostNotification</key>
+            <string>com.shade.nougat/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -57,14 +59,16 @@
         <dict>
             <key>cell</key>
             <string>PSGroupCell</string>
-            </dict>
+        </dict>
             <dict>
             <key>cell</key>
             <string>PSLinkCell</string>
-            <key>label</key>
-            <string>USER_GUIDE</string>
             <key>detail</key>
             <string>NUAUserGuideController</string>
+            <key>icon</key>
+			<string>guide.png</string>
+            <key>label</key>
+            <string>USER_GUIDE</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -75,8 +79,8 @@
             <string>PSLinkCell</string>
             <key>detail</key>
             <string>NUASortOrderController</string>
-            <key>isController</key>
-            <true/>
+            <key>icon</key>
+			<string>edit.png</string>
             <key>label</key>
             <string>SORT_ORDER</string>
         </dict>
@@ -103,6 +107,8 @@
             <string>HBTintedTableCell</string>
 			<key>label</key>
 			<string>SUPPORT</string>
+            <key>icon</key>
+			<string>support.png</string>
 			<key>action</key>
 		    <string>showSupportEmailController</string>
 		</dict>
@@ -110,7 +116,7 @@
             <key>cellClass</key>
             <string>HBLinkTableCell</string>
             <key>icon</key>
-            <string>github.png</string>
+            <string>source.png</string>
             <key>label</key>
             <string>SOURCE_CODE</string>
             <key>url</key>
