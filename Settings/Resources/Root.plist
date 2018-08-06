@@ -10,7 +10,7 @@
             <key>headerCellClass</key>
             <string>HBImageTableCell</string>
             <key>height</key>
-            <integer>174</integer>
+            <integer>160</integer>
             <key>icon</key>
             <string>Header.png</string>
         </dict>
