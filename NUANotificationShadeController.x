@@ -541,7 +541,11 @@
     }
 
     // Stop the Idle timer and banners while presenting
-    [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
+    SBBacklightController *controller = [%c(SBBacklightController) sharedInstance];
+    if ([controller respondsToSelector:@selector(setIdleTimerDisabled:forReason:)]) {
+        [controller setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
+    }
+    
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
 
     // Aquire assertion
@@ -648,7 +652,11 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         [self _updatePresentedHeight:height];
 
         // Resume idle timer and banners
-        [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
+        SBBacklightController *controller = [%c(SBBacklightController) sharedInstance];
+        if ([controller respondsToSelector:@selector(setIdleTimerDisabled:forReason:)]) {
+            [controller setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
+        }
+
         [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 
         if (dismissed) {
