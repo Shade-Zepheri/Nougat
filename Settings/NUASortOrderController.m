@@ -23,6 +23,14 @@
     return @"";
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+	return @"";
+}
+
+- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    return nil;
+}
+
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
@@ -57,8 +65,24 @@
     return UITableViewCellEditingStyleNone;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    return 0.0;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 44.0;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView titleAlignmentForFooterInSection:(NSInteger)section {
+	return 1;
+}
+
+- (UIView *)_tableView:(UITableView *)tableView viewForCustomInSection:(NSInteger)section isHeader:(BOOL)isHeader {
+	return nil;
+}
+
+- (CGFloat)_tableView:(UITableView *)tableView heightForCustomInSection:(CGFloat)section isHeader:(BOOL)isHeader {
+    return 0.0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
