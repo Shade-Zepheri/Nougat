@@ -1,10 +1,6 @@
-#import <UIKit/UIKit.h>
-#import <Preferences/PSSpecifier.h>
-#import <Preferences/PSViewController.h>
+#import <CepheiPrefs/HBListController.h>
 
-@interface NUASortOrderController : PSViewController <UITableViewDelegate, UITableViewDataSource>
-
-@property (strong, nonatomic) UITableView *tableView;
+@interface NUASortOrderController : HBListController
 @property (copy, readonly, nonatomic) NSArray <NSString *> *togglesList;
 
 @end

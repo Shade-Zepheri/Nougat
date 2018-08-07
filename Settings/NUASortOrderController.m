@@ -4,34 +4,23 @@
 
 @implementation NUASortOrderController
 
+#pragma mark - PSListController
+
 - (NSMutableArray <PSSpecifier *> *)specifiers {
     return nil;
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        _tableView = [[UITableView alloc] initWithFrame:[UIScreen mainScreen].bounds style:UITableViewStyleGrouped];
-        self.tableView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        self.tableView.delegate = self;
-        self.tableView.dataSource = self;
-        self.tableView.editing = YES;
-        self.tableView.allowsSelection = YES;
-        self.tableView.allowsSelectionDuringEditing = YES;
-
-        _togglesList = [NUAPreferenceManager sharedSettings].togglesList;
-    }
-
-    return self;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.view addSubview:self.tableView];
+
+    _togglesList = [NUAPreferenceManager sharedSettings].togglesList;
+    [self table].editing = YES;
 }
 
+#pragma mark - TableView
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return @"Toggles order";
+    return @"";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -59,12 +48,17 @@
     }
 
     cell.textLabel.text = self.togglesList[indexPath.row];
+    cell.backgroundColor = [UIColor colorWithRed:0.74 green:0.89 blue:1.00 alpha:1.0];
 
     return cell;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
     return UITableViewCellEditingStyleNone;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 44.0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -77,13 +71,17 @@
 
     [array removeObjectAtIndex:sourceIndexPath.row];
     [array insertObject:string atIndex:destinationIndexPath.row];
-    [self setPreferenceValue:[array copy] forKey:NUAPreferencesTogglesListKey];
+    [self _updateTogglesArray:[array copy]];
 }
 
 
-- (void)setPreferenceValue:(id)value forKey:(NSString *)key {
+- (void)_updateTogglesArray:(NSArray *)array {
+    // Update ivar
+    _togglesList = array;
+
+    // Update HBPreferences
     HBPreferences *preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
-    [preferences setObject:value forKey:key];
+    [preferences setObject:array forKey:NUAPreferencesTogglesListKey];
 
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
