@@ -57,11 +57,19 @@
         _presentationGestureRecognizer.delegate = self;
         [[FBSystemGestureManager sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
 
+        // Add assertion
+        _resignActiveAssertion = [[FBUIApplicationSceneDeactivationAssertion alloc] initWithReason:1];
+
         // CC calls this in init so we will too
         [self view];
     }
 
     return self;
+}
+
+- (void)dealloc {
+    // Relinquish assertion
+    [_resignActiveAssertion relinquish];
 }
 
 #pragma mark - View management
@@ -536,6 +544,9 @@
     [[%c(SBBacklightController) sharedInstance] setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
 
+    // Aquire assertion
+    [_resignActiveAssertion acquire];
+
     self.presented = YES;
 
     // Add child view controller
@@ -647,6 +658,10 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
             [_viewController endAppearanceTransition];
 
             self.presented = NO;
+
+            // Relinquish assertion
+            [_resignActiveAssertion relinquish];
+
             [self _endAnimation];
         }
     }

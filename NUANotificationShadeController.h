@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "NUANotificationShadeViewController.h"
+#import <FrontBoard/FBUIApplicationSceneDeactivationAssertion.h>
 #import <SpringBoard/SBIgnoredForAutorotationSecureWindow.h>
 #import <SpringBoard/SBScreenEdgePanGestureRecognizer+Private.h>
 #import <SpringBoard/SBSystemGestureRecognizerDelegate.h>
@@ -14,6 +15,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     SBWindow *_window;
     SBScreenEdgePanGestureRecognizer *_presentationGestureRecognizer;
     NUANotificationShadeViewController *_viewController;
+    FBUIApplicationSceneDeactivationAssertion *_resignActiveAssertion;
     BOOL _isPresenting;
     BOOL _isDismissing;
     BOOL _panHasGoneBelowTopEdge;
