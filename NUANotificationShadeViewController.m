@@ -41,8 +41,8 @@
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     _panGesture.maximumNumberOfTouches = 1;
 
-    // Not sure what these do but Apple uses them so why not
-    // Breaks things [_panGesture setValue:@(NO) forKey:@"failsPastMaxTouches"];
+    // Increase pan gesture tolerance and not fail past max touches
+    _panGesture.failsPastMaxTouches = NO;
     _panGesture._hysteresis = 20;
 
     [self.view addGestureRecognizer:_panGesture];
