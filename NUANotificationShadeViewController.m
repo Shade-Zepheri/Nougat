@@ -43,7 +43,7 @@
 
     // Increase pan gesture tolerance and not fail past max touches
     _panGesture.failsPastMaxTouches = NO;
-    _panGesture._hysteresis = 20;
+    _panGesture._hysteresis = 20.0;
 
     [self.view addGestureRecognizer:_panGesture];
     _panGesture.delegate = self;
