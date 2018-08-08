@@ -190,7 +190,7 @@
 
 - (void)_showNotificationShadeGestureBeganWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
     // Disable icon editing
-    [[%c(SBIconController) sharedInstance] setIsEditing:NO withFeedbackBehavior:nil];
+    [[%c(SBIconController) sharedInstance] setIsEditing:NO];
 
     // Inhibit system gestures
     NUANotificationCenterInhibitor.inhibited = YES;
