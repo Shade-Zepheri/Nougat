@@ -7,7 +7,10 @@
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
 #import <SpringBoard/SBBulletinWindowController.h>
+#import <SpringBoard/SBDashBoardRegion.h>
+#import <SpringBoard/SBDashBoardViewController.h>
 #import <SpringBoard/SBIconController+Private.h>
+#import <SpringBoard/SBLockScreenManager+Private.h>
 #import <SpringBoard/SBNotificationCenterController+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
@@ -50,6 +53,15 @@
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
         [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
 
+        // Add LS stuff
+        SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+        if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+            // Only iOS 10+
+            SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+            [dashBoardViewController registerExternalBehaviorProvider:self];
+            [dashBoardViewController registerExternalPresentationProvider:self];
+        }
+
         //Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
@@ -68,6 +80,14 @@
 }
 
 - (void)dealloc {
+    SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+    if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+        // Only iOS 10+
+        SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+        [dashBoardViewController unregisterExternalBehaviorProvider:self];
+        [dashBoardViewController unregisterExternalPresentationProvider:self];
+    }
+
     // Relinquish assertion
     [_resignActiveAssertion relinquish];
 }
@@ -124,6 +144,23 @@
     [_viewController endAppearanceTransition];
 
     [super viewDidDisappear:animated];
+}
+
+#pragma mark - Properties
+
+- (void)setPresented:(BOOL)presented {
+    if (_presented == presented) {
+        return;
+    }
+
+    _presented = presented;
+
+    SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+    if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+        // Only iOS 10+
+        SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+        [dashBoardViewController externalPresentationProviderPresentationChanged:self];
+    }
 }
 
 #pragma mark - UIViewController
@@ -283,6 +320,62 @@
 
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     return (_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged);
+}
+
+#pragma mark - Dashboard participating
+
+- (NSString *)dashBoardIdentifier {
+    return NSStringFromClass(self.class);
+}
+
+- (NSInteger)participantState {
+    return self.visible ? 2 : 1;
+}
+
+#pragma mark - Behavior providing
+
+- (NSInteger)scrollingStrategy {
+    return 3;
+}
+
+- (NSInteger)notificationBehavior {
+    return 0;
+}
+
+- (NSUInteger)restrictedCapabilities {
+    return 0;
+}
+
+- (NSInteger)idleWarnMode {
+    return 0;
+}
+
+- (NSInteger)idleTimerMode {
+    return 1;
+}
+
+- (NSInteger)idleTimerDuration {
+    return 6;
+}
+
+- (NSInteger)proximityDetectionMode {
+    return 0;
+}
+
+#pragma mark - Presentation providing
+
+- (id<UICoordinateSpace>)presentationCoordinateSpace {
+    return self.view;
+}
+
+- (NSArray *)presentationRegions {
+    if (self.presented) {
+        SBDashBoardRegion *region = [%c(SBDashBoardRegion) regionForCoordinateSpace:self.view];
+        region = [region role:SBDashBoardRegionRoleOverlay];
+        return @[region];
+    }
+
+    return nil;
 }
 
 #pragma mark - Notifications
@@ -531,6 +624,13 @@
     // Create view if not already
     [self _setupViewForPresentation];
 
+    SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+    if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+        // Only iOS 10+
+        SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+        [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
+    }
+
     // Do some alpha thingies
     _window.hidden = NO;
     [[%c(SBWindowHidingManager) sharedInstance] setAlpha:1.0 forWindow:_window];
@@ -671,6 +771,13 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
             [_resignActiveAssertion relinquish];
 
             [self _endAnimation];
+
+            SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+            if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+                // Only iOS 10+
+                SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+                [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
+            }
         }
     }
 
