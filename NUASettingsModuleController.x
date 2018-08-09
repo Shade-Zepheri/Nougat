@@ -150,8 +150,10 @@
     }
 
     SBPreciseClockTimer *timer = [%c(SBPreciseClockTimer) sharedInstance];
+    // Probably not a retain cycle but lets play it safe
+    __weak __typeof(self) weakSelf = self;
     _timerToken = [timer startMinuteUpdatesWithHandler:^{
-        [self _updateTime];
+        [weakSelf _updateTime];
     }];
 }
 

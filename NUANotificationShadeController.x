@@ -718,10 +718,12 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 - (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     __block NSInteger fireTimes = 0;
     __block CGFloat difference = targetHeight - baseHeight;
+
+    __weak __typeof(self) weakSelf = self;
     _animationTimer = [CADisplayLink displayLinkWithBlock:^(CADisplayLink *link) {
         if (fireTimes == 19) {
             [link invalidate];
-            [self _updatePresentedHeight:targetHeight];
+            [weakSelf _updatePresentedHeight:targetHeight];
 
             if (completion) {
                 completion();
@@ -736,7 +738,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
         // Update height
         CGFloat newHeight = baseHeight + (difference * multiplier);
-        [self _updatePresentedHeight:newHeight];
+        [weakSelf _updatePresentedHeight:newHeight];
     }];
     [_animationTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
 }
