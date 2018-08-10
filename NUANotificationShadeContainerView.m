@@ -52,10 +52,6 @@
 }
 
 - (void)_updateMasks {
-    // Heres where the magic happens
-
-    // TODO: figure out the voodoo that goes on
-
     // Defer expansion to view
     NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
     [panelView expandHeight:self.presentedHeight];
