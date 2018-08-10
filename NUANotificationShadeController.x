@@ -10,6 +10,7 @@
 #import <SpringBoard/SBDashBoardRegion.h>
 #import <SpringBoard/SBDashBoardViewController.h>
 #import <SpringBoard/SBIconController+Private.h>
+#import <SpringBoard/SBIdleTimerGlobalCoordinator.h>
 #import <SpringBoard/SBLockScreenManager+Private.h>
 #import <SpringBoard/SBNotificationCenterController+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
@@ -644,6 +645,9 @@
     SBBacklightController *controller = [%c(SBBacklightController) sharedInstance];
     if ([controller respondsToSelector:@selector(setIdleTimerDisabled:forReason:)]) {
         [controller setIdleTimerDisabled:YES forReason:@"Nougat Reveal"];
+    } else {
+        // iOS 11
+        self.idleTimerDisableAssertion = [[%c(SBIdleTimerGlobalCoordinator) sharedInstance] acquireIdleTimerDisableAssertionForReason:@"Nougat Animating"];
     }
     
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
@@ -757,6 +761,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         SBBacklightController *controller = [%c(SBBacklightController) sharedInstance];
         if ([controller respondsToSelector:@selector(setIdleTimerDisabled:forReason:)]) {
             [controller setIdleTimerDisabled:NO forReason:@"Nougat Reveal"];
+        } else {
+            [self.idleTimerDisableAssertion invalidate];
+            self.idleTimerDisableAssertion = nil;
         }
 
         [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];

@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
 #import "NUANotificationShadeViewController.h"
+#import <BaseBoard/BSInvalidatable.h>
 #import <FrontBoard/FBUIApplicationSceneDeactivationAssertion.h>
 #import <SpringBoard/SBDashBoardExternalBehaviorProviding.h>
 #import <SpringBoard/SBDashBoardExternalPresentationProviding.h>
@@ -26,6 +27,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
 }
 
 @property (nonatomic) NUANotificationShadePresentedState presentedState;
+@property (strong, nonatomic) id<BSInvalidatable> idleTimerDisableAssertion;
 @property (getter=isVisible, readonly, nonatomic) BOOL visible;
 @property (getter=isPresented, nonatomic) BOOL presented;
 @property (getter=isAnimating, nonatomic) BOOL animating;
