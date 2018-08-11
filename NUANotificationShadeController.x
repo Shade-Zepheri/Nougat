@@ -16,6 +16,7 @@
 #import <SpringBoard/SBOrientationLockManager+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
+#import <version.h>
 
 @implementation NUANotificationShadeController
 
@@ -255,9 +256,7 @@
 
     // Defer hard stuffs
     CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
-    CGPoint velocity = FBSystemGestureVelocityInView(gestureRecognizer, self.view);
-
-    [self updateAnimationWithLocation:location andVelocity:velocity];
+    [self updateAnimationWithLocation:location];
 }
 
 - (void)_showNotificationShadeGestureEndedWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
@@ -301,8 +300,7 @@
         }
         case UIGestureRecognizerStateChanged: {
             CGPoint location = [panGesture locationInView:self.view];
-            CGPoint velocity = [panGesture velocityInView:self.view];
-            [self updateAnimationWithLocation:location andVelocity:velocity];
+            [self updateAnimationWithLocation:location];
             break;
         }
         case UIGestureRecognizerStateEnded: {
@@ -337,7 +335,7 @@
 #pragma mark - Behavior providing
 
 - (NSInteger)scrollingStrategy {
-    return 3;
+    return IS_IOS_OR_NEWER(iOS_11_0) ? 0 : 3;
 }
 
 - (NSInteger)notificationBehavior {
@@ -371,7 +369,7 @@
 }
 
 - (NSArray *)presentationRegions {
-    if (self.presented) {
+    if (self.presented && %c(SBDashBoardRegion)) {
         SBDashBoardRegion *region = [%c(SBDashBoardRegion) regionForCoordinateSpace:self.view];
         region = [region role:SBDashBoardRegionRoleOverlay];
         return @[region];
@@ -489,7 +487,7 @@
     }
 }
 
-- (void)updateAnimationWithLocation:(CGPoint)location andVelocity:(CGPoint)velocity {
+- (void)updateAnimationWithLocation:(CGPoint)location {
     // Make sure visible before continue
     if (!self.presented || !self.visible) {
         return;
