@@ -13,6 +13,7 @@
 #import <SpringBoard/SBIdleTimerGlobalCoordinator.h>
 #import <SpringBoard/SBLockScreenManager+Private.h>
 #import <SpringBoard/SBNotificationCenterController+Private.h>
+#import <SpringBoard/SBOrientationLockManager+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
 
@@ -625,6 +626,9 @@
     // Create view if not already
     [self _setupViewForPresentation];
 
+    // Lock rotation
+    [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:YES forReason:@"Nougat Visible"];
+
     SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
     if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
         // Only iOS 10+
@@ -775,6 +779,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
             [_viewController endAppearanceTransition];
 
             self.presented = NO;
+
+            // Unlock rotation
+            [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:NO forReason:@"Nougat Visible"];
 
             // Relinquish assertion
             [_resignActiveAssertion relinquish];
