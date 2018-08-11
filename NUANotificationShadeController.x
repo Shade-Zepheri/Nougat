@@ -477,7 +477,6 @@
     // Setup view controller
     [self _prepareForPresentation];
 
-    _panHasGoneBelowTopEdge = location.y < [self _yValueForCurrentState];
     _initalTouchLocation = location;
 
     // Slide to height of touch location
@@ -496,13 +495,6 @@
         return;
     }
 
-    if (_isDismissing && !_panHasGoneBelowTopEdge) {
-        _panHasGoneBelowTopEdge = location.y < [self _yValueForCurrentState];
-        if (_panHasGoneBelowTopEdge) {
-            _initalTouchLocation = location;
-        }
-    }
-
     // Calculate height and reveal to it
     CGFloat height = [self _notificationShadeHeightForLocation:location initalLocation:_initalTouchLocation];
     [self _presentViewToHeight:height];
@@ -516,7 +508,7 @@
             // Check if within range to present
             CGFloat targetY = [self _yValueForPresented] * 0.85;
             self.presentedState = (projectedY >= targetY) ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateNone; 
-        } else if (_panHasGoneBelowTopEdge) {
+        } else {
             if (self.presentedState == NUANotificationShadePresentedStateQuickToggles) {
                 // Decide if dismiss or fully present
                 CGFloat targetMainY = [self _yValueForFullyPresented] * 0.7;
@@ -580,17 +572,7 @@
 
 - (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
     // Makes the transition more elegant
-    if (_isPresenting) {
-        return location.y;
-    }
-
-    // When dismissing, pad the the height so it looks like we're dragging the panel down
-    if (_panHasGoneBelowTopEdge) {
-        return location.y - initalLocation.y + [self _yValueForCurrentState];
-    }
-
-    // return fully open height as fallback
-    return [self _yValueForPresented];
+    return _isPresenting ? location.y : location.y - initalLocation.y + [self _yValueForCurrentState];
 }
 
 - (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
@@ -829,7 +811,6 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     _isPresenting = NO;
     _isDismissing = NO;
     _initalTouchLocation = CGPointZero;
-    _panHasGoneBelowTopEdge = NO;
 }
 
 @end

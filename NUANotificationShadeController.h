@@ -21,7 +21,6 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     FBUIApplicationSceneDeactivationAssertion *_resignActiveAssertion;
     BOOL _isPresenting;
     BOOL _isDismissing;
-    BOOL _panHasGoneBelowTopEdge;
     CGPoint _initalTouchLocation;
     CADisplayLink *_animationTimer;
 }
