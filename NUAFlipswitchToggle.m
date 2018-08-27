@@ -17,9 +17,6 @@
 - (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
     self = [super initWithFrame:frame];
     if (self) {
-        UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleWasTapped:)];
-        [self addGestureRecognizer:tapGesture];
-
         _resourceBundle = [self.class sharedResourceBundle];
 
         _displayName = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -61,12 +58,22 @@
     return [NSString stringWithFormat:@"<%@: %p; switchIdentifier = %@>", self.class, self, self.switchIdentifier];
 }
 
-- (void)toggleWasTapped:(UITapGestureRecognizer *)recognizer {
+#pragma mark - Ripple
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+
+    [self toggleSwitchState];
+}
+
+#pragma mark - Toggles
+
+- (void)toggleSwitchState {
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
     NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", self.switchIdentifier];
-    _state = [switchPanel stateForSwitchIdentifier:flipswitchIdentifier];
-    [switchPanel setState:(self.state == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:flipswitchIdentifier];
+    _switchState = [switchPanel stateForSwitchIdentifier:flipswitchIdentifier];
+    [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:flipswitchIdentifier];
 }
 
 #pragma mark - Properties
@@ -76,7 +83,7 @@
 
     // Update state
     NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", identifier];
-    _state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
+    _switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
 
     // Update image
     [self _updateImageView:NO];
@@ -94,17 +101,17 @@
 
 - (void)_updateImageView:(BOOL)animated {
     // Get image name
-    NSString *stateString = NSStringFromFSSwitchState(self.state);
+    NSString *stateString = NSStringFromFSSwitchState(self.switchState);
     NSString *imageName = [NSString stringWithFormat:@"%@_%@", self.switchIdentifier, stateString];
 
     // TODO: Simplify this mess
     if ([self.switchIdentifier isEqualToString:@"rotation-lock"]) {
-        if (self.state == FSSwitchStateOff) {
+        if (self.switchState == FSSwitchStateOff) {
             BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
             NSString *imageStyle = useDark ? @"_black" : @"_white";
             imageName = [imageName stringByAppendingString:imageStyle];
         }
-    } else if (self.state == FSSwitchStateOn) {
+    } else if (self.switchState == FSSwitchStateOn) {
         // Use dark / light image
         BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
         NSString *imageStyle = useDark ? @"_black" : @"_white";
@@ -127,7 +134,7 @@
         return;
     }
 
-    _state = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
+    _switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
     [self _updateImageView:YES];
 
     if ([self.switchIdentifier isEqualToString:@"wifi"]) {
