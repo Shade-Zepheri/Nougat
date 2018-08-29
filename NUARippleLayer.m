@@ -21,8 +21,8 @@
 
 - (void)setRadiiWithRect:(CGRect)rect {
     // Calculate radius
-    self.initialRadius = (CGFloat)(hypot(CGRectGetHeight(rect), CGRectGetWidth(rect)) / 2 * 0.6);
-    self.finalRadius = (CGFloat)(hypot(CGRectGetHeight(rect), CGRectGetWidth(rect)) / 2 + 10.0);
+    self.initialRadius = hypot(CGRectGetHeight(rect), CGRectGetWidth(rect)) / 2 * 0.6;
+    self.finalRadius = hypot(CGRectGetHeight(rect), CGRectGetWidth(rect)) / 2 + 10.0;
 }
 
 #pragma mark - Ripple animation
@@ -53,8 +53,7 @@
             scaleStart = 0.6;
         }
 
-        CABasicAnimation *scaleAnim = [CABasicAnimation animation];
-        scaleAnim.keyPath = @"transform.scale";
+        CABasicAnimation *scaleAnim = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
         scaleAnim.fromValue = @(scaleStart);
         scaleAnim.toValue = @1.0;
         scaleAnim.duration = 0.333;
@@ -70,8 +69,7 @@
         [centerPath addLineToPoint:endPoint];
         [centerPath closePath];
 
-        CAKeyframeAnimation *positionAnim = [CAKeyframeAnimation animation];
-        positionAnim.keyPath = @"position";
+        CAKeyframeAnimation *positionAnim = [CAKeyframeAnimation animationWithKeyPath:@"position"];
         positionAnim.path = centerPath.CGPath;
         positionAnim.keyTimes = @[ @0, @1.0 ];
         positionAnim.values = @[ @0, @1.0 ];
@@ -81,8 +79,7 @@
         positionAnim.fillMode = kCAFillModeForwards;
         positionAnim.removedOnCompletion = NO;
 
-        CABasicAnimation *fadeInAnim = [CABasicAnimation animation];
-        fadeInAnim.keyPath = @"opacity";
+        CABasicAnimation *fadeInAnim = [CABasicAnimation animationWithKeyPath:@"opacity"];
         fadeInAnim.fromValue = @0;
         fadeInAnim.toValue = @1.0;
         fadeInAnim.duration = 0.083;
@@ -110,19 +107,13 @@
         self.endAnimationDelay = 0.25;
     }
 
-    CGFloat opacity = 1.0f;
-    BOOL viewContainsPoint = CGRectContainsPoint(self.bounds, point);
-    if (!viewContainsPoint) {
-        opacity = 0;
-    }
-
+    CGFloat opacity = CGRectContainsPoint(self.bounds, point) ? 1.0 : 0.0;
     if (!animated) {
         self.opacity = 0;
         [self removeFromSuperlayer];
     } else {
         [CATransaction begin];
-        CABasicAnimation *fadeOutAnim = [CABasicAnimation animation];
-        fadeOutAnim.keyPath = @"opacity";
+        CABasicAnimation *fadeOutAnim = [CABasicAnimation animationWithKeyPath:@"opacity"];
         fadeOutAnim.fromValue = @(opacity);
         fadeOutAnim.toValue = @0;
         fadeOutAnim.duration = 0.15;
