@@ -31,8 +31,7 @@
     self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
     self.slider.alpha = 0.0;
 
-    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", useDark ? @"black" : @"white"];
+    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", [NUAPreferenceManager sharedSettings].usingDark ? @"black" : @"white"];
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
     UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:imageBundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
@@ -122,8 +121,7 @@
 
     self.slider.minimumTrackTintColor = colorInfo[@"tintColor"];
 
-    BOOL useDark = [colorInfo[@"textColor"] isEqual:[UIColor blackColor]];
-    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", useDark ? @"black" : @"white"];
+    NSString *imageName = [NSString stringWithFormat:@"brightness_%@", [NUAPreferenceManager sharedSettings].usingDark ? @"black" : @"white"];
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
     UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:imageBundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];

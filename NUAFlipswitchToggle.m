@@ -107,14 +107,12 @@
     // TODO: Simplify this mess
     if ([self.switchIdentifier isEqualToString:@"rotation-lock"]) {
         if (self.switchState == FSSwitchStateOff) {
-            BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-            NSString *imageStyle = useDark ? @"_black" : @"_white";
+            NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
             imageName = [imageName stringByAppendingString:imageStyle];
         }
     } else if (self.switchState == FSSwitchStateOn) {
         // Use dark / light image
-        BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-        NSString *imageStyle = useDark ? @"_black" : @"_white";
+        NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
         imageName = [imageName stringByAppendingString:imageStyle];
     } 
 

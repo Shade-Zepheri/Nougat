@@ -28,8 +28,7 @@
 
 - (void)_createDivider {
     _dividerView = [[UIView alloc] initWithFrame:CGRectZero];
-    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-    _dividerView.backgroundColor = useDark ? OreoDividerColor : [UIColor clearColor];
+    _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
     [self addSubview:_dividerView];
 
     // Constraints
@@ -110,8 +109,7 @@
     tapGesture.numberOfTapsRequired = 1;
     [imageView addGestureRecognizer:tapGesture];
 
-    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-    NSString *imageStyle = useDark ? @"_black" : @"_white";
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
     imageName = [imageName stringByAppendingString:imageStyle];
 
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
@@ -203,11 +201,10 @@
     UIColor *textColor = colorInfo[@"textColor"];
     self.dateLabel.textColor = textColor;
 
-    BOOL useDark = [textColor isEqual:[UIColor blackColor]];
-    _dividerView.backgroundColor = useDark ? OreoDividerColor : [UIColor clearColor];
+    _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
 
     // Update imageView images
-    NSString *imageStyle = useDark ? @"_black" : @"_white";
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
     NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
 
     NSString *accountImage = [@"account" stringByAppendingString:imageStyle];

@@ -16,6 +16,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 @interface NUAPreferenceManager : NSObject
 
 @property (assign, readonly, nonatomic) BOOL enabled;
+@property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
 @property (strong, readonly, nonatomic) UIColor *textColor;

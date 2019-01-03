@@ -69,8 +69,7 @@
         name = [name stringByAppendingString:@"20_"];
     }
 
-    BOOL useDark = [[NUAPreferenceManager sharedSettings].textColor isEqual:[UIColor blackColor]];
-    NSString *imageStyle = useDark ? @"black" : @"white";
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"black" : @"white";
     name = [name stringByAppendingString:imageStyle];
 
     if (self.charging) {
