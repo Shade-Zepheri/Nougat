@@ -1,5 +1,6 @@
 #import "NUATogglesContentView.h"
 #import "NUAPreferenceManager.h"
+#import "NSArray+Map.h"
 
 @implementation NUATogglesContentView
 
@@ -18,12 +19,10 @@
 #pragma mark - Toggles management
 
 - (void)_createToggles {
-    NSMutableArray *toggles = [NSMutableArray array];
-    for (NSString *identifier in [NUAPreferenceManager sharedSettings].togglesList) {
-        NUAFlipswitchToggle *toggle = [[NUAFlipswitchToggle alloc] initWithFrame:CGRectZero andSwitchIdentifier:identifier];
-        [toggles addObject:toggle];
-    }
-    self.togglesArray = toggles;
+    NSArray *identifiers = [[NUAPreferenceManager sharedSettings].togglesList copy];
+    self.togglesArray = [identifiers map:^id(id obj) {
+        return [[NUAFlipswitchToggle alloc] initWithFrame:CGRectZero andSwitchIdentifier:(NSString *)obj];
+    }];
 
     _topRow = [toggles subarrayWithRange:NSMakeRange(0, 3)]; // First 3
     _middleRow = [toggles subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
@@ -31,8 +30,9 @@
 }
 
 - (void)_updateToggleIdentifiers {
-    for (int i = 0; i < [NUAPreferenceManager sharedSettings].togglesList.count; i++) {
-        NSString *identifier = [NUAPreferenceManager sharedSettings].togglesList[i];
+    NSArray *identifiers = [NUAPreferenceManager sharedSettings].togglesList;
+    for (int i = 0; i < identifiers.count; i++) {
+        NSString *identifier = identifiers[i];
         NUAFlipswitchToggle *toggle = self.togglesArray[i];
 
         // Reassign identifiers

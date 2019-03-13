@@ -57,7 +57,7 @@
         scaleAnim.fromValue = @(scaleStart);
         scaleAnim.toValue = @1.0;
         scaleAnim.duration = 0.333;
-        scaleAnim.beginTime = 0.083;
+        // scaleAnim.beginTime = 0.083;
         scaleAnim.timingFunction = materialTimingFunction;
         scaleAnim.fillMode = kCAFillModeForwards;
         scaleAnim.removedOnCompletion = NO;
@@ -74,7 +74,7 @@
         positionAnim.keyTimes = @[ @0, @1.0 ];
         positionAnim.values = @[ @0, @1.0 ];
         positionAnim.duration = 0.333;
-        positionAnim.beginTime = 0.083;
+        // positionAnim.beginTime = 0.083;
         positionAnim.timingFunction = materialTimingFunction;
         positionAnim.fillMode = kCAFillModeForwards;
         positionAnim.removedOnCompletion = NO;
@@ -83,7 +83,7 @@
         fadeInAnim.fromValue = @0;
         fadeInAnim.toValue = @1.0;
         fadeInAnim.duration = 0.083;
-        fadeInAnim.beginTime = 0.083;
+        // fadeInAnim.beginTime = 0.083;
         fadeInAnim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionLinear];
         fadeInAnim.fillMode = kCAFillModeForwards;
         fadeInAnim.removedOnCompletion = NO;

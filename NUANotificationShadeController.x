@@ -728,7 +728,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         CGFloat newHeight = baseHeight + (difference * multiplier);
         [weakSelf _updatePresentedHeight:newHeight];
     }];
-    [_animationTimer addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    [_animationTimer addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
 }
 
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {
