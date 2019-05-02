@@ -4,6 +4,8 @@
 #import <SpringBoard/SBDefaults.h>
 #import <SpringBoard/SBExternalCarrierDefaults.h>
 #import <SpringBoard/SBExternalDefaults.h>
+#import <SpringBoard/SBTelephonyManager.h>
+#import <SpringBoard/SBTelephonyCarrierBundleInfo.h>
 #import <SpringBoard/SBWiFiManager.h>
 
 @implementation NUAPreferenceManager {
@@ -81,8 +83,14 @@
     //Could use CoreTelephony but lets use SB methods
     SBExternalDefaults *externalDefaults = [NSClassFromString(@"SBDefaults") externalDefaults];
     SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
+    if ([carrierDefaults respondsToSelector:@selector(carrierName)]) {
+        return carrierDefaults.carrierName;
+    } else {
+        SBTelephonyManager *manager = [NSClassFromString(@"SBTelephonyManager") sharedTelephonyManager];
+        SBTelephonyCarrierBundleInfo *bundleInfo = [manager carrierBundleInfo];
 
-    return carrierDefaults.carrierName;
+        return bundleInfo.carrierName;
+    }
 }
 
 @end
