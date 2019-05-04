@@ -24,9 +24,9 @@
         return [[NUAFlipswitchToggle alloc] initWithFrame:CGRectZero andSwitchIdentifier:(NSString *)obj];
     }];
 
-    _topRow = [toggles subarrayWithRange:NSMakeRange(0, 3)]; // First 3
-    _middleRow = [toggles subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
-    _bottomRow = [toggles subarrayWithRange:NSMakeRange(6, 3)]; // Last 3
+    _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
+    _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
+    _bottomRow = [self.togglesArray subarrayWithRange:NSMakeRange(6, 3)]; // Last 3
 }
 
 - (void)_updateToggleIdentifiers {

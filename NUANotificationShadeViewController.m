@@ -3,7 +3,7 @@
 #import "NUAModulesContainerViewController.h"
 #import "NUAPreferenceManager.h"
 #import "Macros.h"
-#import <UIKit/UIPanGestureRecognizer+Private.h>
+#import <UIKit/UIPanGestureRecognizer+Internal.h>
 
 
 @implementation NUANotificationShadeViewController

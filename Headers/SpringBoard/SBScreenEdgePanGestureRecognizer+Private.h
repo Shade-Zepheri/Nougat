@@ -1,7 +1,7 @@
 #import <SpringBoard/SBScreenEdgePanGestureRecognizer.h>
+#import <SpringBoard/SBSystemGestureRecognizerDelegate.h>
+#import <SpringBoard/UIGestureRecognizer+SpringBoard.h>
 #import <UIKit/UIScreenEdgePanGestureRecognizer+Private.h>
-#import "SBSystemGestureRecognizerDelegate.h"
-#import "UIGestureRecognizer+SpringBoard.h"
 
 @interface SBScreenEdgePanGestureRecognizer (Extras)
 

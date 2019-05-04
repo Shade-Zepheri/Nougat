@@ -1,5 +1,5 @@
 #import "NUANotificationCenterInhibitor.h"
-#import <SpringBoard/SBSystemGestureManager+Private.h>
+#import <SpringBoard/SBSystemGestureManager.h>
 
 static BOOL _inhibited = NO;
 
@@ -7,7 +7,7 @@ static BOOL _inhibited = NO;
 
 + (void)setInhibited:(BOOL)inhibited {
     _inhibited = inhibited;
-    [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = inhibited;
+    ((SBSystemGestureManager *)[%c(SBSystemGestureManager) mainDisplayManager]).systemGesturesDisabledForAccessibility = inhibited;
 }
 
 + (BOOL)inhibited {
