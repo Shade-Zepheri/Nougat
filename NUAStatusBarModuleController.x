@@ -30,7 +30,8 @@
     if (overrideDate) {
         [self statusBarView].date = overrideDate;
     } else {
-        [self statusBarView].date = [%c(SBPreciseClockTimer) now];
+        Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+        [self _settingsView].date = [clockTimerClass now];
         if (!_disablesUpdates) {
             [self _startUpdateTimer];
         }
@@ -111,7 +112,8 @@
         return;
     }
 
-    SBPreciseClockTimer *timer = [%c(SBPreciseClockTimer) sharedInstance];
+    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
     [timer stopMinuteUpdatesForToken:_timerToken];
     _timerToken = nil;
 }
@@ -121,7 +123,8 @@
         return;
     }
 
-    SBPreciseClockTimer *timer = [%c(SBPreciseClockTimer) sharedInstance];
+    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
     _timerToken = [timer startMinuteUpdatesWithHandler:^{
         [self _updateTime];
     }];
@@ -140,7 +143,8 @@
         if (overrideDate) {
             [self statusBarView].date = overrideDate;
         } else {
-            [self statusBarView].date = [%c(SBPreciseClockTimer) now];
+            Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+            [self _settingsView].date = [clockTimerClass now];
             [self _startUpdateTimer];
         }
     }

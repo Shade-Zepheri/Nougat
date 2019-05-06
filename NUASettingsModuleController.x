@@ -1,6 +1,7 @@
 #import "NUASettingsModuleController.h"
 #import <SpringBoard/SBDateTimeController.h>
 #import <SpringBoard/SBPreciseClockTimer.h>
+#import <SpringBoardUIServices/SBUIPreciseClockTimer.h>
 
 @implementation NUASettingsModuleController
 
@@ -28,7 +29,8 @@
     if (overrideDate) {
         [self _settingsView].date = overrideDate;
     } else {
-        [self _settingsView].date = [%c(SBPreciseClockTimer) now];
+        Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+        [self _settingsView].date = [clockTimerClass now];
         if (!_disablesUpdates) {
             [self _startUpdateTimer];
         }
@@ -74,7 +76,7 @@
     [self _settingsView].expandedPercent = percentage;
 }
 
-#pragma mark - delegate
+#pragma mark - Delegate
 
 - (void)contentViewWantsNotificationShadeDismissal:(NUASettingsContentView *)contentView completely:(BOOL)completely {
     [self.delegate moduleWantsNotificationShadeDismissal:self completely:completely];
@@ -97,7 +99,8 @@
         if (overrideDate) {
             [self _settingsView].date = overrideDate;
         } else {
-            [self _settingsView].date = [%c(SBPreciseClockTimer) now];
+            Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+            [self _settingsView].date = [clockTimerClass now];
             [self _startUpdateTimer];
         }
     }
@@ -139,7 +142,8 @@
         return;
     }
 
-    SBPreciseClockTimer *timer = [%c(SBPreciseClockTimer) sharedInstance];
+    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
     [timer stopMinuteUpdatesForToken:_timerToken];
     _timerToken = nil;
 }
@@ -149,7 +153,8 @@
         return;
     }
 
-    SBPreciseClockTimer *timer = [%c(SBPreciseClockTimer) sharedInstance];
+    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
+    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
     // Probably not a retain cycle but lets play it safe
     __weak __typeof(self) weakSelf = self;
     _timerToken = [timer startMinuteUpdatesWithHandler:^{
