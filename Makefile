@@ -1,4 +1,5 @@
-export TARGET = iphone:11.2:9.0
+export TARGET = iphone:latest:9.0
+export ARCHS = armv7 arm64 arm64e
 
 INSTALL_TARGET_PROCESSES = Preferences
 
@@ -13,10 +14,11 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = Nougat
 Nougat_FILES = $(wildcard *.[xm])
 Nougat_FRAMEWORKS = UIKit QuartzCore
-Nougat_PRIVATE_FRAMEWORKS = BackBoardServices BaseBoard FrontBoard
+#Nougat_PRIVATE_FRAMEWORKS = BackBoardServices BaseBoard FrontBoard
 Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
 Nougat_CFLAGS = -IHeaders
+Nougat_LDFLAGS = $(wildcard includes/*.tbd)
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
