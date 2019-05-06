@@ -82,8 +82,8 @@
 + (NSString *)carrierName {
     //Could use CoreTelephony but lets use SB methods
     SBExternalDefaults *externalDefaults = [NSClassFromString(@"SBDefaults") externalDefaults];
-    SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
-    if ([carrierDefaults respondsToSelector:@selector(carrierName)]) {
+    if ([externalDefaults respondsToSelector:@selector(carrierDefaults)]) {
+        SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
         return carrierDefaults.carrierName;
     } else {
         SBTelephonyManager *manager = [NSClassFromString(@"SBTelephonyManager") sharedTelephonyManager];
