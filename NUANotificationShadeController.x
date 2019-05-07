@@ -16,6 +16,9 @@
 #import <SpringBoard/SBOrientationLockManager+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
+#import <UIKit/UIApplication+Private.h>
+#import <UIKit/UIStatusBar.h>
+#import <UIKit/UIStatusBar_Modern.h>
 #import <version.h>
 
 @implementation NUANotificationShadeController
@@ -202,7 +205,22 @@
     CGPoint location = [gestureRecognizer locationInView:window];
 
     // Dont start gesture if in left 1/3 of screen
-    return location.x > (kScreenWidth / 3);
+    return [self _isLocationXWithinNotchRegion:location.x];
+}
+
+- (BOOL)_isLocationXWithinNotchRegion:(CGFloat)location {
+    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
+    if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
+        // Use notch insets
+        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
+
+        return location > CGRectGetMaxX(leadingFrame) && location < CGRectGetMinX(trailingFrame);
+    } else {
+        // Regular old frames
+        return location > (kScreenWidth / 3) && location < (kScreenWidth * 2 / 3);
+    }
 }
 
 - (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)recognizer {
