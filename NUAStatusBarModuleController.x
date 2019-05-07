@@ -31,7 +31,7 @@
         [self statusBarView].date = overrideDate;
     } else {
         Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-        [self _settingsView].date = [clockTimerClass now];
+        [self statusBarView].date = [clockTimerClass now];
         if (!_disablesUpdates) {
             [self _startUpdateTimer];
         }
@@ -144,7 +144,7 @@
             [self statusBarView].date = overrideDate;
         } else {
             Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-            [self _settingsView].date = [clockTimerClass now];
+            [self statusBarView].date = [clockTimerClass now];
             [self _startUpdateTimer];
         }
     }
