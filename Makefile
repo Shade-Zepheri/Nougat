@@ -13,7 +13,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = Nougat
 Nougat_FILES = $(wildcard *.[xm])
-Nougat_FRAMEWORKS = UIKit QuartzCore
+Nougat_FRAMEWORKS = UIKit QuartzCore CoreTelephony
 #Nougat_PRIVATE_FRAMEWORKS = BackBoardServices BaseBoard FrontBoard
 Nougat_EXTRA_FRAMEWORKS = Cephei
 Nougat_LIBRARIES = flipswitch
