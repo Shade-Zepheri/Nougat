@@ -610,9 +610,10 @@
 
 - (void)_setupViewForPresentation {
     // Create window if necessary
+    // _UISpringBoardLockScreenWindowLevel
     if (!_window) {
         _window = [[%c(SBIgnoredForAutorotationSecureWindow) alloc] initWithScreen:[UIScreen mainScreen] debugName:@"NougatWindow" rootViewController:self];
-        _window.windowLevel = 1092;
+        _window.windowLevel = IS_IOS_OR_NEWER(iOS_11_0) ? 1075 : 1092;
     }
 
     // Set orientation
