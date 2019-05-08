@@ -1,6 +1,7 @@
 #import "NUAStatusBarContentView.h"
 #import "NUAPreferenceManager.h"
 #import <BaseBoard/BSDateFormatterCache.h>
+#import <UIKit/UIStatusBar_Modern.h>
 
 @implementation NUAStatusBarContentView
 
@@ -39,6 +40,13 @@
 }
 
 - (void)_createPercentLabel {
+    // Determine if percent hidden or not
+    Class baseStatusBar = NSClassFromString(@"UIStatusBar_Base");
+    BOOL hasModernStatusBar = ([baseStatusBar respondsToSelector:@selector(_statusBarImplementationClass)] && [baseStatusBar _statusBarImplementationClass] == NSClassFromString(@"UIStatusBar_Modern")) || ([baseStatusBar respondsToSelector:@selector(_implementationClass)] && [baseStatusBar _implementationClass] == NSClassFromString(@"UIStatusBar_Modern"));
+    if (baseStatusBar && hasModernStatusBar) {
+        return;
+    }
+
     _batteryLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.batteryLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
     self.batteryLabel.textAlignment = NSTextAlignmentLeft;
@@ -91,7 +99,10 @@
     _currentPercent = currentPercent;
 
     // Pass to labels
-    self.batteryLabel.text = [NSString stringWithFormat:@"%g%%", currentPercent];
+    if (self.batteryLabel) {
+        self.batteryLabel.text = [NSString stringWithFormat:@"%g%%", currentPercent];
+    }
+
     self.batteryView.currentPercent = currentPercent;
 }
 
@@ -115,7 +126,9 @@
     UIColor *textColor = colorInfo[@"textColor"];
 
     self.carrierLabel.textColor = textColor;
-    self.batteryLabel.textColor = textColor;
+    if (self.batteryLabel) {
+        self.batteryLabel.textColor = textColor;
+    }
     self.dateLabel.textColor = textColor;
 }
 
