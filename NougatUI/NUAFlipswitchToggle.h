@@ -2,14 +2,16 @@
 #import <Flipswitch/Flipswitch.h>
 
 @interface NUAFlipswitchToggle : NUARippleButton
-@property (strong, readonly, nonatomic) UIImageView *imageView;
-@property (copy, nonatomic) NSString *switchIdentifier;
+@property (copy, readonly, nonatomic) NSString *switchIdentifier;
+@property (strong, readonly, nonatomic) UILabel *toggleLabel;
+@property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
+
+@property (getter=isInverted, readonly, nonatomic) BOOL inverted;
 @property (strong, readonly, nonatomic) NSBundle *resourceBundle;
-@property (readonly, nonatomic) FSSwitchState switchState;
-@property (strong, readonly, nonatomic) UILabel *displayName;
+@property (copy, readonly, nonatomic) NSString *displayName;
+@property (strong, readonly, nonatomic) UIImage *icon;
+@property (strong, readonly, nonatomic) UIImage *selectedIcon;
 
-+ (NSBundle *)sharedResourceBundle;
-
-- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier;
+- (instancetype)initWithSwitchIdentifier:(NSString *)identifier;
 
 @end

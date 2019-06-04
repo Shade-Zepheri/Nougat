@@ -2,38 +2,33 @@
 #import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 
+@interface NUAFlipswitchToggle ()
+@property (strong, nonatomic) UIImageView *imageView;
+@property (assign, nonatomic) FSSwitchState switchState;
+
+@end
+
 @implementation NUAFlipswitchToggle
 
-+ (NSBundle *)sharedResourceBundle {
-	static NSBundle *sharedResourceBundle = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken,  ^{
-    	sharedResourceBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
-    });
-
-    return sharedResourceBundle;
-}
-
-- (instancetype)initWithFrame:(CGRect)frame andSwitchIdentifier:(NSString *)identifier {
-    self = [super initWithFrame:frame];
+- (instancetype)initWithSwitchIdentifier:(NSString *)identifier {
+    self = [super initWithFrame:CGRectZero];
     if (self) {
-        _resourceBundle = [self.class sharedResourceBundle];
-
-        _displayName = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.displayName.translatesAutoresizingMaskIntoConstraints = NO;
-        self.displayName.alpha = 0.0;
-        self.displayName.font = [UIFont systemFontOfSize:12];
-        self.displayName.textColor = [NUAPreferenceManager sharedSettings].textColor;
-        self.displayName.backgroundColor = [UIColor clearColor];
-        self.displayName.textAlignment = NSTextAlignmentCenter;
-        [self addSubview:self.displayName];
+        _toggleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        self.toggleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        self.toggleLabel.alpha = 0.0;
+        self.toggleLabel.font = [UIFont systemFontOfSize:12];
+        self.toggleLabel.text = self.displayName;
+        self.toggleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+        self.toggleLabel.backgroundColor = [UIColor clearColor];
+        self.toggleLabel.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:self.toggleLabel];
 
         // Constraints
-        [self.displayName.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-        [self.displayName.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+        [self.toggleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [self.toggleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
         // Create imageView
-        _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:self.imageView];
@@ -44,7 +39,7 @@
         [self.imageView.widthAnchor constraintEqualToConstant:28].active = YES;
         [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
 
-        self.switchIdentifier = identifier;
+        _switchIdentifier = identifier;
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
@@ -72,54 +67,46 @@
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
     NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", self.switchIdentifier];
-    _switchState = [switchPanel stateForSwitchIdentifier:flipswitchIdentifier];
+    self.switchState = [switchPanel stateForSwitchIdentifier:flipswitchIdentifier];
     [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:flipswitchIdentifier];
 }
 
 #pragma mark - Properties
 
-- (void)setSwitchIdentifier:(NSString *)identifier {
-    _switchIdentifier = identifier;
+- (BOOL)isUsingDark {
+    return [NUAPreferenceManager sharedSettings].usingDark;
+}
 
-    // Update state
-    NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", identifier];
-    _switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
+- (BOOL)isInverted {
+    return NO;
+}
 
-    // Update image
-    [self _updateImageView:NO];
+- (NSBundle *)resourceBundle {
+    return nil;
+}
 
-    // Update label text
-    NSString *labelText = [self.resourceBundle localizedStringForKey:identifier value:identifier table:nil];
-    if ([identifier isEqualToString:@"wifi"]) {
-        self.displayName.text = [NUAPreferenceManager currentWifiSSID] ?: labelText;
-    } else {
-        self.displayName.text = labelText;
-    }
+- (NSString *)displayName {
+    return nil;
+}
+
+- (UIImage *)icon {
+    return nil;
+}
+
+- (UIImage *)selectedIcon {
+    return nil;
 }
 
 #pragma mark - Image management
 
 - (void)_updateImageView:(BOOL)animated {
-    // Get image name
-    NSString *stateString = NSStringFromFSSwitchState(self.switchState);
-    NSString *imageName = [NSString stringWithFormat:@"%@_%@", self.switchIdentifier, stateString];
-
-    // TODO: Simplify this mess
-    if ([self.switchIdentifier isEqualToString:@"rotation-lock"]) {
-        if (self.switchState == FSSwitchStateOff) {
-            NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
-            imageName = [imageName stringByAppendingString:imageStyle];
-        }
-    } else if (self.switchState == FSSwitchStateOn) {
-        // Use dark / light image
-        NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
-        imageName = [imageName stringByAppendingString:imageStyle];
-    } 
+    // Get proper image
+    UIImage *glyph = (self.switchState == FSSwitchStateOn) ? self.selectedIcon : self.icon;
 
     // Animate transition
     CGFloat duration = animated ? 0.4 : 0.0;
     [UIView transitionWithView:self.imageView duration:duration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-        self.imageView.image = [UIImage imageNamed:imageName inBundle:self.resourceBundle];
+        self.imageView.image = glyph
     } completion:nil];
 }
 
@@ -132,24 +119,15 @@
         return;
     }
 
-    _switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
+    self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
     [self _updateImageView:YES];
-
-    if ([self.switchIdentifier isEqualToString:@"wifi"]) {
-        NSString *labelText = [self.resourceBundle localizedStringForKey:self.switchIdentifier value:self.switchIdentifier table:nil];
-
-        // Animate change
-        [UIView transitionWithView:self.displayName duration:0.25 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-            self.displayName.text = [NUAPreferenceManager currentWifiSSID] ?: labelText;
-        } completion:nil];
-    }
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
     NSDictionary<NSString *, UIColor *> *colorInfo = notification.userInfo;
 
     // Update label and image
-    self.displayName.textColor = colorInfo[@"textColor"];
+    self.toggleLabel.textColor = colorInfo[@"textColor"];
     [self _updateImageView:NO];
 }
 
