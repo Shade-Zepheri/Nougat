@@ -1,7 +1,7 @@
 #import "NUANotificationShadeController.h"
 #import "NUANotificationCenterInhibitor.h"
-#import "NUAPreferenceManager.h"
-#import "Macros.h"
+#import <NougatServices/NougatServices.h>
+#import <Macros.h>
 #import "CADisplayLink+Blocks.h"
 #import <FrontBoard/FBDisplayManager.h>
 #import <FrontBoard/FBSystemGestureManager.h>

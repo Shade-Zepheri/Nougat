@@ -1,6 +1,6 @@
 #import "NUASettingsContentView.h"
-#import "NUAPreferenceManager.h"
-#import "Macros.h"
+#import <Macros.h>
+#import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 #import <version.h>
 

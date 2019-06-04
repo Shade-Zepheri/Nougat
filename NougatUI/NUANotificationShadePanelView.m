@@ -1,5 +1,5 @@
 #import "NUANotificationShadePanelView.h"
-#import "NUAPreferenceManager.h"
+#import <NougatServices/NougatServices.h>
 #import "Macros.h"
 
 @implementation NUANotificationShadePanelView

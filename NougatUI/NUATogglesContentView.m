@@ -1,6 +1,6 @@
 #import "NUATogglesContentView.h"
-#import "NUAPreferenceManager.h"
 #import "NSArray+Map.h"
+#import <NougatServices/NougatServices.h>
 
 @implementation NUATogglesContentView
 

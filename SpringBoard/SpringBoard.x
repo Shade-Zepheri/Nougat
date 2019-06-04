@@ -1,5 +1,5 @@
-#import "NUANotificationShadeController.h"
-#import "NUAPreferenceManager.h"
+#import <NougatServices/NougatServices.h>
+#import <NougatUI/NougatUI.h>
 
 #pragma mark - Hooks
 

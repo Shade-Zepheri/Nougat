@@ -1,8 +1,6 @@
 #import "NUANotificationShadeViewController.h"
 #import "NUANotificationCenterInhibitor.h"
 #import "NUAModulesContainerViewController.h"
-#import "NUAPreferenceManager.h"
-#import "Macros.h"
 #import <UIKit/UIPanGestureRecognizer+Internal.h>
 
 

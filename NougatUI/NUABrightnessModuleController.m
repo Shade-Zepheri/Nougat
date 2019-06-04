@@ -1,6 +1,6 @@
 #import "NUABrightnessModuleController.h"
 #import "NUANotificationShadeController.h"
-#import "NUAPreferenceManager.h"
+#import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 
 @implementation NUABrightnessModuleController

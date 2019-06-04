@@ -1,6 +1,4 @@
 #import "NUATogglesModuleController.h"
-#import "NUAFlipswitchToggle.h"
-#import "NUAPreferenceManager.h"
 #import "NUATogglesContentView.h"
 
 @implementation NUATogglesModuleController

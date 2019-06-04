@@ -1,5 +1,5 @@
 #import "NUASortOrderController.h"
-#import "NUAPreferenceManager.h"
+#import <NougatServices/NougatServices.h>
 #import <Cephei/HBPreferences.h>
 
 @implementation NUASortOrderController

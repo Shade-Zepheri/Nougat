@@ -1,6 +1,6 @@
 #import "NUAStatusBarContentView.h"
-#import "NUAPreferenceManager.h"
 #import <BaseBoard/BSDateFormatterCache.h>
+#import <NougatServices/NougatServices.h>
 #import <UIKit/UIStatusBar_Modern.h>
 
 @implementation NUAStatusBarContentView

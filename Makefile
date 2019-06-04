@@ -11,19 +11,13 @@ export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
 
 include $(THEOS)/makefiles/common.mk
 
-TWEAK_NAME = Nougat
-Nougat_FILES = $(wildcard *.[xm])
-Nougat_FRAMEWORKS = UIKit QuartzCore CoreTelephony
-#Nougat_PRIVATE_FRAMEWORKS = BackBoardServices BaseBoard FrontBoard
-Nougat_EXTRA_FRAMEWORKS = Cephei
-Nougat_LIBRARIES = flipswitch
-Nougat_CFLAGS = -IHeaders
-Nougat_LDFLAGS = $(wildcard includes/*.tbd)
+SUBPROJECTS += NougatServices
+SUBPROJECTS += NougatUI
+SUBPROJECTS += SpringBoard
+SUBPROJECTS += Settings
 
 BUNDLE_NAME = Nougat-Resources
 Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
-
-SUBPROJECTS = Settings
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 include $(THEOS)/makefiles/bundle.mk

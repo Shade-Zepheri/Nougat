@@ -1,9 +1,8 @@
 #import "NUAPreferenceManager.h"
-#import "Macros.h"
+#import <Macros.h>
 #import <Cephei/HBPreferences.h>
-#import <SpringBoard/SBDefaults.h>
-#import <SpringBoard/SBExternalCarrierDefaults.h>
-#import <SpringBoard/SBExternalDefaults.h>
+#import <CoreTelephony/CTTelephonyNetworkInfo.h>
+#import <CoreTelephony/CTCarrier.h>
 #import <SpringBoard/SBWiFiManager.h>
 
 @implementation NUAPreferenceManager {
@@ -78,11 +77,9 @@
 }
 
 + (NSString *)carrierName {
-    //Could use CoreTelephony but lets use SB methods
-    SBExternalDefaults *externalDefaults = [NSClassFromString(@"SBDefaults") externalDefaults];
-    SBExternalCarrierDefaults *carrierDefaults = externalDefaults.carrierDefaults;
-
-    return carrierDefaults.carrierName;
+    CTTelephonyNetworkInfo *networkInfo = [[CTTelephonyNetworkInfo alloc] init];
+    CTCarrier *carrier = [networkInfo subscriberCellularProvider];
+    return carrier.carrierName;
 }
 
 @end
