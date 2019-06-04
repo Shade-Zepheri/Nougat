@@ -3,7 +3,6 @@
 #import <Cephei/HBPreferences.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
-#import <SpringBoard/SBWiFiManager.h>
 
 @implementation NUAPreferenceManager {
     HBPreferences *_preferences;
@@ -71,10 +70,6 @@
 }
 
 #pragma mark - Convenience Methods
-
-+ (NSString *)currentWifiSSID {
-    return [[NSClassFromString(@"SBWiFiManager") sharedInstance] currentNetworkName];
-}
 
 + (NSString *)carrierName {
     CTTelephonyNetworkInfo *networkInfo = [[CTTelephonyNetworkInfo alloc] init];

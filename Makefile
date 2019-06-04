@@ -14,6 +14,7 @@ include $(THEOS)/makefiles/common.mk
 SUBPROJECTS += NougatServices
 SUBPROJECTS += NougatUI
 SUBPROJECTS += SpringBoard
+SUBPROJECTS += Toggles
 SUBPROJECTS += Settings
 
 BUNDLE_NAME = Nougat-Resources
