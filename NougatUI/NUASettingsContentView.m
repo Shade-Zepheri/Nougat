@@ -109,11 +109,11 @@
     tapGesture.numberOfTapsRequired = 1;
     [imageView addGestureRecognizer:tapGesture];
 
-    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
     imageName = [imageName stringByAppendingString:imageStyle];
 
-    NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
-    UIImage *image = [UIImage imageNamed:imageName inBundle:imageBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    UIImage *image = [UIImage imageNamed:imageName inBundle:bundle];
     imageView.image = image;
 
     return imageView;

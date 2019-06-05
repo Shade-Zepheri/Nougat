@@ -45,35 +45,35 @@
 #pragma mark - Image management
 
 - (NSString *)_imageNameForPercent:(CGFloat)percent {
-    NSString *name = @"battery_";
+    NSString *name = @"battery-";
     if (percent == 100.0) {
         // Full
-        name = [name stringByAppendingString:@"full_"];
+        name = [name stringByAppendingString:@"full-"];
     } else if (percent < 100.0 && percent >= 90) {
         // 90
-        name = [name stringByAppendingString:@"90_"];
+        name = [name stringByAppendingString:@"90-"];
     } else if (percent < 90.0 && percent >= 80.0) {
         // 80
-        name = [name stringByAppendingString:@"80_"];
+        name = [name stringByAppendingString:@"80-"];
     } else if (percent < 80.0 && percent >= 60.0) {
         // 60
-        name = [name stringByAppendingString:@"60_"];
+        name = [name stringByAppendingString:@"60-"];
     } else if (percent < 60.0 && percent >= 50.0) {
         // 50
-        name = [name stringByAppendingString:@"50_"];
+        name = [name stringByAppendingString:@"50-"];
     } else if (percent < 50.0 && percent >= 30.0) {
         // 30
-        name = [name stringByAppendingString:@"30_"];
+        name = [name stringByAppendingString:@"30-"];
     } else if (percent < 30.0) {
         // 20
-        name = [name stringByAppendingString:@"20_"];
+        name = [name stringByAppendingString:@"20-"];
     }
 
-    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"black" : @"white";
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"dark" : @"light";
     name = [name stringByAppendingString:imageStyle];
 
     if (self.charging) {
-        name = [name stringByAppendingString:@"_charging"];
+        name = [name stringByAppendingString:@"-charging"];
     }
 
     return name;
@@ -81,8 +81,8 @@
 
 - (void)_updateImageForPercent:(CGFloat)percent {
     NSString *imageName = [self _imageNameForPercent:percent];
-    NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
-    UIImage *image = [UIImage imageNamed:imageName inBundle:imageBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    UIImage *image = [UIImage imageNamed:imageName inBundle:bundle];
     self.batteryImageView.image = image;
 }
 

@@ -17,11 +17,6 @@ SUBPROJECTS += SpringBoard
 SUBPROJECTS += Toggles
 SUBPROJECTS += Settings
 
-BUNDLE_NAME = Nougat-Resources
-Nougat-Resources_INSTALL_PATH = /var/mobile/Library/
-
-include $(THEOS_MAKE_PATH)/tweak.mk
-include $(THEOS)/makefiles/bundle.mk
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::
