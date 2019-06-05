@@ -27,19 +27,22 @@
         [self.toggleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
         [self.toggleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
+        _switchIdentifier = identifier;
+        self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
+
         // Create imageView
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
         self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
         self.imageView.contentMode = UIViewContentModeScaleAspectFit;
         [self addSubview:self.imageView];
 
+        [self _updateImageView:NO];
+
         // Constraints
         [self.imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
         [self.imageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
         [self.imageView.widthAnchor constraintEqualToConstant:28].active = YES;
         [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
-
-        _switchIdentifier = identifier;
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
@@ -56,9 +59,9 @@
 #pragma mark - Ripple
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
-    [super touchesEnded:touches withEvent:event];
-
     [self toggleSwitchState];
+
+    [super touchesEnded:touches withEvent:event];
 }
 
 #pragma mark - Toggles
@@ -96,7 +99,14 @@
 
 - (void)_updateImageView:(BOOL)animated {
     // Get proper image
-    UIImage *glyph = (self.switchState == FSSwitchStateOn) ? self.selectedIcon : self.icon;
+    FSSwitchState state;
+    if (self.inverted) {
+        state = (self.switchState == FSSwitchStateOn) ? FSSwitchStateOff : FSSwitchStateOn;
+    } else {
+        state = self.switchState;
+    }
+
+    UIImage *glyph = (state == FSSwitchStateOn) ? self.selectedIcon : self.icon;
 
     // Animate transition
     CGFloat duration = animated ? 0.4 : 0.0;

@@ -19,6 +19,5 @@
 @property (copy, nonatomic) NSArray<NUAFlipswitchToggle *> *togglesArray;
 
 - (void)_layoutToggles;
-- (void)_updateToggleIdentifiers;
 
 @end

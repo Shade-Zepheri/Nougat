@@ -1,15 +1,18 @@
 #import "NUATogglesContentView.h"
+#import "NUAToggleInstancesProvider.h"
 #import "NSArray+Map.h"
 #import <NougatServices/NougatServices.h>
+#import <Macros.h>
 
 @implementation NUATogglesContentView
 
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        // Do somethings
-        // Please excuse the messiness, extreme prototype
+        // Load instance manager
+        [NUAToggleInstancesProvider defaultProvider];
 
+        // Populate Toggles
         [self _createToggles];
     }
 
@@ -19,28 +22,17 @@
 #pragma mark - Toggles management
 
 - (void)_createToggles {
-    NSArray *identifiers = [[NUAPreferenceManager sharedSettings].togglesList copy];
-    self.togglesArray = [identifiers map:^id(id obj) {
-        return [[NUAFlipswitchToggle alloc] initWithFrame:CGRectZero andSwitchIdentifier:(NSString *)obj];
-    }];
+    self.togglesArray = [NUAToggleInstancesProvider defaultProvider].toggleInstances;
 
-    _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
-    _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
-    _bottomRow = [self.togglesArray subarrayWithRange:NSMakeRange(6, 3)]; // Last 3
-}
-
-- (void)_updateToggleIdentifiers {
-    NSArray *identifiers = [NUAPreferenceManager sharedSettings].togglesList;
-    for (int i = 0; i < identifiers.count; i++) {
-        NSString *identifier = identifiers[i];
-        NUAFlipswitchToggle *toggle = self.togglesArray[i];
-
-        // Reassign identifiers
-        if ([toggle.switchIdentifier isEqualToString:identifier]) {
-            continue;
-        }
-
-        toggle.switchIdentifier = identifier;
+    if (self.togglesArray.count > 6) {
+        _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
+        _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
+        _bottomRow = [self.togglesArray subarrayWithRange:NSMakeRange(6, self.togglesArray.count - 6)];
+    } else if (self.togglesArray.count > 3) {
+        _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
+        _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , self.togglesArray.count - 3)]; 
+    } else {
+        _topRow = self.togglesArray;
     }
 }
 
@@ -134,7 +126,7 @@
     [self rearrangeForPercent:percent];
 
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
-        toggle.displayName.alpha = percent;
+        toggle.toggleLabel.alpha = percent;
     }
 }
 

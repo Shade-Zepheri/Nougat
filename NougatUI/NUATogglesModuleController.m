@@ -57,7 +57,6 @@
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
     // Defer to view
-    [[self _togglesContentView] _updateToggleIdentifiers];
 }
 
 @end
