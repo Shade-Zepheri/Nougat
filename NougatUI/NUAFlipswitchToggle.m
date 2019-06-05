@@ -66,9 +66,8 @@
 - (void)toggleSwitchState {
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
-    NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", self.switchIdentifier];
-    self.switchState = [switchPanel stateForSwitchIdentifier:flipswitchIdentifier];
-    [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:flipswitchIdentifier];
+    self.switchState = [switchPanel stateForSwitchIdentifier:self.switchIdentifier];
+    [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:self.switchIdentifier];
 }
 
 #pragma mark - Properties
@@ -114,12 +113,11 @@
 
 - (void)switchesChangedState:(NSNotification *)notification {
     NSString *changedSwitch = notification.userInfo[FSSwitchPanelSwitchIdentifierKey];
-    NSString *flipswitchIdentifier = [NSString stringWithFormat:@"com.a3tweaks.switch.%@", self.switchIdentifier];
-    if (changedSwitch && ![changedSwitch isEqualToString:flipswitchIdentifier]) {
+    if (changedSwitch && ![changedSwitch isEqualToString:self.switchIdentifier]) {
         return;
     }
 
-    self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:flipswitchIdentifier];
+    self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
     [self _updateImageView:YES];
 }
 
