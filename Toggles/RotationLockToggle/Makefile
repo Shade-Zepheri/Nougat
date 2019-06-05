@@ -1,7 +1,7 @@
 include $(THEOS)/makefiles/common.mk
 
-BUNDLE_NAME = RotationLockToggleToggle
-RotationLockToggle_BUNDLE_NAME = com.shade.nougat.RotationLockToggleToggle
+BUNDLE_NAME = RotationLockToggle
+RotationLockToggle_BUNDLE_NAME = com.shade.nougat.RotationLockToggle
 RotationLockToggle_BUNDLE_EXTENSION = bundle
 RotationLockToggle_FILES = $(wildcard *.m)
 RotationLockToggle_FRAMEWORKS = Foundation UIKit CoreGraphics CoreImage QuartzCore
