@@ -80,10 +80,6 @@
     return NO;
 }
 
-- (NSBundle *)resourceBundle {
-    return nil;
-}
-
 - (NSString *)displayName {
     return nil;
 }
@@ -105,7 +101,7 @@
     // Animate transition
     CGFloat duration = animated ? 0.4 : 0.0;
     [UIView transitionWithView:self.imageView duration:duration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-        self.imageView.image = glyph
+        self.imageView.image = glyph;
     } completion:nil];
 }
 

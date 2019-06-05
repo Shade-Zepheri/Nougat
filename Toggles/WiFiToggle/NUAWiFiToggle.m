@@ -1,5 +1,6 @@
 #import "NUAWiFiToggle.h"
 #import <SpringBoard/SBWiFiManager.h>
+#import <UIKit/UIImage+Private.h>
 
 @implementation NUAWiFiToggle
 
@@ -20,8 +21,8 @@
 }
 
 - (void)_updateLabel {
-    NSString displayName = self.displayName ?: @"WiFi";
-    self.displayLabel.text = displayName;
+    NSString *displayName = self.displayName ?: @"WiFi";
+    self.toggleLabel.text = displayName;
 }
 
 #pragma mark - Toggle
@@ -35,12 +36,14 @@
 }
 
 - (UIImage *)icon {
-    return [UIImage imageNamed:@"Off" inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [UIImage imageNamed:@"Off" inBundle:bundle];
 }
 
 - (UIImage *)selectedIcon {
-    NSString *imageName = [NSString stringWithFormat:@"On-", self.usingDark ? @"Dark" : @"Light"];
-    return [UIImage imageNamed:imageName inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *imageName = [NSString stringWithFormat:@"On-%@", self.usingDark ? @"Dark" : @"Light"];
+    return [UIImage imageNamed:imageName inBundle:bundle];
 }
 
 @end

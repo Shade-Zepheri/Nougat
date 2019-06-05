@@ -1,4 +1,5 @@
 #import "NUABatterySaverToggle.h"
+#import <UIKit/UIImage+Private.h>
 
 @implementation NUABatterySaverToggle
 
@@ -10,21 +11,19 @@
 
 #pragma mark - Toggle
 
-- (NSBundle *)resourceBundle {
-    return [NSBundle bundleForClass:[self class]];
-}
-
 - (NSString *)displayName {
     return @"Battery Saver";
 }
 
 - (UIImage *)icon {
-    return [UIImage imageNamed:@"Off" inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [UIImage imageNamed:@"Off" inBundle:bundle];
 }
 
 - (UIImage *)selectedIcon {
-    NSString *imageName = [NSString stringWithFormat:@"On-", self.usingDark ? @"Dark" : @"Light"];
-    return [UIImage imageNamed:imageName inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *imageName = [NSString stringWithFormat:@"On-%@", self.usingDark ? @"Dark" : @"Light"];
+    return [UIImage imageNamed:imageName inBundle:bundle];
 }
 
 @end

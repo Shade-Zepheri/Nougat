@@ -1,4 +1,5 @@
 #import "NUARotationLockToggle.h"
+#import <UIKit/UIImage+Private.h>
 
 @implementation NUARotationLockToggle
 
@@ -14,21 +15,19 @@
     return YES;
 }
 
-- (NSBundle *)resourceBundle {
-    return [NSBundle bundleForClass:[self class]];
-}
-
 - (NSString *)displayName {
     return @"Rotation Lock";
 }
 
 - (UIImage *)icon {
-    return [UIImage imageNamed:@"Off" inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [UIImage imageNamed:@"Off" inBundle:bundle];
 }
 
 - (UIImage *)selectedIcon {
-    NSString *imageName = [NSString stringWithFormat:@"On-", self.usingDark ? @"Dark" : @"Light"];
-    return [UIImage imageNamed:imageName inBundle:self.resourceBundle];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *imageName = [NSString stringWithFormat:@"On-%@", self.usingDark ? @"Dark" : @"Light"];
+    return [UIImage imageNamed:imageName inBundle:bundle];
 }
 
 @end
