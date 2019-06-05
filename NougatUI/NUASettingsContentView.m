@@ -204,20 +204,20 @@
     _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
 
     // Update imageView images
-    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"_black" : @"_white";
-    NSBundle *imageBundle = [NSBundle bundleWithPath:@"/var/mobile/Library/Nougat-Resources.bundle"];
+    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 
     NSString *accountImage = [@"account" stringByAppendingString:imageStyle];
-    self.accountView.image = [UIImage imageNamed:accountImage inBundle:imageBundle];
+    self.accountView.image = [UIImage imageNamed:accountImage inBundle:bundle];
 
     NSString *nougatImage = [@"edit" stringByAppendingString:imageStyle];
-    self.nougatView.image = [UIImage imageNamed:nougatImage inBundle:imageBundle];
+    self.nougatView.image = [UIImage imageNamed:nougatImage inBundle:bundle];
 
     NSString *settingsImage = [@"settings" stringByAppendingString:imageStyle];
-    self.settingsView.image = [UIImage imageNamed:settingsImage inBundle:imageBundle];
+    self.settingsView.image = [UIImage imageNamed:settingsImage inBundle:bundle];
 
     NSString *arrowImage = [@"arrow" stringByAppendingString:imageStyle];
-    self.arrowView.image = [UIImage imageNamed:arrowImage inBundle:imageBundle];
+    self.arrowView.image = [UIImage imageNamed:arrowImage inBundle:bundle];
 }
 
 @end
