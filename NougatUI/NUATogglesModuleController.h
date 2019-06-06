@@ -1,7 +1,8 @@
 #import "NUANotificationShadeModuleViewController.h"
 #import "NUANotificationShadePageContentProvider.h"
+#import "NUATogglesContentView.h"
 
-@interface NUATogglesModuleController : NUANotificationShadeModuleViewController
+@interface NUATogglesModuleController : NUANotificationShadeModuleViewController <NUATogglesContentViewDelegate>
 @property (assign, nonatomic) CGFloat presentedHeight;
 
 @end

@@ -24,6 +24,10 @@
 - (void)_createToggles {
     self.togglesArray = [NUAToggleInstancesProvider defaultProvider].toggleInstances;
 
+    for (NUAFlipswitchToggle *toggle in self.togglesArray) {
+        toggle.delegate = self;
+    }
+
     if (self.togglesArray.count > 6) {
         _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
         _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
@@ -116,6 +120,12 @@
     CGFloat newY = ((CGRectGetHeight(self.frame) - (50 * percent)) / 3)  * 2;
     _bottomContainerView.alpha = percent;
     _bottomContainerView.frame = CGRectMake(35, newY, CGRectGetWidth(oldFrame), 100 * percent);
+}
+
+#pragma mark - Delegate
+
+- (void)toggleWantsNotificationShadeDismissal:(NUAFlipswitchToggle *)toggle {
+    [self.delegate contentViewWantsNotificationShadeDismissal:self];
 }
 
 #pragma mark - Properties

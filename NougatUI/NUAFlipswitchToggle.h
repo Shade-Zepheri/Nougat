@@ -1,7 +1,15 @@
 #import "NUARippleButton.h"
-#import <Flipswitch/Flipswitch.h>
+
+@class NUAFlipswitchToggle;
+
+@protocol NUAFlipswitchToggleDelegate <NSObject>
+
+- (void)toggleWantsNotificationShadeDismissal:(NUAFlipswitchToggle *)toggle;
+
+@end
 
 @interface NUAFlipswitchToggle : NUARippleButton
+@property (weak, nonatomic) id<NUAFlipswitchToggleDelegate> delegate;
 @property (copy, readonly, nonatomic) NSString *switchIdentifier;
 @property (strong, readonly, nonatomic) UILabel *toggleLabel;
 @property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;

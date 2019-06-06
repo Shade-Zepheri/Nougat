@@ -1,5 +1,4 @@
 #import "NUATogglesModuleController.h"
-#import "NUATogglesContentView.h"
 
 @implementation NUATogglesModuleController
 
@@ -15,7 +14,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Figure out what else to do here
+
+    // Set as delegate
+    [self _togglesContentView].delegate = self;
 
     // Register for notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
@@ -51,6 +52,12 @@
 
     // Pass to view
     [self _togglesContentView].expandedPercent = multiplier / 350;
+}
+
+#pragma mark - Delegate
+
+- (void)contentViewWantsNotificationShadeDismissal:(NUATogglesContentView *)contentView {
+    [self.delegate moduleWantsNotificationShadeDismissal:self completely:YES];
 }
 
 #pragma mark - Notifications

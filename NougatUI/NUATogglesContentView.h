@@ -1,7 +1,15 @@
 #import <UIKit/UIKit.h>
 #import "NUAFlipswitchToggle.h"
 
-@interface NUATogglesContentView : UIView {
+@class NUATogglesContentView;
+
+@protocol NUATogglesContentViewDelegate <NSObject>
+
+- (void)contentViewWantsNotificationShadeDismissal:(NUATogglesContentView *)contentView;
+
+@end
+
+@interface NUATogglesContentView : UIView <NUAFlipswitchToggleDelegate> {
     CGFloat _startingWidth;
     CGFloat _widthDifference;
 
@@ -14,6 +22,7 @@
     UIView *_bottomContainerView;
 }
 
+@property (weak, nonatomic) id<NUATogglesContentViewDelegate> delegate;
 @property (assign, nonatomic) CGFloat expandedPercent;
 
 @property (copy, nonatomic) NSArray<NUAFlipswitchToggle *> *togglesArray;

@@ -1,4 +1,5 @@
 #import "NUAFlipswitchToggle.h"
+#import <Flipswitch/Flipswitch.h>
 #import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 
@@ -79,7 +80,7 @@
 
     if (![[UIApplication sharedApplication] canOpenURL:self.settingsURL]) {
         return;
-}
+    }
 
     if (![[UIApplication sharedApplication] openURL:self.settingsURL]) {
         // Failed
@@ -87,6 +88,7 @@
     }
 
     // Dismiss notification shade
+    [self.delegate toggleWantsNotificationShadeDismissal:self];
 }
 
 #pragma mark - Toggles
