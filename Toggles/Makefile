@@ -8,8 +8,11 @@ SUBPROJECTS += BluetoothToggle
 SUBPROJECTS += DataToggle
 SUBPROJECTS += DoNotDisturbToggle
 SUBPROJECTS += FlashlightToggle
+SUBPROJECTS += HotspotToggle
 SUBPROJECTS += LocationToggle
+SUBPROJECTS += NightLightToggle
 SUBPROJECTS += RotationLockToggle
+SUBPROJECTS += VPNToggle
 SUBPROJECTS += WiFiToggle
 
 include $(THEOS_MAKE_PATH)/aggregate.mk
