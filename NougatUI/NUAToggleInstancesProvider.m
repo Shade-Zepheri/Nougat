@@ -32,7 +32,7 @@
 - (void)_populateToggles {
     NSMutableArray<NUAFlipswitchToggle *> *populatedToggles = [NSMutableArray array];
 
-    NSArray<NSString *> *enabledToggles = [self.preferences _installedToggleIdentifiers];
+    NSArray<NSString *> *enabledToggles = self.preferences.enabledToggles;
     for (NSString *identifier in enabledToggles) {
         NUAToggleInfo *info = [self.preferences toggleInfoForIdentifier:identifier];
         if (!info) {

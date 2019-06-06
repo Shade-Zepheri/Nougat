@@ -177,12 +177,12 @@
     return NO;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView titleAlignmentForHeaderInSection:(NSInteger)section {
-    return 1;
+- (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForHeaderInSection:(NSInteger)section {
+    return NSTextAlignmentCenter;
 }
 
-- (NSInteger)tableView:(UITableView *)tableView titleAlignmentForFooterInSection:(NSInteger)section {
-	return 1;
+- (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForFooterInSection:(NSInteger)section {
+	return NSTextAlignmentCenter;
 }
 
 #pragma mark - Preferences
