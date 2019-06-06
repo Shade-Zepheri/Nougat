@@ -23,6 +23,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
 @property (strong, readonly, nonatomic) UIColor *textColor;
 @property (copy, readonly, nonatomic) NSArray<NSString *> *enabledToggles;
+@property (copy, readonly, nonatomic) NSArray<NSString *> *disabledToggles;
 
 
 - (NSArray<NSString *> *)_installedToggleIdentifiers;

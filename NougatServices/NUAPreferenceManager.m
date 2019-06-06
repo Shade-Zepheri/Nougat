@@ -31,7 +31,7 @@
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
 
-        NSArray<NSString *> *defaultToggleOrder = @[@"wifi", @"cellular-data", @"bluetooth", @"do-not-disturb", @"flashlight", @"rotation-lock", @"low-power", @"location", @"airplane-mode"];
+        NSArray<NSString *> *defaultToggleOrder = @[@"com.shade.nougat.WiFiToggle", @"com.shade.nougat.DataToggle", @"com.shade.nougat.BluetoothToggle", @"com.shade.nougat.DoNotDisturbToggle", @"com.shade.nougat.FlashlightToggle", @"com.shade.nougat.RotationLockToggle", @"com.shade.nougat.BatterySaverToggle", @"com.shade.nougat.LocationToggle", @"com.shade.nougat.AirplaneModeToggle"];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -71,6 +71,8 @@
         }
     }
 
+    [self refreshToggleInfo];
+
     NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor, @"textColor": _textColor};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
@@ -91,6 +93,18 @@
     } else {
         HBLogError(@"%@", error);
     }
+
+    NSMutableArray<NSString *> *disabledToggles = [NSMutableArray array];
+    // Construct disabled toggles
+    for (NSString *identifier in _toggleInfoDictionary.allKeys) {
+        if ([self.enabledToggles containsObject:identifier]) {
+            continue;
+        }
+
+        [disabledToggles addObject:identifier];
+    }
+
+    _disabledToggles = [disabledToggles copy];
 }
 
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier {
@@ -98,7 +112,7 @@
 }
 
 - (NSArray<NSString *> *)_installedToggleIdentifiers {
-    return [_toggleInfoDictionary allKeys];
+    return _toggleInfoDictionary.allKeys;
 }
 
 #pragma mark - Convenience Methods
