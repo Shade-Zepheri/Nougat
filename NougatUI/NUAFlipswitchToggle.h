@@ -7,6 +7,7 @@
 @property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
 
 @property (getter=isInverted, readonly, nonatomic) BOOL inverted;
+@property (strong, readonly, nonatomic) NSURL *settingsURL;
 @property (copy, readonly, nonatomic) NSString *displayName;
 @property (strong, readonly, nonatomic) UIImage *icon;
 @property (strong, readonly, nonatomic) UIImage *selectedIcon;

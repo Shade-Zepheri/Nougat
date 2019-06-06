@@ -15,6 +15,10 @@
     return @"Battery Saver";
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=BATTERY_USAGE"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];

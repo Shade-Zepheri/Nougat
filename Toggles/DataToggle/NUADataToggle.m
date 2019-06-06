@@ -15,6 +15,10 @@
     return @"Mobile data";
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=MOBILE_DATA_SETTINGS_ID"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];

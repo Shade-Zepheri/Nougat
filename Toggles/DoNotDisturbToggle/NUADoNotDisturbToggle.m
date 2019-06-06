@@ -15,6 +15,10 @@
     return @"Do not disturb";
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=DO_NOT_DISTURB"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];

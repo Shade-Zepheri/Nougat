@@ -23,6 +23,12 @@
         self.toggleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.toggleLabel];
 
+        // Gesture
+        if (self.settingsURL) {
+            UILongPressGestureRecognizer *longPressGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleLongPressGesture:)];
+            [self addGestureRecognizer:longPressGesture];
+        }
+
         // Constraints
         [self.toggleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
         [self.toggleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
@@ -64,6 +70,25 @@
     [super touchesEnded:touches withEvent:event];
 }
 
+#pragma mark - Gesture
+
+- (void)handleLongPressGesture:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateBegan) {
+        return;
+    }
+
+    if (![[UIApplication sharedApplication] canOpenURL:self.settingsURL]) {
+        return;
+}
+
+    if (![[UIApplication sharedApplication] openURL:self.settingsURL]) {
+        // Failed
+        return;
+    }
+
+    // Dismiss notification shade
+}
+
 #pragma mark - Toggles
 
 - (void)toggleSwitchState {
@@ -81,6 +106,10 @@
 
 - (BOOL)isInverted {
     return NO;
+}
+
+- (NSURL *)settingsURL {
+    return nil;
 }
 
 - (NSString *)displayName {

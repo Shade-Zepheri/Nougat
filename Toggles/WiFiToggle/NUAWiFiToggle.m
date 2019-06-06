@@ -22,17 +22,25 @@
 
 - (void)_updateLabel {
     NSString *displayName = self.displayName ?: @"WiFi";
+
+    // Transition label
+    CATransition *animation = [CATransition animation];
+    animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    animation.type = kCATransitionFade;
+    animation.duration = 0.25;
+    [self.toggleLabel.layer addAnimation:animation forKey:@"kCATransitionFade"];
+
     self.toggleLabel.text = displayName;
 }
 
 #pragma mark - Toggle
 
-- (NSBundle *)resourceBundle {
-    return [NSBundle bundleForClass:[self class]];
-}
-
 - (NSString *)displayName {
     return [[NSClassFromString(@"SBWiFiManager") sharedInstance] currentNetworkName];
+}
+
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=WIFI"];
 }
 
 - (UIImage *)icon {

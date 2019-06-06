@@ -15,6 +15,10 @@
     return @"Hotspot";
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=INTERNET_TETHERING"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];

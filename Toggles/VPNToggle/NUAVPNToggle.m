@@ -15,6 +15,10 @@
     return @"VPN";
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=VPN"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];
