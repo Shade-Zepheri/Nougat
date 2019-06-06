@@ -24,9 +24,11 @@
 
 @property (weak, nonatomic) id<NUATogglesContentViewDelegate> delegate;
 @property (assign, nonatomic) CGFloat expandedPercent;
+@property (getter=isArranged, readonly, nonatomic) BOOL arranged;
 
 @property (copy, nonatomic) NSArray<NUAFlipswitchToggle *> *togglesArray;
 
 - (void)_layoutToggles;
+- (void)refreshToggleLayout;
 
 @end

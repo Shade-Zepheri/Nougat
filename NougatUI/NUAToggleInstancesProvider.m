@@ -22,6 +22,9 @@
         _toggleInstances = [NSArray array];
 
         [self _populateToggles];
+
+        // Register for notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
     }
 
     return self;
@@ -71,6 +74,13 @@
     }
 
     return nil;
+}
+
+#pragma mark - Notifications
+
+- (void)preferencesDidChange:(NSNotification *)notification {
+    // Refresh toggles list
+    [self _populateToggles];
 }
 
 @end

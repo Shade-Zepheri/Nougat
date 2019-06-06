@@ -1,6 +1,5 @@
 #import "NUATogglesContentView.h"
 #import "NUAToggleInstancesProvider.h"
-#import "NSArray+Map.h"
 #import <NougatServices/NougatServices.h>
 #import <Macros.h>
 
@@ -12,8 +11,11 @@
         // Load instance manager
         [NUAToggleInstancesProvider defaultProvider];
 
+        // Set properties
+        _arranged = NO;
+
         // Populate Toggles
-        [self _createToggles];
+        [self _populateToggles];
     }
 
     return self;
@@ -21,7 +23,7 @@
 
 #pragma mark - Toggles management
 
-- (void)_createToggles {
+- (void)_populateToggles {
     self.togglesArray = [NUAToggleInstancesProvider defaultProvider].toggleInstances;
 
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
@@ -41,7 +43,7 @@
 }
 
 - (void)_layoutToggles {
-    if (self.subviews.count > 0) {
+    if (self.arranged) {
         return;
     }
 
@@ -67,16 +69,39 @@
         [topStackView addArrangedSubview:toggle];
     }
     
-    for (NUAFlipswitchToggle *toggle in _middleRow) {
-        [middleStackView addArrangedSubview:toggle];
+    if (_middleRow) {
+        for (NUAFlipswitchToggle *toggle in _middleRow) {
+            [middleStackView addArrangedSubview:toggle];
+        }
     }
-
-    for (NUAFlipswitchToggle *toggle in _bottomRow) {
-        [bottomStackView addArrangedSubview:toggle];
+    
+    if (_bottomRow) {
+        for (NUAFlipswitchToggle *toggle in _bottomRow) {
+            [bottomStackView addArrangedSubview:toggle];
+        }
     }
 
     _startingWidth = containerWidth;
     _widthDifference = bottomWidth - containerWidth;
+
+    _arranged = YES;
+}
+
+- (void)refreshToggleLayout {
+    _arranged = NO;
+
+    // Remove old views
+    [_topContainerView removeFromSuperview];
+    [_middleContainerView removeFromSuperview];
+    [_bottomContainerView removeFromSuperview];
+
+    _topContainerView = nil;
+    _middleContainerView = nil;
+    _bottomContainerView = nil;
+
+    // Populate and relayout
+    [self _populateToggles];
+    [self _layoutToggles];
 }
 
 #pragma mark - View creation
