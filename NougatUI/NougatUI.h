@@ -1,8 +1,7 @@
 // Umbrella header for NougatUI.
-#import "CADisplayLink+Blocks.h"
-#import "NSArray+Map.h"
 #import "NUABatteryView.h"
 #import "NUABrightnessModuleController.h"
+#import "NUADisplayLink.h"
 #import "NUAFlipswitchToggle.h"
 #import "NUAModulesContainerViewController.h"
 #import "NUANotificationCenterInhibitor.h"
@@ -19,6 +18,7 @@
 #import "NUASettingsModuleController.h"
 #import "NUAStatusBarContentView.h"
 #import "NUAStatusBarModuleController.h"
+#import "NUAToggleInstancesProvider.h"
 #import "NUATogglesContentView.h"
 #import "NUATogglesModuleController.h"
 
