@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import "NUADisplayLink.h"
 #import "NUANotificationShadeViewController.h"
 #import <BaseBoard/BSInvalidatable.h>
 #import <FrontBoard/FBUIApplicationSceneDeactivationAssertion.h>
@@ -22,7 +23,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     BOOL _isPresenting;
     BOOL _isDismissing;
     CGPoint _initalTouchLocation;
-    CADisplayLink *_animationTimer;
+    NUADisplayLink *_animationTimer;
 }
 
 @property (nonatomic) NUANotificationShadePresentedState presentedState;

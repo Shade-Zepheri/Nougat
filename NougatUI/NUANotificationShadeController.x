@@ -2,7 +2,6 @@
 #import "NUANotificationCenterInhibitor.h"
 #import <NougatServices/NougatServices.h>
 #import <Macros.h>
-#import "CADisplayLink+Blocks.h"
 #import <FrontBoard/FBDisplayManager.h>
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
@@ -727,9 +726,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     __block CGFloat difference = targetHeight - baseHeight;
 
     __weak __typeof(self) weakSelf = self;
-    _animationTimer = [CADisplayLink displayLinkWithBlock:^(CADisplayLink *link) {
+    _animationTimer = [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
         if (fireTimes == 19) {
-            [link invalidate];
+            [displayLink invalidate];
             [weakSelf _updatePresentedHeight:targetHeight];
 
             if (completion) {
@@ -747,7 +746,6 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         CGFloat newHeight = baseHeight + (difference * multiplier);
         [weakSelf _updatePresentedHeight:newHeight];
     }];
-    [_animationTimer addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
 }
 
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {
