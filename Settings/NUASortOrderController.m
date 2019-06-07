@@ -29,6 +29,13 @@
     [self table].editing = YES;
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    // Save settings
+    [self _updateEnabledToggles];
+}
+
 - (UIView *)_tableView:(UITableView *)tableView viewForCustomInSection:(NSInteger)section isHeader:(BOOL)isHeader {
 	return nil;
 }
@@ -37,8 +44,23 @@
     return 0.0;
 }
 
+#pragma mark - Helper methods
+
 - (NSArray<NSString *> *)arrayForSection:(NSInteger)section {
     return (section == 0) ? self.enabledToggles : self.disabledToggles;
+}
+
+- (NSString *)_displayNameForIdentifier:(NSString *)identifier {
+    return [self.preferences toggleInfoForIdentifier:identifier].displayName;
+}
+
+- (NSUInteger)_indexForInsertingItemWithIdentifier:(NSString *)identifier intoArray:(NSArray<NSString *> *)array {
+    return [array indexOfObject:identifier inSortedRange:NSMakeRange(0, array.count) options:NSBinarySearchingInsertionIndex usingComparator:^(NSString *id1, NSString *id2) {
+        NSString *displayName1 = [self _displayNameForIdentifier:id1];
+        NSString *displayName2 = [self _displayNameForIdentifier:id2];
+
+        return [displayName1 compare:displayName2];
+    }];
 }
 
 #pragma mark - UITableViewDataSource
@@ -85,34 +107,37 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Add toggles
-        [tableView beginUpdates];
+        if (self.enabledToggles.count >= 9) {
+            // Dont add more than 9 toggles
+            return;
+        }
 
-        // Add to enabled list
+        // Move from disabled to enabled
         NSString *identifier = self.disabledToggles[indexPath.row];
+        NSUInteger insertIndex = self.enabledToggles.count;
+        [self.disabledToggles removeObject:identifier];
         [self.enabledToggles addObject:identifier];
 
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.enabledToggles indexOfObject:identifier] inSection:0]] withRowAnimation:UITableViewRowAnimationFade];
+        // Update table
+        [tableView beginUpdates];
 
-        // Remove from disabled
-        [self.disabledToggles removeObject:identifier];
-
-        [tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:1]] withRowAnimation:YES];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:100];
+        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:100];
 
         [tableView endUpdates];
     } else if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Remove toggles
+        // Move from enabled to disabled
+        NSString *identifier = self.enabledToggles[indexPath.row];
+        NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledToggles];
+
+        [self.enabledToggles removeObject:identifier];
+        [self.disabledToggles insertObject:identifier atIndex:insertIndex];
+
+        // Update table
         [tableView beginUpdates];
 
-        NSString *identifier = self.enabledToggles[indexPath.row];
-        [self.disabledToggles addObject:identifier];
-
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:[self.disabledToggles indexOfObject:identifier] inSection:1]] withRowAnimation:UITableViewRowAnimationFade];
-
-        // Remove from enabled
-        [self.enabledToggles removeObject:identifier];
-
-        [tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:0]] withRowAnimation:YES];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:100];
+        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:1]] withRowAnimation:100];
 
         [tableView endUpdates];
     }
@@ -125,7 +150,7 @@
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    return (indexPath.section == 0);
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
@@ -175,6 +200,19 @@
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
+}
+
+- (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
+    if (proposedDestinationIndexPath.section != 1) {
+        // Inserting into enabled, no need to alphabetize
+        return proposedDestinationIndexPath;
+    }
+
+    // Get index of proper alphabetical order
+    NSString *identifier = self.enabledToggles[sourceIndexPath.row];
+    NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledToggles];
+
+    return [NSIndexPath indexPathForRow:insertIndex inSection:1];
 }
 
 - (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForHeaderInSection:(NSInteger)section {
