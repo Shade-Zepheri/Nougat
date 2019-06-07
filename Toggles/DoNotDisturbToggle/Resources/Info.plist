@@ -9,7 +9,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>com.shade.nougat.DoNotDisturbToggle</string>
 	<key>CFBundleDisplayName</key>
-	<string>Do not disturb</string>
+	<string>Do Not Disturb</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundlePackageType</key>
