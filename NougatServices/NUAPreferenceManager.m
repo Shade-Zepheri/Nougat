@@ -31,7 +31,7 @@
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
 
-        NSArray<NSString *> *defaultToggleOrder = @[@"com.shade.nougat.WiFiToggle", @"com.shade.nougat.DataToggle", @"com.shade.nougat.BluetoothToggle", @"com.shade.nougat.DoNotDisturbToggle", @"com.shade.nougat.FlashlightToggle", @"com.shade.nougat.RotationLockToggle", @"com.shade.nougat.BatterySaverToggle", @"com.shade.nougat.LocationToggle", @"com.shade.nougat.AirplaneModeToggle"];
+        NSArray<NSString *> *defaultToggleOrder = [self _defaultEnabledToggles]
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -39,6 +39,10 @@
         [self preferencesWereUpdated];
 
         [self refreshToggleInfo];
+
+        if ([self _hasLegacyPrefs]) {
+            [self _migrateFromLegacyPrefs];
+        }
     }
 
     return self;
@@ -115,12 +119,55 @@
     return _toggleInfoDictionary.allKeys;
 }
 
+#pragma mark - Migration
+
+- (BOOL)_hasLegacyPrefs {
+    // Check if toggles list has old keys
+    [self.enabledToggles conatinsObject:@"do-not-disturb"];
+}
+
+- (void)_migrateFromLegacyPrefs {
+    // Change old keys into their new equivalent key
+    NSArray<NSString *> *oldTogglesList = self.enabledToggles;
+    NSMutableArray<NSString *> newTogglesList = [NSMutableArray array];
+    for (NSString *identifier in oldTogglesList) {
+        // Exception for low power, data, wifi
+        if ([identifier isEqualToString:@"wifi"]) {
+            [newTogglesList addObject:@"com.shade.nougat.WiFiToggle"];
+        } else if ([identifier isEqualToString:@"cellular-data"]) {
+            [newTogglesList addObject:@"com.shade.nougat.DataToggle"];
+        } else if ([identifier isEqualToString:@"low-power"]) {
+            [newTogglesList addObject:@"com.shade.nougat.BatterySaverToggle"];
+        }
+
+        // Get components
+        NSArray<NSString *> *components = [identifier componentsSeparatedByString:@"-"];
+        NSString *equivalentKey = @"";
+        for (NSString *item in components) {
+            // Capitalize first letter
+            equivalentKey = [equivalentKey stringByAppendingString:item.capitalizedString];
+        }
+
+        // Construct and add key
+        NSString *updatedKey = [NSString stringWithFormat:@"com.shade.nougat.%@Toggle", equivalentKey];
+        [newTogglesList addObject:updatedKey];
+    }
+
+    // Add to prefs
+    [_preferences setObject:[newTogglesList copy] forKey:NUAPreferencesTogglesListKey];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
+}
+
 #pragma mark - Convenience Methods
 
 + (NSString *)carrierName {
     CTTelephonyNetworkInfo *networkInfo = [[CTTelephonyNetworkInfo alloc] init];
     CTCarrier *carrier = [networkInfo subscriberCellularProvider];
     return carrier.carrierName;
+}
+
+- (NSArray<NSString *> *)_defaultEnabledToggles {
+    return @[@"com.shade.nougat.WiFiToggle", @"com.shade.nougat.DataToggle", @"com.shade.nougat.BluetoothToggle", @"com.shade.nougat.DoNotDisturbToggle", @"com.shade.nougat.FlashlightToggle", @"com.shade.nougat.RotationLockToggle", @"com.shade.nougat.BatterySaverToggle", @"com.shade.nougat.LocationToggle", @"com.shade.nougat.AirplaneModeToggle"];
 }
 
 @end
