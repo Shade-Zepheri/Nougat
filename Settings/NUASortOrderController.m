@@ -23,7 +23,25 @@
 
     // Load arrays
     _enabledToggles = [self.preferences.enabledToggles mutableCopy];
-    _disabledToggles = [self.preferences.disabledToggles mutableCopy];
+
+    NSArray<NSString *> *currentDisabledToggles = self.preferences.disabledToggles;
+    NSMutableArray<NSString *> *displayNamesArray = [NSMutableArray array];
+    for (NSString *identifier in currentDisabledToggles) {
+        NSString *displayName = [self _displayNameForIdentifier:identifier];
+        NSString *sortedNameEntry = [NSString stringWithFormat:@"%@|%@", displayName, identifier];
+        [displayNamesArray addObject:sortedNameEntry];
+    }
+
+    // Alphabetize
+    NSArray<NSString *> *sortedDisplayName = [displayNamesArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    NSMutableArray<NSString *> *sortedDisabledToggles = [NSMutableArray array];
+    for (NSString *entry in sortedDisplayName) {
+        // Get identifier from entry
+		NSArray<NSString *> *components = [entry componentsSeparatedByString:@"|"];
+		[sortedDisabledToggles addObject:components[1]];
+	}
+    
+    _disabledToggles = sortedDisabledToggles;
 
     // Set Editing
     [self table].editing = YES;
