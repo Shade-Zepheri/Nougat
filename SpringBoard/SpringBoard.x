@@ -1,7 +1,7 @@
 #import <NougatServices/NougatServices.h>
 #import <NougatUI/NougatUI.h>
 
-#pragma mark - Hooks
+#pragma mark - Battery
 
 %hook SpringBoard
 
@@ -10,6 +10,8 @@
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
 }
+
+#pragma mark - Dismissal
 
 %group iOS9
 
@@ -36,6 +38,61 @@
 }
 
 %end
+%end
+
+%hook SBAssistantController // Siri
+
+- (void)_presentForMainScreenAnimated:(BOOL)animated completion:(id)completion {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:animated];
+}
+
+%end
+
+%hook SBDashBoardViewController
+
+- (void)_presentModalViewController:(UIViewController *)modalViewController animated:(BOOL)animated completion:(id)completion {
+    %orig;
+
+    if (!modalViewController) {
+        return;
+    }
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:animated];
+}
+
+%end
+
+
+%hook SBStarkRelockUIAlert
+
+- (void)activate {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+}
+
+%end
+
+%hook SBUIAnimationFadeAlertToRemoteAlert
+
+- (void)_animationFinished {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:NO];   
+}
+
+%end
+
+%hook SBDismissOverlaysAnimationController
+
+- (void)_startAnimation  {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+}
+
 %end
 
 #pragma mark - Constructor
