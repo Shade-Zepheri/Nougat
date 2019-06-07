@@ -1,6 +1,7 @@
 #import "NUAWiFiToggle.h"
 #import <SpringBoard/SBWiFiManager.h>
 #import <UIKit/UIImage+Private.h>
+#import <HBLog.h>
 
 @implementation NUAWiFiToggle
 
@@ -11,16 +12,13 @@
     if (self) {
         // Register for notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(_updateLabel) name:@"SBWifiManagerPowerStateDidChangeNotification" object:nil];
-        [center addObserver:self selector:@selector(_updateLabel) name:@"SBWifiManagerLinkDidChangeNotification" object:nil];
-        [center addObserver:self selector:@selector(_updateLabel) name:@"SBWifiManagerDevicePresenceDidChangeNotification" object:nil];
-        [center addObserver:self selector:@selector(_updateLabel) name:@"SBWifiManagerPrimaryInterfaceMayHaveChangedNotification" object:nil];
+        [center addObserver:self selector:@selector(_updateLabel:) name:@"SBWifiManagerLinkDidChangeNotification" object:nil];
     }
 
     return self;
 }
 
-- (void)_updateLabel {
+- (void)_updateLabel:(NSNotification *)notification {
     NSString *displayName = self.displayName ?: @"WiFi";
 
     // Transition label
