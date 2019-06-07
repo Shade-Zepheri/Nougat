@@ -4,7 +4,6 @@
 #import "NUADisplayLink.h"
 #import "NUAFlipswitchToggle.h"
 #import "NUAModulesContainerViewController.h"
-#import "NUANotificationCenterInhibitor.h"
 #import "NUANotificationShadeContainerView.h"
 #import "NUANotificationShadeController.h"
 #import "NUANotificationShadeModuleViewController.h"

@@ -1,5 +1,4 @@
 #import "NUANotificationShadeViewController.h"
-#import "NUANotificationCenterInhibitor.h"
 #import "NUAModulesContainerViewController.h"
 #import <UIKit/UIPanGestureRecognizer+Internal.h>
 

@@ -1,5 +1,4 @@
 #import "NUANotificationShadeController.h"
-#import "NUANotificationCenterInhibitor.h"
 #import <NougatServices/NougatServices.h>
 #import <Macros.h>
 #import <FrontBoard/FBDisplayManager.h>
@@ -249,9 +248,6 @@
 - (void)_showNotificationShadeGestureBeganWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
     // Disable icon editing
     [[%c(SBIconController) sharedInstance] setIsEditing:NO];
-
-    // Inhibit system gestures
-    NUANotificationCenterInhibitor.inhibited = YES;
 
     // Begin presentation
     [self _beginAnimationWithGestureRecognizer:gestureRecognizer];
@@ -806,17 +802,11 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
         return;
     }
 
-    // Uninhibit system gestures
-    NUANotificationCenterInhibitor.inhibited = NO;
-
     _window.hidden = YES;
     self.presentedState = NUANotificationShadePresentedStateNone;
 }
 
 - (void)_cancelAnimation {
-    // Uninhibit NC
-    NUANotificationCenterInhibitor.inhibited = NO;
-
     // Dismiss animated and reset
     [self dismissAnimated:self.visible];
     [self _resetPanGestureStates];

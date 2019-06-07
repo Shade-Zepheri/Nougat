@@ -1,5 +1,11 @@
+#import <Macros.h>
 #import <NougatServices/NougatServices.h>
 #import <NougatUI/NougatUI.h>
+#import <SpringBoard/SBCoverSheetSystemGesturesDelegate.h>
+#import <SpringBoard/SBUIController.h>
+#import <UIKit/UIApplication+Private.h>
+#import <UIKit/UIStatusBar.h>
+#import <UIKit/UIStatusBar_Modern.h>
 
 #pragma mark - Battery
 
@@ -56,7 +62,7 @@
     %orig;
 
     [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
-    }
+}
 
 %end
 
@@ -96,18 +102,49 @@
 %end
 %end
 
+#pragma mark - Gesture 
+
+%group PreCoverSheet
+%hook SBNotificationCenterController
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // Manually override to only show on left 1/3 to prevent conflict with Nougat
+    UIWindow *window = [[%c(SBUIController) sharedInstance] window];
+    CGFloat xlocation = [gestureRecognizer locationInView:window].x;
+    return xlocation < (kScreenWidth / 3);
 }
 
 %end
+%end
 
-%hook SBDismissOverlaysAnimationController
+%group CoverSheet
+%hook SBCoverSheetSystemGesturesDelegate
 
-- (void)_startAnimation  {
-    %orig;
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer != self.presentGestureRecognizer) {
+        // Only override present gesture
+        return %orig;
+    }
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+    // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
+    UIWindow *window = [[%c(SBUIController) sharedInstance] window];
+    CGFloat xlocation = [gestureRecognizer locationInView:window].x;
+
+    // Check if notched or not
+    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
+    if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
+        // Use notch insets
+        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+
+        return xlocation < CGRectGetMaxX(leadingFrame);
+    } else {
+        // Regular old frames if no notch
+        return xlocation < (kScreenWidth / 3);
+    }
 }
 
+%end
 %end
 
 #pragma mark - Constructor
@@ -115,6 +152,12 @@
 %ctor {
     // Init hooks
     %init;
+
+    if (%c(SBNotificationCenterController)) {
+        %init(PreCoverSheet);
+    } else {
+        %init(CoverSheet);
+    }
 
     if (%c(SBHomeHardwareButtonActions)) {
         %init(iOS10);
