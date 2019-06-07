@@ -1,5 +1,4 @@
 #import "NUATogglesContentView.h"
-#import "NUAToggleInstancesProvider.h"
 #import <NougatServices/NougatServices.h>
 #import <Macros.h>
 
@@ -9,7 +8,7 @@
     self = [super initWithFrame:frame];
     if (self) {
         // Load instance manager
-        [NUAToggleInstancesProvider defaultProvider];
+        _togglesProvider = [NUAToggleInstancesProvider defaultProvider];
 
         // Set properties
         _arranged = NO;
@@ -24,7 +23,7 @@
 #pragma mark - Toggles management
 
 - (void)_populateToggles {
-    self.togglesArray = [NUAToggleInstancesProvider defaultProvider].toggleInstances;
+    self.togglesArray = self.togglesProvider.toggleInstances;
 
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
         toggle.delegate = self;
@@ -98,6 +97,10 @@
     _topContainerView = nil;
     _middleContainerView = nil;
     _bottomContainerView = nil;
+
+    _topRow = nil;
+    _middleRow = nil;
+    _bottomRow = nil;
 
     // Populate and relayout
     [self _populateToggles];

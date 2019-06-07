@@ -1,5 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "NUAFlipswitchToggle.h"
+#import "NUAToggleInstancesProvider.h"
 
 @class NUATogglesContentView;
 
@@ -26,6 +26,7 @@
 @property (assign, nonatomic) CGFloat expandedPercent;
 @property (getter=isArranged, readonly, nonatomic) BOOL arranged;
 
+@property (strong, readonly, nonatomic) NUAToggleInstancesProvider *togglesProvider;
 @property (copy, nonatomic) NSArray<NUAFlipswitchToggle *> *togglesArray;
 
 - (void)_layoutToggles;
