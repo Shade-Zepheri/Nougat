@@ -31,7 +31,7 @@
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
 
-        NSArray<NSString *> *defaultToggleOrder = [self _defaultEnabledToggles]
+        NSArray<NSString *> *defaultToggleOrder = [self _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -123,13 +123,13 @@
 
 - (BOOL)_hasLegacyPrefs {
     // Check if toggles list has old keys
-    [self.enabledToggles conatinsObject:@"do-not-disturb"];
+    return [self.enabledToggles containsObject:@"do-not-disturb"];
 }
 
 - (void)_migrateFromLegacyPrefs {
     // Change old keys into their new equivalent key
     NSArray<NSString *> *oldTogglesList = self.enabledToggles;
-    NSMutableArray<NSString *> newTogglesList = [NSMutableArray array];
+    NSMutableArray<NSString *> *newTogglesList = [NSMutableArray array];
     for (NSString *identifier in oldTogglesList) {
         // Exception for low power, data, wifi
         if ([identifier isEqualToString:@"wifi"]) {
