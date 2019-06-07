@@ -12,7 +12,7 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Mobile data";
+    return @"Mobile Data";
 }
 
 - (NSURL *)settingsURL {

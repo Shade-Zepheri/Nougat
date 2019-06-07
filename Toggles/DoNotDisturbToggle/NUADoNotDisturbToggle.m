@@ -12,7 +12,7 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Do not disturb";
+    return @"Do Not Disturb";
 }
 
 - (NSURL *)settingsURL {

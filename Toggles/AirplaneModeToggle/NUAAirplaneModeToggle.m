@@ -12,7 +12,7 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Airplane mode";
+    return @"Airplane Mode";
 }
 
 - (UIImage *)icon {

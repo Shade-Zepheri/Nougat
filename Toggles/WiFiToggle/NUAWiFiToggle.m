@@ -19,7 +19,7 @@
 }
 
 - (void)_updateLabel:(NSNotification *)notification {
-    NSString *displayName = self.displayName ?: @"WiFi";
+    NSString *displayName = self.displayName ?: @"Wi-Fi";
 
     // Transition label
     CATransition *animation = [CATransition animation];

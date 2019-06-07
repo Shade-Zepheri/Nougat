@@ -16,7 +16,7 @@
 }
 
 - (NSString *)displayName {
-    return @"Rotation Lock";
+    return @"Auto-rotate";
 }
 
 - (UIImage *)icon {
