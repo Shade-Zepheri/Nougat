@@ -6,6 +6,7 @@
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
 #import <SpringBoard/SBBulletinWindowController.h>
+#import <SpringBoard/SBControlCenterController+Private.h>
 #import <SpringBoard/SBDashBoardRegion.h>
 #import <SpringBoard/SBDashBoardViewController.h>
 #import <SpringBoard/SBIconController+Private.h>
@@ -203,8 +204,8 @@
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [gestureRecognizer locationInView:window];
 
-    // Dont start gesture if in left 1/3 of screen
-    return [self _isLocationXWithinNotchRegion:location.x];
+    // Only start if within the notch and CC isnt present
+    return [self _isLocationXWithinNotchRegion:location.x] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGFloat)location {
