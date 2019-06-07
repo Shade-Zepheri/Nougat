@@ -50,7 +50,38 @@
 
 %end
 
-%hook SBDashBoardViewController
+%hook SBStarkRelockUIAlert
+
+- (void)activate {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+    }
+
+%end
+
+%hook SBUIAnimationFadeAlertToRemoteAlert
+
+- (void)_animationFinished {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:NO];   
+}
+
+%end
+
+%hook SBDismissOverlaysAnimationController
+
+- (void)_startAnimation  {
+    %orig;
+
+    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+}
+
+%end
+
+%group iOS10
+%hook SBDashBoardViewController // iOS 10+
 
 - (void)_presentModalViewController:(UIViewController *)modalViewController animated:(BOOL)animated completion:(id)completion {
     %orig;
@@ -63,24 +94,8 @@
 }
 
 %end
-
-
-%hook SBStarkRelockUIAlert
-
-- (void)activate {
-    %orig;
-
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
-}
-
 %end
 
-%hook SBUIAnimationFadeAlertToRemoteAlert
-
-- (void)_animationFinished {
-    %orig;
-
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:NO];   
 }
 
 %end
