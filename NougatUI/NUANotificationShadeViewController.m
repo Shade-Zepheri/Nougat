@@ -102,8 +102,12 @@
 
 #pragma mark - Container view delegate
 
-- (UIView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView {
+- (NUANotificationShadePanelView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView {
     return [_containerViewController _panelView];
+}
+
+- (void)containerViewWantsDismissal:(NUANotificationShadeContainerView *)containerView {
+    [self.delegate notificationShadeViewControllerWantsDismissal:self completely:YES];
 }
 
 #pragma mark - Page container view controller delegate

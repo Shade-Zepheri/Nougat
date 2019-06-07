@@ -15,11 +15,17 @@
         _backdropView.alpha = 0;
         [self addSubview:_backdropView];
 
+        // Add tap to dismiss
+        UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+        [_backdropView addGestureRecognizer:tapGestureRecognizer];
+
         [self _updateMasks];
     }
 
     return self;
 }
+
+#pragma mark - Properties
 
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
@@ -41,6 +47,8 @@
     }];
 }
 
+#pragma mark - View management
+
 - (void)layoutSubviews {
     [self _updateContentFrame];
     [self _updateMasks];
@@ -54,6 +62,19 @@
     // Defer expansion to view
     NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
     [panelView expandHeight:self.presentedHeight];
+}
+
+#pragma mark - Gesture
+
+- (void)handleTapGesture:(UITapGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [gestureRecognizer locationInView:_backdropView];
+    CGFloat yPosition = location.y;
+    if (yPosition < self.presentedHeight) {
+        // Tap in within panel
+        return;
+    }
+
+    [self.delegate containerViewWantsDismissal:self];
 }
 
 @end

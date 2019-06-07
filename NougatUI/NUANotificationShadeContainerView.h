@@ -9,6 +9,7 @@
 @required
 
 - (NUANotificationShadePanelView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView;
+- (void)containerViewWantsDismissal:(NUANotificationShadeContainerView *)containerView;
 
 @end
 
