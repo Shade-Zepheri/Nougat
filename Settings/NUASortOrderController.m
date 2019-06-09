@@ -35,9 +35,6 @@
         }
 
         _disabledToggles = sortedDisabledToggles;
-
-        // Set Editing
-        [self table].editing = YES;
     }
 
     return self;
@@ -51,6 +48,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // Set Editing
+    [self table].editing = YES;
 
     // Register custom cell class
     [[self table] registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
@@ -122,9 +122,9 @@
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
         case 0:
-            return @"Enabled Toggles";
+            return @"INCLUDE";
         case 1:
-            return @"Disabled Toggles";
+            return @"MORE TOGGLES";
         default:
             return @"";
     }
@@ -245,11 +245,11 @@
 }
 
 - (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForHeaderInSection:(NSInteger)section {
-    return NSTextAlignmentCenter;
+    return NSTextAlignmentLeft;
 }
 
 - (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForFooterInSection:(NSInteger)section {
-	return NSTextAlignmentCenter;
+	return NSTextAlignmentLeft;
 }
 
 #pragma mark - Preferences
