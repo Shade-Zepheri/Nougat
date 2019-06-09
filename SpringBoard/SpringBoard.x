@@ -121,9 +121,10 @@
 %hook SBCoverSheetSystemGesturesDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    BOOL shouldBegin = %orig;
     if (gestureRecognizer != self.presentGestureRecognizer) {
         // Only override present gesture
-        return %orig;
+        return shouldBegin;
     }
 
     // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
@@ -137,10 +138,10 @@
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
 
-        return xlocation < CGRectGetMaxX(leadingFrame);
+        return xlocation < CGRectGetMaxX(leadingFrame) && shouldBegin;
     } else {
         // Regular old frames if no notch
-        return xlocation < (kScreenWidth / 3);
+        return xlocation < (kScreenWidth / 3) && shouldBegin;
     }
 }
 
