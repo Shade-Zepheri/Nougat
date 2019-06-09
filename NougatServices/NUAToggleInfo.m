@@ -1,4 +1,5 @@
 #import "NUAToggleInfo.h"
+#import <UIKit/UIImage+Private.h>
 
 @implementation NUAToggleInfo
 
@@ -19,6 +20,20 @@
     }
 
     return self;
+}
+
+#pragma mark - Properties
+
+- (UIImage *)settingsIcon {
+    // Init on demand because init is called from ctor and creating images causes crashes
+    NSBundle *bundle = [NSBundle bundleWithURL:self.bundleURL];
+    UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
+    if (!settingsIcon) {
+        // Provide fallback icon
+        settingsIcon = [UIImage imageNamed:@"FallbackSettingsIcon" inBundle:[NSBundle bundleForClass:[self class]]];
+    }
+
+    return settingsIcon;
 }
 
 @end
