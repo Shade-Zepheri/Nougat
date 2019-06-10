@@ -7,6 +7,9 @@
 #import <UIKit/UIStatusBar.h>
 #import <UIKit/UIStatusBar_Modern.h>
 
+NUAPreferenceManager *settings;
+NUANotificationShadeController *notificationShade;
+
 #pragma mark - Battery
 
 %hook SpringBoard
@@ -22,7 +25,7 @@
 %group iOS9
 
 - (void)_handleMenuButtonEvent {
-    if ([[NUANotificationShadeController defaultNotificationShade] handleMenuButtonTap]) {
+    if ([notificationShade handleMenuButtonTap]) {
         return;
     }
 
@@ -36,7 +39,7 @@
 %hook SBHomeHardwareButtonActions
 
 - (void)performSinglePressUpActions {
-    if ([[NUANotificationShadeController defaultNotificationShade] handleMenuButtonTap]) {
+    if ([notificationShade handleMenuButtonTap]) {
         return;
     }
 
@@ -51,7 +54,7 @@
 - (void)_presentForMainScreenAnimated:(BOOL)animated completion:(id)completion {
     %orig;
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:animated];
+    [notificationShade dismissAnimated:animated];
 }
 
 %end
@@ -61,7 +64,7 @@
 - (void)activate {
     %orig;
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+    [notificationShade dismissAnimated:YES];
 }
 
 %end
@@ -71,7 +74,7 @@
 - (void)_animationFinished {
     %orig;
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:NO];   
+    [notificationShade dismissAnimated:NO];   
 }
 
 %end
@@ -81,7 +84,7 @@
 - (void)_startAnimation  {
     %orig;
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:YES];
+    [notificationShade dismissAnimated:YES];
 }
 
 %end
@@ -96,7 +99,7 @@
         return;
     }
 
-    [[NUANotificationShadeController defaultNotificationShade] dismissAnimated:animated];
+    [notificationShade dismissAnimated:animated];
 }
 
 %end
@@ -108,10 +111,15 @@
 %hook SBNotificationCenterController
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    BOOL shouldBegin = %orig;
+    if (!settings.enabled) {
+        return shouldBegin;
+    }
+
     // Manually override to only show on left 1/3 to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGFloat xlocation = [gestureRecognizer locationInView:window].x;
-    return xlocation < (kScreenWidth / 3);
+    return xlocation < (kScreenWidth / 3) && shouldBegin;
 }
 
 %end
@@ -122,7 +130,7 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
-    if (gestureRecognizer != self.presentGestureRecognizer) {
+    if (gestureRecognizer != self.presentGestureRecognizer || !settings.enabled) {
         // Only override present gesture
         return shouldBegin;
     }
@@ -167,13 +175,13 @@
     }
 
     // Create our singleton
-    [NUAPreferenceManager sharedSettings];
+    settings = [NUAPreferenceManager sharedSettings];
 
     // Register to tweak loads when springboard done launching
     NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
     id __block token = [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
         // Simply create singleton
-        [NUANotificationShadeController defaultNotificationShade];
+        notificationShade = [NUANotificationShadeController defaultNotificationShade];
 
         // Deregister as only created once
         [center removeObserver:token];
