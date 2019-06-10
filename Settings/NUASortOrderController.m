@@ -1,4 +1,5 @@
 #import "NUASortOrderController.h"
+#import "NUASortOrderHeaderView.h"
 #import "NUAToggleTableCell.h"
 #import <Cephei/HBPreferences.h>
 #import <HBLog.h>
@@ -10,6 +11,13 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Configure viewcontroller
+        self.title = @"Sort Order";
+        if (@available(iOS 11, *)) {
+            // iOS 11 only
+            self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
+        }
+
         // Refresh Installed
         _preferences = [NUAPreferenceManager sharedSettings];
         [self.preferences refreshToggleInfo];
@@ -35,27 +43,38 @@
         }
 
         _disabledToggles = sortedDisabledToggles;
+
+        // Create tableview
+        _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        [self.tableViewController setEditing:YES animated:NO];
+        [self addChildViewController:self.tableViewController];
     }
 
     return self;
 }
 
-#pragma mark - PSListController
-
-- (NSMutableArray<PSSpecifier *> *)specifiers {
-    return nil;
-}
+#pragma mark - PSViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Set Editing
-    [self table].editing = YES;
+    // Configure tableView
+    self.tableViewController.tableView.dataSource = self;
+    self.tableViewController.tableView.delegate = self;
+    self.tableViewController.tableView.estimatedRowHeight = [UIFont preferredFontForTextStyle:UIFontTextStyleBody].lineHeight;
+
 
     // Register custom cell class
-    [[self table] registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
+    [self.tableViewController.tableView registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
 
     // Add eventual header view
+    NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
+    headerView.text = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
+
+    self.tableViewController.tableView.tableHeaderView = headerView;
+    [headerView sizeToFit];
+
+    [self.view addSubview:self.tableViewController.tableView];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -63,14 +82,6 @@
 
     // Save settings
     [self _updateEnabledToggles];
-}
-
-- (UIView *)_tableView:(UITableView *)tableView viewForCustomInSection:(NSInteger)section isHeader:(BOOL)isHeader {
-	return nil;
-}
-
-- (CGFloat)_tableView:(UITableView *)tableView heightForCustomInSection:(CGFloat)section isHeader:(BOOL)isHeader {
-    return 0.0;
 }
 
 #pragma mark - Helper methods
@@ -130,10 +141,6 @@
     }
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-	return @"";
-}
-
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleInsert) {
         if (self.enabledToggles.count >= 9) {
@@ -190,7 +197,7 @@
     [sourceArray removeObjectAtIndex:sourceIndexPath.row];
     [destinationArray insertObject:identifier atIndex:destinationIndexPath.row];
 
-    [[self table] reloadData];
+    [self.tableViewController.tableView reloadData];
     [self _updateEnabledToggles];
 }
 
@@ -198,22 +205,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    return nil;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-	return 28;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    return 0.0;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 44.0;
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -246,14 +237,6 @@
     NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledToggles];
 
     return [NSIndexPath indexPathForRow:insertIndex inSection:1];
-}
-
-- (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForHeaderInSection:(NSInteger)section {
-    return NSTextAlignmentLeft;
-}
-
-- (NSTextAlignment)tableView:(UITableView *)tableView titleAlignmentForFooterInSection:(NSInteger)section {
-	return NSTextAlignmentLeft;
 }
 
 #pragma mark - Preferences
