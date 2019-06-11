@@ -49,22 +49,22 @@
     if (percent == 100.0) {
         // Full
         name = [name stringByAppendingString:@"full-"];
-    } else if (percent < 100.0 && percent >= 90) {
+    } else if (percent >= 90) {
         // 90
         name = [name stringByAppendingString:@"90-"];
-    } else if (percent < 90.0 && percent >= 80.0) {
+    } else if (percent >= 80.0) {
         // 80
         name = [name stringByAppendingString:@"80-"];
-    } else if (percent < 80.0 && percent >= 60.0) {
+    } else if (percent >= 60.0) {
         // 60
         name = [name stringByAppendingString:@"60-"];
-    } else if (percent < 60.0 && percent >= 50.0) {
+    } else if (percent >= 50.0) {
         // 50
         name = [name stringByAppendingString:@"50-"];
-    } else if (percent < 50.0 && percent >= 30.0) {
+    } else if (percent >= 30.0) {
         // 30
         name = [name stringByAppendingString:@"30-"];
-    } else if (percent < 30.0) {
+    } else {
         // 20
         name = [name stringByAppendingString:@"20-"];
     }
