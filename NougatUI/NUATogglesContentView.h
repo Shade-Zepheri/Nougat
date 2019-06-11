@@ -16,10 +16,6 @@
     NSArray<NUAFlipswitchToggle *> *_topRow;
     NSArray<NUAFlipswitchToggle *> *_middleRow;
     NSArray<NUAFlipswitchToggle *> *_bottomRow;
-
-    UIView *_topContainerView;
-    UIView *_middleContainerView;
-    UIView *_bottomContainerView;
 }
 
 @property (weak, nonatomic) id<NUATogglesContentViewDelegate> delegate;
