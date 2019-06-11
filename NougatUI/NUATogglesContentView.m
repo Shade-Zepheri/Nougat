@@ -185,17 +185,27 @@
 
 #pragma mark - Rearrangement
 
-- (void)rearrangeForPercent:(CGFloat)percent {
-    // Update top inset
-    self.middleTopInsetConstraint.constant = 100 * percent;
+CGFloat easingXForT(CGFloat t) {
+    return (3 * (1 - t) * t * t * 0.2) + (t * t * t);
+}
 
-    // Update left and right inset
+CGFloat easingYForT(CGFloat t) {
+    return (3 * (1 - t) * t * t) + (t * t * t);
+}
+
+- (void)rearrangeForPercent:(CGFloat)percent {
+    // Update top inset and ease
+    CGFloat easedYPercent = easingYForT(percent);
+    self.middleTopInsetConstraint.constant = 100 * easedYPercent;
+
+    // Update left and ease right inset
+    CGFloat easedXPercent = easingXForT(percent);
     self.topLeftInsetConstraint.constant = 35 * percent;
-    self.middleRightInsetConstraint.constant = -35 * percent;
+    self.middleRightInsetConstraint.constant = -35 * easedXPercent;
 
     // Update width
     for (NSLayoutConstraint *constraint in self.widthConstraints) {
-        constraint.constant = _startingWidth + (_widthDifference * percent);
+        constraint.constant = _startingWidth + (_widthDifference * easedXPercent);
     }
 
     // Update height
