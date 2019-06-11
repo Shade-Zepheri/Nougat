@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Flashlight";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_FLASHLIGHT_DISPLAY_NAME" value:@"Flashlight" table:nil];
 }
 
 - (UIImage *)icon {

@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Location";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_LOCATION_DISPLAY_NAME" value:@"Location" table:nil];
 }
 
 - (UIImage *)icon {

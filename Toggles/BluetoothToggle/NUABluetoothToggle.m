@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Bluetooth";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_BLUETOOTH_DISPLAY_NAME" value:@"Bluetooth" table:nil];
 }
 
 - (NSURL *)settingsURL {

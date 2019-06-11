@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Battery Saver";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_BATTERY_SAVER_DISPLAY_NAME" value:@"Battery Saver" table:nil];
 }
 
 - (NSURL *)settingsURL {

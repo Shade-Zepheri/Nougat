@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Airplane Mode";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_AIRPLANE_MODE_DISPLAY_NAME" value:@"Airplane Mode" table:nil];
 }
 
 - (UIImage *)icon {

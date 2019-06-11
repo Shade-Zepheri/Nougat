@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Hotspot";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_HOTSPOT_DISPLAY_NAME" value:@"Hotspot" table:nil];
 }
 
 - (NSURL *)settingsURL {

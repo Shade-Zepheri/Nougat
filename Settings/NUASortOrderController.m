@@ -12,7 +12,9 @@
     self = [super init];
     if (self) {
         // Configure viewcontroller
-        self.title = @"Sort Order";
+        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+        self.title = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_TITLE" value:@"Sort Order" table:@"SortOrder"];
+
         if (@available(iOS 11, *)) {
             // iOS 11 only
             self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
@@ -69,7 +71,9 @@
 
     // Add eventual header view
     NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
-    headerView.text = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *fallbackText = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
+    headerView.text = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_HEADER" value:fallbackText table:@"SortOrder"];
 
     self.tableViewController.tableView.tableHeaderView = headerView;
     [headerView sizeToFit];
@@ -131,11 +135,12 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     switch (section) {
         case 0:
-            return @"INCLUDE";
+            return [bundle localizedStringForKey:@"ENABLED_MODULES_SECTION_TITLE" value:@"Include" table:@"SortOrder"];
         case 1:
-            return @"MORE TOGGLES";
+            return [bundle localizedStringForKey:@"DISABLED_MODULES_SECTION_TITLE" value:@"More Toggles" table:@"SortOrder"];
         default:
             return @"";
     }
@@ -219,7 +224,8 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return @"Remove";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_REMOVE" value:@"Remove" table:@"SortOrder"];
 }
 
 - (BOOL)tableView:(UITableView *)tableView shouldIndentWhileEditingRowAtIndexPath:(NSIndexPath *)indexPath {

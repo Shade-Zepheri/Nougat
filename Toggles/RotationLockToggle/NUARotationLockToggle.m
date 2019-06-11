@@ -16,7 +16,8 @@
 }
 
 - (NSString *)displayName {
-    return @"Auto-rotate";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_AUTO_ROTATE_DISPLAY_NAME" value:@"Auto-rotate" table:nil];
 }
 
 - (UIImage *)icon {

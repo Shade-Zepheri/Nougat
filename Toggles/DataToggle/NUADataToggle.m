@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Mobile Data";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_DATA_DISPLAY_NAME" value:@"Mobile Data" table:nil];
 }
 
 - (NSURL *)settingsURL {

@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Do Not Disturb";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_DO_NOT_DISTURB_DISPLAY_NAME" value:@"Do Not Disturb" table:nil];
 }
 
 - (NSURL *)settingsURL {

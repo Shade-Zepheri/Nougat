@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"Night Light";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_NIGHT_LIGHT_DISPLAY_NAME" value:@"Night Light" table:nil];
 }
 
 - (UIImage *)icon {

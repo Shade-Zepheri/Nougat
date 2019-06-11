@@ -19,7 +19,9 @@
 }
 
 - (void)_updateLabel:(NSNotification *)notification {
-    NSString *displayName = self.displayName ?: @"Wi-Fi";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *localizedWifiText = [bundle localizedStringForKey:@"NOUGAT_STATUS_WIFI_DISPLAY_NAME" value:@"Wi-Fi" table:nil];
+    NSString *displayName = self.displayName ?: localizedWifiText;
 
     // Transition label
     CATransition *animation = [CATransition animation];

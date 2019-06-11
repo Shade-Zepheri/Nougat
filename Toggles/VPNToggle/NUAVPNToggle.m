@@ -12,7 +12,8 @@
 #pragma mark - Toggle
 
 - (NSString *)displayName {
-    return @"VPN";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    return [bundle localizedStringForKey:@"NOUGAT_STATUS_VPN_DISPLAY_NAME" value:@"VPN" table:nil];
 }
 
 - (NSURL *)settingsURL {
