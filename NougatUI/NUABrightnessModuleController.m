@@ -87,10 +87,6 @@
     _heightConstraint.constant = newConstant;
 
     // Update slider alpha with delay
-    if (percent < 0.5 && percent != 0.0) {
-        return;
-    }
-
     self.slider.alpha = (percent - 0.5) * 2;
 }
 

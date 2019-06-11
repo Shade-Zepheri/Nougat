@@ -227,11 +227,6 @@ CGFloat easingYForT(CGFloat t) {
 
     [self rearrangeForPercent:percent];
 
-    if (percent < 0.75 && percent != 0.0) {
-        // Allow 0.0 becaue that is passed or reset purposes
-        return;
-    }
-
     // Delay appearance of labels
     CGFloat adjustedPercent = (percent - 0.75) * 4;
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
