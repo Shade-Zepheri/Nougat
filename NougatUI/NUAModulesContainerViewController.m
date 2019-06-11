@@ -80,6 +80,10 @@
     [self.delegate contentViewControllerWantsExpansion:self];
 }
 
+- (CGFloat)moduleWantsNotificationShadeFullyPresentedHeight:(NUANotificationShadeModuleViewController *)module {
+    return [self.delegate contentViewControllerWantsFullyPresentedHeight:self];
+}
+
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 

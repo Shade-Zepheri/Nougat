@@ -7,6 +7,7 @@
 
 - (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module completely:(BOOL)completely;
 - (void)moduleWantsNotificationShadeExpansion:(NUANotificationShadeModuleViewController *)module;
+- (CGFloat)moduleWantsNotificationShadeFullyPresentedHeight:(NUANotificationShadeModuleViewController *)module;
 
 @end
 

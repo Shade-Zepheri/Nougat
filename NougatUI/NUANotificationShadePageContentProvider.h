@@ -5,6 +5,7 @@
 
 - (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely;
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController;
+- (CGFloat)contentViewControllerWantsFullyPresentedHeight:(UIViewController *)contentViewController;
 
 @end
 

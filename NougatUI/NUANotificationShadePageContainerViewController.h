@@ -9,6 +9,7 @@
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController completely:(BOOL)completely;
 - (void)containerViewControllerWantsExpansion:(NUANotificationShadePageContainerViewController *)containerViewController;
+- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController;
 
 @end
 

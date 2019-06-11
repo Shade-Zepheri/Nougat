@@ -336,6 +336,10 @@
     return (_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged);
 }
 
+- (CGFloat)notificationShadeViewControllerWantsFullyPresentedHeight:(NUANotificationShadeViewController *)controller {
+    return [self _yValueForFullyPresented];
+}
+
 #pragma mark - Dashboard participating
 
 - (NSString *)dashBoardIdentifier {
@@ -567,8 +571,15 @@
 }
 
 - (CGFloat)_yValueForFullyPresented {
-    // Height of the main panel
+    // Height of the main panel, depends on amount of toggles
+    NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
+    if (togglesCount > 6) {
     return 500.0;
+    } else if (togglesCount > 3) {
+        return 400.0;
+    } else {
+        return 300.0;
+    }
 }
 
 - (CGFloat)_yValueForCurrentState {

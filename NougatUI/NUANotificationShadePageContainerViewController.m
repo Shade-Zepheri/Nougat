@@ -54,4 +54,8 @@
     [self.delegate containerViewControllerWantsExpansion:self];
 }
 
+- (CGFloat)contentViewControllerWantsFullyPresentedHeight:(UIViewController *)contentViewController {
+    return [self.delegate containerViewControllerFullyPresentedHeight:self];
+}
+
 @end

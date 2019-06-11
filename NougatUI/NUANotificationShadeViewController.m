@@ -119,6 +119,10 @@
     [self.delegate notificationShadeViewControllerWantsExpansion:self];
 }
 
+- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController {
+    return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
+}
+
 #pragma mark - Gesture
 
 - (void)_handlePanGesture:(UIPanGestureRecognizer *)recognizer {

@@ -37,6 +37,8 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
+    CGFloat fullHeight = [self.delegate moduleWantsNotificationShadeFullyPresentedHeight:self];
+
     if (height == 0.0) {
         // Reset on 0.0;
         height = 150.0;
@@ -46,12 +48,14 @@
     }
 
     // Set new height (don't ask about func, line of best fit / lazy);
-    CGFloat multiplier = height - 150.0;
-    CGFloat newConstant = (multiplier * 6) / 7 + 50;
+    CGFloat expandedHeight = height - 150.0;
+    CGFloat totalHeight = fullHeight - 200;
+    CGFloat percent = expandedHeight / (fullHeight - 150);
+    CGFloat newConstant = percent * totalHeight + 50;
     _heightConstraint.constant = newConstant;
 
     // Pass to view
-    [self _togglesContentView].expandedPercent = multiplier / 350;
+    [self _togglesContentView].expandedPercent = percent;
 }
 
 #pragma mark - Delegate

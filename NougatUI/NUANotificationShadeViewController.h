@@ -11,6 +11,7 @@
 - (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller completely:(BOOL)completely;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture;
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
+- (CGFloat)notificationShadeViewControllerWantsFullyPresentedHeight:(NUANotificationShadeViewController *)controller;
 
 @end
 

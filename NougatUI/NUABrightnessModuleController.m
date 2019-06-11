@@ -70,6 +70,8 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
+    CGFloat fullHeight = [self.delegate moduleWantsNotificationShadeFullyPresentedHeight:self];
+
     if (height == 0.0) {
         // Reset on 0.0;
         height = 150.0;
@@ -79,11 +81,13 @@
     }
 
     // Slowly present to full height
-    CGFloat newConstant = (height - 150) / 7;
+    CGFloat expandedHeight = height - 150.0;
+    CGFloat percent = expandedHeight / (fullHeight - 150);
+    CGFloat newConstant = percent * 50;
     _heightConstraint.constant = newConstant;
 
     // Update slider alpha
-    self.slider.alpha = newConstant / 50;
+    self.slider.alpha = percent;
 }
 
 - (void)sliderDidBeginTracking:(UISlider *)slider {
