@@ -2,7 +2,6 @@
 #import "NUAModulesContainerViewController.h"
 #import <UIKit/UIPanGestureRecognizer+Internal.h>
 
-
 @implementation NUANotificationShadeViewController
 
 #pragma mark - Initialization
@@ -47,7 +46,7 @@
 
     // Add tap to dismiss
      _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_handleTapGesture:)];
-    [self.view addGestureRecognizer:tapGestureRecognizer];
+    [self.view addGestureRecognizer:_tapGesture];
     _tapGesture.delegate = self;
 }
 
@@ -138,18 +137,21 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     // Check if gestures allowed
-    if ([self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer]) {
-        if (gestureRecognizer == _panGesture) {
-            // Always allowed
-            return YES;
-        } else if (gestureRecognizer == _tapGesture) {
+    BOOL allowGesture = [self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer];
+    if (allowGesture) {
+        if (gestureRecognizer == _tapGesture) {
             // Only if not within panel view
-            CGPoint location = [gestureRecognizer locationInView:self.view];
-            return location.y > self.presentedHeight;
+            CGPoint location = [touch locationInView:self.view];
+            allowGesture =  location.y > self.presentedHeight;
+        } else if (gestureRecognizer == _panGesture) {
+            // Always allowed
+            allowGesture = YES;
         }
     } else {
-        return NO;
+        allowGesture = NO;
     }
+
+    return allowGesture;
 }
 
 @end
