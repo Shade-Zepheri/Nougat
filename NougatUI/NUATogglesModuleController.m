@@ -42,9 +42,6 @@
     if (height == 0.0) {
         // Reset on 0.0;
         height = 150.0;
-    } else if (height < 150) {
-        // Dont do anything if in first stage
-        return;
     }
 
     // Set new height (don't ask about func, line of best fit / lazy);

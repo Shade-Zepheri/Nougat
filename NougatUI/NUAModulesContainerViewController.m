@@ -87,6 +87,11 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
+    if (height < 150.0) {
+        // Modules dont need updates till 150
+        return;
+    }
+
     // Pass height to toggles
     _brightnessModule.presentedHeight = height;
     _togglesModule.presentedHeight = height;

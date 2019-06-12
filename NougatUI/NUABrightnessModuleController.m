@@ -75,9 +75,6 @@
     if (height == 0.0) {
         // Reset on 0.0;
         height = 150.0;
-    } else if (height < 150) {
-        // Dont do anything if in first stage
-        return;
     }
 
     // Slowly present to full height

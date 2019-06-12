@@ -69,7 +69,7 @@
     if (presentedHeight == 0.0) {
         // Reset on 0
         presentedHeight = 150.0;
-    } else if (presentedHeight < 150.0 || presentedHeight > fullHeight) {
+    } else if (presentedHeight > fullHeight) {
         // Dont do anything on first stage
         return;
     }
