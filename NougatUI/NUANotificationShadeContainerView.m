@@ -8,17 +8,32 @@
     if (self) {
         self.delegate = delegate;
 
+        // Create blur
         UIBlurEffect *darkeningBlur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
         _darkeningView = [[UIVisualEffectView alloc] initWithEffect:darkeningBlur];
+        self.darkeningView.alpha = 0.0;
         self.darkeningView.frame = frame;
         self.darkeningView.userInteractionEnabled = YES;
-        self.darkeningView.alpha = 0.0;
+        self.darkeningView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:self.darkeningView];
 
-        [self _updateMasks];
+        // Add constraints
+        [self.darkeningView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        [self.darkeningView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [self.darkeningView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
+        [self.darkeningView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
     }
 
     return self;
+}
+
+#pragma mark - View management
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
+    panelView.height = self.presentedHeight;
 }
 
 #pragma mark - Properties
@@ -26,16 +41,12 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
-    // Force relayout of the subviews (private methods)
-    [self setNeedsLayout];
-    [self layoutBelowIfNeeded];
+    // Update panel view
+    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
+    panelView.height = height;
 
-    if (height > 151.0) {
-        // No need to change alpha further
-        return;
-    }
     // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
-    _backdropView.alpha = height / 150.0;
+    self.darkeningView.alpha = height / 150.0;
 }
 
 - (void)setChangingBrightness:(BOOL)changingBrightness {
@@ -43,25 +54,8 @@
 
     // Animate view alpha
     [UIView animateWithDuration:0.25 animations:^{
-        _backdropView.alpha = changingBrightness ? 0.0 : 1.0;
+        self.darkeningView.alpha = changingBrightness ? 0.0 : 1.0;
     }];
-}
-
-#pragma mark - View management
-
-- (void)layoutSubviews {
-    [self _updateContentFrame];
-    [self _updateMasks];
-}
-
-- (void)_updateContentFrame {
-    _backdropView.frame = self.bounds;
-}
-
-- (void)_updateMasks {
-    // Defer expansion to view
-    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
-    [panelView expandHeight:self.presentedHeight];
 }
 
 @end
