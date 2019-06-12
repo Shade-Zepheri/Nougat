@@ -195,30 +195,41 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
+    HBLogInfo(@"[Nougat] calling esture recognizer should begin");
     if (![NUAPreferenceManager sharedSettings].enabled || [[%c(SBNotificationCenterController) sharedInstance] isVisible]) {
+        HBLogInfo(@"[Nougat] Stop gesture");
         return NO;
     }
 
-    // Use SBHomeScreenWindow to get location
-    UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGPoint location = [gestureRecognizer locationInView:window];
+    HBLogInfo(@"[Nougat] Gesture recognizer should maybe begin");
+
+    // Use status bar to get location
+    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
+    CGPoint location = [gestureRecognizer locationInView:statusBar];
 
     // Only start if within the notch and CC isnt present
-    return [self _isLocationXWithinNotchRegion:location.x] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+    BOOL shouldBegin = [self _isLocationXWithinNotchRegion:location] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+    return shouldBegin;
 }
 
-- (BOOL)_isLocationXWithinNotchRegion:(CGFloat)location {
+- (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
-        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
-        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"]; // {{18.666666666666668, 14.000000000000002}, {56, 18}}
+        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"]; // {{294, 17.333333333333332}, {66.666666666666629, 11.333333333333332}}
+        // CGPoint convertedPoint = [statusBar convertPoint:location toView]
+        // [1;36m[NougatUI] [m[0;36mNUANotificationShadeController.x:218[m [0;30;46mDEBUG:[m leadingFrame: {{inf, inf}, {0, 0}}
+        // HBLogDebug(@"leadingFrame: %@", NSStringFromCGRect(leadingFrame));
+        // HBLogDebug(@"trailingFrame: %@", NSStringFromCGRect(trailingFrame));
+        // HBLogDebug(@"location: %@", NSStringFromCGPoint(location));
 
-        return location > CGRectGetMaxX(leadingFrame) && location < CGRectGetMinX(trailingFrame);
+        // return !CGRectContainsPoint(leadingFrame, location) && !CGRectContainsPoint(trailingFrame, location);
+        return location.x > CGRectGetMaxX(leadingFrame) && location.x < CGRectGetMinX(trailingFrame);
     } else {
         // Regular old frames
-        return location > (kScreenWidth / 3) && location < (kScreenWidth * 2 / 3);
+        return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);
     }
 }
 
@@ -578,7 +589,7 @@
     // Height of the main panel, depends on amount of toggles
     NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
     if (togglesCount > 6) {
-    return 500.0;
+        return 500.0;
     } else if (togglesCount > 3) {
         return 400.0;
     } else {
@@ -739,7 +750,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
     __weak __typeof(self) weakSelf = self;
     _animationTimer = [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == 19) {
+        if (fireTimes == 21) {
             [displayLink invalidate];
             [weakSelf _updatePresentedHeight:targetHeight];
 
@@ -751,7 +762,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
         
         fireTimes++;
-        CGFloat t = fireTimes / 20.0;
+        CGFloat t = fireTimes / 22.0;
         CGFloat multiplier = multiplerAdjustedForEasing(t);
 
         // Update height
