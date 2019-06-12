@@ -62,10 +62,6 @@
     }
 
     // Create containers
-    CGFloat viewWidth = CGRectGetWidth(self.bounds);
-    CGFloat containerWidth = viewWidth / 2;
-    CGFloat bottomWidth = (viewWidth - 70);
-
     self.topStackView = [[UIStackView alloc] initWithFrame:CGRectZero];
     self.topStackView.axis = UILayoutConstraintAxisHorizontal;
     self.topStackView.alignment = UIStackViewAlignmentFill;
@@ -76,14 +72,14 @@
 
     [self.topStackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
 
-    self.topLeftInsetConstraint = [self.topStackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:0];
+    self.topLeftInsetConstraint = [self.topStackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor];
     self.topLeftInsetConstraint.active = YES;
 
-    NSLayoutConstraint *widthConstraint = [self.topStackView.widthAnchor constraintEqualToConstant:containerWidth];
+    NSLayoutConstraint *widthConstraint = [self.topStackView.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.5];
     widthConstraint.active = YES;
     [self.widthConstraints addObject:widthConstraint];
 
-    NSLayoutConstraint *heightConstraint = [self.topStackView.heightAnchor constraintEqualToConstant:CGRectGetHeight(self.bounds)];
+    NSLayoutConstraint *heightConstraint = [self.topStackView.heightAnchor constraintEqualToConstant:50.0];
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
@@ -99,16 +95,10 @@
         [self _createBottomRow];
     }
 
-    _startingWidth = containerWidth;
-    _widthDifference = bottomWidth - containerWidth;
-
     _arranged = YES;
 }
 
 - (void)_createMiddleRow {
-    CGFloat viewWidth = CGRectGetWidth(self.bounds);
-    CGFloat containerWidth = viewWidth / 2;
-
     self.middleStackView = [[UIStackView alloc] initWithFrame:CGRectZero];
     self.middleStackView.axis = UILayoutConstraintAxisHorizontal;
     self.middleStackView.alignment = UIStackViewAlignmentFill;
@@ -117,17 +107,17 @@
     self.middleStackView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.middleStackView];
 
-    self.middleTopInsetConstraint = [self.middleStackView.topAnchor constraintEqualToAnchor:self.topAnchor constant:0];
+    self.middleTopInsetConstraint = [self.middleStackView.topAnchor constraintEqualToAnchor:self.topAnchor];
     self.middleTopInsetConstraint.active = YES;
 
-    self.middleRightInsetConstraint = [self.middleStackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:0];
+    self.middleRightInsetConstraint = [self.middleStackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor];
     self.middleRightInsetConstraint.active = YES;
 
-    NSLayoutConstraint *widthConstraint = [self.middleStackView.widthAnchor constraintEqualToConstant:containerWidth];
+    NSLayoutConstraint *widthConstraint = [self.middleStackView.widthAnchor constraintEqualToAnchor:self.widthAnchor multiplier:0.5];
     widthConstraint.active = YES;
     [self.widthConstraints addObject:widthConstraint];
 
-    NSLayoutConstraint *heightConstraint = [self.middleStackView.heightAnchor constraintEqualToConstant:CGRectGetHeight(self.bounds)];
+    NSLayoutConstraint *heightConstraint = [self.middleStackView.heightAnchor constraintEqualToConstant:50.0];
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
@@ -137,9 +127,6 @@
 }
 
 - (void)_createBottomRow {
-    CGFloat viewWidth = CGRectGetWidth(self.bounds);
-    CGFloat bottomWidth = (viewWidth - 70);
-
     self.bottomStackView = [[UIStackView alloc] initWithFrame:CGRectZero];
     self.bottomStackView.axis = UILayoutConstraintAxisHorizontal;
     self.bottomStackView.alignment = UIStackViewAlignmentFill;
@@ -150,9 +137,9 @@
 
     [self.bottomStackView.topAnchor constraintEqualToAnchor:self.middleStackView.bottomAnchor].active = YES;
     [self.bottomStackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:35].active = YES;
-    [self.bottomStackView.widthAnchor constraintEqualToConstant:bottomWidth].active = YES;
+    [self.bottomStackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-35].active = YES;
 
-    NSLayoutConstraint *heightConstraint = [self.bottomStackView.heightAnchor constraintEqualToConstant:CGRectGetHeight(self.bounds)];
+    NSLayoutConstraint *heightConstraint = [self.bottomStackView.heightAnchor constraintEqualToConstant:50.0];
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
@@ -194,6 +181,13 @@ CGFloat easingYForT(CGFloat t) {
 }
 
 - (void)rearrangeForPercent:(CGFloat)percent {
+    if (!_targetWidthConstant) {
+        CGFloat viewWidth = CGRectGetWidth(self.bounds);
+        CGFloat startingContainerWidth = viewWidth / 2;
+        CGFloat targetWidth = viewWidth - 70;
+        _targetWidthConstant = targetWidth - startingContainerWidth;
+    }
+
     // Update top inset and ease
     CGFloat easedYPercent = easingYForT(percent);
     self.middleTopInsetConstraint.constant = 100 * easedYPercent;
@@ -205,7 +199,7 @@ CGFloat easingYForT(CGFloat t) {
 
     // Update width
     for (NSLayoutConstraint *constraint in self.widthConstraints) {
-        constraint.constant = _startingWidth + (_widthDifference * easedXPercent);
+        constraint.constant = _targetWidthConstant * easedXPercent;
     }
 
     // Update height

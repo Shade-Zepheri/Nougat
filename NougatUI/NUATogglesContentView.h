@@ -10,8 +10,7 @@
 @end
 
 @interface NUATogglesContentView : UIView <NUAFlipswitchToggleDelegate> {
-    CGFloat _startingWidth;
-    CGFloat _widthDifference;
+    CGFloat _targetWidthConstant;
 
     NSArray<NUAFlipswitchToggle *> *_topRow;
     NSArray<NUAFlipswitchToggle *> *_middleRow;
