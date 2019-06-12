@@ -1,7 +1,6 @@
 #import "NUAModulesContainerViewController.h"
 #import "NUANotificationShadePanelView.h"
 #import <UIKit/UIView+Internal.h>
-#import <UIKit/_UIBackdropView.h>
 
 @class NUANotificationShadeContainerView;
 
@@ -12,11 +11,9 @@
 
 @end
 
-@interface NUANotificationShadeContainerView : UIView {
-    _UIBackdropView *_backdropView;
-}
-
+@interface NUANotificationShadeContainerView : UIView
 @property (weak, nonatomic) id<NUANotificationShadeContainerViewDelegate> delegate;
+@property (strong, readonly, nonatomic) UIVisualEffectView *darkeningView;
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (getter=isChangingBrightness, nonatomic) BOOL changingBrightness;
 

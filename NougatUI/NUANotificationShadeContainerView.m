@@ -8,13 +8,12 @@
     if (self) {
         self.delegate = delegate;
 
-        // Create backdrop view
-        _UIBackdropViewSettings *blurSettings = [_UIBackdropViewSettings settingsForStyle:2030 graphicsQuality:100];
-        _backdropView = [[NSClassFromString(@"_UIBackdropView") alloc] initWithFrame:frame autosizesToFitSuperview:NO settings:blurSettings];
-        _backdropView.userInteractionEnabled = YES;
-        _backdropView.alpha = 0;
-        [self addSubview:_backdropView];
-
+        UIBlurEffect *darkeningBlur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        _darkeningView = [[UIVisualEffectView alloc] initWithEffect:darkeningBlur];
+        self.darkeningView.frame = frame;
+        self.darkeningView.userInteractionEnabled = YES;
+        self.darkeningView.alpha = 0.0;
+        [self addSubview:self.darkeningView];
 
         [self _updateMasks];
     }
@@ -27,12 +26,16 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
-    // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
-    _backdropView.alpha = height / 150;
-
     // Force relayout of the subviews (private methods)
     [self setNeedsLayout];
     [self layoutBelowIfNeeded];
+
+    if (height > 151.0) {
+        // No need to change alpha further
+        return;
+    }
+    // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
+    _backdropView.alpha = height / 150.0;
 }
 
 - (void)setChangingBrightness:(BOOL)changingBrightness {
