@@ -62,8 +62,19 @@
     [self.view addSubview:_containerViewController.view];
     [_containerViewController didMoveToParentViewController:self];
 
+    // Add constraints instead of relying on viewWillLayoutSubviews to update frame
+    [_containerViewController.view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [_containerViewController.view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+
+    // Do something special with top because slide in from top
+    NSLayoutConstraint *topConstraint = [_containerViewController.view.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:-150.0];
+    topConstraint.active = YES;
+    [_containerViewController _panelView].insetConstraint = topConstraint;
+
     [self.view setNeedsLayout];
 }
+
+#pragma mark - Properties
 
 - (CGFloat)presentedHeight {
     return _containerView.presentedHeight;

@@ -4,19 +4,21 @@
 
 @implementation NUANotificationShadePanelView
 
-+ (CGFloat)baseHeight {
-    return 150.0;
-}
-
-#pragma mark - Initialization
+#pragma mark - Init
 
 - (instancetype)initWithDefaultSize {
-    // Create with base height but hidden at top of screen
-    CGRect frame = CGRectMake(0, -[self.class baseHeight], kScreenWidth, [self.class baseHeight]);
-    self = [super initWithFrame:frame];
+    self = [super initWithFrame:CGRectZero];
     if (self) {
+        // Init properities
+        self.height = 0.0;
         self.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+        self.translatesAutoresizingMaskIntoConstraints = NO;
 
+        // Constraint
+        self.heightConstraint = [self.heightAnchor constraintEqualToConstant:150.0];
+        self.heightConstraint.active = YES;
+
+        // Notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
     }
@@ -31,25 +33,29 @@
     self.backgroundColor = colorInfo[@"backgroundColor"];
 }
 
-#pragma mark - View management
+#pragma mark - Properties
 
-- (void)expandHeight:(CGFloat)height {
-    CGFloat baseHeight = [self.class baseHeight];
+- (void)setHeight:(CGFloat)height {
+    if (_height == height) {
+        // Nothing to change
+        return;
+    }
+
+    _height = height;
 
     // Determine if should expand or pan
-    if (height < baseHeight) {
-        // Move down
-        CGRect newFrame = CGRectMake(0, height - baseHeight, CGRectGetWidth(self.bounds), baseHeight);
-        self.frame = newFrame;
+    if (height < 150.0) {
+        // Pan down
+        self.insetConstraint.constant = height - 150.0;
     } else {
         // Actually expand view
-        CGRect newFrame = CGRectMake(0, 0, CGRectGetWidth(self.bounds), height);
-        self.frame = newFrame;
+        self.insetConstraint.constant = 0.0;
+        self.heightConstraint.constant = height;
     }
 }
 
 - (void)setContentView:(UIView *)contentView {
-    if (self.contentView == contentView) {
+    if (_contentView == contentView) {
         return;
     }
 
