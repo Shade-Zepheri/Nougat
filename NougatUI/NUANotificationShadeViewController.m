@@ -34,7 +34,7 @@
     // create and add modules container
     [self _loadModulesContainer];
 
-    // create gesture recognizer
+    // Add pan gesture recognizer
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     _panGesture.maximumNumberOfTouches = 1;
 
@@ -44,6 +44,11 @@
 
     [self.view addGestureRecognizer:_panGesture];
     _panGesture.delegate = self;
+
+    // Add tap to dismiss
+     _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_handleTapGesture:)];
+    [self.view addGestureRecognizer:tapGestureRecognizer];
+    _tapGesture.delegate = self;
 }
 
 - (void)_loadModulesContainer {
@@ -105,10 +110,6 @@
     return [_containerViewController _panelView];
 }
 
-- (void)containerViewWantsDismissal:(NUANotificationShadeContainerView *)containerView {
-    [self.delegate notificationShadeViewControllerWantsDismissal:self completely:YES];
-}
-
 #pragma mark - Page container view controller delegate
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController completely:(BOOL)completely {
@@ -123,16 +124,32 @@
     return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
 }
 
-#pragma mark - Gesture
+#pragma mark - Gestures
 
 - (void)_handlePanGesture:(UIPanGestureRecognizer *)recognizer {
     // Defer the gesture to the main controller
     [self.delegate notificationShadeViewController:self handlePan:recognizer];
 }
 
+- (void)_handleTapGesture:(UITapGestureRecognizer *)recognizer {
+    // Defer the gesture to the main controller
+    [self.delegate notificationShadeViewController:self handleTap:recognizer];
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    // Temporary
-    return [self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer];
+    // Check if gestures allowed
+    if ([self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer]) {
+        if (gestureRecognizer == _panGesture) {
+            // Always allowed
+            return YES;
+        } else if (gestureRecognizer == _tapGesture) {
+            // Only if not within panel view
+            CGPoint location = [gestureRecognizer locationInView:self.view];
+            return location.y > self.presentedHeight;
+        }
+    } else {
+        return NO;
+    }
 }
 
 @end

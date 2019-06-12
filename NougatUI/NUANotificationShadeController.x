@@ -302,24 +302,24 @@
     [self dismissAnimated:YES completely:completely];
 }
 
-- (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGesture {
+- (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer {
     // Defer to use presentation methods (Note handles expanding further and dismissing)
-    switch (panGesture.state) {
+    switch (panGestureRecognizer.state) {
         case UIGestureRecognizerStatePossible:
             break;
         case UIGestureRecognizerStateBegan: {
-            CGPoint location = [panGesture locationInView:self.view];
+            CGPoint location = [panGestureRecognizer locationInView:self.view];
             [self beginAnimationWithLocation:location];
             break;
         }
         case UIGestureRecognizerStateChanged: {
-            CGPoint location = [panGesture locationInView:self.view];
+            CGPoint location = [panGestureRecognizer locationInView:self.view];
             [self updateAnimationWithLocation:location];
             break;
         }
         case UIGestureRecognizerStateEnded: {
-            CGPoint location = [panGesture locationInView:self.view];
-            CGPoint velocity = [panGesture velocityInView:self.view];
+            CGPoint location = [panGestureRecognizer locationInView:self.view];
+            CGPoint velocity = [panGestureRecognizer velocityInView:self.view];
             [self endAnimationWithVelocity:velocity location:location wasCancelled:NO completion:nil];
             break;
         }
@@ -330,6 +330,10 @@
             break;
         }
     }
+}
+
+- (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
+    [self dismissAnimated:YES];
 }
 
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {

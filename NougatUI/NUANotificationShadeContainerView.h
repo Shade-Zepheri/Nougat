@@ -9,7 +9,6 @@
 @required
 
 - (NUANotificationShadePanelView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView;
-- (void)containerViewWantsDismissal:(NUANotificationShadeContainerView *)containerView;
 
 @end
 
@@ -18,7 +17,7 @@
 }
 
 @property (weak, nonatomic) id<NUANotificationShadeContainerViewDelegate> delegate;
-@property (nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat presentedHeight;
 @property (getter=isChangingBrightness, nonatomic) BOOL changingBrightness;
 
 - (instancetype)initWithFrame:(CGRect)frame andDelegate:(id<NUANotificationShadeContainerViewDelegate>)delegate;
