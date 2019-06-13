@@ -15,6 +15,7 @@
 #import <SpringBoard/SBOrientationLockManager+Private.h>
 #import <SpringBoard/SBWindowHidingManager.h>
 #import <SpringBoard/SpringBoard+Private.h>
+#import <SpringBoardServices/SBSDisplayLayoutElement.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIStatusBar.h>
 #import <UIKit/UIStatusBar_Modern.h>
@@ -66,6 +67,8 @@
             [dashBoardViewController registerExternalBehaviorProvider:self];
             [dashBoardViewController registerExternalPresentationProvider:self];
         }
+
+        self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:%c(SBSDisplayLayoutElement)];
 
         //Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
@@ -195,21 +198,16 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
-    HBLogInfo(@"[Nougat] calling esture recognizer should begin");
-    if (![NUAPreferenceManager sharedSettings].enabled || [[%c(SBNotificationCenterController) sharedInstance] isVisible]) {
-        HBLogInfo(@"[Nougat] Stop gesture");
+    if (![NUAPreferenceManager sharedSettings].enabled || [[%c(SBNotificationCenterController) sharedInstance] isVisible] || [[%c(SBControlCenterController) sharedInstance] isVisible]) {
         return NO;
     }
-
-    HBLogInfo(@"[Nougat] Gesture recognizer should maybe begin");
 
     // Use status bar to get location
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     CGPoint location = [gestureRecognizer locationInView:statusBar];
 
     // Only start if within the notch and CC isnt present
-    BOOL shouldBegin = [self _isLocationXWithinNotchRegion:location] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
-    return shouldBegin;
+    return [self _isLocationXWithinNotchRegion:location];
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
@@ -677,6 +675,16 @@
     
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
 
+    // FBDisplayLayoutElement stuffs
+    [self.displayLayoutElement activateWithBuilder:^FBSDisplayLayoutElement *(FBSDisplayLayoutElement *element) {
+        // We can cast because we know set the element class
+        SBSDisplayLayoutElement *sbsElement = (SBSDisplayLayoutElement *)element;
+        sbsElement.fillsDisplayBounds = YES;
+        sbsElement.level = _window.windowLevel;
+        sbsElement.layoutRole = SBSDisplayLayoutRoleOverlay;
+        return sbsElement;
+    }];
+
     // Aquire assertion
     [_resignActiveAssertion acquire];
 
@@ -802,6 +810,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
             // Unlock rotation
             [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:NO forReason:@"Nougat Visible"];
+
+            // Deactivate displayLayoutElement
+            [self.displayLayoutElement deactivate];
 
             // Relinquish assertion
             [_resignActiveAssertion relinquish];
