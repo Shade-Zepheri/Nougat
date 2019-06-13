@@ -215,16 +215,14 @@
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
-        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"]; // {{18.666666666666668, 14.000000000000002}, {56, 18}}
-        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"]; // {{294, 17.333333333333332}, {66.666666666666629, 11.333333333333332}}
-        // CGPoint convertedPoint = [statusBar convertPoint:location toView]
-        // [1;36m[NougatUI] [m[0;36mNUANotificationShadeController.x:218[m [0;30;46mDEBUG:[m leadingFrame: {{inf, inf}, {0, 0}}
-        // HBLogDebug(@"leadingFrame: %@", NSStringFromCGRect(leadingFrame));
-        // HBLogDebug(@"trailingFrame: %@", NSStringFromCGRect(trailingFrame));
-        // HBLogDebug(@"location: %@", NSStringFromCGPoint(location));
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
 
-        // return !CGRectContainsPoint(leadingFrame, location) && !CGRectContainsPoint(trailingFrame, location);
-        return location.x > CGRectGetMaxX(leadingFrame) && location.x < CGRectGetMinX(trailingFrame);
+        // Adjust frames to include entire notch inset
+        CGRect adjustedLeadingFrame = CGRectMake(0, 0, CGRectGetMaxX(leadingFrame), CGRectGetMaxY(leadingFrame));
+        CGRect adjustedTrailingFrame = CGRectMake(CGRectGetMinX(trailingFrame), 0, CGRectGetMaxX(trailingFrame), CGRectGetMaxY(trailingFrame));
+
+        return !(CGRectContainsPoint(adjustedLeadingFrame, location) || CGRectContainsPoint(adjustedTrailingFrame, location));
     } else {
         // Regular old frames
         return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);
