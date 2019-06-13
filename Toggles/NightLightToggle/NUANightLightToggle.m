@@ -16,6 +16,10 @@
     return [bundle localizedStringForKey:@"NOUGAT_STATUS_NIGHT_LIGHT_DISPLAY_NAME" value:@"Night Light" table:nil];
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=DISPLAY"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];

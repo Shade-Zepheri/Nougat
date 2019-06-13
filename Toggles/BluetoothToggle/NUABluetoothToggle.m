@@ -17,7 +17,7 @@
 }
 
 - (NSURL *)settingsURL {
-    return [NSURL URLWithString:@"prefs:root=BLUETOOTH"];
+    return [NSURL URLWithString:@"prefs:root=Bluetooth"];
 }
 
 - (UIImage *)icon {

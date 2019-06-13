@@ -16,6 +16,10 @@
     return [bundle localizedStringForKey:@"NOUGAT_STATUS_LOCATION_DISPLAY_NAME" value:@"Location" table:nil];
 }
 
+- (NSURL *)settingsURL {
+    return [NSURL URLWithString:@"prefs:root=Privacy"];
+}
+
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:@"Off" inBundle:bundle];
