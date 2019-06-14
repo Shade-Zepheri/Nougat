@@ -51,7 +51,7 @@
     [self statusBarView].date = controller.currentDate;
 
     // Update Battery label
-    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel] * 100;
+    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel];
     [self statusBarView].currentPercent = currentPercent;
 
     BOOL isCharging = [[%c(SBUIController) sharedInstance] isBatteryCharging];
@@ -168,7 +168,7 @@
     BOOL isCharging = userInfo[@"IsCharging"].boolValue;
     CGFloat currentCapacity = userInfo[@"CurrentCapacity"].floatValue;
     CGFloat maxCapacity = userInfo[@"MaxCapacity"].floatValue;
-    CGFloat currentPercent = (currentCapacity / maxCapacity) * 100;
+    CGFloat currentPercent = (currentCapacity / maxCapacity);
 
     [self statusBarView].currentPercent = currentPercent;
     [self statusBarView].charging = isCharging;
