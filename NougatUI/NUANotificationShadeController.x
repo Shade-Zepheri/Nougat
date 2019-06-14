@@ -802,7 +802,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
     __weak __typeof(self) weakSelf = self;
     _animationTimer = [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == 21) {
+        if (fireTimes == 20) {
             [displayLink invalidate];
             [weakSelf _updatePresentedHeight:targetHeight];
 
@@ -814,7 +814,7 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
         
         fireTimes++;
-        CGFloat t = fireTimes / 22.0;
+        CGFloat t = fireTimes / 21.0;
         CGFloat multiplier = multiplerAdjustedForEasing(t);
 
         // Update height
