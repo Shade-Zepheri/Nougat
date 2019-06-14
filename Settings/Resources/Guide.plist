@@ -9,18 +9,54 @@
             <string>PSGroupCell</string>
         </dict>
         <dict>
-            <key>cell</key>
-            <string>PSTitleValueCell</string>
+            <key>cellClass</key>
+            <string>NUAVideoTableCell</string>
             <key>label</key>
-            <string>HOW_TO</string>
+            <string>Invoke</string>
+            <key>height</key>
+			<integer>300</integer>
         </dict>
         <dict>
-            <key>cell</key>
-            <string>PSTitleValueCell</string>
             <key>cellClass</key>
             <string>NUADetailedTextCell</string>
             <key>label</key>
-            <string>HOW_TO_USE_TEXT</string>
+            <string>INVOKE_TEXT</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUAVideoTableCell</string>
+            <key>label</key>
+            <string>Behavior</string>
+            <key>height</key>
+			<integer>300</integer>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUADetailedTextCell</string>
+            <key>label</key>
+            <string>BEHAVIOR_TEXT</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUAVideoTableCell</string>
+            <key>label</key>
+            <string>Features</string>
+            <key>height</key>
+			<integer>300</integer>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUADetailedTextCell</string>
+            <key>label</key>
+            <string>FEATURES_TEXT</string>
         </dict>
     </array>
     <key>title</key>

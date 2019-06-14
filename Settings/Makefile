@@ -3,7 +3,7 @@ include $(THEOS)/makefiles/common.mk
 BUNDLE_NAME = Nougat
 Nougat_FILES = $(wildcard *.m)
 Nougat_INSTALL_PATH = /Library/PreferenceBundles
-Nougat_FRAMEWORKS = UIKit
+Nougat_FRAMEWORKS = AVFoundation UIKit
 Nougat_EXTRA_FRAMEWORKS = Cephei CepheiPrefs NougatServices
 Nougat_LDFLAGS = Preferences.tbd
 
