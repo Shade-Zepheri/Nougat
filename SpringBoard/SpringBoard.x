@@ -162,16 +162,16 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
 %group CoverSheet
 %hook SBCoverSheetSystemGesturesDelegate
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    BOOL shouldBegin = %orig;
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    BOOL shouldReceiveTouch = %orig;
     if (gestureRecognizer != self.presentGestureRecognizer || !settings.enabled) {
         // Only override present gesture
-        return shouldBegin;
+        return shouldReceiveTouch;
     }
 
     // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGPoint location = [gestureRecognizer locationInView:window];
+    CGPoint location = [touch locationInView:window];
     CGPoint correctedLocation = _adjustTouchLocationForActiveOrientation(location);
 
     // Check if notched or not
@@ -187,10 +187,10 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
             maxLeadingX = kScreenWidth / 4;
         }
 
-        return (correctedLocation.x < maxLeadingX) && shouldBegin;
+        return (correctedLocation.x < maxLeadingX) && shouldReceiveTouch;
     } else {
         // Regular old frames if no notch
-        return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
+        return (correctedLocation.x < (kScreenWidth / 3)) && shouldReceiveTouch;
     }
 }
 
