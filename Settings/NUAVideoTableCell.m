@@ -30,6 +30,10 @@
 
         [self.player play];
 
+        // Add tap to pause
+         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+        [self addGestureRecognizer:tapGesture];
+
         // Register for notification for loop
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
 	}
@@ -59,6 +63,12 @@
     } else {
         [self.player play];
     }
+}
+
+#pragma mark - Gesture
+
+- (void)handleTapGesture:(UITapGestureRecognizer *)recognizer {
+    self.paused = !self.paused;
 }
 
 #pragma mark - Notification
