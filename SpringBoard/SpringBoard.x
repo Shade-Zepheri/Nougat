@@ -3,7 +3,9 @@
 #import <NougatUI/NougatUI.h>
 #import <SpringBoard/SBCoverSheetSystemGesturesDelegate.h>
 #import <SpringBoard/SBUIController.h>
+#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIApplication+Private.h>
+#import <UIKit/UIScreen+Internal.h>
 #import <UIKit/UIStatusBar.h>
 #import <UIKit/UIStatusBar_Modern.h>
 
@@ -107,6 +109,37 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Gesture 
 
+CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
+    CGFloat rotatedX = 0.0;
+    CGFloat rotatedY = 0.0;
+    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    switch (orientation) {
+        case UIInterfaceOrientationUnknown:
+        case UIInterfaceOrientationPortrait: {
+            rotatedX = location.x;
+            rotatedY = location.y;
+            break;
+        }
+        case UIInterfaceOrientationPortraitUpsideDown: {
+            rotatedX = CGRectGetWidth([UIScreen mainScreen].bounds) - location.x;
+            rotatedY = CGRectGetHeight([UIScreen mainScreen].bounds) - location.y;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeLeft: {
+            rotatedX = CGRectGetHeight([UIScreen mainScreen]._referenceBounds) - location.y;
+            rotatedY = location.x;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeRight: {
+            rotatedX = location.y;
+            rotatedY = CGRectGetWidth([UIScreen mainScreen]._referenceBounds) - location.x;
+            break;
+        }
+    }
+
+    return CGPointMake(rotatedX, rotatedY);
+}
+
 %group PreCoverSheet
 %hook SBNotificationCenterController
 
@@ -118,8 +151,9 @@ NUANotificationShadeController *notificationShade;
 
     // Manually override to only show on left 1/3 to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGFloat xlocation = [gestureRecognizer locationInView:window].x;
-    return xlocation < (kScreenWidth / 3) && shouldBegin;
+    CGPoint location = [gestureRecognizer locationInView:window];
+    CGPoint correctedLocation = _adjustTouchLocationForActiveOrientation(location);
+    return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
 }
 
 %end
@@ -137,7 +171,8 @@ NUANotificationShadeController *notificationShade;
 
     // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGFloat xlocation = [gestureRecognizer locationInView:window].x;
+    CGPoint location = [gestureRecognizer locationInView:window];
+    CGPoint correctedLocation = _adjustTouchLocationForActiveOrientation(location);
 
     // Check if notched or not
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
@@ -146,10 +181,16 @@ NUANotificationShadeController *notificationShade;
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
 
-        return xlocation < CGRectGetMaxX(leadingFrame) && shouldBegin;
+        CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
+        if (maxLeadingX > 5000.0) {
+            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
+            maxLeadingX = kScreenWidth / 4;
+        }
+
+        return (correctedLocation.x < maxLeadingX) && shouldBegin;
     } else {
         // Regular old frames if no notch
-        return xlocation < (kScreenWidth / 3) && shouldBegin;
+        return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
     }
 }
 

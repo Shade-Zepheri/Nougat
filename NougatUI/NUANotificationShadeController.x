@@ -218,11 +218,13 @@
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
         CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
 
-        // Adjust frames to include entire notch inset
-        CGRect adjustedLeadingFrame = CGRectMake(0, 0, CGRectGetMaxX(leadingFrame), CGRectGetMaxY(leadingFrame));
-        CGRect adjustedTrailingFrame = CGRectMake(CGRectGetMinX(trailingFrame), 0, CGRectGetMaxX(trailingFrame), CGRectGetMaxY(trailingFrame));
+        CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
+        if (maxLeadingX > 5000.0) {
+            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
+            maxLeadingX = kScreenWidth / 4;
+        }
 
-        return !(CGRectContainsPoint(adjustedLeadingFrame, location) || CGRectContainsPoint(adjustedTrailingFrame, location));
+        return location.x > maxLeadingX && location.x < CGRectGetMinX(trailingFrame);
     } else {
         // Regular old frames
         return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);
