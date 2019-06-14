@@ -1,6 +1,5 @@
 #import "NUAModulesContainerViewController.h"
 #import "NUANotificationShadePanelView.h"
-#import <UIKit/UIView+Internal.h>
 
 @class NUANotificationShadeContainerView;
 

@@ -1,6 +1,7 @@
 #import "NUANotificationShadeViewController.h"
 #import "NUAModulesContainerViewController.h"
 #import <UIKit/UIPanGestureRecognizer+Internal.h>
+#import <Macros.h>
 
 @implementation NUANotificationShadeViewController
 
@@ -63,8 +64,11 @@
     [_containerViewController didMoveToParentViewController:self];
 
     // Add constraints instead of relying on viewWillLayoutSubviews to update frame
-    [_containerViewController.view.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [_containerViewController.view.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [_containerViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+
+    // Constrain width on ipads or set width on phones to device width;
+    CGFloat desiredWith = IS_IPAD ? 414.0 : kScreenWidth;
+    [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWith].active = YES;
 
     // Do something special with top because slide in from top
     NSLayoutConstraint *topConstraint = [_containerViewController.view.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:-150.0];

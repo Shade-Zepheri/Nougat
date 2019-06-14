@@ -1,6 +1,6 @@
 #import "NUANotificationShadeController.h"
-#import <NougatServices/NougatServices.h>
 #import <Macros.h>
+#import <NougatServices/NougatServices.h>
 #import <FrontBoard/FBDisplayManager.h>
 #import <FrontBoard/FBSystemGestureManager.h>
 #import <SpringBoard/SBBacklightController.h>
@@ -17,6 +17,7 @@
 #import <SpringBoard/SpringBoard+Private.h>
 #import <SpringBoardServices/SBSDisplayLayoutElement.h>
 #import <UIKit/UIApplication+Private.h>
+#import <UIKit/UIScreen+Internal.h>
 #import <UIKit/UIStatusBar.h>
 #import <UIKit/UIStatusBar_Modern.h>
 #import <version.h>
@@ -198,16 +199,48 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
-    if (![NUAPreferenceManager sharedSettings].enabled || [[%c(SBNotificationCenterController) sharedInstance] isVisible] || [[%c(SBControlCenterController) sharedInstance] isVisible]) {
-        return NO;
-    }
+    return [NUAPreferenceManager sharedSettings].enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+}
 
-    // Use status bar to get location
-    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
-    CGPoint location = [gestureRecognizer locationInView:statusBar];
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    // Get location of touch
+    CGPoint location = [self _locationOfTouchInActiveInterfaceOrientation:touch gestureRecognizer:gestureRecognizer];
 
     // Only start if within the notch and CC isnt present
     return [self _isLocationXWithinNotchRegion:location];
+}
+
+- (CGPoint)_locationOfTouchInActiveInterfaceOrientation:(UITouch *)touch gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    CGPoint location = [touch locationInView:nil];
+
+    CGFloat rotatedX = 0.0;
+    CGFloat rotatedY = 0.0;
+    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    switch (orientation) {
+        case UIInterfaceOrientationUnknown:
+        case UIInterfaceOrientationPortrait: {
+            rotatedX = location.x;
+            rotatedY = location.y;
+            break;
+        }
+        case UIInterfaceOrientationPortraitUpsideDown: {
+            rotatedX = CGRectGetWidth([UIScreen mainScreen].bounds) - location.x;
+            rotatedY = CGRectGetHeight([UIScreen mainScreen].bounds) - location.y;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeLeft: {
+            rotatedX = CGRectGetHeight([UIScreen mainScreen]._referenceBounds) - location.y;
+            rotatedY = location.x;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeRight: {
+            rotatedX = location.y;
+            rotatedY = CGRectGetWidth([UIScreen mainScreen]._referenceBounds) - location.x;
+            break;
+        }
+    }
+
+    return CGPointMake(rotatedX, rotatedY);
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
@@ -224,7 +257,9 @@
             maxLeadingX = kScreenWidth / 4;
         }
 
-        return location.x > maxLeadingX && location.x < CGRectGetMinX(trailingFrame);
+        // Get min trailing x taking into account orientation
+        CGFloat minTrailingX = kScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame));
+        return location.x > maxLeadingX && location.x < minTrailingX;
     } else {
         // Regular old frames
         return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);
@@ -540,9 +575,12 @@
         } else {
             if (self.presentedState == NUANotificationShadePresentedStateQuickToggles) {
                 // Decide if dismiss or fully present
+                UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+                BOOL overrideForLandscape = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) && UIInterfaceOrientationIsLandscape(orientation);
+
                 CGFloat targetMainY = [self _yValueForFullyPresented] * 0.7;
                 CGFloat targetCloseY = [self _yValueForPresented] * 0.4;
-                if (projectedY >= targetMainY) {
+                if ((projectedY >= targetMainY) && !overrideForLandscape) {
                     self.presentedState = NUANotificationShadePresentedStateMainPanel;
                 } else if (projectedY <= targetCloseY) {
                     self.presentedState = NUANotificationShadePresentedStateNone;
@@ -727,6 +765,12 @@
             minTriggerHeight = [self _yValueForPresented];
             break;
         }
+    }
+
+    // Overrides for if in landscape on iphones
+    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    if (([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) && UIInterfaceOrientationIsLandscape(orientation)) {
+        maxTriggerHeight = [self _yValueForPresented];
     }
 
     // Apply slowdowns
