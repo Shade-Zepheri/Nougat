@@ -78,7 +78,7 @@
         [[FBSystemGestureManager sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
 
         // Add assertion
-        _resignActiveAssertion = [[FBUIApplicationSceneDeactivationAssertion alloc] initWithReason:2];
+        _resignActiveAssertion = [[FBUIApplicationSceneDeactivationAssertion alloc] initWithReason:UIApplicationSceneDeactivationReasonControlCenter];
 
         // CC calls this in init so we will too
         [self view];

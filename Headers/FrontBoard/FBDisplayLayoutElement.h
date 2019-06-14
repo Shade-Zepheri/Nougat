@@ -1,6 +1,6 @@
 typedef NS_ENUM(NSInteger, FBSDisplayType) {
     FBSDisplayTypeMain,
-    FBSDisplayTypeAirplan,
+    FBSDisplayTypeAirplay,
     FBSDisplayTypeUndefined,
     FBSDisplayTypeCar,
     FBSDisplayTypeiPodOnly,
