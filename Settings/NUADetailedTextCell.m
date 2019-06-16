@@ -10,7 +10,7 @@
 }
 
 - (CGFloat)preferredHeightForWidth:(CGFloat)width {
-    return 200.f;
+    return 200.0;
 }
 
 @end

@@ -14,21 +14,20 @@
 		self.detailTextLabel.hidden = YES;
 
         // Get video url
-        NSString *videoName = specifier.identifier;
-        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-        NSURL *videoURL = [bundle URLForResource:videoName withExtension:@"mov"];
+        NSString *videoURLString = [NSString stringWithFormat:@"https://shade-zepheri.github.io/depic/com.shade.nougat/videos/%@.mov", specifier.identifier];
+        NSURL *videoURL = [NSURL URLWithString:videoURLString];
 
 		// Create player
         _playerItem = [AVPlayerItem playerItemWithURL:videoURL];
         _player = [AVPlayer playerWithPlayerItem:self.playerItem];
         self.player.volume = 0.0;
         self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
-        self.playerLayer.frame = self.bounds;
+        [self.player addObserver:self forKeyPath:@"status" options:0 context:nil];  
+
         _playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
+        self.playerLayer.frame = self.bounds;
         self.playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
         [self.layer insertSublayer:self.playerLayer atIndex:0];
-
-        [self.player play];
 
         // Add tap to pause
          UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
@@ -76,6 +75,31 @@
 - (void)playerDidReachEnd:(NSNotification *)notification {
     // Loop to beginning
     [self.playerItem seekToTime:kCMTimeZero];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
+    if (object != self.player || ![keyPath isEqualToString:@"status"]) {
+        // return of not applicable
+        return;
+    }
+
+    switch (self.player.status) {
+        case AVPlayerStatusUnknown:
+            break;
+        case AVPlayerStatusFailed: { 
+            // Show error
+            NSError *error = self.player.error;
+
+            self.textLabel.hidden = NO;
+            self.textLabel.text = error.localizedDescription;
+            break;
+        }
+        case AVPlayerStatusReadyToPlay:
+            // Start playing
+            self.paused = NO;
+            self.textLabel.hidden = YES;
+            break;
+    }
 }
 
 @end
