@@ -579,7 +579,7 @@
                 BOOL overrideForLandscape = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) && UIInterfaceOrientationIsLandscape(orientation);
 
                 CGFloat targetMainY = [self _yValueForFullyPresented] * 0.7;
-                CGFloat targetCloseY = [self _yValueForPresented] * 0.4;
+                CGFloat targetCloseY = [self _yValueForPresented] * 1.4;
                 if ((projectedY >= targetMainY) && !overrideForLandscape) {
                     self.presentedState = NUANotificationShadePresentedStateMainPanel;
                 } else if (projectedY <= targetCloseY) {
