@@ -8,6 +8,6 @@
     BOOL _disablesUpdates;
 }
 
-@property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
 
 @end

@@ -61,21 +61,11 @@
 
 #pragma mark - Properties
 
-- (void)setPresentedHeight:(CGFloat)presentedHeight {
-    _presentedHeight = presentedHeight;
+- (void)setRevealPercentage:(CGFloat)percent {
+    _revealPercentage = percent;
 
-    CGFloat fullHeight = [self.delegate moduleWantsNotificationShadeFullyPresentedHeight:self];
-
-    if (presentedHeight == 0.0) {
-        // Reset on 0
-        presentedHeight = 150.0;
-    } else if (presentedHeight > fullHeight) {
-        // Dont do anything on first stage
-        return;
-    }
-
-    CGFloat percentage = (presentedHeight - 150) / (fullHeight - 150);
-    [self _settingsView].expandedPercent = percentage;
+    // Pass to view
+    [self _settingsView].expandedPercent = percent;
 }
 
 #pragma mark - Delegate

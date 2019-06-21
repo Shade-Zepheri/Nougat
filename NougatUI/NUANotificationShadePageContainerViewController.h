@@ -20,6 +20,7 @@
 @property (readonly, nonatomic) UIViewController<NUANotificationShadePageContentProvider> *contentViewController;
 @property (strong, readonly, nonatomic) UIPanGestureRecognizer *panGesture;
 @property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
 
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;
 

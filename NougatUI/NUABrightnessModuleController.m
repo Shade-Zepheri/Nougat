@@ -67,21 +67,10 @@
     [super viewDidDisappear:animated];
 }
 
-- (void)setPresentedHeight:(CGFloat)height {
-    _presentedHeight = height;
+- (void)setRevealPercentage:(CGFloat)percent {
+    _revealPercentage = percent;
 
-    CGFloat fullHeight = [self.delegate moduleWantsNotificationShadeFullyPresentedHeight:self];
-
-    if (height == 0.0) {
-        // Reset on 0.0;
-        height = 150.0;
-    }
-
-    // Slowly present to full height
-    CGFloat expandedHeight = height - 150.0;
-    CGFloat percent = expandedHeight / (fullHeight - 150);
-    CGFloat newConstant = percent * 50;
-    _heightConstraint.constant = newConstant;
+    _heightConstraint.constant = percent * 50.0;
 
     // Update slider alpha with delay
     self.slider.alpha = (percent - 0.5) * 2;

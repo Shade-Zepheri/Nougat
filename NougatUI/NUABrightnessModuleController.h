@@ -7,6 +7,6 @@
 }
 
 @property (strong, readonly, nonatomic) UISlider *slider;
-@property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
 
 @end

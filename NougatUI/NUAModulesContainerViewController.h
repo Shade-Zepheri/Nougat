@@ -15,7 +15,8 @@
 }
 
 @property (weak, nonatomic) id<NUANotificationShadePageContentViewControllerDelegate> delegate;
-@property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
+@property (readonly, nonatomic) CGFloat completeHeight;
 
 - (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module completely:(BOOL)completely;
 

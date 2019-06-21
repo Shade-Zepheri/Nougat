@@ -66,8 +66,30 @@
     }
 
     // Set default height to modules
-    _brightnessModule.presentedHeight = 150.0;
-    _settingsModule.presentedHeight = 150.0;
+    _brightnessModule.revealPercentage = 0.0;
+    _settingsModule.revealPercentage = 0.0;
+}
+
+#pragma mark - Properties
+
+- (CGFloat)completeHeight {
+    NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
+    if (togglesCount > 6) {
+        return 500.0;
+    } else if (togglesCount > 3) {
+        return 400.0;
+    } else {
+        return 300.0;
+    }
+}
+
+- (void)setRevealPercentage:(CGFloat)percent {
+    _revealPercentage = percent;
+
+    // Pass percent to toggles
+    _brightnessModule.revealPercentage = percent;
+    _togglesModule.revealPercentage = percent;
+    _settingsModule.revealPercentage = percent;
 }
 
 #pragma mark - Delegate
@@ -82,20 +104,6 @@
 
 - (CGFloat)moduleWantsNotificationShadeFullyPresentedHeight:(NUANotificationShadeModuleViewController *)module {
     return [self.delegate contentViewControllerWantsFullyPresentedHeight:self];
-}
-
-- (void)setPresentedHeight:(CGFloat)height {
-    _presentedHeight = height;
-
-    if (height < 150.0) {
-        // Modules dont need updates till 150
-        return;
-    }
-
-    // Pass height to toggles
-    _brightnessModule.presentedHeight = height;
-    _togglesModule.presentedHeight = height;
-    _settingsModule.presentedHeight = height;
 }
 
 @end

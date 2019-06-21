@@ -11,11 +11,14 @@
 
 @protocol NUANotificationShadePageContentProvider <NSObject>
 @property (weak, nonatomic) id<NUANotificationShadePageContentViewControllerDelegate> delegate;
-@property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
+@property (readonly, nonatomic) CGFloat completeHeight;
 
 @required
-- (void)setPresentedHeight:(CGFloat)height;
-- (CGFloat)presentedHeight;
+- (void)setRevealPercentage:(CGFloat)height;
+- (CGFloat)revealPercentage;
+
+- (CGFloat)completeHeight;
 
 - (void)setDelegate:(id<NUANotificationShadePageContentViewControllerDelegate>)delegate;
 - (id<NUANotificationShadePageContentViewControllerDelegate>)delegate;

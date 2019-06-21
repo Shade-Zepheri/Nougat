@@ -49,15 +49,21 @@
     return (NUANotificationShadePanelView *)self.view;
 }
 
-#pragma mark - Delegate
+#pragma mark - Properties
 
-- (CGFloat)presentedHeight {
-    return self.contentViewController.presentedHeight;
+- (CGFloat)revealPercentage {
+    return self.contentViewController.revealPercentage;
 }
 
+- (void)setRevealPercentage:(CGFloat)percent {
+    self.contentViewController.revealPercentage = percent;
+}
+
+#pragma mark - Delegate
+
 - (void)setPresentedHeight:(CGFloat)height {
-    // Pass on to content vc
-    self.contentViewController.presentedHeight = height;
+    _presentedHeight = height;
+
     // Pass on to panel
     [self _panelView].height = height;
 }
@@ -182,6 +188,12 @@ CGFloat multiplerAdjustedWithEasing(CGFloat t) {
 
 - (void)_updatePresentedHeight:(CGFloat)height {
     self.presentedHeight = height;
+
+    // Calculate and update percent
+    CGFloat fullHeight = self.contentViewController.completeHeight;
+    CGFloat expandedHeight = height - 150.0;
+    CGFloat percent = expandedHeight / (fullHeight - 150);
+    self.revealPercentage = percent;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {

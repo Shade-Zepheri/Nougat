@@ -3,6 +3,6 @@
 #import "NUATogglesContentView.h"
 
 @interface NUATogglesModuleController : NUANotificationShadeModuleViewController <NUATogglesContentViewDelegate>
-@property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
 
 @end
