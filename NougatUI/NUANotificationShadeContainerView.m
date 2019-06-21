@@ -3,11 +3,9 @@
 
 @implementation NUANotificationShadeContainerView
 
-- (instancetype)initWithFrame:(CGRect)frame andDelegate:(id<NUANotificationShadeContainerViewDelegate>)delegate {
+- (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.delegate = delegate;
-
         // Create blur
         UIBlurEffect *darkeningBlur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
         _darkeningView = [[UIVisualEffectView alloc] initWithEffect:darkeningBlur];
@@ -27,23 +25,11 @@
     return self;
 }
 
-#pragma mark - View management
-
-- (void)layoutSubviews {
-    [super layoutSubviews];
-
-    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
-    panelView.height = self.presentedHeight;
-}
 
 #pragma mark - Properties
 
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
-
-    // Update panel view
-    NUANotificationShadePanelView *panelView = [self.delegate notificationPanelForContainerView:self];
-    panelView.height = height;
 
     // Change alpha on backdrop (use this little trick to have it be 1 alpha at quick toggles)
     self.darkeningView.alpha = height / 150.0;

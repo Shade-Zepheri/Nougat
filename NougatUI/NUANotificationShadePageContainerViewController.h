@@ -13,10 +13,13 @@
 
 @end
 
-@interface NUANotificationShadePageContainerViewController : UIViewController <NUANotificationShadePageContentViewControllerDelegate>
+@interface NUANotificationShadePageContainerViewController : UIViewController <NUANotificationShadePageContentViewControllerDelegate, UIGestureRecognizerDelegate> {
+    CGFloat _initialHeight;
+}
 @property (weak, nonatomic) id<NUANotificationShadePageContainerViewControllerDelegate> delegate;
 @property (readonly, nonatomic) UIViewController<NUANotificationShadePageContentProvider> *contentViewController;
-@property (nonatomic) CGFloat presentedHeight;
+@property (strong, readonly, nonatomic) UIPanGestureRecognizer *panGesture;
+@property (assign, nonatomic) CGFloat presentedHeight;
 
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;
 

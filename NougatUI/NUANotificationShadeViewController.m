@@ -23,7 +23,7 @@
 
 - (void)loadView {
     // Just like SB (create container view and make it self.view)
-    _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:CGRectZero andDelegate:self];
+    _containerView = [[NUANotificationShadeContainerView alloc] initWithFrame:CGRectZero];
     _containerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.view = _containerView;
 }
@@ -118,12 +118,6 @@
     _containerView.changingBrightness = NO;
 }
 
-#pragma mark - Container view delegate
-
-- (NUANotificationShadePanelView *)notificationPanelForContainerView:(NUANotificationShadeContainerView *)containerView {
-    return [_containerViewController _panelView];
-}
-
 #pragma mark - Page container view controller delegate
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController completely:(BOOL)completely {
@@ -154,13 +148,15 @@
     // Check if gestures allowed
     BOOL allowGesture = [self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer];
     if (allowGesture) {
+        CGPoint location = [touch locationInView:self.view];
         if (gestureRecognizer == _tapGesture) {
             // Only if not within panel view
-            CGPoint location = [touch locationInView:self.view];
             allowGesture =  location.y > self.presentedHeight;
         } else if (gestureRecognizer == _panGesture) {
-            // Always allowed
-            allowGesture = YES;
+            // Only allow dismiss when interacting outside of panel
+            CGRect panelFrame = [_containerViewController _panelView].frame;
+            CGRect convertedFrame = [[_containerViewController _panelView] convertRect:panelFrame toView:self.view];
+            return !CGRectContainsPoint(convertedFrame, location);
         }
     } else {
         allowGesture = NO;
