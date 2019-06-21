@@ -53,7 +53,7 @@
     self = [super init];
     if (self) {
         // Set defaults
-        self.presentedState = NUANotificationShadePresentedStateNone;
+        self.state = NUANotificationShadeStateDismissed;
 
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -69,7 +69,7 @@
             [dashBoardViewController registerExternalPresentationProvider:self];
         }
 
-        self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:%c(SBSDisplayLayoutElement)];
+        self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
 
         //Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
@@ -339,11 +339,11 @@
 
 - (void)notificationShadeViewControllerWantsExpansion:(NUANotificationShadeViewController *)controller {
     // Since expanding, show main panel
-    [self presentAnimated:YES showQuickSettings:NO];
+    [self presentAnimated:YES];
 }
 
 - (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller completely:(BOOL)completely {
-    [self dismissAnimated:YES completely:completely];
+    [self dismissAnimated:YES];
 }
 
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer {
@@ -385,7 +385,7 @@
 }
 
 - (CGFloat)notificationShadeViewControllerWantsFullyPresentedHeight:(NUANotificationShadeViewController *)controller {
-    return [self _yValueForFullyPresented];
+    return [self _yValueForPresented];
 }
 
 #pragma mark - Dashboard participating
@@ -477,21 +477,16 @@
 #pragma mark - Presentation
 
 - (void)dismissAnimated:(BOOL)animated {
-    // Default to dismiss completely
-    [self dismissAnimated:animated completely:YES];
-}
-
-- (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely {
-    // Always going to dismiss completely
+    // Dismiss completely
     if (!self.presented) {
         return;
     }
 
     self.animating = YES;
-    self.presentedState = completely ? NUANotificationShadePresentedStateNone : NUANotificationShadePresentedStateQuickToggles;
+    self.state = NUANotificationShadeStateDismissed;
 
     // Animate out
-    CGFloat height = [self _yValueForCurrentState];
+    CGFloat height = [self _yValueForDismissed];
     if (animated) {
         CGFloat baseHeight = _viewController.presentedHeight;
         [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
@@ -504,22 +499,18 @@
 }
 
 - (void)presentAnimated:(BOOL)animated {
-    [self presentAnimated:animated showQuickSettings:YES];
-}
-
-- (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings {
-    // Dont start if at main panel
-    if (self.presentedState == NUANotificationShadePresentedStateMainPanel) {
+    // Show quick settings
+    if (self.state == NUANotificationShadeStatePresented) {
         return;
     }
 
     [self _beginPresentation];
 
     self.animating = YES;
-    self.presentedState = showSettings ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
+    self.state = NUANotificationShadeStatePresented;
 
     // Animate in
-    CGFloat height = [self _yValueForCurrentState];
+    CGFloat height = [self _yValueForPresented];
     if (animated) {
         CGFloat baseHeight = _viewController.presentedHeight;
         [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
@@ -571,29 +562,14 @@
         if (_isPresenting) {
             // Check if within range to present
             CGFloat targetY = [self _yValueForPresented] * 0.85;
-            self.presentedState = (projectedY >= targetY) ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateNone; 
+            self.state = (projectedY >= targetY) ? NUANotificationShadeStatePresented : NUANotificationShadeStateDismissed;
         } else {
-            if (self.presentedState == NUANotificationShadePresentedStateQuickToggles) {
-                // Decide if dismiss or fully present
-                UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-                BOOL overrideForLandscape = ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) && UIInterfaceOrientationIsLandscape(orientation);
-
-                CGFloat targetMainY = [self _yValueForFullyPresented] * 0.7;
-                CGFloat targetCloseY = [self _yValueForPresented] * 1.4;
-                if ((projectedY >= targetMainY) && !overrideForLandscape) {
-                    self.presentedState = NUANotificationShadePresentedStateMainPanel;
-                } else if (projectedY <= targetCloseY) {
-                    self.presentedState = NUANotificationShadePresentedStateNone;
-                }
-            } else if (self.presentedState == NUANotificationShadePresentedStateMainPanel) {
-                // Decide if collapse
-                CGFloat targetCollapseY = [self _yValueForFullyPresented] * 0.45;
-                self.presentedState = (projectedY <= targetCollapseY) ? NUANotificationShadePresentedStateQuickToggles : NUANotificationShadePresentedStateMainPanel;
-            }
+            CGFloat targetY = [self _yValueForPresented] * 0.85;
+            self.state = (projectedY <= targetY) ? NUANotificationShadeStateDismissed : NUANotificationShadeStateDismissed;
         }
 
         // Animate to finished height
-        CGFloat height = [self _yValueForCurrentState];
+        CGFloat height = (self.state == NUANotificationShadeStatePresented) ? [self _yValueForPresented] : [self _yValueForDismissed];
         [self _updatePresentedHeightGradually:height baseHeight:_viewController.presentedHeight completion:^{
             [self _finishAnimationWithCompletion:completion];
         }];
@@ -617,11 +593,8 @@
 }
 
 - (CGFloat)_yValueForPresented {
-    // Height of the quick toggles view
     return 150.0;
-}
-
-- (CGFloat)_yValueForFullyPresented {
+/*
     // Height of the main panel, depends on amount of toggles
     NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
     if (togglesCount > 6) {
@@ -631,22 +604,12 @@
     } else {
         return 300.0;
     }
-}
-
-- (CGFloat)_yValueForCurrentState {
-    switch (self.presentedState) {
-        case NUANotificationShadePresentedStateNone:
-            return [self _yValueForDismissed];
-        case NUANotificationShadePresentedStateQuickToggles:
-            return [self _yValueForPresented];
-        case NUANotificationShadePresentedStateMainPanel: 
-            return [self _yValueForFullyPresented];
-    }
+*/
 }
 
 - (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
     // Makes the transition more elegant
-    return _isPresenting ? location.y : location.y - initalLocation.y + [self _yValueForCurrentState];
+    return _isPresenting ? location.y : location.y - initalLocation.y + [self _yValueForPresented];
 }
 
 - (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
@@ -744,42 +707,11 @@
 }
 
 - (void)_presentViewToHeight:(CGFloat)height {
-    // Find when to trigger slowdowns
-    CGFloat maxTriggerHeight = 0;
-    CGFloat minTriggerHeight = 0;
-    switch (self.presentedState) {
-        case NUANotificationShadePresentedStateNone: {
-            // Max Height: Quick toggles
-            maxTriggerHeight = [self _yValueForPresented];
-            break;
-        }
-        case NUANotificationShadePresentedStateQuickToggles: {
-            // Max Height: Main Panel
-            maxTriggerHeight = [self _yValueForFullyPresented];
-            break;
-        }
-        case NUANotificationShadePresentedStateMainPanel: {
-            // Max Height: self
-            // Min Height: Quick toggles
-            maxTriggerHeight = [self _yValueForFullyPresented];
-            minTriggerHeight = [self _yValueForPresented];
-            break;
-        }
-    }
-
-    // Overrides for if in landscape on iphones
-    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    if (([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) && UIInterfaceOrientationIsLandscape(orientation)) {
-        maxTriggerHeight = [self _yValueForPresented];
-    }
-
     // Apply slowdowns
+    CGFloat maxTriggerHeight = [self _yValueForPresented];
     if (height > maxTriggerHeight) {
         height = maxTriggerHeight + (height - maxTriggerHeight) * 0.1;
-    } else if (height < minTriggerHeight) {
-        height = minTriggerHeight - (minTriggerHeight - height) * 0.1;
     }
-
     // Update the height
     [self _updatePresentedHeight:height];
 }
@@ -827,10 +759,10 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     self.animating = NO;
 
     if (self.presented) {
-        BOOL dismissed = self.presentedState == NUANotificationShadePresentedStateNone;
+        BOOL dismissed = self.state == NUANotificationShadeStateDismissed;
 
         // Make sure at right height
-        CGFloat height = [self _yValueForCurrentState];
+        CGFloat height = dismissed ? [self _yValueForDismissed] : [self _yValueForPresented];
         [self _updatePresentedHeight:height];
 
         // Resume idle timer and banners
@@ -884,14 +816,14 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
     }
 
     _window.hidden = YES;
-    self.presentedState = NUANotificationShadePresentedStateNone;
+    self.state = NUANotificationShadeStateDismissed;
 }
 
 - (void)_cancelAnimation {
     // Dismiss animated and reset
     [self dismissAnimated:self.visible];
     [self _resetPanGestureStates];
-    self.presentedState = NUANotificationShadePresentedStateNone;
+    self.state = NUANotificationShadeStateDismissed;
 }
 
 - (void)_resetPanGestureStates {

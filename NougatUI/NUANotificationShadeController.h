@@ -10,10 +10,9 @@
 #import <SpringBoard/SBScreenEdgePanGestureRecognizer+Private.h>
 #import <SpringBoard/SBSystemGestureRecognizerDelegate.h>
 
-typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
-    NUANotificationShadePresentedStateNone,
-    NUANotificationShadePresentedStateQuickToggles,
-    NUANotificationShadePresentedStateMainPanel,
+typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
+    NUANotificationShadeStateDismissed,
+    NUANotificationShadeStatePresented
 };
 
 @interface NUANotificationShadeController : UIViewController <SBSystemGestureRecognizerDelegate, NUANotificationShadeViewControllerDelegate, SBDashBoardExternalBehaviorProviding, SBDashBoardExternalPresentationProviding> {
@@ -27,7 +26,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
     NUADisplayLink *_animationTimer;
 }
 
-@property (nonatomic) NUANotificationShadePresentedState presentedState;
+@property (nonatomic) NUANotificationShadeState state;
 @property (strong, nonatomic) id<BSInvalidatable> idleTimerDisableAssertion;
 @property (strong, nonatomic) FBDisplayLayoutElement *displayLayoutElement;
 @property (getter=isVisible, readonly, nonatomic) BOOL visible;
@@ -41,10 +40,6 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePresentedState) {
 - (BOOL)handleMenuButtonTap;
 
 - (void)dismissAnimated:(BOOL)animated;
-- (void)dismissAnimated:(BOOL)animated completely:(BOOL)completely;
-
-// Not sure if should actually include
 - (void)presentAnimated:(BOOL)animated;
-- (void)presentAnimated:(BOOL)animated showQuickSettings:(BOOL)showSettings;
 
 @end
