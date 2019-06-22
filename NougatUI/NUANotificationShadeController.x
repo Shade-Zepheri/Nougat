@@ -337,12 +337,7 @@
 
 #pragma mark - Notification shade delegate
 
-- (void)notificationShadeViewControllerWantsExpansion:(NUANotificationShadeViewController *)controller {
-    // Since expanding, show main panel
-    [self presentAnimated:YES];
-}
-
-- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller completely:(BOOL)completely {
+- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller {
     [self dismissAnimated:YES];
 }
 

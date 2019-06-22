@@ -7,8 +7,7 @@
 @protocol NUANotificationShadeViewControllerDelegate <NSObject>
 @required
 
-- (void)notificationShadeViewControllerWantsExpansion:(NUANotificationShadeViewController *)controller;
-- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller completely:(BOOL)completely;
+- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;

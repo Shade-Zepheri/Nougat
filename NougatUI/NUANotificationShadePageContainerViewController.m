@@ -31,6 +31,8 @@
     [self _panelView].contentView = self.contentViewController.view;
     [self.contentViewController didMoveToParentViewController:self];
 
+    [self _panelView].completeHeight = self.contentViewController.completeHeight;
+
     // Add pan gesture
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     self.panGesture.maximumNumberOfTouches = 1;
@@ -57,6 +59,7 @@
 
 - (void)setRevealPercentage:(CGFloat)percent {
     self.contentViewController.revealPercentage = percent;
+    [self _panelView].revealPercentage = percent;
 }
 
 #pragma mark - Delegate
@@ -65,19 +68,29 @@
     _presentedHeight = height;
 
     // Pass on to panel
-    [self _panelView].height = height;
+    [self _panelView].inset = height;
 }
 
 - (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely {
-    [self.delegate containerViewControllerWantsDismissal:self completely:completely];
+    [self _updatePresentedHeightGradually:150.0 baseHeight:self.presentedHeight];
+
+    if (completely) {
+        [self.delegate containerViewControllerWantsDismissal:self];
+    }
 }
 
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController {
-    [self.delegate containerViewControllerWantsExpansion:self];
+    CGFloat fullHeight = self.contentViewController.completeHeight;
+    [self _updatePresentedHeightGradually:fullHeight baseHeight:self.presentedHeight];
 }
 
 - (CGFloat)contentViewControllerWantsFullyPresentedHeight:(UIViewController *)contentViewController {
     return [self.delegate containerViewControllerFullyPresentedHeight:self];
+}
+
+- (void)handleDismiss {
+    CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
+    [self _updatePresentedHeightGradually:150.0 baseHeight:baseHeight];
 }
 
 #pragma mark - Gestures
@@ -96,7 +109,7 @@
             break;
         case UIGestureRecognizerStateBegan:
             // Capture initial height
-            _initialHeight = panel.height;
+            _initialHeight = CGRectGetHeight(panel.bounds);
             break;
         case UIGestureRecognizerStateChanged: {
             // Expand the height
@@ -147,7 +160,8 @@
         targetHeight = 150.0;
     }
 
-    [self _updatePresentedHeightGradually:targetHeight baseHeight:self.presentedHeight];
+    CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
+    [self _updatePresentedHeightGradually:targetHeight baseHeight:baseHeight];
 }
 
 - (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
@@ -187,8 +201,6 @@ CGFloat multiplerAdjustedWithEasing(CGFloat t) {
 }
 
 - (void)_updatePresentedHeight:(CGFloat)height {
-    self.presentedHeight = height;
-
     // Calculate and update percent
     CGFloat fullHeight = self.contentViewController.completeHeight;
     CGFloat expandedHeight = height - 150.0;

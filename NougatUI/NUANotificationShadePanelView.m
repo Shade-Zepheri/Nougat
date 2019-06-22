@@ -10,7 +10,7 @@
     self = [super initWithFrame:CGRectZero];
     if (self) {
         // Init properities
-        self.height = 0.0;
+        self.inset = 0.0;
         self.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
         self.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -35,23 +35,28 @@
 
 #pragma mark - Properties
 
-- (void)setHeight:(CGFloat)height {
-    if (_height == height) {
+- (void)setInset:(CGFloat)height {
+    if (_inset == height) {
         // Nothing to change
         return;
     }
 
-    _height = height;
+    _inset = height;
 
-    // Determine if should expand or pan
-    if (height < 150.0) {
-        // Pan down
-        self.insetConstraint.constant = height - 150.0;
-    } else {
-        // Actually expand view
-        self.insetConstraint.constant = 0.0;
-        self.heightConstraint.constant = height;
+    if (height > 150.0) {
+        height = 150.0;
     }
+
+    // Pan down
+    self.insetConstraint.constant = height - 150.0;
+}
+
+- (void)setRevealPercentage:(CGFloat)percent {
+    _revealPercentage = percent;
+
+    // Calculate height
+    CGFloat revealPortion = (self.completeHeight - 150.0) * percent;
+    self.heightConstraint.constant = revealPortion + 150.0;
 }
 
 - (void)setContentView:(UIView *)contentView {

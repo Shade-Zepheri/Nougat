@@ -120,12 +120,12 @@
 
 #pragma mark - Page container view controller delegate
 
-- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController completely:(BOOL)completely {
-    [self.delegate notificationShadeViewControllerWantsDismissal:self completely:completely];
+- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController {
+    [self.delegate notificationShadeViewControllerWantsDismissal:self];
 }
 
-- (void)containerViewControllerWantsExpansion:(NUANotificationShadePageContainerViewController *)containerViewController {
-    [self.delegate notificationShadeViewControllerWantsExpansion:self];
+- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController {
+    return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
 }
 
 - (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController {

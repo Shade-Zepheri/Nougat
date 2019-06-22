@@ -7,8 +7,7 @@
 @protocol NUANotificationShadePageContainerViewControllerDelegate <NSObject>
 @required
 
-- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController completely:(BOOL)completely;
-- (void)containerViewControllerWantsExpansion:(NUANotificationShadePageContainerViewController *)containerViewController;
+- (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController;
 - (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController;
 
 @end
@@ -25,5 +24,7 @@
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;
 
 - (NUANotificationShadePanelView *)_panelView;
+
+- (void)handleDismiss;
 
 @end
