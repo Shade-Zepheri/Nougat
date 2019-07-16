@@ -12,6 +12,11 @@
 
 @end
 
+typedef NS_ENUM(NSUInteger, NUANotificationShadePanelState) {
+    NUANotificationShadePanelStateCollapsed,
+    NUANotificationShadePanelStateExpanded
+};
+
 @interface NUANotificationShadePageContainerViewController : UIViewController <NUANotificationShadePageContentViewControllerDelegate, UIGestureRecognizerDelegate> {
     CGFloat _initialHeight;
 }
@@ -20,6 +25,7 @@
 @property (strong, readonly, nonatomic) UIPanGestureRecognizer *panGesture;
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (assign, nonatomic) CGFloat revealPercentage;
+@property (readonly, nonatomic) NUANotificationShadePanelState panelState;
 
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;
 

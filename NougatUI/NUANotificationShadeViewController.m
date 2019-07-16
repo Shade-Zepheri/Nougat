@@ -135,6 +135,11 @@
 #pragma mark - Gestures
 
 - (void)_handlePanGesture:(UIPanGestureRecognizer *)recognizer {
+    if (_containerViewController.panelState == NUANotificationShadePanelStateExpanded) {
+        // Don't invoke present gesture if panel is fully expanded
+        return;
+    }
+
     // Defer the gesture to the main controller
     [self.delegate notificationShadeViewController:self handlePan:recognizer];
 }

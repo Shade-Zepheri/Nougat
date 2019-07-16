@@ -155,9 +155,15 @@
     if (projectedHeight >= expandTargetHeight) {
         // Expand
         targetHeight = fullHeight;
+
+        // Set state
+        _panelState = NUANotificationShadePanelStateExpanded;
     } else if (projectedHeight <= collapseTargetHeight) {
         // Collapse
         targetHeight = 150.0;
+
+        // Set state
+        _panelState = NUANotificationShadePanelStateCollapsed;
     }
 
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
