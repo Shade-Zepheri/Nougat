@@ -156,7 +156,8 @@
         CGPoint location = [touch locationInView:self.view];
         if (gestureRecognizer == _tapGesture) {
             // Only if not within panel view
-            allowGesture =  location.y > self.presentedHeight;
+            CGFloat panelHeight = CGRectGetHeight([_containerViewController _panelView].bounds);
+            allowGesture =  location.y > panelHeight;
         } else if (gestureRecognizer == _panGesture) {
             // Only allow dismiss when interacting outside of panel
             CGRect panelFrame = [_containerViewController _panelView].frame;
