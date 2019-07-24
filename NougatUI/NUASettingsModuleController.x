@@ -1,7 +1,5 @@
 #import "NUASettingsModuleController.h"
-#import <SpringBoard/SBDateTimeController.h>
-#import <SpringBoard/SBPreciseClockTimer.h>
-#import <SpringBoardUIServices/SBUIPreciseClockTimer.h>
+#import <SpringBoardUIServices/SpringBoardUIServices.h>
 
 @implementation NUASettingsModuleController
 

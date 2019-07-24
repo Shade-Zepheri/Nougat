@@ -1,14 +1,10 @@
 #import <UIKit/UIKit.h>
 #import "NUADisplayLink.h"
 #import "NUANotificationShadeViewController.h"
-#import <BaseBoard/BSInvalidatable.h>
-#import <FrontBoard/FBDisplayLayoutElement.h>
-#import <FrontBoard/FBUIApplicationSceneDeactivationAssertion.h>
-#import <SpringBoard/SBDashBoardExternalBehaviorProviding.h>
-#import <SpringBoard/SBDashBoardExternalPresentationProviding.h>
+#import <BaseBoard/BaseBoard.h>
+#import <FrontBoard/FrontBoard.h>
 #import <SpringBoard/SBIgnoredForAutorotationSecureWindow.h>
-#import <SpringBoard/SBScreenEdgePanGestureRecognizer+Private.h>
-#import <SpringBoard/SBSystemGestureRecognizerDelegate.h>
+#import <SpringBoard/SpringBoard-Umbrella.h>
 
 typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
     NUANotificationShadeStateDismissed,
@@ -40,6 +36,5 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
 - (BOOL)handleMenuButtonTap;
 
 - (void)dismissAnimated:(BOOL)animated;
-- (void)presentAnimated:(BOOL)animated;
 
 @end

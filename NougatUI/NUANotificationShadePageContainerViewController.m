@@ -1,6 +1,6 @@
 #import "NUANotificationShadePageContainerViewController.h"
 #import "NUADisplayLink.h"
-#import <UIKit/UIPanGestureRecognizer+Internal.h>
+#import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
 @implementation NUANotificationShadePageContainerViewController

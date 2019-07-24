@@ -1,8 +1,6 @@
 #import "NUAStatusBarModuleController.h"
 #import "NUAStatusBarContentView.h"
-#import <SpringBoard/SBDateTimeController.h>
-#import <SpringBoard/SBPreciseClockTimer.h>
-#import <SpringBoard/SBUIController+Private.h>
+#import <SpringBoardUIServices/SpringBoardUIServices.h>
 
 @implementation NUAStatusBarModuleController
 

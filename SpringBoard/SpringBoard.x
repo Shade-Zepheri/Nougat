@@ -1,13 +1,10 @@
 #import <Macros.h>
 #import <NougatServices/NougatServices.h>
 #import <NougatUI/NougatUI.h>
-#import <SpringBoard/SBCoverSheetSystemGesturesDelegate.h>
-#import <SpringBoard/SBUIController.h>
-#import <SpringBoard/SpringBoard+Private.h>
+#import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIApplication+Private.h>
-#import <UIKit/UIScreen+Internal.h>
+#import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
-#import <UIKit/UIStatusBar_Modern.h>
 
 NUAPreferenceManager *settings;
 NUANotificationShadeController *notificationShade;

@@ -2,24 +2,10 @@
 #import <Macros.h>
 #import <NougatServices/NougatServices.h>
 #import <FrontBoard/FBDisplayManager.h>
-#import <FrontBoard/FBSystemGestureManager.h>
-#import <SpringBoard/SBBacklightController.h>
-#import <SpringBoard/SBBulletinWindowController.h>
-#import <SpringBoard/SBControlCenterController+Private.h>
-#import <SpringBoard/SBDashBoardRegion.h>
-#import <SpringBoard/SBDashBoardViewController.h>
-#import <SpringBoard/SBIconController+Private.h>
-#import <SpringBoard/SBIdleTimerGlobalCoordinator.h>
-#import <SpringBoard/SBLockScreenManager+Private.h>
-#import <SpringBoard/SBNotificationCenterController+Private.h>
-#import <SpringBoard/SBOrientationLockManager+Private.h>
-#import <SpringBoard/SBWindowHidingManager.h>
-#import <SpringBoard/SpringBoard+Private.h>
-#import <SpringBoardServices/SBSDisplayLayoutElement.h>
+#import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIApplication+Private.h>
-#import <UIKit/UIScreen+Internal.h>
+#import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
-#import <UIKit/UIStatusBar_Modern.h>
 #import <version.h>
 
 @implementation NUANotificationShadeController
@@ -493,6 +479,7 @@
     }
 }
 
+/*
 - (void)presentAnimated:(BOOL)animated {
     // Show quick settings
     if (self.state == NUANotificationShadeStatePresented) {
@@ -516,6 +503,7 @@
         [self _finishAnimationWithCompletion:nil];
     }
 }
+*/
 
 #pragma mark - Second stage animation helpers
 
@@ -588,7 +576,7 @@
 }
 
 - (CGFloat)_yValueForPresented {
-    return 150.0;
+    return 310.0;
 /*
     // Height of the main panel, depends on amount of toggles
     NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
