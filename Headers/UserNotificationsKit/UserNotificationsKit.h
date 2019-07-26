@@ -1,3 +1,8 @@
+#import "NCCoalescedNotification.h"
+#import "NCNotificationAction.h"
+#import "NCNotificationContent.h"
 #import "NCNotificationDestinationDelegate.h"
 #import "NCNotificationDispatcher.h"
+#import "NCNotificationRequest.h"
+#import "NCNotificationSection.h"
 #import "NCNotificationStore.h"

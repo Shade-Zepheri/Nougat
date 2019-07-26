@@ -34,6 +34,9 @@
     // create and add modules container
     [self _loadModulesContainer];
 
+    // Load extensions table
+    [self _loadExtensionsTable];
+
     // Add pan gesture recognizer
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
     _panGesture.maximumNumberOfTouches = 1;
@@ -67,8 +70,8 @@
     [_containerViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 
     // Constrain width on ipads or set width on phones to device width;
-    CGFloat desiredWith = IS_IPAD ? 414.0 : kScreenWidth;
-    [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWith].active = YES;
+    CGFloat desiredWidth = 375.0;
+    [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWidth].active = YES;
 
     // Do something special with top because slide in from top
     NSLayoutConstraint *topConstraint = [_containerViewController.view.topAnchor constraintEqualToAnchor:self.view.topAnchor constant:-150.0];
@@ -78,6 +81,22 @@
     [self.view setNeedsLayout];
 }
 
+- (void)_loadExtensionsTable {
+    _tableViewController = [[NUAMainTableViewController alloc] init];
+    self.tableViewController.delegate = self;
+
+    // Add as child
+    [self addChildViewController:self.tableViewController];
+    [self.view addSubview:self.tableViewController.view];
+    [self.tableViewController didMoveToParentViewController:self];
+
+    // Constraint up
+    [self.tableViewController.view.widthAnchor constraintEqualToAnchor:_containerViewController.view.widthAnchor].active = YES;
+
+    [self.tableViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
+    [self.tableViewController.view.topAnchor constraintEqualToAnchor:_containerViewController.view.bottomAnchor].active  = YES;
+}
+
 #pragma mark - Properties
 
 - (CGFloat)presentedHeight {
@@ -85,7 +104,7 @@
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
-    // This is where all the animating is done actually
+    self.tableViewController.presentedHeight = height;
     _containerView.presentedHeight = height;
     _containerViewController.presentedHeight = height;
 }
@@ -128,8 +147,10 @@
     return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
 }
 
-- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController {
-    return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
+#pragma mark - Table view delegate
+
+- (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)controller {
+    [self.delegate notificationShadeViewControllerWantsDismissal:self];
 }
 
 #pragma mark - Gestures
@@ -146,6 +167,7 @@
 
 - (void)_handleTapGesture:(UITapGestureRecognizer *)recognizer {
     // Defer the gesture to the main controller
+    [_containerViewController handleDismiss];
     [self.delegate notificationShadeViewController:self handleTap:recognizer];
 }
 
@@ -155,14 +177,20 @@
     if (allowGesture) {
         CGPoint location = [touch locationInView:self.view];
         if (gestureRecognizer == _tapGesture) {
-            // Only if not within panel view
-            CGFloat panelHeight = CGRectGetHeight([_containerViewController _panelView].bounds);
-            allowGesture =  location.y > panelHeight;
+            // Check if inside panel
+            CGRect panelFrame = [_containerViewController _panelView].frame;
+            CGRect convertedPanelFrame = [[_containerViewController _panelView] convertRect:panelFrame toView:self.view];
+            BOOL touchInsidePanel = CGRectContainsPoint(convertedPanelFrame, location);
+
+            // Check if inside table
+            CGRect tableFrame = self.tableViewController.view.frame;
+            BOOL touchInsideTable = CGRectContainsPoint(tableFrame, location);
+            allowGesture = !touchInsidePanel && !touchInsideTable;
         } else if (gestureRecognizer == _panGesture) {
             // Only allow dismiss when interacting outside of panel
             CGRect panelFrame = [_containerViewController _panelView].frame;
             CGRect convertedFrame = [[_containerViewController _panelView] convertRect:panelFrame toView:self.view];
-            return !CGRectContainsPoint(convertedFrame, location);
+            allowGesture = !CGRectContainsPoint(convertedFrame, location);
         }
     } else {
         allowGesture = NO;

@@ -576,7 +576,7 @@
 }
 
 - (CGFloat)_yValueForPresented {
-    return 310.0;
+    return 450.0;
 /*
     // Height of the main panel, depends on amount of toggles
     NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
@@ -588,6 +588,8 @@
         return 300.0;
     }
 */
+
+// MIN(maxheight - 20, notificatinheight)
 }
 
 - (CGFloat)_notificationShadeHeightForLocation:(CGPoint)location initalLocation:(CGPoint)initalLocation {
