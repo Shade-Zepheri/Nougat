@@ -1,9 +1,13 @@
 include $(THEOS)/makefiles/common.mk
 
-FRAMEWORK_NAME = NougatUI
+# Get Sources
+SOURCES  = $(shell find . -name '*.m')
+SOURCES += $(shell find . -name '*.x')
+HEADERS = $(shell find . -name '*.h') 
 
-NougatUI_FILES = $(wildcard *.[xm]) $(wildcard Media/*.[xm]) $(wildcard Notifications/*.[xm])
-NougatUI_PUBLIC_HEADERS = $(wildcard *.h) $(wildcard Media/*.h) $(wildcard Notifications/*.h)
+FRAMEWORK_NAME = NougatUI
+NougatUI_FILES = $(SOURCES)
+NougatUI_PUBLIC_HEADERS = $(HEADERS)
 NougatUI_FRAMEWORKS = UIKit QuartzCore
 NougatUI_EXTRA_FRAMEWORKS = NougatServices
 NougatUI_LIBRARIES = flipswitch
