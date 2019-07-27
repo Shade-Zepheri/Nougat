@@ -172,17 +172,19 @@
     }
 
     // Add to dictionary
-    NSMutableArray<NUACoalescedNotification *> *notificationGroups = [_notifications[request.sectionIdentifier] mutableCopy];
+    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     if (!notificationGroups) {
         // Create if doesnt exist
-        notificationGroups = [NSMutableArray array];
+        notificationGroups = [NSArray array];
     }
 
+    NSMutableArray<NUACoalescedNotification *> *mutableArray = [notificationGroups mutableCopy];
+
     // Update
-    [notificationGroups addObject:notification];
+    [mutableArray addObject:notification];
     NSMutableDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
-    notifications[request.sectionIdentifier] = [notificationGroups copy];
-    _notifications = [notification copy];
+    notifications[request.sectionIdentifier] = [mutableArray copy];
+    _notifications = [notifications copy];
 
     // Observer
     NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {

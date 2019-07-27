@@ -74,15 +74,15 @@
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
     [notifications insertObject:newNotification atIndex:0];
 
+    // Update ivar
+    _notifications = [notifications copy];
+
     // Update table
     [self.tableViewController.tableView beginUpdates];
 
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     [self.tableViewController.tableView endUpdates];
-
-    // Update ivar
-    _notifications = [notifications copy];
 }
 
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
@@ -99,6 +99,9 @@
     [notifications removeObject:oldNotification];
     [notifications insertObject:updatedNotification atIndex:0];
 
+    // Update ivar
+    _notifications = [notifications copy];
+
     // Update table
     [self.tableViewController.tableView beginUpdates];
 
@@ -106,9 +109,6 @@
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     [self.tableViewController.tableView endUpdates];
-
-    // Update ivar
-    _notifications = [notifications copy];
 }
 
 - (NUACoalescedNotification *)_notificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
