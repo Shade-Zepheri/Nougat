@@ -67,7 +67,7 @@ content<NCNotificationContent> = request.content
         }
 
         NCNotificationSection *section = notificationSections[sectionIdentifier];
-        NSMutableArray<NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary array];
+        NSMutableArray<NUACoalescedNotification *> *notificationGroups = [NSMutableArray array];
         for (NCCoalescedNotification *coalescedNotification in section.coalescedNotifications.allValues) {
             // Apps can have different groups for notifications (eg: Followers and Likes groups)
             NUACoalescedNotification *notification = [self _coalescedNotificationFromNotification:coalescedNotification];
