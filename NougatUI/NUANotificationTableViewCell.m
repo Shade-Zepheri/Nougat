@@ -6,6 +6,7 @@
 
 @interface NUANotificationTableViewCell ()
 @property (strong, nonatomic) UIImageView *glyphView;
+@property (strong, nonatomic) UIImageView *attachmentImageView;
 @property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *messageLabel;
@@ -23,6 +24,7 @@
         // Create the things
         [self _createGlyphViewIfNecessary];
         [self _createHeaderLabelIfNecessary];
+        [self _createAttachmentImageViewIfNecessary];
         [self _createTitleLabelIfNecessary];
         [self _createMessageLabelIfNecessary];
         [self _createExpandButtonIfNecessary];
@@ -56,6 +58,16 @@
     [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 }
 
+- (void)_createAttachmentImageViewIfNecessary {
+    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.attachmentImageView];
+
+    [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:7.0].active = YES;
+    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-10.0].active = YES;
+    [self.attachmentImageView.heightAnchor constraintEqualToConstant:35.0].active = YES;
+}
+
 - (void)_createTitleLabelIfNecessary {
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
@@ -68,7 +80,7 @@
     [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:7.0].active = YES;
     [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.titleLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
 - (void)_createMessageLabelIfNecessary {
@@ -83,7 +95,7 @@
     [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:5.0].active = YES;
     [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
-    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
 - (void)_createExpandButtonIfNecessary {
@@ -105,12 +117,24 @@
     _timestamp = notification.timestamp;
     self.glyphView.image = notification.icon;
 
+    [self _configureAttachment];
     [self _configureHeaderText];
     [self _configureTitleText];
     [self _configureMessageText];
 }
 
 #pragma mark - Label management
+
+- (void)_configureAttachment {
+    if (!self.notification.attachmentImage) {
+        return;
+    }
+
+    self.attachmentImageView.image = self.notification.attachmentImage;
+
+    // Update constraints
+    [self.attachmentImageView.widthAnchor constraintEqualToConstant:35.0].active = YES;
+}
 
 - (void)_configureHeaderText {
     // Attribute up
