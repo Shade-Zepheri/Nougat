@@ -38,8 +38,8 @@
     self.glyphView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.glyphView];
 
-    [self.glyphView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-    [self.glyphView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
+    [self.glyphView.topAnchor constraintEqualToAnchor:self.topAnchor constant:12.0].active = YES;
+    [self.glyphView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:12.0].active = YES;
     [self.glyphView.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.glyphView.widthAnchor constraintEqualToConstant:18.0].active = YES;
 }
@@ -52,20 +52,23 @@
     [self addSubview:self.headerLabel];
 
     [self.headerLabel.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
-    [self.headerLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.trailingAnchor].active = YES;
+    [self.headerLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.trailingAnchor constant:5.0].active = YES;
     [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 }
 
 - (void)_createTitleLabelIfNecessary {
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.messageLabel.numberOfLines = 0;
+    self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.titleLabel.textColor = [UIColor blackColor];
     self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.titleLabel];
 
-    [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor].active = YES;
+    [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:7.0].active = YES;
     [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.titleLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
+    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
 }
 
 - (void)_createMessageLabelIfNecessary {
@@ -77,7 +80,7 @@
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.messageLabel];
 
-    [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor].active = YES;
+    [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:5.0].active = YES;
     [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
