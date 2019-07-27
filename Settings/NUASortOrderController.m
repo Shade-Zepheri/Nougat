@@ -162,8 +162,8 @@
         // Update table
         [tableView beginUpdates];
 
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:100];
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:100];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
         [tableView endUpdates];
     } else if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -177,8 +177,8 @@
         // Update table
         [tableView beginUpdates];
 
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:100];
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:1]] withRowAnimation:100];
+        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:1]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
         [tableView endUpdates];
     }
