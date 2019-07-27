@@ -12,14 +12,15 @@
     return notification;
 }
 
-+ (instancetype)coalescedNotificationWithSectionID:(NSString *)sectionID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
-    return [[self alloc] initWithSectionID:sectionID title:title message:message entires:entries];
++ (instancetype)coalescedNotificationWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
+    return [[self alloc] initWithSectionID:sectionID threadID:threadID title:title message:message entires:entries];
 }
 
-- (instancetype)initWithSectionID:(NSString *)sectionID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
+- (instancetype)initWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
     self = [super init];
     if (self) {
         _sectionID = sectionID;
+        _threadID = threadID;
         _title = title;
         _message = message;
         _entries = entries;
@@ -33,7 +34,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; title = %@; message = %@>", self.class, self, self.sectionID, self.title, self.message];
+    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message];
 }
 
 #pragma mark - Properties

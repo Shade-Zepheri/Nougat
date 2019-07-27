@@ -12,7 +12,7 @@
 
 @end
 
-@interface NUAMainTableViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
+@interface NUAMainTableViewController : UIViewController <NUANotificationsObserver, UITableViewDataSource, UITableViewDelegate> {
     NSLayoutConstraint *_heightConstraint;
     NSArray<NUACoalescedNotification *> *_notifications;
 }

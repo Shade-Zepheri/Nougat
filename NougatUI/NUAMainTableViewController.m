@@ -17,24 +17,33 @@
         // Create now playing controller
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
 
-        // Notification stuffs
+        // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
+        [self.notificationRepository addObserver:self];
     }
 
     return self;
 }
 
-- (UITableView *)_tableView {
-    return self.tableViewController.tableView;
+- (void)_loadNotificationsIfNecessary {
+    if (_notifications) {
+        return;
 }
 
-- (void)_populateTableView {
-    // Load notifications form repo
-    // NUACoalescedNotification *notif1 = [NUACoalescedNotification coalescedNotificationWithSectionID:@"com.apple.Preferences" title:@"Test1" message:@"This is a test" entires:nil];
-    // NUACoalescedNotification *notif2 = [NUACoalescedNotification coalescedNotificationWithSectionID:@"com.atebits.Tweetie2" title:@"Test2" message:@"This is a test" entires:nil];
+    // Generate only once
+    NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notificationsEntries = self.notificationRepository.notifications;
+    NSMutableArray<NUACoalescedNotification *> *notifications = [NSMutableArray array];
+    for (NSArray<NUACoalescedNotification *> *notificationGroups in notificationsEntries.allValues) {
+        // Add all entries from each array
+        [notifications addObjectsFromArray:notificationGroups];
+    }
 
-    NSArray<NUACoalescedNotification *> *notifications = self.notificationRepository.notifications.allValues;
-    _notifications = notifications;
+    // Sort via date
+    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+        return [notification2.timestamp compare:notification1.timestamp];
+    }];
+
+    _notifications = [notifications copy];
 }
 
 #pragma mark - Properties
@@ -68,17 +77,17 @@
     [super viewDidLoad];
 
     // Configure tableView
-    [self _tableView].dataSource = self;
-    [self _tableView].delegate = self;
-    [self _tableView].translatesAutoresizingMaskIntoConstraints = NO;
-    [self _tableView].tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
-    [self.view addSubview:[self _tableView]];
+    self.tableViewController.tableView.dataSource = self;
+    self.tableViewController.tableView.delegate = self;
+    self.tableViewController.tableView.translatesAutoresizingMaskIntoConstraints = NO;
+    self.tableViewController.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
+    [self.view addSubview:self.tableViewController.tableView];
 
     // // constraint up
-    [[self _tableView].topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-    [[self _tableView].bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
-    [[self _tableView].leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
-    [[self _tableView].trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
+    [self.tableViewController.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
+    [self.tableViewController.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [self.tableViewController.tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
+    [self.tableViewController.tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
 
     // Register custom classes
     [self.tableViewController.tableView registerClass:[NUANotificationTableViewCell class] forCellReuseIdentifier:@"NotificationCell"];
@@ -89,7 +98,7 @@
     [super viewWillAppear:animated];
 
     // Populate
-    [self _populateTableView];
+    [self _loadNotificationsIfNecessary];
 
     // Register for notifications
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
@@ -115,11 +124,10 @@
             _notifications = [mutableNotifications copy];
 
             // Remove media cell
-            UITableView *tableView = [self _tableView];
-            [tableView beginUpdates];
+            [self.tableViewController.tableView beginUpdates];
             NSIndexPath *mediaIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-            [tableView deleteRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [tableView endUpdates];
+            [self.tableViewController.tableView deleteRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            [self.tableViewController.tableView endUpdates];
         }
 
         return;
@@ -209,11 +217,10 @@
     _notifications = [mutableNotifications copy];
 
     // Insert at top
-    UITableView *tableView = [self _tableView];
-    [tableView beginUpdates];
+    [self.tableViewController.tableView beginUpdates];
     NSIndexPath *mediaIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [tableView insertRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-    [tableView endUpdates];
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableViewController.tableView endUpdates];
 }
 
 @end

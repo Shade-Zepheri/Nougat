@@ -8,6 +8,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 
 @interface NUACoalescedNotification : NSObject
 @property (copy, readonly, nonatomic) NSString *sectionID;
+@property (copy, readonly, nonatomic) NSString *threadID;
 @property (copy, readonly, nonatomic) NSString *title;
 @property (copy, readonly, nonatomic) NSString *message;
 @property (strong, readonly, nonatomic) UIImage *icon;
@@ -17,7 +18,9 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 
 + (instancetype)mediaNotification;
 
-+ (instancetype)coalescedNotificationWithSectionID:(NSString *)sectionID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries;
-- (instancetype)initWithSectionID:(NSString *)sectionID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries;
++ (instancetype)coalescedNotificationWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries;
+- (instancetype)initWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries;
+
+- (void)updateWithNewEntry:(NUANotificationEntry *)entry;
 
 @end

@@ -35,7 +35,7 @@
 
 #pragma mark - Properties
 
-- (NSDictionary<NSString *, NUACoalescedNotification *> *)notifications {
+- (NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *)notifications {
 // 5       UserNotificationsServer         0x1d3cc58cc 0x1d3c73000 + 0x528cc       // -[UNSNotificationRepository notificationRecordsForBundleIdentifier:] + 0x9c
 // 6       UserNotificationsServer         0x1d3caab2c 0x1d3c73000 + 0x37b2c       // -[UNSDefaultDataProvider notificationRecords] + 0x44
 // 7       UserNotificationsServer         0x1d3caa77c 0x1d3c73000 + 0x3777c       // -[UNSDefaultDataProvider _allBulletinsWithMaxCount:sinceDate:] + 0x84
@@ -52,18 +52,33 @@ notif<NCMutableCoalescedNotification> = obj in section.coalescedNotifications
 request<NCNotificationRequest> = obj in notif.notificationRequests
 content<NCNotificationContent> = request.content
 */
-    // NSArray<NCNotificationSection *> *sections = [self _notificationStore].sections;
-    NSMutableDictionary<NSString *, NUACoalescedNotification *> *notifications = [NSMutableDictionary dictionary];
-    NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
-    for (NCNotificationSection *section in notificationSections.allValues) {
-        // Loop through each section notifications
-        for (NCCoalescedNotification *coalescedNotification in section.coalescedNotifications.allValues) {
-            NUACoalescedNotification *notification = [self _coalescedNotificationFromNotification:coalescedNotification];
-            notifications[coalescedNotification.sectionIdentifier] = notification;
-        }
+    // Only generate once and have it be updated
+    if (_notifications) {
+        return _notifications;
     }
 
-    return [notifications copy];
+    NSMutableDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
+    NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
+    for (NSString *sectionIdentifier in sectionIdentifiers) {
+        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"]) {
+            // Exclude DND notification
+            continue;
+        }
+
+        NCNotificationSection *section = notificationSections[sectionIdentifier];
+        NSMutableArray<NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary array];
+        for (NCCoalescedNotification *coalescedNotification in section.coalescedNotifications.allValues) {
+            // Apps can have different groups for notifications (eg: Followers and Likes groups)
+            NUACoalescedNotification *notification = [self _coalescedNotificationFromNotification:coalescedNotification];
+            [notificationGroups addObject:notification];
+        }
+
+        notifications[sectionIdentifier] = [notificationGroups copy];
+    }
+
+    _notifications = [notifications copy];
+    return _notifications;
 }
 
 - (NCNotificationStore *)_notificationStore {
@@ -73,14 +88,14 @@ content<NCNotificationContent> = request.content
     return dispatcher.notificationStore;
 }
 
+#pragma mark - Nougat equivalents
+
 - (NUACoalescedNotification *)_coalescedNotificationFromNotification:(NCCoalescedNotification *)coalescedNotification {
     // Construct entires
     NSMutableArray<NUANotificationEntry *> *entries = [NSMutableArray array];
     NSArray<NCNotificationRequest *> *notificationRequests = coalescedNotification.notificationRequests;
     for (NCNotificationRequest *request in notificationRequests) {
-        NCNotificationContent *content = request.content;
-
-        NUANotificationEntry *entry = [NUANotificationEntry notificationEntryWithTitle:content.title message:content.message timestamp:request.timestamp];
+        NUANotificationEntry *entry = [self _entryFromRequest:request];
         [entries addObject:entry];
     }
 
@@ -91,8 +106,13 @@ content<NCNotificationContent> = request.content
 
     // Construct NUA equivalent
     NCNotificationContent *content = coalescedNotification.content;
-    NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationWithSectionID:coalescedNotification.sectionIdentifier title:content.title message:content.message entires:entries];
+    NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationWithSectionID:coalescedNotification.sectionIdentifier threadID:coalescedNotification.threadIdentifier title:content.title message:content.message entires:entries];
     return notification;
+}
+
+- (NUANotificationEntry *)_entryFromRequest:(NCNotificationRequest *)request {
+    NCNotificationContent *content = request.content;
+    return[NUANotificationEntry notificationEntryWithTitle:content.title message:content.message timestamp:request.timestamp];
 }
 
 #pragma mark - Observers

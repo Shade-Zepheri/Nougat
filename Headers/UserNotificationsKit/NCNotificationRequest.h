@@ -2,6 +2,7 @@
 
 @interface NCNotificationRequest : NSObject
 @property (copy, readonly, nonatomic) NSString *sectionIdentifier;
+@property (copy, readonly, nonatomic) NSString *threadIdentifier;
 @property (readonly, nonatomic) NSDate *timestamp;
 @property (readonly, nonatomic) NCNotificationContent *content;
 @property (readonly, nonatomic) NCNotificationAction *clearAction;
