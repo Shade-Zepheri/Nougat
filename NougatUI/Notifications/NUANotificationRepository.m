@@ -144,8 +144,6 @@
         NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
         [notification updateWithNewEntry:entry];
 
-        HBLogWarn(@"[NotifReppo] Notification: %@", notification);
-
         // Observer
         NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -162,7 +160,6 @@
 
 - (BOOL)addNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     // Construct new notification
-    HBLogWarn(@"[NotifReppo] Request: %@; Notif: %@", request, coalescedNotification);
     NUACoalescedNotification *notification = nil;
     if (coalescedNotification) {
         notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
