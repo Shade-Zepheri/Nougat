@@ -7,17 +7,17 @@
 
     NSInteger days = dateComponents.day;
     if (days > 0) {
-        return [NSString stringWithFormat:@"%zd d", days];
+        return [NSString stringWithFormat:@"%zdd", days];
     }
 
     NSInteger hours = dateComponents.hour;
     if (hours > 0) {
-        return [NSString stringWithFormat:@"%zd h", hours];
+        return [NSString stringWithFormat:@"%zdh", hours];
     }
 
     NSInteger minutes = dateComponents.minute;
     if (minutes > 0) {
-        return [NSString stringWithFormat:@"%zd m", minutes];
+        return [NSString stringWithFormat:@"%zdm", minutes];
     } 
 
     return @"now";
