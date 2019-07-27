@@ -65,27 +65,44 @@
 
 #pragma mark - Observer
 
+- (void)notificationRepositoryAddedNotification:(NUACoalescedNotification *)newNotification {
+    if (!_notifications) {
+        [self _loadNotificationsIfNecessary];
+    }
+
+    // Add new entry
+    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    [notifications insertObject:newNotification atIndex:0];
+
+    // Update table
+    [self.tableViewController.tableView beginUpdates];
+
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    [self.tableViewController.tableView endUpdates];
+
+    // Update ivar
+    _notifications = [notifications copy];
+}
+
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
     if (!_notifications) {
         [self _loadNotificationsIfNecessary];
     }
 
-    // Get old notification if exists
+    // Get old notification 
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self _notificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
+
+    // Remove old and add new      
+    NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
+    [notifications removeObject:oldNotification];
+    [notifications insertObject:updatedNotification atIndex:0];
 
     // Update table
     [self.tableViewController.tableView beginUpdates];
 
-    // Remove old if needed and add new
-    if (oldNotification) {        
-        NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
-        [notifications removeObject:oldNotification];
-
-        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
-
-    [notifications insertObject:updatedNotification atIndex:0];
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     [self.tableViewController.tableView endUpdates];

@@ -1,5 +1,7 @@
 #import "NUANotificationRepository.h"
+#import "NSArray+Map.h"
 #import <SpringBoard/SpringBoard-Umbrella.h>
+#import <HBLog.h>
 
 @implementation NUANotificationRepository
 
@@ -111,7 +113,27 @@
 
 #pragma mark - Notification management
 
+- (BOOL)containsNotificationForRequest:(NCNotificationRequest *)request {
+    BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
+    if (!containsSection) {
+        return NO;
+    }
+
+    // Fun little trick
+    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    NSArray<NSString *> *threadIdentifiers = [notificationGroups map:^id(id obj) {
+        return ((NUACoalescedNotification *)obj).threadID;
+    }];
+
+    return [threadIdentifiers containsObject:request.threadIdentifier];
+}
+
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    if (![self containsNotificationForRequest:request]) {
+        // Adding new entry
+        return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
+    }
+
     // Update notification
     NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     for (NUACoalescedNotification *notification in notificationGroups) {
@@ -121,6 +143,8 @@
 
         NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
         [notification updateWithNewEntry:entry];
+
+        HBLogWarn(@"[NotifReppo] Notification: %@", notification);
 
         // Observer
         NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -133,6 +157,42 @@
     }
 
     // Figure out what to do with return value
+    return YES;
+}
+
+- (BOOL)addNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Construct new notification
+    HBLogWarn(@"[NotifReppo] Request: %@; Notif: %@", request, coalescedNotification);
+    NUACoalescedNotification *notification = nil;
+    if (coalescedNotification) {
+        notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
+    } else {
+        // Construct from request
+        notification = [NUACoalescedNotification coalescedNotificationFromRequest:request];
+    }
+
+    // Add to dictionary
+    NSMutableArray<NUACoalescedNotification *> *notificationGroups = [_notifications[request.sectionIdentifier] mutableCopy];
+    if (!notificationGroups) {
+        // Create if doesnt exist
+        notificationGroups = [NSMutableArray array];
+    }
+
+    // Update
+    [notificationGroups addObject:notification];
+    NSMutableDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
+    notifications[request.sectionIdentifier] = [notificationGroups copy];
+    _notifications = [notification copy];
+
+    // Observer
+    NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [observer notificationRepositoryAddedNotification:notification];
+        });
+    };
+
+    [self notifyObserversUsingBlock:handlerBlock];
+
     return YES;
 }
 

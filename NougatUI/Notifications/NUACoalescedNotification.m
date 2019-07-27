@@ -46,6 +46,28 @@
     return self;
 }
 
++ (instancetype)coalescedNotificationFromRequest:(NCNotificationRequest *)request {
+    return [[self alloc] initFromRequest:request];
+}
+
+- (instancetype)initFromRequest:(NCNotificationRequest *)request {
+    self = [super init];
+    if (self) {
+        // Most some of the properties are going to be nil but essentials rely on the entry
+        _sectionID = request.sectionIdentifier;
+        _threadID = request.threadIdentifier;
+        _type = NUANotificationTypeNotification;
+
+        // Construct entry
+        NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+        _entries = @[entry];
+    }
+
+    return self;
+}
+
+#pragma mark - Description
+
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message];
 }
