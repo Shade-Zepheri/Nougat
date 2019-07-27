@@ -12,22 +12,35 @@
     return notification;
 }
 
-+ (instancetype)coalescedNotificationWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
-    return [[self alloc] initWithSectionID:sectionID threadID:threadID title:title message:message entires:entries];
++ (instancetype)coalescedNotificationFromNotification:(NCCoalescedNotification *)notification {
+    return [[self alloc] initFromNotification:notification];
 }
 
-- (instancetype)initWithSectionID:(NSString *)sectionID threadID:(NSString *)threadID title:(NSString *)title message:(NSString *)message entires:(NSArray<NUANotificationEntry *> *)entries {
+- (instancetype)initFromNotification:(NCCoalescedNotification *)notification {
     self = [super init];
     if (self) {
-        _sectionID = sectionID;
-        _threadID = threadID;
-        _title = title;
-        _message = message;
+        _sectionID = notification.sectionIdentifier;
+        _threadID = notification.threadIdentifier;
+        _type = NUANotificationTypeNotification;
+
+        // Construct entires
+        NSMutableArray<NUANotificationEntry *> *entries = [NSMutableArray array];
+        NSArray<NCNotificationRequest *> *notificationRequests = notification.notificationRequests;
+        for (NCNotificationRequest *request in notificationRequests) {
+            NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+            [entries addObject:entry];
+        }
+
+        // Sort entires
+        [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
+            return [entry2.timestamp compare:entry1.timestamp];
+        }];
         _entries = entries;
 
-        _type = NUANotificationTypeNotification;
-        _icon = [UIImage _applicationIconImageForBundleIdentifier:sectionID format:0 scale:[UIScreen mainScreen].scale];
-
+        // Get ivars from content
+        NCNotificationContent *content = notification.content;
+        _title = content.title;
+        _message = content.message;
     }
 
     return self;
@@ -39,12 +52,37 @@
 
 #pragma mark - Properties
 
+- (UIImage *)icon {
+    if (!self.entries) {
+        return nil;
+    }
+
+    return self.entries[0].icon;
+}
+
+- (UIImage *)attachmentImage {
+    if (!self.entries) {
+        return nil;
+    }
+
+    return self.entries[0].attachmentImage;
+}
+
 - (NSDate *)timestamp {
     if (!self.entries) {
         return nil;
     }
 
     return self.entries[0].timestamp;
+}
+
+#pragma mark - Updates
+
+- (void)updateWithNewEntry:(NUANotificationEntry *)entry {
+    // Extra stuffs
+    NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
+    [entries insertObject:entry atIndex:0];
+    _entries = [entries copy];
 }
 
 @end

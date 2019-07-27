@@ -4,16 +4,21 @@
 
 #pragma mark - Init
 
-+ (instancetype)notificationEntryWithTitle:(NSString *)title message:(NSString *)message timestamp:(NSDate *)timestamp {
-    return [[self alloc] initWithTitle:title message:message timestamp:timestamp];
++ (instancetype)notificationEntryFromRequest:(NCNotificationRequest *)request {
+    return [[self alloc] initFromRequest:request];
 }
 
-- (instancetype)initWithTitle:(NSString *)title message:(NSString *)message timestamp:(NSDate *)timestamp {
+- (instancetype)initFromRequest:(NCNotificationRequest *)request {
     self = [super init];
     if (self) {
-        _title = title;
-        _message = message;
-        _timestamp = timestamp;
+        _timestamp = request.timestamp;
+
+        // Get info from content
+        NCNotificationContent *content = request.content;
+        _title = content.title;
+        _message = content.message;
+        _icon = content.icon;
+        _attachmentImage = content.attachmentImage;
     }
 
     return self;

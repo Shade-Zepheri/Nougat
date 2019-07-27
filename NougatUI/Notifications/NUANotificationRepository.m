@@ -70,7 +70,7 @@ content<NCNotificationContent> = request.content
         NSMutableArray<NUACoalescedNotification *> *notificationGroups = [NSMutableArray array];
         for (NCCoalescedNotification *coalescedNotification in section.coalescedNotifications.allValues) {
             // Apps can have different groups for notifications (eg: Followers and Likes groups)
-            NUACoalescedNotification *notification = [self _coalescedNotificationFromNotification:coalescedNotification];
+            NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
             [notificationGroups addObject:notification];
         }
 
@@ -86,33 +86,6 @@ content<NCNotificationContent> = request.content
     SBDashBoardNotificationDispatcher *destination = notificationDispatcher.dashBoardDestination;
     NCNotificationDispatcher *dispatcher = destination.delegate;
     return dispatcher.notificationStore;
-}
-
-#pragma mark - Nougat equivalents
-
-- (NUACoalescedNotification *)_coalescedNotificationFromNotification:(NCCoalescedNotification *)coalescedNotification {
-    // Construct entires
-    NSMutableArray<NUANotificationEntry *> *entries = [NSMutableArray array];
-    NSArray<NCNotificationRequest *> *notificationRequests = coalescedNotification.notificationRequests;
-    for (NCNotificationRequest *request in notificationRequests) {
-        NUANotificationEntry *entry = [self _entryFromRequest:request];
-        [entries addObject:entry];
-    }
-
-    // Sort entires
-    [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
-        return [entry2.timestamp compare:entry1.timestamp];
-	}];
-
-    // Construct NUA equivalent
-    NCNotificationContent *content = coalescedNotification.content;
-    NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationWithSectionID:coalescedNotification.sectionIdentifier threadID:coalescedNotification.threadIdentifier title:content.title message:content.message entires:entries];
-    return notification;
-}
-
-- (NUANotificationEntry *)_entryFromRequest:(NCNotificationRequest *)request {
-    NCNotificationContent *content = request.content;
-    return[NUANotificationEntry notificationEntryWithTitle:content.title message:content.message timestamp:request.timestamp];
 }
 
 #pragma mark - Observers
