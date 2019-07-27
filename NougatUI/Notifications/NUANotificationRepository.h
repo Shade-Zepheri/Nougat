@@ -1,10 +1,11 @@
 #import <UIKit/UIKit.h>
 #import "NUACoalescedNotification.h"
 #import "NUANotificationEntry.h"
+#import <UserNotificationsKit/UserNotificationsKit.h>
 
 @protocol NUANotificationsObserver <NSObject>
 
-- (void)didPostNotificationEntry:(NUANotificationEntry *)entry;
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification;
 
 @end
 
@@ -22,5 +23,7 @@ typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> obs
 
 - (void)addObserver:(id<NUANotificationsObserver>)observer;
 - (void)removeObserver:(id<NUANotificationsObserver>)observer;
+
+- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification;
 
 @end

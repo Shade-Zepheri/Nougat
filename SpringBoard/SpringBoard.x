@@ -2,6 +2,7 @@
 #import <NougatServices/NougatServices.h>
 #import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
+#import <UserNotificationsKit/UserNotificationsKit.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
@@ -194,6 +195,23 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
 %end
 %end
 
+#pragma mark - Notifications
+// TODO: Find iOS 9 equivalent
+%group CombinedList
+%hook NCNotificationCombinedListViewController
+// Hook in to capture new notification entries
+- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    BOOL orig = %orig;
+
+    // Pass along to repository
+    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+
+    return orig;
+}
+
+%end
+%end
+
 #pragma mark - Constructor
 
 %ctor {
@@ -210,6 +228,10 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
         %init(iOS10);
     } else {
         %init(iOS9);
+    }
+
+    if (%c(NCNotificationCombinedListViewController)) {
+        %init(CombinedList);
     }
 
     // Create our singleton

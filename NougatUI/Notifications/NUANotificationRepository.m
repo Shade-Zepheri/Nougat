@@ -1,6 +1,5 @@
 #import "NUANotificationRepository.h"
 #import <SpringBoard/SpringBoard-Umbrella.h>
-#import <UserNotificationsKit/UserNotificationsKit.h>
 
 @implementation NUANotificationRepository
 
@@ -36,23 +35,6 @@
 #pragma mark - Properties
 
 - (NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *)notifications {
-// 5       UserNotificationsServer         0x1d3cc58cc 0x1d3c73000 + 0x528cc       // -[UNSNotificationRepository notificationRecordsForBundleIdentifier:] + 0x9c
-// 6       UserNotificationsServer         0x1d3caab2c 0x1d3c73000 + 0x37b2c       // -[UNSDefaultDataProvider notificationRecords] + 0x44
-// 7       UserNotificationsServer         0x1d3caa77c 0x1d3c73000 + 0x3777c       // -[UNSDefaultDataProvider _allBulletinsWithMaxCount:sinceDate:] + 0x84
-// 8       UserNotificationsServer         0x1d3caac08 0x1d3c73000 + 0x37c08       // -[UNSDefaultDataProvider bulletinsWithRequestParameters:lastCleared:] + 0xb8
-/*
-
-dispatcher = SpringBoard.notificationDispatcher
-dispatcher = SBNCNotificationDispatcher.dashBoardDestination
-dispatcher = SBDashBoardNotificationDispatcher.delegate
-store = NCNotificationDispatcher.notificationStore
-notifs = NCNotificationStore.notificationSections
-section<NCNotificationSection> = obj in notifs
-notif<NCMutableCoalescedNotification> = obj in section.coalescedNotifications
-request<NCNotificationRequest> = obj in notif.notificationRequests
-content<NCNotificationContent> = request.content
-*/
-    // Only generate once and have it be updated
     if (_notifications) {
         return _notifications;
     }
@@ -125,6 +107,33 @@ content<NCNotificationContent> = request.content
             });
         }
     });
+}
+
+#pragma mark - Notification management
+
+- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Update notification
+    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    for (NUACoalescedNotification *notification in notificationGroups) {
+        if (![notification.threadID isEqualToString:request.threadIdentifier]) {
+            continue;
+        }
+
+        NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+        [notification updateWithNewEntry:entry];
+
+        // Observer
+        NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [observer notificationRepositoryUpdatedNotification:notification];
+            });
+        };
+
+        [self notifyObserversUsingBlock:handlerBlock];
+    }
+
+    // Figure out what to do with return value
+    return YES;
 }
 
 @end

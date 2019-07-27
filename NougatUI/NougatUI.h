@@ -20,4 +20,4 @@
 #import "NUAToggleInstancesProvider.h"
 #import "NUATogglesContentView.h"
 #import "NUATogglesModuleController.h"
-
+#import "NUANotificationRepository.h"

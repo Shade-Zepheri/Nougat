@@ -28,7 +28,7 @@
 - (void)_loadNotificationsIfNecessary {
     if (_notifications) {
         return;
-}
+    }
 
     // Generate only once
     NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notificationsEntries = self.notificationRepository.notifications;
@@ -61,6 +61,50 @@
 
     _heightConstraint.constant = height - 150.0;
 
+}
+
+#pragma mark - Observer
+
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
+    if (!_notifications) {
+        [self _loadNotificationsIfNecessary];
+    }
+
+    // Get old notification if exists
+    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    NUACoalescedNotification *oldNotification = [self _notificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
+
+    // Update table
+    [self.tableViewController.tableView beginUpdates];
+
+    // Remove old if needed and add new
+    if (oldNotification) {        
+        NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
+        [notifications removeObject:oldNotification];
+
+        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
+
+    [notifications insertObject:updatedNotification atIndex:0];
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    [self.tableViewController.tableView endUpdates];
+
+    // Update ivar
+    _notifications = [notifications copy];
+}
+
+- (NUACoalescedNotification *)_notificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
+    for (NUACoalescedNotification *notification in _notifications) {
+        if (![notification.sectionID isEqualToString:sectionID] || ![notification.threadID isEqualToString:threadID]) {
+            // Make sure its the same notification
+            continue;
+        }
+
+        return notification;
+    }
+
+    return nil;
 }
 
 #pragma mark - UIViewController
@@ -155,7 +199,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 150.0;
+    return 100.0;
 }
 
 #pragma mark - UITableViewDataSource
@@ -170,7 +214,6 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Test for now
     NUACoalescedNotification *notification = _notifications[indexPath.row];
     if (notification.type == NUANotificationTypeMedia) {
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell"];
@@ -200,10 +243,6 @@
 
 
 #pragma mark - Cells
-
-- (void)insertCellForNotificationRequest:(id)request {
-    // Not sure classes yet
-}
 
 - (void)insertMediaCellIfNeccessary {
     if ([self _mediaCellPresent]) {
