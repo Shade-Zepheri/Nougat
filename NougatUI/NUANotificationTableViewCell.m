@@ -49,7 +49,7 @@
 - (void)_createHeaderLabelIfNecessary {
     self.headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.headerLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.headerLabel.textColor = [UIColor blackColor];
+    self.headerLabel.textColor = [UIColor grayColor];
     self.headerLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.headerLabel];
 
@@ -133,7 +133,8 @@
     self.attachmentImageView.image = self.notification.attachmentImage;
 
     // Update constraints
-    [self.attachmentImageView.widthAnchor constraintEqualToConstant:35.0].active = YES;
+    CGFloat constant = (self.attachmentImageView.image) ? 35.0 : 0.0;
+    [self.attachmentImageView.widthAnchor constraintEqualToConstant:constant].active = YES;
 }
 
 - (void)_configureHeaderText {
