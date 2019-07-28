@@ -11,6 +11,7 @@
 - (instancetype)initFromRequest:(NCNotificationRequest *)request {
     self = [super init];
     if (self) {
+        _request = request;
         _timestamp = request.timestamp;
 
         // Get info from content

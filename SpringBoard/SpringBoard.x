@@ -3,6 +3,7 @@
 #import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UserNotificationsKit/UserNotificationsKit.h>
+#import <UserNotificationsUIKit/UserNotificationsUIKit.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
@@ -199,7 +200,39 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
 // TODO: Find iOS 9 equivalent
 %group CombinedList
 %hook NCNotificationCombinedListViewController
-// Hook in to capture new notification entries
+// Hook into to manage notification stuffs
+
+- (instancetype)init {
+    self = %orig;
+    if (self) {
+        // Register for notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(nua_executeAction:) name:@"NUANotificationLaunchNotification" object:nil];
+    }
+
+    return self;
+}
+
+- (void)dealloc {
+    // Deregister notification
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUANotificationLaunchNotification" object:nil];
+
+    %orig;
+}
+
+#pragma mark - Actions
+
+%new
+- (void)nua_executeAction:(NSNotification *)notification {
+    // Parse for info
+    NCNotificationAction *action = notification.userInfo[@"action"];
+    NCNotificationRequest *request = notification.userInfo[@"request"];
+
+    // Execute
+    [self.destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
+}
+
+#pragma mark - Notification managements
+
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     BOOL orig = %orig;
 

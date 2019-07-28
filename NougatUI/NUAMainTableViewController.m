@@ -213,6 +213,16 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+
+    // Get associated entry
+    NUACoalescedNotification *notification = _notifications[indexPath.row];
+    NUANotificationEntry *entry = notification.entries[0];
+
+    // Post to launch
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"action": entry.request.defaultAction, @"request": entry.request}];
+
+    // Dismiss
+    [self.delegate tableViewControllerWantsDismissal:self];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
