@@ -129,6 +129,11 @@
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"]) {
+        // Exclude DND notification
+        return NO;
+    }
+
     if (![self containsNotificationForRequest:request]) {
         // Adding new entry
         return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
