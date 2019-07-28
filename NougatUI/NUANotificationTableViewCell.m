@@ -154,15 +154,13 @@
 
 - (void)_configureTitleText {
     // Get info from first entry
-    NUANotificationEntry *entry = self.notification.entries[0];
-    NSString *title = (entry.title) ? entry.title : entry.message;
+    NSString *title = (self.notification.title) ? self.notification.title : self.notification.message;
     self.titleLabel.text = title;
 }
 
 - (void)_configureMessageText {
     // Get info from first entry
-    NUANotificationEntry *entry = self.notification.entries[0];
-    NSString *message = (entry.title) ? entry.message : @"Tap for more options.";
+    NSString *message = (self.notification.title) ? self.notification.message : @"Tap for more options.";
     self.messageLabel.text = message;
 }
 

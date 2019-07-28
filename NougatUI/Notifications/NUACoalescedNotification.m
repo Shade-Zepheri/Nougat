@@ -36,11 +36,6 @@
             return [entry2.timestamp compare:entry1.timestamp];
         }];
         _entries = entries;
-
-        // Get ivars from content
-        NCNotificationContent *content = notification.content;
-        _title = content.title;
-        _message = content.message;
     }
 
     return self;
@@ -74,8 +69,24 @@
 
 #pragma mark - Properties
 
+- (NSString *)title {
+    if (!self.entries || self.entries.count < 1) {
+        return nil;
+    }
+
+    return self.entries[0].title;
+}
+
+- (NSString *)message {
+    if (!self.entries || self.entries.count < 1) {
+        return nil;
+    }
+
+    return self.entries[0].message;
+}
+
 - (UIImage *)icon {
-    if (!self.entries) {
+    if (!self.entries || self.entries.count < 1) {
         return nil;
     }
 
@@ -83,7 +94,7 @@
 }
 
 - (UIImage *)attachmentImage {
-    if (!self.entries) {
+    if (!self.entries || self.entries.count < 1) {
         return nil;
     }
 
@@ -91,7 +102,7 @@
 }
 
 - (NSDate *)timestamp {
-    if (!self.entries) {
+    if (!self.entries || self.entries.count < 1) {
         return nil;
     }
 
