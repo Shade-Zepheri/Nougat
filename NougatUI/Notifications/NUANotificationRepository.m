@@ -113,7 +113,7 @@
 
 #pragma mark - Notification management
 
-- (BOOL)containsNotificationForRequest:(NCNotificationRequest *)request {
+- (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
     BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
     if (!containsSection) {
         return NO;
@@ -128,13 +128,34 @@
     return [threadIdentifiers containsObject:request.threadIdentifier];
 }
 
-- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
-        // Exclude DND notification
+- (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
+    if (![self containsThreadForRequest:request]) {
+        // Thread doesnt even exist
         return NO;
     }
 
-    if (![self containsNotificationForRequest:request]) {
+    // Dictionaries would be so much easier
+    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    for (NUACoalescedNotification *notifcation in notificationGroups) {
+        if (![notifcation.threadID isEqualToString:request.threadIdentifier]) {
+            // Make sure same thread
+            continue;
+        }
+
+        return [notifcation containsRequest:request];
+    }
+
+    // Default to no
+    return NO;
+}
+
+- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+        // Exclude DND notification and wallet
+        return NO;
+    }
+
+    if (![self containsThreadForRequest:request]) {
         // Adding new entry
         return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
     }
@@ -146,8 +167,8 @@
             continue;
         }
 
-        NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
-        [notification updateWithNewEntry:entry];
+        // Update with new request
+        [notification updateWithNewRequest:request];
 
         // Observer
         NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {

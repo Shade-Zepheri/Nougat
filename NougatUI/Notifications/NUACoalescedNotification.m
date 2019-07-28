@@ -1,4 +1,5 @@
 #import "NUACoalescedNotification.h"
+#import "NSArray+Map.h"
 #import <UIKit/UIImage+Private.h>
 
 @implementation NUACoalescedNotification
@@ -109,10 +110,22 @@
     return self.entries[0].timestamp;
 }
 
-#pragma mark - Updates
+#pragma mark - Requests
 
-- (void)updateWithNewEntry:(NUANotificationEntry *)entry {
-    // Extra stuffs
+- (BOOL)containsRequest:(NCNotificationRequest *)request {
+    NSArray<NUANotificationEntry *> *entries = self.entries;
+    NSArray<NCNotificationRequest *> *requests = [entries map:^id(id obj) {
+        return ((NUANotificationEntry *)obj).request;
+    }];
+
+    return [requests containsObject:request];
+}
+
+- (void)updateWithNewRequest:(NCNotificationRequest *)request {
+    // Construct entry
+    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+
+    // Add to entries
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
     [entries insertObject:entry atIndex:0];
     _entries = [entries copy];
