@@ -45,8 +45,8 @@
     NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
     NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
     for (NSString *sectionIdentifier in sectionIdentifiers) {
-        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"]) {
-            // Exclude DND notification
+        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+            // Exclude DND notification && wallet stuffs
             continue;
         }
 
@@ -129,7 +129,7 @@
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"]) {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
         // Exclude DND notification
         return NO;
     }
