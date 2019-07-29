@@ -67,7 +67,8 @@
 
 - (void)notificationRepositoryAddedNotification:(NUACoalescedNotification *)newNotification {
     if (!_notifications) {
-        [self _loadNotificationsIfNecessary];
+        // Notification shade hasnt been loaded
+        return;
     }
 
     // Add new entry
@@ -87,7 +88,8 @@
 
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
     if (!_notifications) {
-        [self _loadNotificationsIfNecessary];
+        // Notification shade hasnt been loaded
+        return;
     }
 
     // Get old notification 
@@ -253,7 +255,7 @@
         return mediaCell;
     }
 
-    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell"];
+    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
     cell.notification = notification;
 
     cell.preservesSuperviewLayoutMargins = NO;
