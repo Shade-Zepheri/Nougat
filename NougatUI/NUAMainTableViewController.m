@@ -88,7 +88,7 @@
     [self.tableViewController.tableView endUpdates];
 }
 
-- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification updateIndex:(BOOL)updateIndex {
     if (!_notifications) {
         // Notification shade hasnt been loaded
         return;
@@ -100,8 +100,9 @@
 
     // Remove old and add new      
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
+    NSUInteger newIndex = updateIndex ? 0 : oldIndex;
     [notifications removeObject:oldNotification];
-    [notifications insertObject:updatedNotification atIndex:0];
+    [notifications insertObject:updatedNotification atIndex:newIndex];
 
     // Update ivar
     _notifications = [notifications copy];
@@ -110,7 +111,32 @@
     [self.tableViewController.tableView beginUpdates];
 
     [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    [self.tableViewController.tableView endUpdates];
+}
+
+- (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification {
+    if (!_notifications) {
+        // Notification shade hasnt been loaded
+        return;
+    }
+
+    // Get old notification 
+    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
+
+    // Remove old
+    NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
+    [notifications removeObject:oldNotification];
+
+    // Update ivar
+    _notifications = [notifications copy];
+
+    // Update table
+    [self.tableViewController.tableView beginUpdates];
+
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     [self.tableViewController.tableView endUpdates];
 }
@@ -236,7 +262,6 @@
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    // Temporary for testing
     return _notifications.count;
 }
 

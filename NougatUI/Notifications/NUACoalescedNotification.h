@@ -28,5 +28,6 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 - (BOOL)containsRequest:(NCNotificationRequest *)request;
 
 - (void)updateWithNewRequest:(NCNotificationRequest *)request;
+- (void)removeRequest:(NCNotificationRequest *)request;
 
 @end

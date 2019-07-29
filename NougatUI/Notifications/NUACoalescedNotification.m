@@ -1,5 +1,4 @@
 #import "NUACoalescedNotification.h"
-#import "NSArray+Map.h"
 #import <UIKit/UIImage+Private.h>
 
 @implementation NUACoalescedNotification
@@ -120,19 +119,45 @@
         }
 
         return YES;
-}
+    }
 
     // Default no
     return NO;
 }
 
 - (void)updateWithNewRequest:(NCNotificationRequest *)request {
+    if ([self containsRequest:request]) {
+        // Already has request
+        return;
+    }
+
     // Construct entry
     NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
 
     // Add to entries
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
     [entries insertObject:entry atIndex:0];
+    _entries = [entries copy];
+}
+
+- (void)removeRequest:(NCNotificationRequest *)request {
+    if (![self containsRequest:request]) {
+        // Cant remove something i dont have
+        return;
+    }
+
+    NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
+    for (NUANotificationEntry *entry in [entries reverseObjectEnumerator]) {
+        // Reversed so no problemo
+        if (![entry.request matchesRequest:request]) {
+            // Doesnt have it
+            continue;
+        }
+
+        // Remove object
+        [entries removeObject:entry];
+    }
+
     _entries = [entries copy];
 }
 

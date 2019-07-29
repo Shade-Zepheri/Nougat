@@ -134,7 +134,7 @@
     NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
     return [notification containsRequest:request];
-        }
+}
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
@@ -151,17 +151,17 @@
     NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
 
-        // Update with new request
-        [notification updateWithNewRequest:request];
+    // Update with new request
+    [notification updateWithNewRequest:request];
 
-        // Observer
-        NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [observer notificationRepositoryUpdatedNotification:notification];
-            });
-        };
+    // Observer
+    NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [observer notificationRepositoryUpdatedNotification:notification updateIndex:YES];
+        });
+    };
 
-        [self notifyObserversUsingBlock:handlerBlock];
+    [self notifyObserversUsingBlock:handlerBlock];
 
     // Figure out what to do with return value
     return YES;
@@ -202,6 +202,55 @@
     [self notifyObserversUsingBlock:handlerBlock];
 
     return YES;
+}
+
+- (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+        // Exclude DND notification and wallet
+        return;
+    }
+
+    if (![self containsNotificationRequest:request]) {
+        // Cant remove something i dont have
+        return;
+    }
+
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+
+    // Remove
+    [notification removeRequest:request];
+
+    // Determine action
+    NUANotificationsObserverHandler handlerBlock = nil;
+    if (notification.entries.count < 1) {
+        // Notification is empty, remove entirely
+        NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
+        [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
+
+        // Update main dict
+        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
+        notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
+        _notifications = [notifications copy];
+
+        // Adjust handler
+        handlerBlock = ^(id<NUANotificationsObserver> observer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [observer notificationRepositoryRemovedNotification:notification];
+            });
+        };
+    } else {
+        // Notification was simply modified
+        handlerBlock = ^(id<NUANotificationsObserver> observer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
+            });
+        };
+    }
+
+
+    // Observer
+    [self notifyObserversUsingBlock:handlerBlock];
 }
 
 @end
