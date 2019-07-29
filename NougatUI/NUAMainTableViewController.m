@@ -130,6 +130,11 @@
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
     [notifications removeObject:oldNotification];
 
+    // Sort via date
+    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+        return [notification2.timestamp compare:notification1.timestamp];
+    }];
+
     // Update ivar
     _notifications = [notifications copy];
 
