@@ -27,15 +27,17 @@
 
 - (void)_loadNotificationsIfNecessary {
     if (_notifications) {
+        // Generate only once
         return;
     }
 
-    // Generate only once
-    NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notificationsEntries = self.notificationRepository.notifications;
+    // Fuck it just add all of them for now
+    NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *allNotifications = self.notificationRepository.notifications;
     NSMutableArray<NUACoalescedNotification *> *notifications = [NSMutableArray array];
-    for (NSArray<NUACoalescedNotification *> *notificationGroups in notificationsEntries.allValues) {
+    for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in allNotifications.allValues) {
         // Add all entries from each array
-        [notifications addObjectsFromArray:notificationGroups];
+        NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
+        [notifications addObjectsFromArray:notificationThreads];
     }
 
     // Sort via date
@@ -94,7 +96,7 @@
 
     // Get old notification 
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
-    NUACoalescedNotification *oldNotification = [self _notificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
+    NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
 
     // Remove old and add new      
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
@@ -113,7 +115,7 @@
     [self.tableViewController.tableView endUpdates];
 }
 
-- (NUACoalescedNotification *)_notificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
+- (NUACoalescedNotification *)coalescedNotificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
     for (NUACoalescedNotification *notification in _notifications) {
         if (![notification.sectionID isEqualToString:sectionID] || ![notification.threadID isEqualToString:threadID]) {
             // Make sure its the same notification

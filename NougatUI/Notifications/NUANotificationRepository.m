@@ -1,5 +1,4 @@
 #import "NUANotificationRepository.h"
-#import "NSArray+Map.h"
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <HBLog.h>
 
@@ -36,12 +35,12 @@
 
 #pragma mark - Properties
 
-- (NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *)notifications {
+- (NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *)notifications {
     if (_notifications) {
         return _notifications;
     }
 
-    NSMutableDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
     NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
     NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
     for (NSString *sectionIdentifier in sectionIdentifiers) {
@@ -51,11 +50,12 @@
         }
 
         NCNotificationSection *section = notificationSections[sectionIdentifier];
-        NSMutableArray<NUACoalescedNotification *> *notificationGroups = [NSMutableArray array];
-        for (NCCoalescedNotification *coalescedNotification in section.coalescedNotifications.allValues) {
+        NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
+        for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
             // Apps can have different groups for notifications (eg: Followers and Likes groups)
+            NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
             NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
-            [notificationGroups addObject:notification];
+            notificationGroups[threadIdentifier] = notification;
         }
 
         notifications[sectionIdentifier] = [notificationGroups copy];
@@ -119,13 +119,9 @@
         return NO;
     }
 
-    // Fun little trick
-    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    NSArray<NSString *> *threadIdentifiers = [notificationGroups map:^id(id obj) {
-        return ((NUACoalescedNotification *)obj).threadID;
-    }];
-
-    return [threadIdentifiers containsObject:request.threadIdentifier];
+    // Check if contains thread
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    return [notificationGroups.allKeys containsObject:request.threadIdentifier];
 }
 
 - (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
@@ -135,19 +131,10 @@
     }
 
     // Dictionaries would be so much easier
-    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    for (NUACoalescedNotification *notifcation in notificationGroups) {
-        if (![notifcation.threadID isEqualToString:request.threadIdentifier]) {
-            // Make sure same thread
-            continue;
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+    return [notification containsRequest:request];
         }
-
-        return [notifcation containsRequest:request];
-    }
-
-    // Default to no
-    return NO;
-}
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
@@ -160,12 +147,9 @@
         return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
     }
 
-    // Update notification
-    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    for (NUACoalescedNotification *notification in notificationGroups) {
-        if (![notification.threadID isEqualToString:request.threadIdentifier]) {
-            continue;
-        }
+    // Get notification
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
 
         // Update with new request
         [notification updateWithNewRequest:request];
@@ -178,7 +162,6 @@
         };
 
         [self notifyObserversUsingBlock:handlerBlock];
-    }
 
     // Figure out what to do with return value
     return YES;
@@ -195,18 +178,18 @@
     }
 
     // Add to dictionary
-    NSArray<NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     if (!notificationGroups) {
         // Create if doesnt exist
-        notificationGroups = [NSArray array];
+        notificationGroups = [NSDictionary dictionary];
     }
 
-    NSMutableArray<NUACoalescedNotification *> *mutableArray = [notificationGroups mutableCopy];
+    // Update dictionary
+    NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
+    mutableNotificationGroups[request.threadIdentifier] = notification;
 
-    // Update
-    [mutableArray addObject:notification];
-    NSMutableDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
-    notifications[request.sectionIdentifier] = [mutableArray copy];
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
+    notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
     _notifications = [notifications copy];
 
     // Observer

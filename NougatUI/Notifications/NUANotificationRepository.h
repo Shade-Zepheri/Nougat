@@ -16,11 +16,11 @@ typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> obs
     NSHashTable *_observers;
     dispatch_queue_t _queue;
     dispatch_queue_t _callOutQueue;
-    NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *_notifications;
+    NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *_notifications;
 }
 
 @property (class, strong, readonly) NUANotificationRepository *defaultRepository;
-@property (copy, readonly, nonatomic) NSDictionary<NSString *, NSArray<NUACoalescedNotification *> *> *notifications;
+@property (copy, readonly, nonatomic) NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications;
 
 - (void)addObserver:(id<NUANotificationsObserver>)observer;
 - (void)removeObserver:(id<NUANotificationsObserver>)observer;
