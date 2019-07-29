@@ -10,4 +10,6 @@
 @property (readonly, nonatomic) NCNotificationAction *defaultAction;
 @property (readonly, nonatomic) NCNotificationAction *silenceAction;
 
+- (BOOL)matchesRequest:(NCNotificationRequest *)request;
+
 @end

@@ -113,12 +113,17 @@
 #pragma mark - Requests
 
 - (BOOL)containsRequest:(NCNotificationRequest *)request {
-    NSArray<NUANotificationEntry *> *entries = self.entries;
-    NSArray<NCNotificationRequest *> *requests = [entries map:^id(id obj) {
-        return ((NUANotificationEntry *)obj).request;
-    }];
+    for (NUANotificationEntry *entry in self.entries) {
+        // Since isEqual is too picky, i hate apple sometimes man
+        if (![entry.request matchesRequest:request]) {
+            continue;
+        }
 
-    return [requests containsObject:request];
+        return YES;
+}
+
+    // Default no
+    return NO;
 }
 
 - (void)updateWithNewRequest:(NCNotificationRequest *)request {
