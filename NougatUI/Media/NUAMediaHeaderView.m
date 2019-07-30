@@ -4,6 +4,7 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaHeaderView ()
+@property (strong, nonatomic) UIStackView *stackView;
 @property (strong, nonatomic) UIImageView *appImage;
 @property (strong, nonatomic) UILabel *infoLabel;
 @property (strong, nonatomic) UILabel *songLabel;
@@ -18,57 +19,66 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        // Create top label
-        self.appImage = [[UIImageView alloc] initWithFrame:CGRectZero];
-        self.appImage.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:self.appImage];
+        // Create the stuffs
+        [self createArrangedSubviews];
 
-        self.infoLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.infoLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-        self.infoLabel.textColor = [UIColor whiteColor];
-        self.infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:self.infoLabel];
+        // Create dummy container for header and image
+        UIView *containerView = [[UIView alloc] initWithFrame:CGRectZero];
+        containerView.translatesAutoresizingMaskIntoConstraints = NO;
+        [containerView addSubview:self.appImage];
+        [containerView addSubview:self.infoLabel];
 
-        // Constraints (Massive mess but keeps things clean)
-        [self.appImage.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-        [self.appImage.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.appImage.heightAnchor constraintEqualToConstant:18.0].active = YES;
-        [self.appImage.widthAnchor constraintEqualToConstant:18.0].active = YES;
+        [containerView.heightAnchor constraintEqualToConstant:18.0].active = YES;
 
-        [self.infoLabel.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        // Constrain header accorindly
+        [self.appImage.topAnchor constraintEqualToAnchor:containerView.topAnchor].active = YES;
+        [self.appImage.leadingAnchor constraintEqualToAnchor:containerView.leadingAnchor].active = YES;
+        [self.appImage.heightAnchor constraintEqualToAnchor:containerView.heightAnchor].active = YES;
+        [self.appImage.widthAnchor constraintEqualToAnchor:containerView.heightAnchor].active = YES;
+
+        [self.infoLabel.topAnchor constraintEqualToAnchor:containerView.topAnchor].active = YES;
         [self.infoLabel.leadingAnchor constraintEqualToAnchor:self.appImage.trailingAnchor constant:5.0].active = YES;
-        [self.infoLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-        [self.infoLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+        [self.infoLabel.trailingAnchor constraintEqualToAnchor:containerView.trailingAnchor].active = YES;
+        [self.infoLabel.heightAnchor constraintEqualToAnchor:containerView.heightAnchor].active = YES;
 
-        self.songLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.songLabel.adjustsFontSizeToFitWidth = NO;
-        self.songLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        self.songLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-        self.songLabel.textColor = [UIColor whiteColor];
-        self.songLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:self.songLabel];
+        self.stackView = [[UIStackView alloc] initWithArrangedSubviews:@[containerView, self.songLabel, self.artistLabel]];
+        self.stackView.axis = UILayoutConstraintAxisVertical;
+        self.stackView.alignment = UIStackViewAlignmentFill;
+        self.stackView.distribution = UIStackViewDistributionFillProportionally;
+        self.stackView.spacing = 5.0;
+        self.stackView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:self.stackView];
 
-        [self.songLabel.topAnchor constraintEqualToAnchor:self.infoLabel.bottomAnchor constant:5.0].active = YES;
-        [self.songLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.songLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-        [self.songLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
-
-        self.artistLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.artistLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-        self.artistLabel.textColor = [UIColor whiteColor];
-        self.artistLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:self.artistLabel];
-
-        [self.artistLabel.topAnchor constraintEqualToAnchor:self.songLabel.bottomAnchor constant:5.0].active = YES;
-        [self.artistLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.artistLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-        [self.artistLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
-
-        // Set view height
-        [self.bottomAnchor constraintEqualToAnchor:self.artistLabel.bottomAnchor constant:5.0].active = YES;
+        // Constraint this bad boi
+        // Constraints (Massive mess but keeps things clean)
+        [self.stackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        [self.stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [self.stackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
+        [self.stackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
     }
 
     return self;
+}
+
+- (void)createArrangedSubviews {
+    // Create top label
+    self.appImage = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self.appImage.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.infoLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.infoLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.infoLabel.textColor = [UIColor whiteColor];
+    self.infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    self.songLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.songLabel.adjustsFontSizeToFitWidth = NO;
+    self.songLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.songLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.songLabel.textColor = [UIColor whiteColor];
+
+    self.artistLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.artistLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.artistLabel.textColor = [UIColor whiteColor];
 }
 
 #pragma mark - Properties
