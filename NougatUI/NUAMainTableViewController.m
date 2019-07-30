@@ -16,6 +16,7 @@
 
         // Create now playing controller
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
         // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
@@ -75,7 +76,8 @@
 
     // Add new entry
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
-    [notifications insertObject:newNotification atIndex:0];
+    NSUInteger index = [self _mediaCellPresent] ? 1 : 0;
+    [notifications insertObject:newNotification atIndex:index];
 
     // Update ivar
     _notifications = [notifications copy];
@@ -83,7 +85,7 @@
     // Update table
     [self.tableViewController.tableView beginUpdates];
 
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     [self.tableViewController.tableView endUpdates];
 }
@@ -100,7 +102,7 @@
 
     // Remove old and add new      
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
-    NSUInteger newIndex = updateIndex ? 0 : oldIndex;
+    NSUInteger newIndex = updateIndex ? ([self _mediaCellPresent] ? 1 : 0) : oldIndex;
     [notifications removeObject:oldNotification];
     [notifications insertObject:updatedNotification atIndex:newIndex];
 
@@ -110,8 +112,13 @@
     // Update table
     [self.tableViewController.tableView beginUpdates];
 
-    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    if (newIndex == oldIndex) {
+        // Simply just reload the cell, no need to insert and delete
+        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    } else {
+        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 
     [self.tableViewController.tableView endUpdates];
 }
@@ -175,6 +182,8 @@
     // Configure tableView
     self.tableViewController.tableView.dataSource = self;
     self.tableViewController.tableView.delegate = self;
+    self.tableViewController.tableView.estimatedRowHeight = 100.0;
+    self.tableViewController.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableViewController.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.tableViewController.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     [self.view addSubview:self.tableViewController.tableView];
@@ -195,62 +204,47 @@
 
     // GCD this mug
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-    // Populate
-    [self _loadNotificationsIfNecessary];
+        // Populate
+        [self _loadNotificationsIfNecessary];
     });
 
-    // Register for notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
+    // Update media if needed
     [self _updateMedia];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
-    // Deregister from notifications
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
+    // Remove media cell if needed
+    [self removeMediaCellIfNecessary];
 }
 
 #pragma mark - Media
 
 - (void)_updateMedia {
-    if (!self.nowPlayingController.isPlaying) {
-        // No need to do anything
-        if ([self _mediaCellPresent]) {
-            // Remove dummie
-            NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
-            [mutableNotifications removeObjectAtIndex:0];
-            _notifications = [mutableNotifications copy];
-
-            // Remove media cell
-            [self.tableViewController.tableView beginUpdates];
-            NSIndexPath *mediaIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-            [self.tableViewController.tableView deleteRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [self.tableViewController.tableView endUpdates];
-        }
-
-        return;
-    }
-
+    // Media stuffs
     [self insertMediaCellIfNeccessary];
 }
 
 - (BOOL)_mediaCellPresent {
-    for (NUACoalescedNotification *notification in _notifications) {
-        if (notification.type != NUANotificationTypeMedia) {
-            continue;
-        }
-
-        return YES;
+    if (!_notifications) {
+        // Cant check something that doesnt exist
+        return NO;
     }
 
-    return NO;
+    // Since is always gonna be top notif, only check it
+    NUACoalescedNotification *topNotification = _notifications[0];
+    return topNotification.type == NUANotificationTypeMedia;
 }
 
 #pragma mark - UITableViewDelegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (indexPath.row == 0 && [self _mediaCellPresent]) {
+        // Is media cell
+        return;
+    }
 
     // Get associated entry
     NUACoalescedNotification *notification = _notifications[indexPath.row];
@@ -290,7 +284,7 @@
         return mediaCell;
     }
 
-    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
+    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell"];
     cell.notification = notification;
 
     cell.preservesSuperviewLayoutMargins = NO;
@@ -314,7 +308,8 @@
 #pragma mark - Cells
 
 - (void)insertMediaCellIfNeccessary {
-    if ([self _mediaCellPresent]) {
+    if ([self _mediaCellPresent] || !self.nowPlayingController.isPlaying || !_notifications) {
+        // cant add if already exists, or not playing, or if nothing to add to
         return;
     }
 
@@ -324,11 +319,23 @@
     [mutableNotifications insertObject:mediaNotification atIndex:0];
     _notifications = [mutableNotifications copy];
 
-    // Insert at top
-    [self.tableViewController.tableView beginUpdates];
-    NSIndexPath *mediaIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[mediaIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-    [self.tableViewController.tableView endUpdates];
+    // Just reload
+    [self.tableViewController.tableView reloadData];
+}
+
+- (void)removeMediaCellIfNecessary {
+    if (![self _mediaCellPresent] || self.nowPlayingController.isPlaying) {
+        // Cant remove something i dont have or cant remove something i need
+        return;
+    }
+
+    // Remove dummie
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    [mutableNotifications removeObjectAtIndex:0];
+    _notifications = [mutableNotifications copy];
+
+    // Remove media cell
+    [self.tableViewController.tableView reloadData];
 }
 
 @end
