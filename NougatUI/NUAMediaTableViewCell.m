@@ -118,8 +118,8 @@
     self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.headerView];
 
-    [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor constant:14.0].active = YES;
-    [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.0].active = YES;
+    [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor constant:12.0].active = YES;
+    [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:12.0].active = YES;
     [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
 }
 
@@ -166,18 +166,6 @@
     self.controlsView.tintColor = accentColor;
 }
 
-- (BOOL)_songIsLiked {
-    __block BOOL songIsLiked = NO;
-    MRMediaRemoteGetNowPlayingInfo(dispatch_get_main_queue(), ^(CFDictionaryRef nowPlayingInfo) {
-        // Boolean value;
-        // Boolean valuePresent = CFDictionaryGetValueIfPresent(nowPlayingInfo, kMRMediaRemoteNowPlayingInfoIsLiked, &value);
-        // songIsLiked = valuePresent && value;
-        HBLogWarn(@"We got the information: %@", nowPlayingInfo);
-    });
-
-    return songIsLiked;
-}
-
 #pragma mark - Notifications
 
 - (void)updateMedia {
@@ -193,7 +181,6 @@
     // Parse and pass on
     self.nowPlayingArtwork = controller.currentNowPlayingArtwork;
     self.metadata = controller.currentNowPlayingMetadata;
-    self.controlsView.songLiked = [self _songIsLiked];
 }
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller playbackStateDidChange:(BOOL)isPlaying {
