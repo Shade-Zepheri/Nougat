@@ -208,6 +208,9 @@
         [self _loadNotificationsIfNecessary];
     });
 
+    // Cells notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_reloadForExpansion:) name:@"NUATableCellWantsReloadNotification" object:nil];
+
     // Update media if needed
     [self _updateMedia];
 }
@@ -215,11 +218,20 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
+    // Stop listening for cell notifs
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUATableCellWantsReloadNotification" object:nil];
+
     // Remove media cell if needed
     [self removeMediaCellIfNecessary];
 }
 
-#pragma mark - Media
+#pragma mark - Notifications
+
+- (void)_reloadForExpansion:(NSNotification *)notification {
+    // Simple reload
+    [self.tableViewController.tableView beginUpdates];
+    [self.tableViewController.tableView endUpdates];
+}
 
 - (void)_updateMedia {
     // Media stuffs
@@ -301,7 +313,15 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 100.0;
+    // I hate this
+    if (indexPath.row == 0 && [self _mediaCellPresent]) {
+        // Use media cell class
+        NUAMediaTableViewCell *cell = [self.tableViewController.tableView cellForRowAtIndexPath:indexPath];
+        return cell.expanded ? 150.0 : 100.0;
+    } else {
+        NUANotificationTableViewCell *cell = [self.tableViewController.tableView cellForRowAtIndexPath:indexPath];
+        return cell.expanded ? 150.0 : 100.0;
+    }
 }
 
 #pragma mark - UITableViewDataSource

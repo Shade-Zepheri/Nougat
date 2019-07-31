@@ -3,6 +3,7 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaControlsView ()
+@property (strong, nonatomic) UIStackView *stackView;
 @property (strong, nonatomic) UIButton *skipButton;
 @property (strong, nonatomic) UIButton *rewindButton;
 @property (strong, nonatomic) UIButton *playButton;
@@ -18,74 +19,63 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        // Defaults
+        _expanded = NO;
+
         // Constraint up
         self.translatesAutoresizingMaskIntoConstraints = NO;
         [self.widthAnchor constraintEqualToConstant:260.0].active = YES;
         [self.heightAnchor constraintEqualToConstant:50].active = YES;
 
-        // Controls
-        self.likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.likeButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.likeButton addTarget:self action:@selector(likeTrack) forControlEvents:UIControlEventTouchUpInside];
-        UIImage *likeButtonImage = [[UIImage imageNamed:@"Like" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
-        [self.likeButton setImage:likeButtonImage forState:UIControlStateNormal];
-        [self addSubview:self.likeButton];
+        // Create views
+        [self createArrangedViews];
 
-        [self.likeButton.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.likeButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.likeButton.widthAnchor constraintEqualToConstant:48.0].active = YES;
-        [self.likeButton.heightAnchor constraintEqualToConstant:48.0].active = YES;
+        // Stacc attacc
+        self.stackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.likeButton, self.rewindButton, self.playButton, self.skipButton, self.dislikeButton]];
+        self.stackView.axis = UILayoutConstraintAxisHorizontal;
+        self.stackView.alignment = UIStackViewAlignmentFill;
+        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        self.stackView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:self.stackView];
 
-        self.rewindButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.rewindButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.rewindButton addTarget:self action:@selector(rewindTrack) forControlEvents:UIControlEventTouchUpInside];
-        UIImage *rewindButtonImage = [[UIImage imageNamed:@"Rewind" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
-        [self.rewindButton setImage:rewindButtonImage forState:UIControlStateNormal];
-        [self addSubview:self.rewindButton];
-
-        [self.rewindButton.leadingAnchor constraintEqualToAnchor:self.likeButton.trailingAnchor constant:5.0].active = YES;
-        [self.rewindButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.rewindButton.widthAnchor constraintEqualToConstant:48.0].active = YES;
-        [self.rewindButton.heightAnchor constraintEqualToConstant:48.0].active = YES;   
-
-        self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.playButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.playButton addTarget:self action:@selector(playPauseTrack) forControlEvents:UIControlEventTouchUpInside];
-        UIImage *playButtonImage = [[UIImage imageNamed:@"Play" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
-        [self.playButton setImage:playButtonImage forState:UIControlStateNormal];
-        [self addSubview:self.playButton];
-
-        [self.playButton.leadingAnchor constraintEqualToAnchor:self.rewindButton.trailingAnchor constant:5.0].active = YES;
-        [self.playButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.playButton.widthAnchor constraintEqualToConstant:48.0].active = YES;
-        [self.playButton.heightAnchor constraintEqualToConstant:48.0].active = YES;
-
-        self.skipButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.skipButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.skipButton addTarget:self action:@selector(skipTrack) forControlEvents:UIControlEventTouchUpInside];
-        UIImage *skipButtonImage = [[UIImage imageNamed:@"Skip" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
-        [self.skipButton setImage:skipButtonImage forState:UIControlStateNormal];
-        [self addSubview:self.skipButton];
-
-        [self.skipButton.leadingAnchor constraintEqualToAnchor:self.playButton.trailingAnchor constant:5.0].active = YES;
-        [self.skipButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.skipButton.widthAnchor constraintEqualToConstant:48.0].active = YES;
-        [self.skipButton.heightAnchor constraintEqualToConstant:48.0].active = YES;
-
-        self.dislikeButton = [UIButton buttonWithType:UIButtonTypeCustom];
-        self.dislikeButton.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.dislikeButton addTarget:self action:@selector(dislikeTrack) forControlEvents:UIControlEventTouchUpInside];
-        UIImage *dislikeButtonImage = [[UIImage imageNamed:@"Dislike" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
-        [self.dislikeButton setImage:dislikeButtonImage forState:UIControlStateNormal];
-        [self addSubview:self.dislikeButton];
-
-        [self.dislikeButton.leadingAnchor constraintEqualToAnchor:self.skipButton.trailingAnchor constant:5.0].active = YES;
-        [self.dislikeButton.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.dislikeButton.widthAnchor constraintEqualToConstant:48.0].active = YES;
-        [self.dislikeButton.heightAnchor constraintEqualToConstant:48.0].active = YES;  
+        // Constrain the stacc
+        [self.stackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        [self.stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [self.stackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
+        [self.stackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
     }
 
     return self;
+}
+
+- (void)createArrangedViews{
+    // Controls
+    self.likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.likeButton addTarget:self action:@selector(likeTrack) forControlEvents:UIControlEventTouchUpInside];
+    UIImage *likeButtonImage = [[UIImage imageNamed:@"Like" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
+    [self.likeButton setImage:likeButtonImage forState:UIControlStateNormal];
+    self.likeButton.hidden = YES;
+
+    self.rewindButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.rewindButton addTarget:self action:@selector(rewindTrack) forControlEvents:UIControlEventTouchUpInside];
+    UIImage *rewindButtonImage = [[UIImage imageNamed:@"Rewind" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
+    [self.rewindButton setImage:rewindButtonImage forState:UIControlStateNormal];
+
+    self.playButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.playButton addTarget:self action:@selector(playPauseTrack) forControlEvents:UIControlEventTouchUpInside];
+    UIImage *playButtonImage = [[UIImage imageNamed:@"Play" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
+    [self.playButton setImage:playButtonImage forState:UIControlStateNormal];
+
+    self.skipButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.skipButton addTarget:self action:@selector(skipTrack) forControlEvents:UIControlEventTouchUpInside];
+    UIImage *skipButtonImage = [[UIImage imageNamed:@"Skip" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
+    [self.skipButton setImage:skipButtonImage forState:UIControlStateNormal];
+
+    self.dislikeButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.dislikeButton addTarget:self action:@selector(dislikeTrack) forControlEvents:UIControlEventTouchUpInside];
+    UIImage *dislikeButtonImage = [[UIImage imageNamed:@"Dislike" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:[UIColor whiteColor]];
+    [self.dislikeButton setImage:dislikeButtonImage forState:UIControlStateNormal];
+    self.dislikeButton.hidden = YES;
 }
 
 #pragma mark - Properties

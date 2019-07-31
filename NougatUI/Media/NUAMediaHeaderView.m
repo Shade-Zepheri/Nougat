@@ -9,6 +9,8 @@
 @property (strong, nonatomic) UILabel *infoLabel;
 @property (strong, nonatomic) UILabel *songLabel;
 @property (strong, nonatomic) UILabel *artistLabel;
+@property (strong, nonatomic) NSLayoutConstraint *songWidthConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *artistWidthConstraint;
 
 @end
 
@@ -19,6 +21,9 @@
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        // Defaults
+        _expanded = NO;
+
         // Create the stuffs
         [self createArrangedSubviews];
 
@@ -43,18 +48,24 @@
 
         self.stackView = [[UIStackView alloc] initWithArrangedSubviews:@[containerView, self.songLabel, self.artistLabel]];
         self.stackView.axis = UILayoutConstraintAxisVertical;
-        self.stackView.alignment = UIStackViewAlignmentFill;
-        self.stackView.distribution = UIStackViewDistributionFillProportionally;
+        self.stackView.alignment = UIStackViewAlignmentLeading;
+        self.stackView.distribution = UIStackViewDistributionFill;
         self.stackView.spacing = 5.0;
         self.stackView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:self.stackView];
 
         // Constraint this bad boi
-        // Constraints (Massive mess but keeps things clean)
         [self.stackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
         [self.stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
         [self.stackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
         [self.stackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+
+        // Additional constraints
+        self.songWidthConstraint = [self.songLabel.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:0.0];
+        self.songWidthConstraint.active = YES;
+
+        self.artistWidthConstraint = [self.artistLabel.widthAnchor constraintEqualToAnchor:self.widthAnchor constant:0.0];
+        self.artistWidthConstraint.active = YES;
     }
 
     return self;
@@ -67,21 +78,31 @@
 
     self.infoLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.infoLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.infoLabel.textColor = [UIColor whiteColor];
+    self.infoLabel.textColor = [UIColor grayColor];
     self.infoLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.songLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.songLabel.adjustsFontSizeToFitWidth = NO;
     self.songLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     self.songLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.songLabel.textColor = [UIColor whiteColor];
+    self.songLabel.textColor = [UIColor blackColor];
+    self.songLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     self.artistLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.artistLabel.adjustsFontSizeToFitWidth = NO;
     self.artistLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.artistLabel.textColor = [UIColor whiteColor];
+    self.artistLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.artistLabel.textColor = [UIColor grayColor];
+    self.artistLabel.translatesAutoresizingMaskIntoConstraints = NO;
 }
 
 #pragma mark - Properties
+
+- (void)setExpanded:(BOOL)expanded {
+    _expanded = expanded;
+
+    // Adjust constraints
+}
 
 - (void)setTintColor:(UIColor *)color {
     _tintColor = color;

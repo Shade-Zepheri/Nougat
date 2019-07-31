@@ -1,16 +1,17 @@
 #import "NUAMediaTableViewCell.h"
 #import "Media/NUAMediaControlsView.h"
 #import "Media/NUAMediaHeaderView.h"
-#import <MediaRemote/MediaRemote.h>
 #import "UIColor+Accent.h"
 #import "UIImage+Average.h"
-#import <HBLog.h>
+#import <MediaRemote/MediaRemote.h>
+#import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
 @property (strong, nonatomic) UIImageView *artworkView;
 @property (strong, nonatomic) CAGradientLayer *gradientLayer;
 @property (strong, nonatomic) NUAMediaControlsView *controlsView;
 @property (strong, nonatomic) NUAMediaHeaderView *headerView;
+@property (strong, nonatomic) UIButton *expandButton;
 
 @end
 
@@ -39,11 +40,15 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
 
-    // Layout views
+    // Create views if needed
     [self _createArtworkViewIfNecessary];
     [self _createGradientViewIfNecessary];
     [self _createHeaderViewIfNecessary];
     [self _createControlsViewIfNecessary];
+    [self _createExpandButtonIfNecessary];
+
+    // Set bounds
+    self.gradientLayer.frame = self.artworkView.bounds;
 }
 
 #pragma mark - Media views
@@ -96,19 +101,6 @@
     self.gradientLayer.frame = self.artworkView.bounds;
 }
 
-- (void)_createControlsViewIfNecessary {
-    if (self.controlsView) {
-        return;
-    }
-
-    self.controlsView = [[NUAMediaControlsView alloc] initWithFrame:CGRectZero];
-    self.controlsView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.controlsView];
-
-    [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.bottomAnchor].active = YES;
-    [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor].active = YES;
-}
-
 - (void)_createHeaderViewIfNecessary {
     if (self.headerView) {
         return;
@@ -120,7 +112,52 @@
 
     [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor constant:12.0].active = YES;
     [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:12.0].active = YES;
-    [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
+    [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
+}
+
+- (void)_createControlsViewIfNecessary {
+    if (self.controlsView) {
+        return;
+    }
+
+    self.controlsView = [[NUAMediaControlsView alloc] initWithFrame:CGRectZero];
+    self.controlsView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.controlsView];
+
+    [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor constant:5.0].active = YES;
+    [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
+}
+
+- (void)_createExpandButtonIfNecessary {
+    self.expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self.expandButton addTarget:self action:@selector(_expandCell:) forControlEvents:UIControlEventTouchUpInside];
+    self.expandButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:self.expandButton];
+
+    [self.expandButton.topAnchor constraintEqualToAnchor:self.headerView.topAnchor].active = YES;
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:5.0].active = YES;
+    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
+    [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
+}
+
+#pragma mark - Button
+
+- (void)_expandCell:(UIButton *)sender {
+    // Little trick for flip
+    _expanded = !_expanded;
+
+
+    // Notify table
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUATableCellWantsReloadNotification" object:nil userInfo:nil];
+
+    // Force layout
+    [self setNeedsLayout];
+
+    // Flip image
+    CGFloat angle = M_PI * [@(_expanded) intValue];
+    [UIView transitionWithView:self.imageView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        sender.imageView.transform = CGAffineTransformMakeRotation(angle);
+    } completion:nil];
 }
 
 #pragma mark - Properties
@@ -164,6 +201,14 @@
     UIColor *accentColor = averageColor.accentColor;
     self.headerView.tintColor = accentColor;
     self.controlsView.tintColor = accentColor;
+
+    // Update button
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
+
+    // Tint and set
+    UIImage *tintedImage = [baseImage _flatImageWithColor:accentColor];
+    [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 }
 
 #pragma mark - Notifications

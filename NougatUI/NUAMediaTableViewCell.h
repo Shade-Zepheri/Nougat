@@ -3,6 +3,8 @@
 #import <MediaPlayerUI/MPUNowPlayingMetadata.h>
 
 @interface NUAMediaTableViewCell : UITableViewCell <MPUNowPlayingDelegate>
+@property (getter=isExpanded, readonly, nonatomic) BOOL expanded;
+
 @property (getter=isPlaying, readonly, nonatomic) BOOL playing;
 @property (strong, nonatomic) UIImage *nowPlayingArtwork;
 
