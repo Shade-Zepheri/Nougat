@@ -29,4 +29,6 @@ typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> obs
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification;
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification;
 
+- (void)purgeAllNotifications;
+
 @end

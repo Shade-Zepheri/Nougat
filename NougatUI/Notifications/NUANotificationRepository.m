@@ -253,4 +253,12 @@
     [self notifyObserversUsingBlock:handlerBlock];
 }
 
+- (void)purgeAllNotifications {
+    // Simply reset ivar and regen
+    _notifications = nil;
+
+    // Call to regen
+    [self notifications];
+}
+
 @end
