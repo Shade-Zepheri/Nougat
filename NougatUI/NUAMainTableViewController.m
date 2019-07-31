@@ -334,8 +334,18 @@
     [mutableNotifications removeObjectAtIndex:0];
     _notifications = [mutableNotifications copy];
 
-    // Remove media cell
-    [self.tableViewController.tableView reloadData];
+    // Remove media cell (why do i have to do this stuff)
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        // Reset
+        _notifications = nil;
+        [self.notificationRepository purgeAllNotifications];
+
+        // Populate
+        [self _loadNotificationsIfNecessary];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableViewController.tableView reloadData];
+        });
+    });
 }
 
 @end
