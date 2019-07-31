@@ -226,6 +226,8 @@
     [self insertMediaCellIfNeccessary];
 }
 
+#pragma mark - Media
+
 - (BOOL)_mediaCellPresent {
     if (!_notifications) {
         // Cant check something that doesnt exist
@@ -235,6 +237,47 @@
     // Since is always gonna be top notif, only check it
     NUACoalescedNotification *topNotification = _notifications[0];
     return topNotification.type == NUANotificationTypeMedia;
+}
+
+- (void)insertMediaCellIfNeccessary {
+    if ([self _mediaCellPresent] || !self.nowPlayingController.isPlaying || !_notifications) {
+        // cant add if already exists, or not playing, or if nothing to add to
+        return;
+    }
+
+    // Add dummie to backng array
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    NUACoalescedNotification *mediaNotification = [NUACoalescedNotification mediaNotification];
+    [mutableNotifications insertObject:mediaNotification atIndex:0];
+    _notifications = [mutableNotifications copy];
+
+    // Just reload
+    [self.tableViewController.tableView reloadData];
+}
+
+- (void)removeMediaCellIfNecessary {
+    if (![self _mediaCellPresent] || self.nowPlayingController.isPlaying) {
+        // Cant remove something i dont have or cant remove something i need
+        return;
+    }
+
+    // Remove dummie
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    [mutableNotifications removeObjectAtIndex:0];
+    _notifications = [mutableNotifications copy];
+
+    // Remove media cell (why do i have to do this stuff)
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        // Reset
+        _notifications = nil;
+        [self.notificationRepository purgeAllNotifications];
+
+        // Populate
+        [self _loadNotificationsIfNecessary];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.tableViewController.tableView reloadData];
+        });
+    });
 }
 
 #pragma mark - UITableViewDelegate
@@ -302,50 +345,5 @@
     return NO;
 }
 
-#pragma mark - Cells Delegate
-
-
-#pragma mark - Cells
-
-- (void)insertMediaCellIfNeccessary {
-    if ([self _mediaCellPresent] || !self.nowPlayingController.isPlaying || !_notifications) {
-        // cant add if already exists, or not playing, or if nothing to add to
-        return;
-    }
-
-    // Add dummie to backng array
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
-    NUACoalescedNotification *mediaNotification = [NUACoalescedNotification mediaNotification];
-    [mutableNotifications insertObject:mediaNotification atIndex:0];
-    _notifications = [mutableNotifications copy];
-
-    // Just reload
-    [self.tableViewController.tableView reloadData];
-}
-
-- (void)removeMediaCellIfNecessary {
-    if (![self _mediaCellPresent] || self.nowPlayingController.isPlaying) {
-        // Cant remove something i dont have or cant remove something i need
-        return;
-    }
-
-    // Remove dummie
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
-    [mutableNotifications removeObjectAtIndex:0];
-    _notifications = [mutableNotifications copy];
-
-    // Remove media cell (why do i have to do this stuff)
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        // Reset
-        _notifications = nil;
-        [self.notificationRepository purgeAllNotifications];
-
-        // Populate
-        [self _loadNotificationsIfNecessary];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.tableViewController.tableView reloadData];
-        });
-    });
-}
 
 @end
