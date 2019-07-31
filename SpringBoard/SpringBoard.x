@@ -108,7 +108,7 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Gesture 
 
-CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
+CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     CGFloat rotatedX = 0.0;
     CGFloat rotatedY = 0.0;
     UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
@@ -151,7 +151,7 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
     // Manually override to only show on left 1/3 to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [gestureRecognizer locationInView:window];
-    CGPoint correctedLocation = _adjustTouchLocationForActiveOrientation(location);
+    CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
     return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
 }
 
@@ -171,7 +171,7 @@ CGPoint _adjustTouchLocationForActiveOrientation(CGPoint location) {
     // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [touch locationInView:window];
-    CGPoint correctedLocation = _adjustTouchLocationForActiveOrientation(location);
+    CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
 
     // Check if notched or not
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
