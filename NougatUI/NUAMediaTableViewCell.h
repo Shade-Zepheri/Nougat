@@ -1,10 +1,8 @@
-#import <UIKit/UIKit.h>
+#import "NUATableViewCell.h"
 #import <MediaPlayerUI/MediaPlayerUI.h>
 #import <MediaPlayerUI/MPUNowPlayingMetadata.h>
 
-@interface NUAMediaTableViewCell : UITableViewCell <MPUNowPlayingDelegate>
-@property (getter=isExpanded, readonly, nonatomic) BOOL expanded;
-
+@interface NUAMediaTableViewCell : NUATableViewCell <MPUNowPlayingDelegate>
 @property (getter=isPlaying, readonly, nonatomic) BOOL playing;
 @property (strong, nonatomic) UIImage *nowPlayingArtwork;
 

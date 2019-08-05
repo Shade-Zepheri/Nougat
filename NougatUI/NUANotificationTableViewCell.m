@@ -3,14 +3,16 @@
 #import "UIImage+Average.h"
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIImage+Private.h>
+#import <Macros.h>
 
 @interface NUANotificationTableViewCell ()
-@property (strong, nonatomic) UIImageView *glyphView;
 @property (strong, nonatomic) UIImageView *attachmentImageView;
-@property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *messageLabel;
-@property (strong, nonatomic) UIButton *expandButton;
+@property (strong, nonatomic) UIView *optionsBar;
+
+@property (strong, nonatomic) NSLayoutConstraint *attachmentConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *optionsHeightConstraint;
 
 @end
 
@@ -21,115 +23,86 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        // Defaults
-        _expanded = NO;
-
         // Create the things
-        [self _createGlyphViewIfNecessary];
-        [self _createHeaderLabelIfNecessary];
-        [self _createAttachmentImageViewIfNecessary];
-        [self _createTitleLabelIfNecessary];
-        [self _createMessageLabelIfNecessary];
-        [self _createExpandButtonIfNecessary];
+        [self createViews];
+        [self setupConstraints];
     }
 
     return self;
 }
 
-#pragma mark - Label views
-
-- (void)_createGlyphViewIfNecessary {
-    self.glyphView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.glyphView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.glyphView];
-
-    [self.glyphView.topAnchor constraintEqualToAnchor:self.topAnchor constant:12.0].active = YES;
-    [self.glyphView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:12.0].active = YES;
-    [self.glyphView.heightAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.glyphView.widthAnchor constraintEqualToConstant:18.0].active = YES;
+- (void)createViews {
+    [self _createAttachmentImageViewIfNecessary];
+    [self _createTitleLabelIfNecessary];
+    [self _createMessageLabelIfNecessary];
+    [self _createOptionsBar];
 }
 
-- (void)_createHeaderLabelIfNecessary {
-    self.headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.headerLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.headerLabel.textColor = [UIColor grayColor];
-    self.headerLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.headerLabel];
-
-    [self.headerLabel.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
-    [self.headerLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.trailingAnchor constant:5.0].active = YES;
-    [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-}
-
-- (void)_createAttachmentImageViewIfNecessary {
-    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.attachmentImageView];
-
+- (void)setupConstraints {
     [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
-    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-10.0].active = YES;
+    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor constant:-10.0].active = YES;
     [self.attachmentImageView.heightAnchor constraintEqualToConstant:35.0].active = YES;
-}
-
-- (void)_createTitleLabelIfNecessary {
-    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    self.messageLabel.numberOfLines = 0;
-    self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.titleLabel.textColor = [UIColor blackColor];
-    self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.titleLabel];
+    self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
+    self.attachmentConstraint.active = YES;
 
     [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
     [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.titleLabel.heightAnchor constraintEqualToConstant:20.0].active = YES;
     [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-}
-
-- (void)_createMessageLabelIfNecessary {
-    self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.messageLabel.numberOfLines = 0;
-    self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.messageLabel.textColor = [UIColor grayColor];
-    self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.messageLabel];
 
     [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:5.0].active = YES;
     [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
+
+    [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+    [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+    [self.optionsBar.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:100.0].active = YES;
+    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
+    self.optionsHeightConstraint.active = YES;
 }
 
-- (void)_createExpandButtonIfNecessary {
-    self.expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.expandButton addTarget:self action:@selector(_expandCell:) forControlEvents:UIControlEventTouchUpInside];
-    self.expandButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.expandButton];
+#pragma mark - Label views
 
-    [self.expandButton.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
-    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
+- (void)_createAttachmentImageViewIfNecessary {
+    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.attachmentImageView];
 }
 
-#pragma mark - Button
+- (void)_createTitleLabelIfNecessary {
+    self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.titleLabel.textColor = [UIColor blackColor];
+    self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.titleLabel];
+}
 
-- (void)_expandCell:(UIButton *)sender {
-    // Little trick for flip
-    _expanded = !_expanded;
+- (void)_createMessageLabelIfNecessary {
+    self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.messageLabel.textColor = [UIColor grayColor];
+    self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.messageLabel];
+}
 
-    // Notify table
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUATableCellWantsReloadNotification" object:nil userInfo:nil];
-
-    // Flip image
-    CGFloat angle = M_PI * [@(_expanded) intValue];
-    [UIView transitionWithView:self.imageView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-        sender.imageView.transform = CGAffineTransformMakeRotation(angle);
-    } completion:nil];
+- (void)_createOptionsBar {
+    self.optionsBar = [[UIView alloc] initWithFrame:CGRectZero];
+    self.optionsBar.backgroundColor = OreoBackgroundColor;
+    self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.optionsBar];
 }
 
 #pragma mark - Properties
+
+- (void)setExpanded:(BOOL)expanded {
+    [super setExpanded:expanded];
+
+    // Update options menu
+    self.optionsHeightConstraint.constant = expanded ? 50.0 : 0.0;
+}
 
 - (void)setNotification:(NUACoalescedNotification *)notification {
     _notification = notification;
@@ -152,7 +125,7 @@
 
     // Update constraints
     CGFloat constant = (self.attachmentImageView.image) ? 35.0 : 0.0;
-    [self.attachmentImageView.widthAnchor constraintEqualToConstant:constant].active = YES;
+    self.attachmentConstraint.constant = constant;
 }
 
 - (void)_configureHeaderText {

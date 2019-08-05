@@ -1,11 +1,21 @@
-#import <UIKit/UIKit.h>
+#import "NUATableViewCell.h"
 #import "Notifications/NUACoalescedNotification.h"
 #import "Notifications/NUANotificationEntry.h"
 
-@interface NUANotificationTableViewCell : UITableViewCell
+@class NUANotificationTableViewCell;
+
+@protocol NUANotificationTableViewCellDelegate <NSObject>
+@required
+
+- (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell;
+- (void)notificationTableViewCellRequestsExecuteAlternateAction:(NUANotificationTableViewCell *)cell;
+
+@end
+
+@interface NUANotificationTableViewCell : NUATableViewCell
+@property (weak, nonatomic) id<NUANotificationTableViewCellDelegate> actionsDelegate;
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 
-@property (getter=isExpanded, readonly, nonatomic) BOOL expanded;
 @property (readonly, nonatomic) NSDate *timestamp;
 @property (readonly, nonatomic) UIColor *tintColor;
 

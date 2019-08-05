@@ -1,6 +1,5 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
-#import "NUANotificationTableViewCell.h"
 #import <MediaRemote/MediaRemote.h>
 
 @implementation NUAMainTableViewController
@@ -10,6 +9,9 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Create defaults
+        _expandedCells = [NSMutableArray array];
+
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
         [self addChildViewController:self.tableViewController];
@@ -166,6 +168,18 @@
     return nil;
 }
 
+- (void)launchNotificationForCellAtIndexPath:(NSIndexPath *)indexPath {
+    // Get associated entry
+    NUACoalescedNotification *notification = _notifications[indexPath.row];
+    NUANotificationEntry *entry = notification.entries[0];
+
+    // Post to launch
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"action": entry.request.defaultAction, @"request": entry.request}];
+
+    // Dismiss
+    [self.delegate tableViewControllerWantsDismissal:self];
+}
+
 #pragma mark - UIViewController
 
 - (void)loadView {
@@ -301,27 +315,8 @@
         return;
     }
 
-    // Get associated entry
-    NUACoalescedNotification *notification = _notifications[indexPath.row];
-    NUANotificationEntry *entry = notification.entries[0];
-
-    // Post to launch
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"action": entry.request.defaultAction, @"request": entry.request}];
-
-    // Dismiss
-    [self.delegate tableViewControllerWantsDismissal:self];
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // I hate this
-    if (indexPath.row == 0 && [self _mediaCellPresent]) {
-        // Use media cell class
-        NUAMediaTableViewCell *cell = [self.tableViewController.tableView cellForRowAtIndexPath:indexPath];
-        return cell.expanded ? 150.0 : 100.0;
-    } else {
-        NUANotificationTableViewCell *cell = [self.tableViewController.tableView cellForRowAtIndexPath:indexPath];
-        return cell.expanded ? 150.0 : 100.0;
-    }
+    // Launch notif
+    [self launchNotificationForCellAtIndexPath:indexPath];
 }
 
 #pragma mark - UITableViewDataSource
@@ -337,18 +332,27 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NUACoalescedNotification *notification = _notifications[indexPath.row];
     if (notification.type == NUANotificationTypeMedia) {
-        NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell"];
+        NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
         // Provide basic information
+        mediaCell.delegate = self;
+        mediaCell.expanded = [_expandedCells containsObject:indexPath];
         mediaCell.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
         mediaCell.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
         mediaCell.metadata = self.nowPlayingController.currentNowPlayingMetadata;
 
+        mediaCell.preservesSuperviewLayoutMargins = NO;
+        mediaCell.separatorInset = UIEdgeInsetsZero;
+        mediaCell.layoutMargins = UIEdgeInsetsZero;
+
         return mediaCell;
     }
 
-    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell"];
+    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
+    cell.actionsDelegate = self;
+    cell.delegate = self;
     cell.notification = notification;
+    cell.expanded = [_expandedCells containsObject:indexPath];
 
     cell.preservesSuperviewLayoutMargins = NO;
     cell.separatorInset = UIEdgeInsetsZero;
@@ -365,5 +369,30 @@
     return NO;
 }
 
+#pragma mark - Cells delegate
+
+- (void)tableViewCell:(NUATableViewCell *)cell wantsExpand:(BOOL)expand {
+    // Add indexpath to expanded bois
+    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+    if (expand) {
+        [_expandedCells addObject:indexPath];
+    } else {
+        [_expandedCells removeObject:indexPath];
+    }
+
+    // Reload
+    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
+- (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {
+    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+
+    // Launch notif
+    [self launchNotificationForCellAtIndexPath:indexPath];
+}
+
+- (void)notificationTableViewCellRequestsExecuteAlternateAction:(NUANotificationTableViewCell *)cell {
+    // Figure this out
+}
 
 @end

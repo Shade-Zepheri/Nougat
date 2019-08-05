@@ -10,6 +10,8 @@
 @property (strong, nonatomic) UIButton *likeButton;
 @property (strong, nonatomic) UIButton *dislikeButton;
 
+@property (strong, nonatomic) NSLayoutConstraint *widthConstraint;
+
 @end
 
 @implementation NUAMediaControlsView
@@ -24,8 +26,9 @@
 
         // Constraint up
         self.translatesAutoresizingMaskIntoConstraints = NO;
-        [self.widthAnchor constraintEqualToConstant:260.0].active = YES;
-        [self.heightAnchor constraintEqualToConstant:50].active = YES;
+        self.widthConstraint = [self.widthAnchor constraintEqualToConstant:108.0];
+        self.widthConstraint.active = YES;
+        [self.heightAnchor constraintEqualToConstant:36].active = YES;
 
         // Create views
         [self createArrangedViews];
@@ -34,7 +37,7 @@
         self.stackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.likeButton, self.rewindButton, self.playButton, self.skipButton, self.dislikeButton]];
         self.stackView.axis = UILayoutConstraintAxisHorizontal;
         self.stackView.alignment = UIStackViewAlignmentFill;
-        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        self.stackView.distribution = UIStackViewDistributionFillEqually;
         self.stackView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:self.stackView];
 
@@ -79,6 +82,17 @@
 }
 
 #pragma mark - Properties
+
+- (void)setExpanded:(BOOL)expanded {
+    _expanded = expanded;
+
+    // Show buttons
+    self.likeButton.hidden = !expanded;
+    self.dislikeButton.hidden = !expanded;
+
+    // Adjust constraint
+    self.widthConstraint.constant = expanded ? 180.0 : 108.0;
+}
 
 - (void)setPlaying:(BOOL)playing {
     _playing = playing;

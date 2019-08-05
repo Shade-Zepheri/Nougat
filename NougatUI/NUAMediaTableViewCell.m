@@ -4,6 +4,7 @@
 #import "UIColor+Accent.h"
 #import "UIImage+Average.h"
 #import <MediaRemote/MediaRemote.h>
+#import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
@@ -11,7 +12,8 @@
 @property (strong, nonatomic) CAGradientLayer *gradientLayer;
 @property (strong, nonatomic) NUAMediaControlsView *controlsView;
 @property (strong, nonatomic) NUAMediaHeaderView *headerView;
-@property (strong, nonatomic) UIButton *expandButton;
+
+@property (strong, nonatomic) NSLayoutConstraint *controlsViewConstraint;
 
 @end
 
@@ -30,6 +32,9 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
         [self.nowPlayingController _registerForNotifications];
 
+        // Create views
+        [self setupViews];
+
         // Update
         [self updateMedia];
     }
@@ -37,15 +42,41 @@
     return self;
 }
 
+- (void)setupViews {
+    [self _createArtworkView];
+    [self _createGradientView];
+    [self _createHeaderView];
+    [self _createControlsView];
+
+    // Constraints
+    [self setupConstraints];
+}
+
+- (void)setupConstraints {
+    // Constrain the bad boys
+    [self.artworkView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+    [self.artworkView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+    [self.artworkView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+    [self.artworkView.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
+
+    [self.headerView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
+    [self.headerView.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
+
+    self.controlsViewConstraint = [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor constant:10.0];
+    self.controlsViewConstraint.active = YES;
+    [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
+
+    // Additional constraints
+    [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
+
+    [self.contentView bringSubviewToFront:self.expandButton];
+    [self.expandButton.topAnchor constraintEqualToAnchor:self.headerLabel.topAnchor].active = YES;
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
-
-    // Create views if needed
-    [self _createArtworkViewIfNecessary];
-    [self _createGradientViewIfNecessary];
-    [self _createHeaderViewIfNecessary];
-    [self _createControlsViewIfNecessary];
-    [self _createExpandButtonIfNecessary];
 
     // Set bounds
     self.gradientLayer.frame = self.artworkView.bounds;
@@ -53,27 +84,14 @@
 
 #pragma mark - Media views
 
-- (void)_createArtworkViewIfNecessary {
-    if (self.artworkView) {
-        return;
-    }
-
+- (void)_createArtworkView {
     self.artworkView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.artworkView.contentMode = UIViewContentModeScaleAspectFit;
     self.artworkView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.artworkView];
+    [self.contentView addSubview:self.artworkView];
+}
 
-    [self.artworkView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-    [self.artworkView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-    [self.artworkView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
-    [self.artworkView.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
- }
-
-- (void)_createGradientViewIfNecessary {
-    if (self.gradientLayer) {
-        return;
-    }
-
+- (void)_createGradientView {
     UIView *gradientView = [[UIView alloc] initWithFrame:self.bounds];
     [self.artworkView addSubview:gradientView];
 
@@ -101,66 +119,28 @@
     self.gradientLayer.frame = self.artworkView.bounds;
 }
 
-- (void)_createHeaderViewIfNecessary {
-    if (self.headerView) {
-        return;
-    }
-
+- (void)_createHeaderView {
     self.headerView = [[NUAMediaHeaderView alloc] initWithFrame:CGRectZero];
     self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.headerView];
-
-    [self.headerView.topAnchor constraintEqualToAnchor:self.topAnchor constant:12.0].active = YES;
-    [self.headerView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:12.0].active = YES;
-    [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
+    [self.contentView addSubview:self.headerView];
 }
 
-- (void)_createControlsViewIfNecessary {
-    if (self.controlsView) {
-        return;
-    }
-
+- (void)_createControlsView {
     self.controlsView = [[NUAMediaControlsView alloc] initWithFrame:CGRectZero];
     self.controlsView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.controlsView];
-
-    [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor constant:5.0].active = YES;
-    [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
-}
-
-- (void)_createExpandButtonIfNecessary {
-    self.expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.expandButton addTarget:self action:@selector(_expandCell:) forControlEvents:UIControlEventTouchUpInside];
-    self.expandButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:self.expandButton];
-
-    [self.expandButton.topAnchor constraintEqualToAnchor:self.headerView.topAnchor].active = YES;
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerView.trailingAnchor constant:5.0].active = YES;
-    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
-}
-
-#pragma mark - Button
-
-- (void)_expandCell:(UIButton *)sender {
-    // Little trick for flip
-    _expanded = !_expanded;
-
-
-    // Notify table
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUATableCellWantsReloadNotification" object:nil userInfo:nil];
-
-    // Force layout
-    [self setNeedsLayout];
-
-    // Flip image
-    CGFloat angle = M_PI * [@(_expanded) intValue];
-    [UIView transitionWithView:self.imageView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-        sender.imageView.transform = CGAffineTransformMakeRotation(angle);
-    } completion:nil];
+    [self.contentView addSubview:self.controlsView];
 }
 
 #pragma mark - Properties
+
+- (void)setExpanded:(BOOL)expanded {
+    [super setExpanded:expanded];
+
+    self.headerView.expanded = expanded;
+    self.controlsView.expanded = expanded;
+
+    self.controlsViewConstraint.constant = expanded ? 50.0 : 10.0;
+}
 
 - (BOOL)isPlaying {
     return self.nowPlayingController.isPlaying;
@@ -180,17 +160,21 @@
 - (void)setNowPlayingAppDisplayID:(NSString *)nowPlayingAppDisplayID {
     _nowPlayingAppDisplayID = nowPlayingAppDisplayID;
 
-    // Pass to header
-    self.headerView.nowPlayingApp = nowPlayingAppDisplayID;
+    // Update imageview
+    [self _updateHeaderLabelText];
+    UIImage *appIcon = [UIImage _applicationIconImageForBundleIdentifier:nowPlayingAppDisplayID format:0 scale:[UIScreen mainScreen].scale];
+    self.glyphView.image = appIcon;
 }
 
 - (void)setMetadata:(MPUNowPlayingMetadata *)metadata {
     _metadata = metadata;
 
     // Parse and pass to header
-    self.headerView.album = metadata.album;
     self.headerView.artist = metadata.artist;
     self.headerView.song = metadata.title;
+
+    // Update label
+    [self _updateHeaderLabelText];
 }
 
 - (void)_updateTintsForArtwork:(UIImage *)artwork {
@@ -199,6 +183,7 @@
 
     // Set tint color
     UIColor *accentColor = averageColor.accentColor;
+    self.headerLabel.textColor = accentColor;
     self.headerView.tintColor = accentColor;
     self.controlsView.tintColor = accentColor;
 
@@ -209,6 +194,26 @@
     // Tint and set
     UIImage *tintedImage = [baseImage _flatImageWithColor:accentColor];
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
+}
+
+#pragma mark - Info label
+
+- (void)_updateHeaderLabelText {
+    // Construct strings
+    NSString *displayID = self.nowPlayingAppDisplayID ?: @"com.apple.Music";
+    NSString *appDisplayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(displayID);
+    NSString *baseText = [NSString stringWithFormat:@"%@ • %@", appDisplayName, self.metadata.album];
+
+    NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc] initWithString:baseText];
+    NSRange boldedRange = NSMakeRange(0, appDisplayName.length);
+    UIFont *boldFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+
+    // Add attributes
+    [attributedString beginEditing];
+    [attributedString addAttribute:NSFontAttributeName value:boldFont range:boldedRange];
+    [attributedString endEditing];
+
+    self.headerLabel.attributedText = [attributedString copy];
 }
 
 #pragma mark - Notifications
@@ -235,7 +240,7 @@
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller nowPlayingApplicationDidChange:(NSString *)nowPlayingAppDisplayID {
     // Pass to header
-    self.headerView.nowPlayingApp = nowPlayingAppDisplayID;
+    self.nowPlayingAppDisplayID = nowPlayingAppDisplayID;
 }
 
 - (void)nowPlayingControllerDidBeginListeningForNotifications:(MPUNowPlayingController *)controller {
