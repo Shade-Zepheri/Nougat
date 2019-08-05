@@ -54,7 +54,7 @@
 
     // Constraints
     [self.glyphView.topAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.topAnchor constant:5.0].active = YES;
-    [self.glyphView.leadingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor constant:5.0].active = YES;
+    [self.glyphView.leadingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
     [self.glyphView.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.glyphView.widthAnchor constraintEqualToConstant:18.0].active = YES;
 

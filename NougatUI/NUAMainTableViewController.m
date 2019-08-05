@@ -202,6 +202,9 @@
     self.tableViewController.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
     [self.view addSubview:self.tableViewController.tableView];
 
+    self.tableViewController.tableView.layoutMargins = UIEdgeInsetsZero;
+    self.tableViewController.tableView.separatorInset = UIEdgeInsetsZero;
+
     // // constraint up
     [self.tableViewController.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
     [self.tableViewController.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
@@ -337,13 +340,10 @@
         // Provide basic information
         mediaCell.delegate = self;
         mediaCell.expanded = [_expandedCells containsObject:indexPath];
+        mediaCell.layoutMargins = UIEdgeInsetsZero;
+        mediaCell.metadata = self.nowPlayingController.currentNowPlayingMetadata;
         mediaCell.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
         mediaCell.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
-        mediaCell.metadata = self.nowPlayingController.currentNowPlayingMetadata;
-
-        mediaCell.preservesSuperviewLayoutMargins = NO;
-        mediaCell.separatorInset = UIEdgeInsetsZero;
-        mediaCell.layoutMargins = UIEdgeInsetsZero;
 
         return mediaCell;
     }
@@ -351,12 +351,9 @@
     NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
     cell.actionsDelegate = self;
     cell.delegate = self;
-    cell.notification = notification;
     cell.expanded = [_expandedCells containsObject:indexPath];
-
-    cell.preservesSuperviewLayoutMargins = NO;
-    cell.separatorInset = UIEdgeInsetsZero;
     cell.layoutMargins = UIEdgeInsetsZero;
+    cell.notification = notification;
 
     return cell;
 }
