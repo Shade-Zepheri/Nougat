@@ -72,7 +72,7 @@
 
 - (void)_createTitleLabelIfNecessary {
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.titleLabel.textColor = [UIColor blackColor];
     self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
@@ -81,7 +81,7 @@
 
 - (void)_createMessageLabelIfNecessary {
     self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.messageLabel.textColor = [UIColor grayColor];
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
