@@ -224,11 +224,17 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 %new
 - (void)nua_executeAction:(NSNotification *)notification {
     // Parse for info
+    NSString *type = notification.userInfo[@"type"];
     NCNotificationAction *action = notification.userInfo[@"action"];
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
     // Execute
     [self.destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
+
+    if ([type isEqualToString:@"clear"]) {
+        // Clear if needed
+        [self removeNotificationRequest:request forCoalescedNotification:nil];
+    }
 }
 
 #pragma mark - Notification managements

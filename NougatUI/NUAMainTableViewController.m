@@ -168,16 +168,31 @@
     return nil;
 }
 
-- (void)launchNotificationForCellAtIndexPath:(NSIndexPath *)indexPath {
+- (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
     // Get associated entry
     NUACoalescedNotification *notification = _notifications[indexPath.row];
     NUANotificationEntry *entry = notification.entries[0];
 
-    // Post to launch
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"action": entry.request.defaultAction, @"request": entry.request}];
+    // Get action
+    NCNotificationAction *action = nil;
+    if ([type isEqualToString:@"default"]) {
+        action = entry.request.defaultAction;
+    } else if ([type isEqualToString:@"clear"]) {
+        action = entry.request.clearAction;
+    }
 
-    // Dismiss
-    [self.delegate tableViewControllerWantsDismissal:self];
+    if (!action) {
+        // No action
+        return;
+    }
+
+    // Post to launch
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"type": type, @"action": action, @"request": entry.request}];
+
+    if ([type isEqualToString:@"default"]) {
+        // Dismiss
+        [self.delegate tableViewControllerWantsDismissal:self];
+    }
 }
 
 #pragma mark - UIViewController
@@ -319,7 +334,7 @@
     }
 
     // Launch notif
-    [self launchNotificationForCellAtIndexPath:indexPath];
+    [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
 }
 
 #pragma mark - UITableViewDataSource
@@ -385,11 +400,15 @@
     NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
 
     // Launch notif
-    [self launchNotificationForCellAtIndexPath:indexPath];
+    [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
 }
 
 - (void)notificationTableViewCellRequestsExecuteAlternateAction:(NUANotificationTableViewCell *)cell {
     // Figure this out
+    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+
+    // Launch notif
+    [self executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
 }
 
 @end

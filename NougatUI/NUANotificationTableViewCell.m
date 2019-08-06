@@ -10,6 +10,8 @@
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *messageLabel;
 @property (strong, nonatomic) UIView *optionsBar;
+@property (strong, nonatomic) UIButton *openButton;
+@property (strong, nonatomic) UIButton *clearButton;
 
 @property (strong, nonatomic) NSLayoutConstraint *attachmentConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *optionsHeightConstraint;
@@ -60,6 +62,15 @@
     [self.optionsBar.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:100.0].active = YES;
     self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
     self.optionsHeightConstraint.active = YES;
+
+    // Options buttons
+    [self.openButton.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.openButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
+    [self.openButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+
+    [self.clearButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:30.0].active = YES;
+    [self.clearButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
+    [self.clearButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
 }
 
 #pragma mark - Label views
@@ -93,12 +104,47 @@
     self.optionsBar.backgroundColor = OreoBackgroundColor;
     self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.optionsBar];
+
+    // Create buttons
+    self.openButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.openButton addTarget:self action:@selector(didTapOpenButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.openButton setTitle:@"Open" forState:UIControlStateNormal];
+    self.openButton.hidden = YES;
+    self.openButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.openButton sizeToFit];
+    [self.optionsBar addSubview:self.openButton];
+
+    self.clearButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [self.clearButton addTarget:self action:@selector(didTapClearButton:) forControlEvents:UIControlEventTouchUpInside];
+    [self.clearButton setTitle:@"Clear" forState:UIControlStateNormal];
+    self.clearButton.hidden = YES;
+    self.clearButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.clearButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.clearButton sizeToFit];
+    [self.optionsBar addSubview:self.clearButton];
+}
+
+#pragma mark - Buttons
+
+- (void)didTapOpenButton:(UIButton *)sender {
+    // Just send to delegate
+    [self.actionsDelegate notificationTableViewCellRequestsExecuteDefaultAction:self];
+}
+
+- (void)didTapClearButton:(UIButton *)sender {
+    // Just send to delegate
+    [self.actionsDelegate notificationTableViewCellRequestsExecuteAlternateAction:self];
 }
 
 #pragma mark - Properties
 
 - (void)setExpanded:(BOOL)expanded {
     [super setExpanded:expanded];
+
+    // Show buttons
+    self.openButton.hidden = !expanded;
+    self.clearButton.hidden = !expanded;
 
     // Update options menu
     self.optionsHeightConstraint.constant = expanded ? 50.0 : 0.0;
@@ -115,7 +161,7 @@
     [self _configureHeaderText];
     [self _configureTitleText];
     [self _configureMessageText];
-    [self _configureExpandButton];
+    [self _configureButtons];
 }
 
 #pragma mark - Label management
@@ -137,9 +183,10 @@
     NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:baseHeaderText];
 
     UIColor *textColor = self.notification.icon.averageColor;
+    _tintColor = textColor;
+
     NSDictionary<NSAttributedStringKey, id> *attributes = @{NSForegroundColorAttributeName: textColor};
     [mutableAttributedString setAttributes:attributes range:NSMakeRange(0, displayName.length)];
-    _tintColor = textColor;
 
     self.headerLabel.attributedText = [mutableAttributedString copy];
 }
@@ -156,7 +203,7 @@
     self.messageLabel.text = message;
 }
 
-- (void)_configureExpandButton {
+- (void)_configureButtons {
     // Get image
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
@@ -164,6 +211,10 @@
     // Tint and set
     UIImage *tintedImage = [baseImage _flatImageWithColor:_tintColor];
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
+
+    // Text buttons
+    [self.openButton setTitleColor:_tintColor forState:UIControlStateNormal];
+    [self.clearButton setTitleColor:_tintColor forState:UIControlStateNormal];
 }
 
 @end
