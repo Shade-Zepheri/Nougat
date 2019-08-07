@@ -305,11 +305,6 @@
         return;
     }
 
-    // Remove dummie
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
-    [mutableNotifications removeObjectAtIndex:0];
-    _notifications = [mutableNotifications copy];
-
     // Remove media cell (why do i have to do this stuff)
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
         // Reset
