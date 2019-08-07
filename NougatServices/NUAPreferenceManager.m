@@ -30,6 +30,7 @@
 
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
+        [_preferences registerBool:&_useExternalColor default:YES forKey:NUAPreferencesUsesExternalColorKey];
 
         NSArray<NSString *> *defaultToggleOrder = [self _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];

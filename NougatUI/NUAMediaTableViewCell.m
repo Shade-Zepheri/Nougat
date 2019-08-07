@@ -24,6 +24,9 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
+        // Settings
+        _settings = [NUAPreferenceManager sharedSettings];
+
         // Register as delegate
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
         self.nowPlayingController.delegate = self;
@@ -31,6 +34,12 @@
         // Register for notifications
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
         [self.nowPlayingController _registerForNotifications];
+
+        // Colorflow
+        if (NSClassFromString(@"CFWSBMediaController")) {
+            // Only setup if exists
+            [[NSClassFromString(@"CFWSBMediaController") sharedInstance] addColorDelegateAndNotify:self];
+        }
 
         // Create views
         [self setupViews];
@@ -154,7 +163,7 @@
     }
 
     self.artworkView.image = nowPlayingArtwork;
-    [self _updateTintsForArtwork:nowPlayingArtwork];
+    [self updateTintsFromImage:nowPlayingArtwork];
 }
 
 - (void)setNowPlayingAppDisplayID:(NSString *)nowPlayingAppDisplayID {
@@ -177,22 +186,20 @@
     [self _updateHeaderLabelText];
 }
 
-- (void)_updateTintsForArtwork:(UIImage *)artwork {
-    UIColor *averageColor = artwork.averageColor;
-    [self _updateBackgroundGradientWithColor:averageColor];
+- (void)_updateTintsWithBackgroundColor:(UIColor *)backgroundColor tintColor:(UIColor *)tintColor {
+    [self _updateBackgroundGradientWithColor:backgroundColor];
 
     // Set tint color
-    UIColor *accentColor = averageColor.accentColor;
-    self.headerLabel.textColor = accentColor;
-    self.headerView.tintColor = accentColor;
-    self.controlsView.tintColor = accentColor;
+    self.headerLabel.textColor = tintColor;
+    self.headerView.tintColor = tintColor;
+    self.controlsView.tintColor = tintColor;
 
     // Update button
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
 
     // Tint and set
-    UIImage *tintedImage = [baseImage _flatImageWithColor:accentColor];
+    UIImage *tintedImage = [baseImage _flatImageWithColor:tintColor];
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 }
 
@@ -253,6 +260,44 @@
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller elapsedTimeDidChange:(double)elapsedTime {
 
+}
+
+#pragma mark - Default Color Provider
+
+- (void)updateTintsFromImage:(UIImage *)artworkImage {
+    if (self.settings.useExternalColor) {
+        // Dont use our method if user wants colorflow
+        return;
+    }
+
+
+    // Get colors
+    UIColor *backgroundColor = artworkImage.averageColor;
+    UIColor *tintColor = backgroundColor.accentColor;
+
+    [self _updateTintsWithBackgroundColor:backgroundColor tintColor:tintColor];
+}
+
+#pragma mark - Colorflow
+
+- (void)songAnalysisComplete:(MPModelSong *)song artwork:(UIImage *)artwork colorInfo:(CFWColorInfo *)colorInfo {
+    if (!self.settings.useExternalColor) {
+        // Dont use if not enabled
+        return;
+    }
+
+    // Pass colors
+    [self _updateTintsWithBackgroundColor:colorInfo.backgroundColor tintColor:colorInfo.primaryColor];
+}
+
+- (void)songHadNoArtwork:(MPModelSong *)song {
+    if (!self.settings.useExternalColor) {
+        // Dont use if not enabled
+        return;
+    }
+
+    // Use our methods
+    [self updateTintsFromImage:self.nowPlayingArtwork];
 }
 
 @end
