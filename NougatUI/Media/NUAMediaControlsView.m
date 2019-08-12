@@ -114,6 +114,9 @@
     [self.likeButton setImage:likeButtonImage forState:UIControlStateNormal];
     UIImage *dislikeButtonImage = [[UIImage imageNamed:@"Dislike" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:color];
     [self.dislikeButton setImage:dislikeButtonImage forState:UIControlStateNormal];
+
+    // Color play
+    [self _updatePlayPauseImage:NO];
 }
 
 - (void)_updatePlayPauseImage:(BOOL)animated {
