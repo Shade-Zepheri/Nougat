@@ -15,6 +15,11 @@
 
 @property (strong, nonatomic) NSLayoutConstraint *controlsViewConstraint;
 
+@property (strong, nonatomic) NSLayoutConstraint *controlsViewLeadingConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *controlsViewTrailingConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *headerViewLeadingConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *headerViewTrailingConstraint;
+
 @end
 
 @implementation NUAMediaTableViewCell
@@ -70,11 +75,21 @@
 
     [self.headerView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
     [self.headerView.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
-    [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
 
-    self.controlsViewConstraint = [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor constant:10.0];
+    self.headerViewTrailingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0];
+    self.headerViewTrailingConstraint.active = NO;
+
+    self.headerViewLeadingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.controlsView.leadingAnchor constant:-10.0];
+    self.headerViewLeadingConstraint.active = YES;
+
+    self.controlsViewConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
     self.controlsViewConstraint.active = YES;
-    [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
+
+    self.controlsViewTrailingConstraint = [self.controlsView.trailingAnchor constraintEqualToAnchor:self.expandButton.trailingAnchor];
+    self.controlsViewTrailingConstraint.active = YES;
+
+    self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor];
+    self.controlsViewLeadingConstraint.active = NO;
 
     // Additional constraints
     [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
@@ -148,7 +163,15 @@
     self.headerView.expanded = expanded;
     self.controlsView.expanded = expanded;
 
-    self.controlsViewConstraint.constant = expanded ? 50.0 : 10.0;
+
+    // header constraints
+    self.headerViewLeadingConstraint.active = !expanded;
+    self.headerViewTrailingConstraint.active = expanded;
+
+    // Controls constraints
+    self.controlsViewConstraint.constant = expanded ? 55.0 : 5.0;
+    self.controlsViewLeadingConstraint.active = expanded;
+    self.controlsViewTrailingConstraint.active = !expanded;
 }
 
 - (BOOL)isPlaying {

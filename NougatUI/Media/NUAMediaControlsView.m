@@ -10,8 +10,6 @@
 @property (strong, nonatomic) UIButton *likeButton;
 @property (strong, nonatomic) UIButton *dislikeButton;
 
-@property (strong, nonatomic) NSLayoutConstraint *widthConstraint;
-
 @end
 
 @implementation NUAMediaControlsView
@@ -26,9 +24,7 @@
 
         // Constraint up
         self.translatesAutoresizingMaskIntoConstraints = NO;
-        self.widthConstraint = [self.widthAnchor constraintEqualToConstant:108.0];
-        self.widthConstraint.active = YES;
-        [self.heightAnchor constraintEqualToConstant:36].active = YES;
+        [self.heightAnchor constraintEqualToConstant:48.0].active = YES;
 
         // Create views
         [self createArrangedViews];
@@ -36,16 +32,18 @@
         // Stacc attacc
         self.stackView = [[UIStackView alloc] initWithArrangedSubviews:@[self.likeButton, self.rewindButton, self.playButton, self.skipButton, self.dislikeButton]];
         self.stackView.axis = UILayoutConstraintAxisHorizontal;
-        self.stackView.alignment = UIStackViewAlignmentFill;
-        self.stackView.distribution = UIStackViewDistributionFillEqually;
+        self.stackView.alignment = UIStackViewAlignmentCenter;
+        self.stackView.distribution = UIStackViewDistributionEqualSpacing;
+        self.stackView.spacing = 10.0;
         self.stackView.translatesAutoresizingMaskIntoConstraints = NO;
         [self addSubview:self.stackView];
+
+        // Constrain our width
+        [self.widthAnchor constraintEqualToAnchor:self.stackView.widthAnchor].active = YES;
 
         // Constrain the stacc
         [self.stackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
         [self.stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-        [self.stackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.stackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
     }
 
     return self;
@@ -89,9 +87,6 @@
     // Show buttons
     self.likeButton.hidden = !expanded;
     self.dislikeButton.hidden = !expanded;
-
-    // Adjust constraint
-    self.widthConstraint.constant = expanded ? 180.0 : 108.0;
 }
 
 - (void)setPlaying:(BOOL)playing {
