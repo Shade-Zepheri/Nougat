@@ -82,13 +82,16 @@
         return;
     }
 
-    if (![[UIApplication sharedApplication] openURL:self.settingsURL]) {
-        // Failed
-        return;
-    }
+    // Open the bad boi
+    [[UIApplication sharedApplication] openURL:self.settingsURL options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            // Failed
+            return;
+        }
 
-    // Dismiss notification shade
-    [self.delegate toggleWantsNotificationShadeDismissal:self];
+        // Dismiss notification shade
+        [self.delegate toggleWantsNotificationShadeDismissal:self];
+    }];
 }
 
 #pragma mark - Toggles

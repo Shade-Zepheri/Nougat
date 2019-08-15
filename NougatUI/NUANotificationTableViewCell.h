@@ -1,6 +1,6 @@
 #import "NUATableViewCell.h"
-#import "Notifications/NUACoalescedNotification.h"
-#import "Notifications/NUANotificationEntry.h"
+#import "NUACoalescedNotification.h"
+#import "NUANotificationEntry.h"
 
 @class NUANotificationTableViewCell;
 

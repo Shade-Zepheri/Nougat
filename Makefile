@@ -1,4 +1,4 @@
-export TARGET = iphone:latest:9.0
+export TARGET = iphone:latest:10.0
 export ARCHS = armv7 arm64 arm64e
 
 INSTALL_TARGET_PROCESSES = Preferences

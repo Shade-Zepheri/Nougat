@@ -21,22 +21,10 @@ NUANotificationShadeController *notificationShade;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
 }
 
+%end
+
 #pragma mark - Dismissal
 
-%group iOS9
-
-- (void)_handleMenuButtonEvent {
-    if ([notificationShade handleMenuButtonTap]) {
-        return;
-    }
-
-    %orig;
-}
-
-%end
-%end
-
-%group iOS10
 %hook SBHomeHardwareButtonActions
 
 - (void)performSinglePressUpActions {
@@ -47,7 +35,6 @@ NUANotificationShadeController *notificationShade;
     %orig;
 }
 
-%end
 %end
 
 %hook SBAssistantController // Siri
@@ -90,8 +77,7 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-%group iOS10
-%hook SBDashBoardViewController // iOS 10+
+%hook SBDashBoardViewController
 
 - (void)_presentModalViewController:(UIViewController *)modalViewController animated:(BOOL)animated completion:(id)completion {
     %orig;
@@ -103,7 +89,6 @@ NUANotificationShadeController *notificationShade;
     [notificationShade dismissAnimated:animated];
 }
 
-%end
 %end
 
 #pragma mark - Gesture 
@@ -197,7 +182,7 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 %end
 
 #pragma mark - Notifications
-// TODO: Find iOS 9 equivalent
+
 %group CombinedList
 %hook NCNotificationCombinedListViewController
 // Hook into to manage notification stuffs
@@ -268,12 +253,6 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         %init(PreCoverSheet);
     } else {
         %init(CoverSheet);
-    }
-
-    if (%c(SBHomeHardwareButtonActions)) {
-        %init(iOS10);
-    } else {
-        %init(iOS9);
     }
 
     if (%c(NCNotificationCombinedListViewController)) {

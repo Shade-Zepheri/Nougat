@@ -150,13 +150,17 @@
             break;
     }
 
+    // Open the bad boi
     NSURL *URL = [NSURL URLWithString:URLString];
-    if (![[UIApplication sharedApplication] openURL:URL]) {
-        // Failed
-        return;
-    }
+    [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:^(BOOL success) {
+        if (!success) {
+            // Failed
+            return;
+        }
 
-    [self.delegate contentViewWantsNotificationShadeDismissal:self completely:YES];
+        // Dismiss notification shade
+        [self.delegate contentViewWantsNotificationShadeDismissal:self completely:YES];
+    }];
 }
 
 - (void)_toggleNotificationShadeState {
