@@ -25,5 +25,6 @@
 @property (strong, readonly, nonatomic) NUAMainTableViewController *tableViewController;
 @property (weak, nonatomic) id<NUANotificationShadeViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
+@property (readonly, nonatomic) CGFloat completeHeight;
 
 @end

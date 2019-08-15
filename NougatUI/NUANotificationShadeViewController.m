@@ -109,6 +109,11 @@
     _containerViewController.presentedHeight = height;
 }
 
+- (CGFloat)completeHeight {
+    // Get from tableview + panel
+    return self.tableViewController.contentHeight + 150.0;
+}
+
 #pragma mark - Notifications
 
 - (void)_noteNotificationShadeControlDidActivate:(NSNotification *)notification {
