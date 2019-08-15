@@ -42,8 +42,8 @@
 
 - (void)setupConstraints {
     [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
-    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor constant:-10.0].active = YES;
-    [self.attachmentImageView.heightAnchor constraintEqualToConstant:35.0].active = YES;
+    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+    [self.attachmentImageView.heightAnchor constraintEqualToConstant:40.0].active = YES;
     self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
     self.attachmentConstraint.active = YES;
 
@@ -170,7 +170,7 @@
     self.attachmentImageView.image = self.notification.attachmentImage;
 
     // Update constraints
-    CGFloat constant = (self.attachmentImageView.image) ? 35.0 : 0.0;
+    CGFloat constant = (self.attachmentImageView.image) ? 40.0 : 0.0;
     self.attachmentConstraint.constant = constant;
 }
 
