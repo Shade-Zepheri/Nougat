@@ -40,12 +40,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
         [self.nowPlayingController _registerForNotifications];
 
-        // Colorflow
-        if (NSClassFromString(@"CFWSBMediaController")) {
-            // Only setup if exists
-            [[NSClassFromString(@"CFWSBMediaController") sharedInstance] addColorDelegateAndNotify:self];
-        }
-
         // Create views
         [self setupViews];
 
@@ -290,6 +284,8 @@
 - (void)updateTintsFromImage:(UIImage *)artworkImage {
     if (self.settings.useExternalColor) {
         // Dont use our method if user wants colorflow
+        [self updateTintsUsingColorfow:artworkImage];
+
         return;
     }
 
@@ -303,24 +299,11 @@
 
 #pragma mark - Colorflow
 
-- (void)songAnalysisComplete:(MPModelSong *)song artwork:(UIImage *)artwork colorInfo:(CFWColorInfo *)colorInfo {
-    if (!self.settings.useExternalColor) {
-        // Dont use if not enabled
-        return;
-    }
+- (void)updateTintsUsingColorfow:(UIImage *)artworkImage {
+    AnalyzedInfo info = [NSClassFromString(@"CFWBucket") analyzeImage:artworkImage resize:YES];
+    CFWColorInfo *colorInfo = [NSClassFromString(@"CFWColorInfo") colorInfoWithAnalyzedInfo:info];
 
-    // Pass colors
     [self _updateTintsWithBackgroundColor:colorInfo.backgroundColor tintColor:colorInfo.primaryColor];
-}
-
-- (void)songHadNoArtwork:(MPModelSong *)song {
-    if (!self.settings.useExternalColor) {
-        // Dont use if not enabled
-        return;
-    }
-
-    // Use our methods
-    [self updateTintsFromImage:self.nowPlayingArtwork];
 }
 
 @end

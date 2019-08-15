@@ -4,7 +4,7 @@
 #import <MediaPlayerUI/MPUNowPlayingMetadata.h>
 #import <NougatServices/NougatServices.h>
 
-@interface NUAMediaTableViewCell : NUATableViewCell <CFWColorDelegate, MPUNowPlayingDelegate>
+@interface NUAMediaTableViewCell : NUATableViewCell <MPUNowPlayingDelegate>
 @property (strong, readonly, nonatomic) NUAPreferenceManager *settings;
 @property (getter=isPlaying, readonly, nonatomic) BOOL playing;
 @property (strong, nonatomic) UIImage *nowPlayingArtwork;

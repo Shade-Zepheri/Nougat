@@ -1,13 +1,7 @@
 // ColorFlow 4 Public SpringBoard API Headers.
+#import "CFWColorInfo.h"
 
 @class MPModelSong;
-
-@interface CFWColorInfo : NSObject
-@property(nonatomic, retain) UIColor *backgroundColor;
-@property(nonatomic, retain) UIColor *primaryColor;
-@property(nonatomic, retain) UIColor *secondaryColor;
-@property(nonatomic, assign, getter=isBackgroundDark) BOOL backgroundDark;
-@end
 
 // Your class should implement these methods for use as a CFWSBMediaController color delegate.
 // You may assume that these methods are called on the main thread.
