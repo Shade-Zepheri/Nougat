@@ -7,6 +7,8 @@
 @property (strong, nonatomic) UILabel *songLabel;
 @property (strong, nonatomic) UILabel *artistLabel;
 
+@property (strong, nonatomic) NSLayoutConstraint *widthConstraint;
+
 @end
 
 @implementation NUAMediaHeaderView
@@ -18,6 +20,11 @@
     if (self) {
         // Defaults
         _expanded = NO;
+
+        // Constraints
+        self.translatesAutoresizingMaskIntoConstraints = NO;
+        self.widthConstraint = [self.widthAnchor constraintEqualToConstant:100.0];
+        self.widthConstraint.active = YES;
 
         // Create the stuffs
         [self createArrangedSubviews];
@@ -63,6 +70,7 @@
     _expanded = expanded;
 
     // Constrain self
+    self.widthConstraint.active = !expanded;
 }
 
 - (void)setTintColor:(UIColor *)color {

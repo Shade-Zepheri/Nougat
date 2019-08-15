@@ -17,7 +17,6 @@
 
 @property (strong, nonatomic) NSLayoutConstraint *controlsViewLeadingConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *controlsViewTrailingConstraint;
-@property (strong, nonatomic) NSLayoutConstraint *headerViewLeadingConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *headerViewTrailingConstraint;
 
 @end
@@ -72,9 +71,6 @@
 
     self.headerViewTrailingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0];
     self.headerViewTrailingConstraint.active = NO;
-
-    self.headerViewLeadingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.controlsView.leadingAnchor constant:-10.0];
-    self.headerViewLeadingConstraint.active = YES;
 
     self.controlsViewConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
     self.controlsViewConstraint.active = YES;
@@ -138,14 +134,13 @@
 }
 
 - (void)_createHeaderView {
+    // These are pretty short
     self.headerView = [[NUAMediaHeaderView alloc] initWithFrame:CGRectZero];
-    self.headerView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.headerView];
 }
 
 - (void)_createControlsView {
     self.controlsView = [[NUAMediaControlsView alloc] initWithFrame:CGRectZero];
-    self.controlsView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.controlsView];
 }
 
@@ -157,9 +152,7 @@
     self.headerView.expanded = expanded;
     self.controlsView.expanded = expanded;
 
-
-    // header constraints
-    self.headerViewLeadingConstraint.active = !expanded;
+    // Header constraints
     self.headerViewTrailingConstraint.active = expanded;
 
     // Controls constraints
