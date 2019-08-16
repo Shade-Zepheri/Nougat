@@ -7,12 +7,6 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
     NUADrawerThemeOreo
 };
 
-typedef NS_ENUM(NSUInteger, NUAMediaColorProvider) {
-    NUAMediaColorProviderDefault,
-    NUAMediaColorProviderArtsy,
-    NUAMediaColorProviderColorflow
-};
-
 // Settings keys
 static NSString *const NUAPreferencesEnabledKey = @"enabled";
 
@@ -21,7 +15,6 @@ static NSString *const NUAPreferencesTogglesListKey = @"togglesList";
 static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 
 static NSString *const NUAPreferencesUsesExternalColorKey = @"colorflowEnabled";
-static NSString *const NUAPreferencesColorProviderKey = @"colorProvider";
 
 @interface NUAPreferenceManager : NSObject
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
@@ -35,8 +28,6 @@ static NSString *const NUAPreferencesColorProviderKey = @"colorProvider";
 @property (copy, readonly, nonatomic) NSArray<NSString *> *disabledToggles;
 
 @property (readonly, nonatomic) BOOL useExternalColor;
-@property (readonly, nonatomic) NUAMediaColorProvider colorProvider;
-
 
 - (NSArray<NSString *> *)_installedToggleIdentifiers;
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;

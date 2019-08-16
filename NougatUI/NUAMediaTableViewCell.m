@@ -261,15 +261,15 @@
 }
 
 - (void)nowPlayingControllerDidBeginListeningForNotifications:(MPUNowPlayingController *)controller {
-
+    // Do nothing
 }
 
 - (void)nowPlayingControllerDidStopListeningForNotifications:(MPUNowPlayingController *)controller {
-
+    // Do nothing
 }
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller elapsedTimeDidChange:(double)elapsedTime {
-
+    // Do nothing
 }
 
 #pragma mark - Default Color Provider
@@ -278,10 +278,8 @@
     if (self.settings.useExternalColor) {
         // Dont use our method if user wants colorflow
         [self updateTintsUsingColorfow:artworkImage];
-
         return;
     }
-
 
     // Get colors
     UIColor *backgroundColor = artworkImage.averageColor;

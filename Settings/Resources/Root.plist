@@ -31,8 +31,6 @@
         <dict>
             <key>cell</key>
             <string>PSGroupCell</string>
-            <key>label</key>
-            <string>DRAWER_STYLE</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -60,12 +58,6 @@
         </dict>
         <dict>
             <key>cell</key>
-            <string>PSGroupCell</string>
-            <key>label</key>
-            <string>Colorflow / Artsy</string>
-        </dict>
-        <dict>
-            <key>cell</key>
             <string>PSSwitchCell</string>
             <key>default</key>
             <false/>
@@ -74,31 +66,9 @@
             <key>key</key>
             <string>colorflowEnabled</string>
             <key>label</key>
-            <string>Use Colorflow/Artsy</string>
+            <string>USE_COLORFLOW</string>
             <key>PostNotification</key>
             <string>com.shade.nougat/ReloadPrefs</string>
-        </dict>
-        <dict>
-            <key>cell</key>
-            <string>PSSegmentCell</string>
-            <key>default</key>
-            <integer>0</integer>
-            <key>defaults</key>
-            <string>com.shade.nougat</string>
-            <key>PostNotification</key>
-            <string>com.shade.nougat/ReloadPrefs</string>
-            <key>key</key>
-            <string>colorProvider</string>
-            <key>validTitles</key>
-            <array>
-                <string>Artsy</string>
-                <string>Colorflow</string>
-            </array>
-            <key>validValues</key>
-            <array>
-                <integer>0</integer>
-                <integer>1</integer>
-            </array>
         </dict>
         <dict>
             <key>cell</key>

@@ -5,15 +5,15 @@
     <key>ENABLE</key>
     <string>Enabled</string>
 
-    <key>DRAWER_STYLE</key>
-    <string>Drawer style</string>
-
     <key>NEXUS</key>
     <string>Nexus</string>
     <key>PIXEL</key>
     <string>Pixel</string>
     <key>OREO</key>
     <string>Oreo</string>
+
+    <key>USE_COLORFLOW</key>
+    <string>Use Colorflow Colors</string>
 
     <key>USER_GUIDE</key>
     <string>User guide</string>
