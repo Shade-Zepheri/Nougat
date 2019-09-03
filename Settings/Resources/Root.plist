@@ -65,6 +65,8 @@
             <string>com.shade.nougat</string>
             <key>key</key>
             <string>colorflowEnabled</string>
+            <key>id</key>
+			<string>ColorflowCell</string>
             <key>label</key>
             <string>USE_COLORFLOW</string>
             <key>PostNotification</key>

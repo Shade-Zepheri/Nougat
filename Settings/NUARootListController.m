@@ -1,6 +1,7 @@
 #import "NUARootListController.h"
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
+#import <Preferences/PSSpecifier.h>
 #import <TechSupport/TSContactViewController.h>
 #import <UIKit/UIImage+Private.h>
 
@@ -36,10 +37,37 @@
     return self;
 }
 
+#pragma mark - Specifiers
+
+- (BOOL)_hasColorflowInstalled {
+    // Check stuffs once
+    static BOOL installed = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        BOOL colorflow3 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
+        BOOL colorflow4 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
+        installed = colorflow3 | colorflow4;
+    });
+
+    return installed;
+}
+
+- (void)_configureColorflowSpecifier {
+    if ([self _hasColorflowInstalled]) {
+        // Colorflow installed
+        return;
+    }
+
+    [self removeSpecifierID:@"ColorflowCell"];
+}
+
 #pragma mark - UIViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    // Specifiers
+    [self _configureColorflowSpecifier];
 
     // Create header view
     UIView *headerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 200)];
@@ -56,6 +84,11 @@
     [self.headerImageView.bottomAnchor constraintEqualToAnchor:headerContainerView.bottomAnchor].active = YES;
 
     self.table.tableHeaderView = headerContainerView;
+}
+
+- (void)reloadSpecifiers {
+	[super reloadSpecifiers];
+	[self _configureColorflowSpecifier];
 }
 
 #pragma mark - UIScrollViewDelegate
