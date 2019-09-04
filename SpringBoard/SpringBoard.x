@@ -183,8 +183,7 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 
 #pragma mark - Notifications
 
-%group CombinedList
-%hook NCNotificationCombinedListViewController
+%hook NotificationListClass
 // Hook into to manage notification stuffs
 
 - (instancetype)init {
@@ -214,7 +213,8 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
     // Execute
-    [self.destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
+    id<NCNotificationListViewControllerDestinationDelegate> destinationDelegate = ((NCNotificationListViewController *)self).destinationDelegate;
+    [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
 
     if ([type isEqualToString:@"clear"]) {
         // Clear if needed
@@ -241,23 +241,20 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 }
 
 %end
-%end
 
 #pragma mark - Constructor
 
 %ctor {
     // Init hooks
-    %init;
-
     if (%c(SBNotificationCenterController)) {
         %init(PreCoverSheet);
     } else {
         %init(CoverSheet);
     }
 
-    if (%c(NCNotificationCombinedListViewController)) {
-        %init(CombinedList);
-    }
+    // Specify list class & init
+    Class listClass = %c(NCNotificationCombinedListViewController) ?: %c(NCNotificationSectionListViewController);
+    %init(NotificationListClass=listClass);
 
     // Create our singleton
     settings = [NUAPreferenceManager sharedSettings];
