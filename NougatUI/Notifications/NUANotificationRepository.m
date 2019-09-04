@@ -44,7 +44,7 @@
     NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
     NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
     for (NSString *sectionIdentifier in sectionIdentifiers) {
-        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
             // Exclude DND notification && wallet stuffs
             continue;
         }
@@ -130,14 +130,14 @@
         return NO;
     }
 
-    // Dictionaries would be so much easier
+    // Get notif and check
     NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
     NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
     return [notification containsRequest:request];
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [request.sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
         // Exclude DND notification and wallet
         return NO;
     }
@@ -205,7 +205,7 @@
 }
 
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"]) {
+    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [request.sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
         // Exclude DND notification and wallet
         return;
     }
