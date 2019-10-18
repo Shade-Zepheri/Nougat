@@ -551,7 +551,7 @@
             self.state = (projectedY >= targetY) ? NUANotificationShadeStatePresented : NUANotificationShadeStateDismissed;
         } else {
             CGFloat targetY = [self _yValueForPresented] * 0.85;
-            self.state = (projectedY <= targetY) ? NUANotificationShadeStateDismissed : NUANotificationShadeStateDismissed;
+            self.state = (projectedY <= targetY) ? NUANotificationShadeStateDismissed : NUANotificationShadeStatePresented;
         }
 
         // Animate to finished height
