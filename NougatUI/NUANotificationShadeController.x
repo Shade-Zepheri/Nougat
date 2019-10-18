@@ -279,6 +279,9 @@
     // Disable icon editing
     [[%c(SBIconController) sharedInstance] setIsEditing:NO];
 
+    // Stop system gestures
+    [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = YES;
+
     // Begin presentation
     [self _beginAnimationWithGestureRecognizer:gestureRecognizer];
 }
@@ -760,6 +763,9 @@ CGFloat multiplerAdjustedForEasing(CGFloat t) {
 
             // Unlock rotation
             [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:NO forReason:@"Nougat Visible"];
+
+            // Enable system gestures
+            [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = NO;
 
             // Deactivate displayLayoutElement
             [self.displayLayoutElement deactivate];

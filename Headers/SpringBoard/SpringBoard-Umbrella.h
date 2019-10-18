@@ -16,6 +16,7 @@
 #import "SBIconController+Private.h"
 #import "SBIdleTimerGlobalCoordinator.h"
 #import "SBLockScreenManager+Private.h"
+#import "SpringBoard/SBMainDisplaySystemGestureManager.h"
 #import "SBNCNotificationDispatcher.h"
 #import "SBNotificationCenterController+Private.h"
 #import "SBNotificationDestination.h"
