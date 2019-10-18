@@ -378,7 +378,7 @@
 
 #pragma mark - Cells delegate
 
-- (void)tableViewCell:(NUATableViewCell *)cell wantsExpand:(BOOL)expand {
+- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand; {
     // Add indexpath to expanded bois
     NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
     if (expand) {

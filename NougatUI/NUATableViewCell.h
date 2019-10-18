@@ -5,7 +5,7 @@
 @protocol NUATableViewCellDelegate <NSObject>
 @required
 
-- (void)tableViewCell:(NUATableViewCell *)cell wantsExpand:(BOOL)expand;
+- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand;
 
 @end
 

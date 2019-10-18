@@ -1,6 +1,5 @@
 #import "NUANotificationRepository.h"
 #import <SpringBoard/SpringBoard-Umbrella.h>
-#import <HBLog.h>
 
 @implementation NUANotificationRepository
 

@@ -96,7 +96,7 @@
 
 - (void)_expandCell:(UIButton *)sender {
     // Notify table
-    [self.delegate tableViewCell:self wantsExpand:!self.expanded];
+    [self.delegate tableViewCell:self wantsExpansion:!self.expanded];
 }
 
 @end
