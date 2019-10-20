@@ -95,6 +95,10 @@
 
     [self.tableViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.tableViewController.view.topAnchor constraintEqualToAnchor:_containerViewController.view.bottomAnchor].active  = YES;
+
+    // KVO
+    [_containerViewController addObserver:self.tableViewController forKeyPath:@"presentedHeight" options:(NSKeyValueObservingOptionNew) context:NULL];
+    [_containerViewController addObserver:self.tableViewController forKeyPath:@"revealPercentage" options:(NSKeyValueObservingOptionNew) context:NULL];
 }
 
 #pragma mark - Properties

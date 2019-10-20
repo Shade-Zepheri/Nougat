@@ -1,6 +1,7 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
 #import <MediaRemote/MediaRemote.h>
+#import <Macros.h>
 
 @implementation NUAMainTableViewController
 
@@ -65,7 +66,30 @@
     }
 
     _heightConstraint.constant = height - 150.0;
+}
 
+#pragma mark - KVO
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
+    if ([keyPath isEqualToString:@"revealPercentage"]) {
+        // Adjust table frame
+        CGFloat revealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
+        CGFloat expandedHeight = 350 * revealPercentage;
+
+        CGFloat currentHeight = expandedHeight + self.presentedHeight;
+        CGFloat heightDifference = kScreenHeight - currentHeight;
+        if (heightDifference >= 200) {
+            // Have a tolerance to do nothing
+            return;
+        }
+
+        CGFloat extraHeight = 100 - heightDifference;
+        self.presentedHeight -= extraHeight;
+    } else if ([keyPath isEqualToString:@"presentedHeight"]) {
+        // Update height
+        CGFloat presentedHeight = [change[NSKeyValueChangeNewKey] floatValue]; 
+        self.presentedHeight = presentedHeight;
+    }
 }
 
 #pragma mark - Observer
@@ -131,6 +155,8 @@
         return;
     }
 
+    HBLogWarn(@"[NUAREPO] Removed: %@", removedNotification);
+
     // Get old notification 
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
@@ -139,13 +165,12 @@
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
     [notifications removeObject:oldNotification];
 
-    // Sort via date
-    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
-        return [notification2.timestamp compare:notification1.timestamp];
-    }];
+    HBLogWarn(@"[NUAREPO] Removed: %@", removedNotification);
 
     // Update ivar
     _notifications = [notifications copy];
+
+    HBLogWarn(@"[NUAREPO] New notifs: %@", notifications);
 
     // Update table
     [self.tableViewController.tableView beginUpdates];
@@ -344,6 +369,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NUACoalescedNotification *notification = _notifications[indexPath.row];
+    HBLogWarn(@"[NUAREPO] Notif for cell: %@", notification);
     if (notification.type == NUANotificationTypeMedia) {
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
