@@ -21,6 +21,8 @@
     return sharedInstance;
 }
 
+#pragma mark - Initialization
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -32,7 +34,7 @@
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
 
-        NSArray<NSString *> *defaultToggleOrder = [self _defaultEnabledToggles];
+        NSArray<NSString *> *defaultToggleOrder = [[self class] _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -167,7 +169,7 @@
     return carrier.carrierName;
 }
 
-- (NSArray<NSString *> *)_defaultEnabledToggles {
++ (NSArray<NSString *> *)_defaultEnabledToggles {
     return @[@"com.shade.nougat.WiFiToggle", @"com.shade.nougat.DataToggle", @"com.shade.nougat.BluetoothToggle", @"com.shade.nougat.DoNotDisturbToggle", @"com.shade.nougat.FlashlightToggle", @"com.shade.nougat.RotationLockToggle", @"com.shade.nougat.BatterySaverToggle", @"com.shade.nougat.LocationToggle", @"com.shade.nougat.AirplaneModeToggle"];
 }
 
