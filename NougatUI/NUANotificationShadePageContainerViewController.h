@@ -31,6 +31,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePanelState) {
 
 - (NUANotificationShadePanelView *)_panelView;
 
+- (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion;
 - (void)handleDismiss;
 
 @end

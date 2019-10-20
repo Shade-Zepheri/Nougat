@@ -204,4 +204,8 @@
     return allowGesture;
 }
 
+- (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {
+    [_containerViewController updateToFinalPresentedHeight:finalHeight completion:completion];
+}
+
 @end

@@ -44,6 +44,7 @@
     _inset = height;
 
     if (height > 150.0) {
+        // Reset incase touch doesnt set it exactly to 150
         height = 150.0;
     }
 

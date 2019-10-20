@@ -472,9 +472,9 @@
     // Animate out
     CGFloat height = [self _yValueForDismissed];
     if (animated) {
-        CGFloat baseHeight = _viewController.presentedHeight;
-        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
-            [self _finishAnimationWithCompletion:nil];
+        __weak __typeof(self) weakSelf = self;
+        [_viewController updateToFinalPresentedHeight:height completion:^{
+            [weakSelf _finishAnimationWithCompletion:nil];
         }];
     } else {
         [self _updatePresentedHeight:height];
@@ -556,9 +556,12 @@
 
         // Animate to finished height
         CGFloat height = (self.state == NUANotificationShadeStatePresented) ? [self _yValueForPresented] : [self _yValueForDismissed];
-        [self _updatePresentedHeightGradually:height baseHeight:_viewController.presentedHeight completion:^{
-            [self _finishAnimationWithCompletion:completion];
+
+        __weak __typeof(self) weakSelf = self;
+        [_viewController updateToFinalPresentedHeight:height completion:^{
+            [weakSelf _finishAnimationWithCompletion:completion];
         }];
+
     } else if (completion) {
         completion();
     }
@@ -696,40 +699,6 @@
 - (void)_updatePresentedHeight:(CGFloat)height {
     // Pass height to VC
     _viewController.presentedHeight = height;
-}
-
-CGFloat multiplerAdjustedForEasing(CGFloat t) {
-    // Use material design spec bezier curve to get multiplier
-    CGFloat xForT = (0.6 * (1 - t) * t * t) + (1.2 * (1 - t) * (1 - t) * t) + ((1 - t) * (1 - t) * (1 - t));
-    CGFloat yForX = (3 * xForT * xForT * (1 - xForT)) + (xForT * xForT * xForT);
-    return 1 - yForX;
-}
-
-- (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
-    __block NSInteger fireTimes = 0;
-    __block CGFloat difference = targetHeight - baseHeight;
-
-    __weak __typeof(self) weakSelf = self;
-    _animationTimer = [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == 20) {
-            [displayLink invalidate];
-            [weakSelf _updatePresentedHeight:targetHeight];
-
-            if (completion) {
-                completion();
-            }
-            return;
-        }
-
-        
-        fireTimes++;
-        CGFloat t = fireTimes / 21.0;
-        CGFloat multiplier = multiplerAdjustedForEasing(t);
-
-        // Update height
-        CGFloat newHeight = baseHeight + (difference * multiplier);
-        [weakSelf _updatePresentedHeight:newHeight];
-    }];
 }
 
 - (void)_finishAnimationWithCompletion:(void(^)(void))completion {

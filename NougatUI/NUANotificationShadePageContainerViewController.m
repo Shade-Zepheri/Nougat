@@ -62,8 +62,6 @@
     [self _panelView].revealPercentage = percent;
 }
 
-#pragma mark - Delegate
-
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
@@ -71,8 +69,10 @@
     [self _panelView].inset = height;
 }
 
+#pragma mark - Delegate
+
 - (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely {
-    [self _updatePresentedHeightGradually:150.0 baseHeight:self.presentedHeight];
+    [self _updateExpandedHeight:150.0 baseHeight:self.presentedHeight];
 
     if (completely) {
         [self.delegate containerViewControllerWantsDismissal:self];
@@ -81,7 +81,7 @@
 
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController {
     CGFloat fullHeight = self.contentViewController.completeHeight;
-    [self _updatePresentedHeightGradually:fullHeight baseHeight:self.presentedHeight];
+    [self _updateExpandedHeight:fullHeight baseHeight:self.presentedHeight];
 }
 
 - (CGFloat)contentViewControllerWantsFullyPresentedHeight:(UIViewController *)contentViewController {
@@ -90,7 +90,7 @@
 
 - (void)handleDismiss {
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-    [self _updatePresentedHeightGradually:150.0 baseHeight:baseHeight];
+    [self _updateExpandedHeight:150.0 baseHeight:baseHeight];
 }
 
 #pragma mark - Gestures
@@ -125,10 +125,79 @@
         case UIGestureRecognizerStateCancelled:
         case UIGestureRecognizerStateFailed:
             // Reset height
-            [self _updatePresentedHeight:_initialHeight];
+            [self _updateExpandedHeight:_initialHeight];
             break;
     }
 }
+
+#pragma mark - Helpers
+
+- (CGFloat)_multiplerAdjustedWithEasing:(CGFloat)t {
+    // Use material design spec bezier curve to get multiplier
+    CGFloat xForT = (0.6 * (1 - t) * t * t) + (1.2 * (1 - t) * (1 - t) * t) + ((1 - t) * (1 - t) * (1 - t));
+    CGFloat yForX = (3 * xForT * xForT * (1 - xForT)) + (xForT * xForT * xForT);
+    return 1 - yForX;
+}
+
+- (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight {
+    // Pass through
+    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:nil];
+}
+
+- (void)_updatePresentedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
+    // Pass through
+    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:NO completion:completion];
+}
+
+- (void)_updateHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight expand:(BOOL)expand completion:(void(^)(void))completion {
+    __block NSInteger fireTimes = 0;
+    __block CGFloat difference = targetHeight - baseHeight;
+
+    __weak __typeof(self) weakSelf = self;
+    [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
+        if (fireTimes == 20) {
+            [displayLink invalidate];
+
+            if (expand) {
+                [weakSelf _updateExpandedHeight:targetHeight];
+            } else {
+                [weakSelf _updatePresentedHeight:targetHeight];
+            }
+
+            if (completion) {
+                completion();
+            }
+
+            return;
+        }
+
+        
+        fireTimes++;
+        CGFloat t = fireTimes / 21.0;
+        CGFloat multiplier = [self _multiplerAdjustedWithEasing:t];
+
+        // Update proper height
+        CGFloat newHeight = baseHeight + (difference * multiplier);
+
+        if (expand) {
+            [weakSelf _updateExpandedHeight:newHeight];
+        } else {
+            [weakSelf _updatePresentedHeight:newHeight];
+        }
+    }];
+}
+
+#pragma mark - Presentation
+
+- (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {
+    [self _updatePresentedHeight:finalHeight baseHeight:self.presentedHeight completion:completion];
+}
+
+- (void)_updatePresentedHeight:(CGFloat)height {
+    self.presentedHeight = height;
+}
+
+#pragma mark - Expansion
 
 - (void)_expandHeightWithTranslation:(CGPoint)translation {
     CGFloat newHeight = _initialHeight + translation.y;
@@ -140,7 +209,7 @@
         newHeight = 150.0 - (150.0 - newHeight) * 0.1;
     }
 
-    [self _updatePresentedHeight:newHeight];
+    [self _updateExpandedHeight:newHeight];
 }
 
 - (void)_endExpansionWithTranslation:(CGPoint)translation velocity:(CGPoint)velocity {
@@ -167,7 +236,7 @@
     }
 
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-    [self _updatePresentedHeightGradually:targetHeight baseHeight:baseHeight];
+    [self _updateExpandedHeight:targetHeight baseHeight:baseHeight];
 }
 
 - (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
@@ -175,38 +244,7 @@
     return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate);
 }
 
-CGFloat multiplerAdjustedWithEasing(CGFloat t) {
-    // Use material design spec bezier curve to get multiplier
-    CGFloat xForT = (0.6 * (1 - t) * t * t) + (1.2 * (1 - t) * (1 - t) * t) + ((1 - t) * (1 - t) * (1 - t));
-    CGFloat yForX = (3 * xForT * xForT * (1 - xForT)) + (xForT * xForT * xForT);
-    return 1 - yForX;
-}
-
-- (void)_updatePresentedHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight {
-    __block NSInteger fireTimes = 0;
-    __block CGFloat difference = targetHeight - baseHeight;
-
-    __weak __typeof(self) weakSelf = self;
-    [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == 20) {
-            [displayLink invalidate];
-            [weakSelf _updatePresentedHeight:targetHeight];
-
-            return;
-        }
-
-        
-        fireTimes++;
-        CGFloat t = fireTimes / 21.0;
-        CGFloat multiplier = multiplerAdjustedWithEasing(t);
-
-        // Update height
-        CGFloat newHeight = baseHeight + (difference * multiplier);
-        [weakSelf _updatePresentedHeight:newHeight];
-    }];
-}
-
-- (void)_updatePresentedHeight:(CGFloat)height {
+- (void)_updateExpandedHeight:(CGFloat)height {
     // Calculate and update percent
     CGFloat fullHeight = self.contentViewController.completeHeight;
     CGFloat expandedHeight = height - 150.0;

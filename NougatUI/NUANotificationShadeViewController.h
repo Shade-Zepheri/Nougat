@@ -27,4 +27,6 @@
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (readonly, nonatomic) CGFloat completeHeight;
 
+- (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion;
+
 @end
