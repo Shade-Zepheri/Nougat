@@ -7,6 +7,6 @@ BluetoothToggle_FILES = $(wildcard *.m)
 BluetoothToggle_FRAMEWORKS = Foundation UIKit CoreGraphics CoreImage QuartzCore
 BluetoothToggle_EXTRA_FRAMEWORKS = NougatUI
 BluetoothToggle_INSTALL_PATH = /Library/Nougat/Toggles/
-BluetoothToggle_LDFLAGS += -F$(THEOS_OBJ_DIR)
+BluetoothToggle_LDFLAGS = -F$(THEOS_OBJ_DIR)
 
 include $(THEOS_MAKE_PATH)/bundle.mk

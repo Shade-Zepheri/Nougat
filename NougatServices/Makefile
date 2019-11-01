@@ -1,7 +1,6 @@
 include $(THEOS)/makefiles/common.mk
 
 FRAMEWORK_NAME = NougatServices
-
 NougatServices_FILES = $(wildcard *.m)
 NougatServices_PUBLIC_HEADERS = $(wildcard *.h)
 NougatServices_FRAMEWORKS = UIKit QuartzCore CoreTelephony
