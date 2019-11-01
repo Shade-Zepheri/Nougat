@@ -13,6 +13,7 @@ NougatUI_EXTRA_FRAMEWORKS = NougatServices
 NougatUI_LIBRARIES = flipswitch
 NougatUI_CFLAGS = -I../Headers -IMedia -INotifications
 NougatUI_LDFLAGS = $(wildcard *.tbd)
+NougatUI_LDFLAGS += -F$(THEOS_OBJ_DIR)
 NougatUI_INSTALL_PATH = /Library/Frameworks
 
 include $(THEOS_MAKE_PATH)/framework.mk
