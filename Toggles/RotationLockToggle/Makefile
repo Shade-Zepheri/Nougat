@@ -7,6 +7,5 @@ RotationLockToggle_FILES = $(wildcard *.m)
 RotationLockToggle_FRAMEWORKS = Foundation UIKit CoreGraphics CoreImage QuartzCore
 RotationLockToggle_EXTRA_FRAMEWORKS = NougatUI
 RotationLockToggle_INSTALL_PATH = /Library/Nougat/Toggles/
-RotationLockToggle_LDFLAGS = -F$(THEOS_OBJ_DIR)
 
 include $(THEOS_MAKE_PATH)/bundle.mk

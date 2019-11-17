@@ -1,6 +1,6 @@
 include $(THEOS)/makefiles/common.mk
 
-export ADDITIONAL_CFLAGS += -I../../ -I../../Headers
+export ADDITIONAL_CFLAGS += -I../../Headers
 
 SUBPROJECTS += AirplaneModeToggle
 SUBPROJECTS += BatterySaverToggle

@@ -7,6 +7,5 @@ NightLightToggle_FILES = $(wildcard *.m)
 NightLightToggle_FRAMEWORKS = Foundation UIKit CoreGraphics CoreImage QuartzCore
 NightLightToggle_EXTRA_FRAMEWORKS = NougatUI
 NightLightToggle_INSTALL_PATH = /Library/Nougat/Toggles/
-NightLightToggle_LDFLAGS = -F$(THEOS_OBJ_DIR)
 
 include $(THEOS_MAKE_PATH)/bundle.mk

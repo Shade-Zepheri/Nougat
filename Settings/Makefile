@@ -5,9 +5,7 @@ Nougat_FILES = $(wildcard *.m)
 Nougat_INSTALL_PATH = /Library/PreferenceBundles
 Nougat_FRAMEWORKS = AVFoundation UIKit
 Nougat_EXTRA_FRAMEWORKS = Cephei CepheiPrefs NougatServices
-Nougat_CFLAGS = -I../
 Nougat_LDFLAGS = Preferences.tbd
-Nougat_LDFLAGS += -F$(THEOS_OBJ_DIR)
 
 include $(THEOS_MAKE_PATH)/bundle.mk
 

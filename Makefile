@@ -7,7 +7,8 @@ ifneq ($(RESPRING),0)
 	INSTALL_TARGET_PROCESSES += SpringBoard
 endif
 
-export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
+export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc -I$(THEOS_OBJ_DIR)
+export ADDITIONAL_LDFLAGS = -F$(THEOS_OBJ_DIR)
 
 include $(THEOS)/makefiles/common.mk
 
