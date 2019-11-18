@@ -8,7 +8,7 @@ ifneq ($(RESPRING),0)
 endif
 
 export ADDITIONAL_CFLAGS = -DTHEOS_LEAN_AND_MEAN -fobjc-arc
-export ALL_LDFLAGS += -L$(THEOS_OBJ_DIR)
+export ALL_LDFLAGS += -F$(THEOS_OBJ_DIR)
 
 include $(THEOS)/makefiles/common.mk
 
