@@ -35,33 +35,36 @@
 #pragma mark - Properties
 
 - (NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *)notifications {
-    if (_notifications) {
+    // Create synchronously
+    dispatch_sync(_queue, ^{
+        if (_notifications) {
+            return _notifications;
+        }
+
+        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
+        NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
+        NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
+        for (NSString *sectionIdentifier in sectionIdentifiers) {
+            if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
+                // Exclude DND notification && wallet stuffs
+                continue;
+            }
+
+            NCNotificationSection *section = notificationSections[sectionIdentifier];
+            NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
+            for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
+                // Apps can have different groups for notifications (eg: Followers and Likes groups)
+                NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
+                NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
+                notificationGroups[threadIdentifier] = notification;
+            }
+
+            notifications[sectionIdentifier] = [notificationGroups copy];
+        }
+
+        _notifications = [notifications copy];
         return _notifications;
-    }
-
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
-    NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
-    NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
-    for (NSString *sectionIdentifier in sectionIdentifiers) {
-        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
-            // Exclude DND notification && wallet stuffs
-            continue;
-        }
-
-        NCNotificationSection *section = notificationSections[sectionIdentifier];
-        NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
-        for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
-            // Apps can have different groups for notifications (eg: Followers and Likes groups)
-            NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
-            NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
-            notificationGroups[threadIdentifier] = notification;
-        }
-
-        notifications[sectionIdentifier] = [notificationGroups copy];
-    }
-
-    _notifications = [notifications copy];
-    return _notifications;
+    });
 }
 
 - (NCNotificationStore *)_notificationStore {
@@ -74,33 +77,25 @@
 #pragma mark - Observers
 
 - (void)addObserver:(id<NUANotificationsObserver>)observer {
-    dispatch_sync(_queue, ^{
-        if ([_observers containsObject:observer]) {
-            return;
-        }
+    if ([_observers containsObject:observer]) {
+        return;
+    }
 
-        [_observers addObject:observer];
-    });
+    [_observers addObject:observer];
 }
 
 - (void)removeObserver:(id<NUANotificationsObserver>)observer {
-    dispatch_sync(_queue, ^{
-        if (![_observers containsObject:observer]) {
-            return;
-        }
+    if (![_observers containsObject:observer]) {
+        return;
+    }
 
-        [_observers removeObject:observer];
-    });
+    [_observers removeObject:observer];
 }
 
 - (void)notifyObserversUsingBlock:(NUANotificationsObserverHandler)handler {
     // Dispatch on calloutQueue
     dispatch_async(_callOutQueue, ^{
-        __block NSArray *observers;
-
-        dispatch_sync(_queue, ^{
-            observers = [_observers.allObjects copy];
-        });
+        NSArray *observers = [_observers.allObjects copy];
 
         for (id<NUANotificationsObserver> observer in observers) {
             dispatch_async(_queue, ^{
@@ -113,26 +108,33 @@
 #pragma mark - Notification management
 
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
-    BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
-    if (!containsSection) {
-        return NO;
-    }
+    // Access notifications synchronously
+    dispatch_sync(_queue, ^{
+        // Already inside queue
+        BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
+        if (!containsSection) {
+            return NO;
+        }
 
-    // Check if contains thread
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    return [notificationGroups.allKeys containsObject:request.threadIdentifier];
+        // Check if contains thread
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+        return [notificationGroups.allKeys containsObject:request.threadIdentifier];
+    });
 }
 
 - (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
-    if (![self containsThreadForRequest:request]) {
-        // Thread doesnt even exist
-        return NO;
-    }
+    // Access notifications synchronously
+    dispatch_sync(_queue, ^{
+        if (![self containsThreadForRequest:request]) {
+            // Thread doesnt even exist
+            return NO;
+        }
 
-    // Get notif and check
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
-    return [notification containsRequest:request];
+        // Get notif and check
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+        return [notification containsRequest:request];
+    });
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
@@ -141,17 +143,20 @@
         return NO;
     }
 
-    if (![self containsThreadForRequest:request]) {
-        // Adding new entry
-        return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
-    }
+    // Access notifications synchronously
+    dispatch_sync(_queue, ^{
+        if (![self containsThreadForRequest:request]) {
+            // Adding new entry
+            return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
+        }
 
-    // Get notification
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+        // Get notification
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
 
-    // Update with new request
-    [notification updateWithNewRequest:request];
+        // Update with new request
+        [notification updateWithNewRequest:request];
+    });
 
     // Observer
     NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -176,20 +181,23 @@
         notification = [NUACoalescedNotification coalescedNotificationFromRequest:request];
     }
 
-    // Add to dictionary
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    if (!notificationGroups) {
-        // Create if doesnt exist
-        notificationGroups = [NSDictionary dictionary];
-    }
+    // Modify dictionary synchronously
+    dispatch_sync(_queue, ^{
+        // Add to dictionary
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+        if (!notificationGroups) {
+            // Create if doesnt exist
+            notificationGroups = [NSDictionary dictionary];
+        }
 
-    // Update dictionary
-    NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
-    mutableNotificationGroups[request.threadIdentifier] = notification;
+        // Update dictionary
+        NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
+        mutableNotificationGroups[request.threadIdentifier] = notification;
 
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
-    notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
-    _notifications = [notifications copy];
+        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
+        notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
+        _notifications = [notifications copy];
+    });
 
     // Observer
     NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -214,38 +222,41 @@
         return;
     }
 
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-    NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+    // Access notifications synchronously
+    dispatch_sync(_queue, ^{
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
 
-    // Remove
-    [notification removeRequest:request];
+        // Remove
+        [notification removeRequest:request];
 
-    // Determine action
-    NUANotificationsObserverHandler handlerBlock = nil;
+        // Determine action
+        NUANotificationsObserverHandler handlerBlock = nil;
         if (notification.empty) {
-        // Notification is empty, remove entirely
-        NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
-        [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
+            // Notification is empty, remove entirely
+            NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
+            [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
 
-        // Update main dict
-        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
-        notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
-        _notifications = [notifications copy];
+            // Update main dict
+            NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
+            notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
+            _notifications = [notifications copy];
 
-        // Adjust handler
-        handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [observer notificationRepositoryRemovedNotification:notification];
-            });
-        };
-    } else {
-        // Notification was simply modified
-        handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
-            });
-        };
-    }
+            // Adjust handler
+            handlerBlock = ^(id<NUANotificationsObserver> observer) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [observer notificationRepositoryRemovedNotification:notification];
+                });
+            };
+        } else {
+            // Notification was simply modified
+            handlerBlock = ^(id<NUANotificationsObserver> observer) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
+                });
+            };
+        }
+    });
 
 
     // Observer
@@ -253,8 +264,11 @@
 }
 
 - (void)purgeAllNotifications {
-    // Simply reset ivar and regen
-    _notifications = nil;
+    // Queue synchronously
+    dispatch_sync(_queue, ^{
+        // Simply reset ivar and regen
+        _notifications = nil;
+    });
 
     // Call to regen
     [self notifications];
