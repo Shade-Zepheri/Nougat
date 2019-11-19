@@ -17,6 +17,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 @property (readonly, nonatomic) NSDate *timestamp;
 @property (copy, readonly, nonatomic) NSArray<NUANotificationEntry *> *entries;
 @property (assign, nonatomic) NUANotificationType type;
+@property (getter=isEmpty, readonly, nonatomic) BOOL empty;
 
 + (instancetype)mediaNotification;
 

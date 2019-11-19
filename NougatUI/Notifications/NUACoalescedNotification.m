@@ -109,6 +109,10 @@
     return self.entries[0].timestamp;
 }
 
+- (BOOL)isEmpty {
+    return self.entries.count < 0;
+}
+
 #pragma mark - Requests
 
 - (BOOL)containsRequest:(NCNotificationRequest *)request {

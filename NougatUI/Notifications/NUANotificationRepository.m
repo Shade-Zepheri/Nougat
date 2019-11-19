@@ -222,7 +222,7 @@
 
     // Determine action
     NUANotificationsObserverHandler handlerBlock = nil;
-    if (notification.entries.count < 1) {
+        if (notification.empty) {
         // Notification is empty, remove entirely
         NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
         [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
