@@ -70,7 +70,7 @@
 #pragma mark - Properties
 
 - (NSString *)title {
-    if (!self.entries || self.entries.count < 1) {
+    if (!self.entries || self.empty) {
         return nil;
     }
 
@@ -78,7 +78,7 @@
 }
 
 - (NSString *)message {
-    if (!self.entries || self.entries.count < 1) {
+    if (!self.entries || self.empty) {
         return nil;
     }
 
@@ -86,7 +86,7 @@
 }
 
 - (UIImage *)icon {
-    if (!self.entries || self.entries.count < 1) {
+    if (!self.entries || self.empty) {
         return nil;
     }
 
@@ -94,7 +94,7 @@
 }
 
 - (UIImage *)attachmentImage {
-    if (!self.entries || self.entries.count < 1) {
+    if (!self.entries || self.empty) {
         return nil;
     }
 
@@ -102,7 +102,7 @@
 }
 
 - (NSDate *)timestamp {
-    if (!self.entries || self.entries.count < 1) {
+    if (!self.entries || self.empty) {
         return nil;
     }
 
@@ -110,7 +110,7 @@
 }
 
 - (BOOL)isEmpty {
-    return self.entries.count < 0;
+    return self.entries.count < 1;
 }
 
 #pragma mark - Requests
