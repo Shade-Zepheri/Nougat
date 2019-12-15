@@ -36,11 +36,11 @@
 
 - (NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *)notifications {
     // Create synchronously
-    dispatch_sync(_queue, ^{
-        if (_notifications) {
-            return _notifications;
-        }
+    if (_notifications) {
+        return _notifications;
+    }
 
+    dispatch_sync(_queue, ^{
         NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
         NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
         NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
@@ -63,8 +63,9 @@
         }
 
         _notifications = [notifications copy];
-        return _notifications;
     });
+        
+    return _notifications;
 }
 
 - (NCNotificationStore *)_notificationStore {
@@ -109,32 +110,34 @@
 
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
     // Access notifications synchronously
+    __block NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups;
     dispatch_sync(_queue, ^{
         // Already inside queue
         BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
-        if (!containsSection) {
-            return NO;
+        if (containsSection) {
+            // Check if contains thread
+            notificationGroups = _notifications[request.sectionIdentifier];
         }
-
-        // Check if contains thread
-        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-        return [notificationGroups.allKeys containsObject:request.threadIdentifier];
     });
+    
+    return (notificationGroups != nil) && [notificationGroups.allKeys containsObject:request.threadIdentifier];
 }
 
 - (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
-    // Access notifications synchronously
-    dispatch_sync(_queue, ^{
-        if (![self containsThreadForRequest:request]) {
-            // Thread doesnt even exist
-            return NO;
-        }
+    if (![self containsThreadForRequest:request]) {
+        // Thread doesnt even exist
+        return NO;
+    }
 
+    // Access notifications synchronously
+    __block NUACoalescedNotification *notification;
+    dispatch_sync(_queue, ^{
         // Get notif and check
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
-        return [notification containsRequest:request];
+        notification = notificationGroups[request.threadIdentifier];
     });
+
+    return [notification containsRequest:request];
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
@@ -143,20 +146,21 @@
         return NO;
     }
 
-    // Access notifications synchronously
-    dispatch_sync(_queue, ^{
-        if (![self containsThreadForRequest:request]) {
-            // Adding new entry
-            return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
-        }
+    if (![self containsThreadForRequest:request]) {
+        // Adding new entry
+        return [self addNotificationRequest:request forCoalescedNotification:coalescedNotification];
+    }
 
+    // Access notifications synchronously
+    __block NUACoalescedNotification *notification;
+    dispatch_sync(_queue, ^{
         // Get notification
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
-
-        // Update with new request
-        [notification updateWithNewRequest:request];
+        notification = notificationGroups[request.threadIdentifier];
     });
+
+    // Update with new request
+    [notification updateWithNewRequest:request];
 
     // Observer
     NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -223,16 +227,22 @@
     }
 
     // Access notifications synchronously
+    __block NUACoalescedNotification *notification;
     dispatch_sync(_queue, ^{
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
-        NUACoalescedNotification *notification = notificationGroups[request.threadIdentifier];
+        notification = notificationGroups[request.threadIdentifier];
+    });
 
-        // Remove
-        [notification removeRequest:request];
+    // Remove
+    [notification removeRequest:request];
 
-        // Determine action
-        NUANotificationsObserverHandler handlerBlock = nil;
-        if (notification.empty) {
+    // Determine action
+    NUANotificationsObserverHandler handlerBlock = nil;
+    if (notification.empty) {
+        // Access notifications synchronously
+        dispatch_sync(_queue, ^{
+            NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
+
             // Notification is empty, remove entirely
             NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
             [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
@@ -241,23 +251,22 @@
             NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
             notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
             _notifications = [notifications copy];
+        });
 
-            // Adjust handler
-            handlerBlock = ^(id<NUANotificationsObserver> observer) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [observer notificationRepositoryRemovedNotification:notification];
-                });
-            };
-        } else {
-            // Notification was simply modified
-            handlerBlock = ^(id<NUANotificationsObserver> observer) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
-                });
-            };
-        }
-    });
-
+        // Adjust handler
+        handlerBlock = ^(id<NUANotificationsObserver> observer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [observer notificationRepositoryRemovedNotification:notification];
+            });
+        };
+    } else {
+        // Notification was simply modified
+        handlerBlock = ^(id<NUANotificationsObserver> observer) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
+            });
+        };
+    }
 
     // Observer
     [self notifyObserversUsingBlock:handlerBlock];
@@ -268,10 +277,10 @@
     dispatch_sync(_queue, ^{
         // Simply reset ivar and regen
         _notifications = nil;
-    });
 
-    // Call to regen
-    [self notifications];
+        // Call to regen
+        [self notifications];
+    });
 }
 
 @end
