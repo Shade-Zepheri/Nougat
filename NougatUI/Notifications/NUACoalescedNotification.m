@@ -71,7 +71,7 @@
 
 - (NSString *)title {
     if (!self.entries || self.empty) {
-        return nil;
+        return @"Title";
     }
 
     return self.entries[0].title;
@@ -79,7 +79,7 @@
 
 - (NSString *)message {
     if (!self.entries || self.empty) {
-        return nil;
+        return @"Message";
     }
 
     return self.entries[0].message;
@@ -87,7 +87,7 @@
 
 - (UIImage *)icon {
     if (!self.entries || self.empty) {
-        return nil;
+        return [UIImage _applicationIconImageForBundleIdentifier:@"com.apple.Preferences" format:0 scale:[UIScreen mainScreen].scale];
     }
 
     return self.entries[0].icon;
@@ -103,7 +103,7 @@
 
 - (NSDate *)timestamp {
     if (!self.entries || self.empty) {
-        return nil;
+        return [NSDate date];
     }
 
     return self.entries[0].timestamp;
