@@ -30,8 +30,14 @@
         appearanceSettings.tintColor = [UIColor colorWithRed:0.04 green:0.28 blue:0.42 alpha:1.0];
         appearanceSettings.translucentNavigationBar = NO;
         appearanceSettings.tableViewCellSeparatorColor = [UIColor clearColor];
-
+        appearanceSettings.largeTitleStyle = HBAppearanceSettingsLargeTitleStyleNever;
         self.hb_appearanceSettings = appearanceSettings;
+
+        // Disable large title
+        if (@available(iOS 11, *)) {
+            // iOS 11 only
+            self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
+        }
     }
 
     return self;
@@ -46,7 +52,7 @@
     dispatch_once(&onceToken, ^{
         BOOL colorflow3 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
         BOOL colorflow4 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
-        installed = colorflow3 | colorflow4;
+        installed = colorflow3 || colorflow4;
     });
 
     return installed;
