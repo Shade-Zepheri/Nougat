@@ -176,7 +176,14 @@
 
 - (void)_configureHeaderText {
     // Attribute up
-    NSString *displayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(self.notification.sectionID);
+    NSString *displayName;
+    if ([self.notification.sectionID isEqualToString:@"Screen Recording"]) {
+        // Exception for screen recording, since it doesnt use a conventional bundle id
+        displayName = @"Screen Recording";
+    } else {
+        displayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(self.notification.sectionID);
+    }
+
     NSString *elapsedTime = [self.notification.timestamp getElapsedTime];
     NSString *baseHeaderText = [NSString stringWithFormat:@"%@ • %@", displayName, elapsedTime];
 
