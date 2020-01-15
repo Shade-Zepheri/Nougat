@@ -21,10 +21,7 @@
         // Create threads
         _observers = [NSHashTable weakObjectsHashTable];
 
-        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(nil, DISPATCH_AUTORELEASE_FREQUENCY_NEVER);
-        dispatch_queue_attr_t mainAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INITIATED, 0);
-        _queue = dispatch_queue_create("com.shade.nougat.notifications-provider", mainAttributes);
-
+        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_NEVER);
         dispatch_queue_attr_t calloutAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INTERACTIVE, 0);
         _callOutQueue = dispatch_queue_create("com.shade.nougat.notifications-provider.call-out", calloutAttributes);
     }
@@ -61,9 +58,9 @@
     }
 
     // Modify array synchronously
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         _notifications = [notifications copy];
-    });
+    }
         
     return _notifications;
 }
@@ -99,9 +96,7 @@
         NSArray *observers = [_observers.allObjects copy];
 
         for (id<NUANotificationsObserver> observer in observers) {
-            dispatch_async(_queue, ^{
-                handler(observer);
-            });
+            handler(observer);
         }
     });
 }
@@ -111,14 +106,14 @@
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
     // Access notifications synchronously
     __block NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups;
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         // Already inside queue
         BOOL containsSection = [_notifications.allKeys containsObject:request.sectionIdentifier];
         if (containsSection) {
             // Check if contains thread
             notificationGroups = _notifications[request.sectionIdentifier];
         }
-    });
+    }
     
     return (notificationGroups != nil) && [notificationGroups.allKeys containsObject:request.threadIdentifier];
 }
@@ -131,11 +126,11 @@
 
     // Access notifications synchronously
     __block NUACoalescedNotification *notification;
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         // Get notif and check
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
         notification = notificationGroups[request.threadIdentifier];
-    });
+    }
 
     return [notification containsRequest:request];
 }
@@ -153,11 +148,11 @@
 
     // Access notifications synchronously
     __block NUACoalescedNotification *notification;
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         // Get notification
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
         notification = notificationGroups[request.threadIdentifier];
-    });
+    }
 
     // Update with new request
     [notification updateWithNewRequest:request];
@@ -186,7 +181,7 @@
     }
 
     // Modify dictionary synchronously
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         // Add to dictionary
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
         if (!notificationGroups) {
@@ -201,7 +196,7 @@
         NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
         notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
         _notifications = [notifications copy];
-    });
+    }
 
     // Observer
     NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -228,10 +223,10 @@
 
     // Access notifications synchronously
     __block NUACoalescedNotification *notification;
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
         notification = notificationGroups[request.threadIdentifier];
-    });
+    }
 
     // Remove
     [notification removeRequest:request];
@@ -240,7 +235,7 @@
     NUANotificationsObserverHandler handlerBlock = nil;
     if (notification.empty) {
         // Access notifications synchronously
-        dispatch_sync(_queue, ^{
+        @synchronized(_notifications) {
             NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = _notifications[request.sectionIdentifier];
 
             // Notification is empty, remove entirely
@@ -251,7 +246,7 @@
             NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [_notifications mutableCopy];
             notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
             _notifications = [notifications copy];
-        });
+        }
 
         // Adjust handler
         handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -274,13 +269,13 @@
 
 - (void)purgeAllNotifications {
     // Queue synchronously
-    dispatch_sync(_queue, ^{
+    @synchronized(_notifications) {
         // Simply reset ivar and regen
         _notifications = nil;
 
         // Call to regen
         [self notifications];
-    });
+    }
 }
 
 @end

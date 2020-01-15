@@ -15,7 +15,6 @@ typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> obs
 
 @interface NUANotificationRepository : NSObject {
     NSHashTable *_observers;
-    dispatch_queue_t _queue;
     dispatch_queue_t _callOutQueue;
     NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *_notifications;
 }
