@@ -22,11 +22,11 @@
         _observers = [NSHashTable weakObjectsHashTable];
 
         dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(nil, DISPATCH_AUTORELEASE_FREQUENCY_NEVER);
-		dispatch_queue_attr_t mainAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INITIATED, 0);
-		_queue = dispatch_queue_create("com.shade.nougat.notifications-provider", mainAttributes);
+        dispatch_queue_attr_t mainAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INITIATED, 0);
+        _queue = dispatch_queue_create("com.shade.nougat.notifications-provider", mainAttributes);
 
         dispatch_queue_attr_t calloutAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INTERACTIVE, 0);
-		_callOutQueue = dispatch_queue_create("com.shade.nougat.notifications-provider.call-out", calloutAttributes);
+        _callOutQueue = dispatch_queue_create("com.shade.nougat.notifications-provider.call-out", calloutAttributes);
     }
 
     return self;
@@ -40,28 +40,28 @@
         return _notifications;
     }
 
-    dispatch_sync(_queue, ^{
-        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
-        NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
-        NSArray<NSString *> *sectionIdentifiers = notificationSections.allKeys;
-        for (NSString *sectionIdentifier in sectionIdentifiers) {
-            if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
-                // Exclude DND notification && wallet stuffs
-                continue;
-            }
-
-            NCNotificationSection *section = notificationSections[sectionIdentifier];
-            NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
-            for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
-                // Apps can have different groups for notifications (eg: Followers and Likes groups)
-                NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
-                NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
-                notificationGroups[threadIdentifier] = notification;
-            }
-
-            notifications[sectionIdentifier] = [notificationGroups copy];
+    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
+    for (NSString *sectionIdentifier in notificationSections.allKeys) {
+        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
+            // Exclude DND notification && wallet stuffs
+            continue;
         }
 
+        NCNotificationSection *section = notificationSections[sectionIdentifier];
+        NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
+        for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
+            // Apps can have different groups for notifications (eg: Followers and Likes groups)
+            NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
+            NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
+            notificationGroups[threadIdentifier] = notification;
+        }
+
+        notifications[sectionIdentifier] = [notificationGroups copy];
+    }
+
+    // Modify array synchronously
+    dispatch_sync(_queue, ^{
         _notifications = [notifications copy];
     });
         
