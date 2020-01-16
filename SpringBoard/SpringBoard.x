@@ -183,6 +183,7 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 
 #pragma mark - Notifications
 
+%group Pre13CoverSheet
 %hook NotificationListClass
 // Hook into to manage notification stuffs
 
@@ -241,6 +242,66 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 }
 
 %end
+%end
+
+// iOS 13 Notifications
+%group iOS13CoverSheet
+%hook NCNotificationStructuredListViewController
+
+- (instancetype)init {
+    self = %orig;
+    if (self) {
+        // Register for notifications
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(nua_executeAction:) name:@"NUANotificationLaunchNotification" object:nil];
+    }
+
+    return self;
+}
+
+- (void)dealloc {
+    // Deregister notification
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUANotificationLaunchNotification" object:nil];
+
+    %orig;
+}
+
+#pragma mark - Actions
+
+%new
+- (void)nua_executeAction:(NSNotification *)notification {
+    // Parse for info
+    NSString *type = notification.userInfo[@"type"];
+    NCNotificationAction *action = notification.userInfo[@"action"];
+    NCNotificationRequest *request = notification.userInfo[@"request"];
+
+    // Execute
+    id<NCNotificationStructuredListViewControllerDelegate> delegate = self.delegate;
+    [delegate notificationStructuredListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
+
+    if ([type isEqualToString:@"clear"]) {
+        // Clear if needed
+        [self removeNotificationRequest:request];
+    }
+}
+
+#pragma mark - Notification managements
+
+- (void)insertNotificationRequest:(NCNotificationRequest *)request {
+    // Pass along to repository
+    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:nil];
+
+    %orig;
+}
+
+- (void)removeNotificationRequest:(NCNotificationRequest *)request {
+    // Pass along to repository
+    [[NUANotificationRepository defaultRepository] removeNotificationRequest:request forCoalescedNotification:nil];
+
+    %orig;
+}
+
+%end
+%end
 
 #pragma mark - Constructor
 
@@ -252,9 +313,18 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         %init(CoverSheet);
     }
 
-    // Specify list class & init
-    Class listClass = %c(NCNotificationCombinedListViewController) ?: %c(NCNotificationSectionListViewController);
-    %init(NotificationListClass=listClass);
+    // Figure out notification hooks
+    if (%c(NCNotificationStructuredListViewController)) {
+        // iOS 13+
+        %init(iOS13CoverSheet);
+    } else {
+        // iOS 12-
+        Class listClass = %c(NCNotificationCombinedListViewController) ?: %c(NCNotificationSectionListViewController);
+        %init(Pre13CoverSheet, NotificationListClass=listClass);
+    }
+
+    // Init the rest
+    %init(_ungrouped);
 
     // Create our singleton
     settings = [NUAPreferenceManager sharedSettings];
