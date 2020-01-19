@@ -21,6 +21,13 @@ NUANotificationShadeController *notificationShade;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
 }
 
+// iOS 11+
+- (void)toggleSearchWithWillBeginHandler:(void(^)(void))beginHandler completionHandler:(void(^)(void))completionHandler {
+    [notificationShade dismissAnimated:YES];
+
+    %orig;
+}
+
 %end
 
 #pragma mark - Dismissal
@@ -37,7 +44,19 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-%hook SBAssistantController // Siri
+// iOS 13
+%hook SBMainWorkspace
+
+- (void)transientOverlayPresentationManagerRequestsControlCenterDismissal:(id)presentationManager animated:(BOOL)animated {
+    %orig;
+
+    [notificationShade dismissAnimated:animated];
+}
+
+%end
+
+// Siri
+%hook SBAssistantController 
 
 - (void)_presentForMainScreenAnimated:(BOOL)animated completion:(id)completion {
     %orig;
