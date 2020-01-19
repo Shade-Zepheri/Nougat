@@ -5,7 +5,7 @@ typedef NS_ENUM(NSInteger, SBDashBoardRegionRole) {
     SBDashBoardRegionRoleOverlay,
 };
 
-@interface SBDashBoardRegion : NSObject
+@interface SBDashBoardRegion : NSObject <NSCopying, UICoordinateSpace>
 @property (assign, nonatomic) SBDashBoardRegionRole role;
 
 + (instancetype)regionForCoordinateSpace:(id<UICoordinateSpace>)coordinateSpace;

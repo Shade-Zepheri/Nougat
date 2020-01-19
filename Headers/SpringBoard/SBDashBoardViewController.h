@@ -1,5 +1,6 @@
 #import "SBDashBoardExternalBehaviorProviding.h"
 #import "SBDashBoardExternalPresentationProviding.h"
+#import "SBDashBoardExternalAppearanceProviding.h"
 
 // Has a bunch of superclasses so simplyfiying
 @interface SBDashBoardViewController : UIViewController
@@ -11,5 +12,9 @@
 - (void)registerExternalPresentationProvider:(UIViewController<SBDashBoardExternalPresentationProviding> *)provider;
 - (void)externalPresentationProviderPresentationChanged:(UIViewController<SBDashBoardExternalPresentationProviding> *)provider;
 - (void)unregisterExternalPresentationProvider:(UIViewController<SBDashBoardExternalPresentationProviding> *)provider;
+
+- (void)registerExternalAppearanceProvider:(UIViewController<SBDashBoardExternalAppearanceProviding> *)provider;
+- (void)externalAppearanceProviderBehaviorChanged:(UIViewController<SBDashBoardExternalAppearanceProviding> *)provider;
+- (void)unregisterExternalAppearanceProvider:(UIViewController<SBDashBoardExternalAppearanceProviding> *)provider;
 
 @end

@@ -53,6 +53,13 @@
             SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
             [dashBoardViewController registerExternalBehaviorProvider:self];
             [dashBoardViewController registerExternalPresentationProvider:self];
+            [dashBoardViewController registerExternalAppearanceProvider:self];
+        } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+            // iOS 13
+            CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+            [coverSheetViewController registerExternalBehaviorProvider:self];
+            [coverSheetViewController registerExternalPresentationProvider:self];
+            [coverSheetViewController registerExternalAppearanceProvider:self];
         }
 
         self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
@@ -81,6 +88,11 @@
         SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
         [dashBoardViewController unregisterExternalBehaviorProvider:self];
         [dashBoardViewController unregisterExternalPresentationProvider:self];
+    } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+        // iOS 13
+        CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+        [coverSheetViewController unregisterExternalBehaviorProvider:self];
+        [coverSheetViewController unregisterExternalPresentationProvider:self];
     }
 
     // Relinquish assertion
@@ -155,6 +167,9 @@
         // Only iOS 10+
         SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
         [dashBoardViewController externalPresentationProviderPresentationChanged:self];
+    } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+        CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+        [coverSheetViewController externalPresentationProviderPresentationChanged:self];
     }
 }
 
@@ -378,6 +393,10 @@
     return NSStringFromClass(self.class);
 }
 
+- (NSString *)coverSheetIdentifier {
+    return [self dashBoardIdentifier];
+}
+
 - (NSInteger)participantState {
     return self.visible ? 2 : 1;
 }
@@ -419,12 +438,63 @@
 }
 
 - (NSArray *)presentationRegions {
-    if (self.presented && %c(SBDashBoardRegion)) {
-        SBDashBoardRegion *region = [%c(SBDashBoardRegion) regionForCoordinateSpace:self.view];
-        region = [region role:SBDashBoardRegionRoleOverlay];
-        return @[region];
+    if (self.presented) {
+        if (%c(CSRegion)) {
+            // iOS 13
+            CSRegion *region = [%c(CSRegion) regionForCoordinateSpace:self.view];
+            region = [region role:CSRegionRoleOverlay];
+            return @[region];
+        } else {
+            // iOS 10-12
+            SBDashBoardRegion *region = [%c(SBDashBoardRegion) regionForCoordinateSpace:self.view];
+            region = [region role:SBDashBoardRegionRoleOverlay];
+            return @[region];
+        }
     }
 
+    return nil;
+}
+
+#pragma mark - Appearance providing
+
+- (NSString *)appearanceIdentifier {
+    return [self coverSheetIdentifier];
+}
+
+- (NSInteger)backgroundStyle {
+    return 0;
+}
+
+- (NSSet *)components {
+    NSMutableSet *components = [NSMutableSet set];
+    if (self.presented) {
+        if (%c(CSComponent)) {
+            // iOS 13
+            CSComponent *component = [%c(CSComponent) homeAffordance];
+            component = [component identifier:[self appearanceIdentifier]];
+            component = [component priority:1];
+            component = [component value:@(YES)];
+
+            [components addObject:component];
+        } else {
+            // iOS 10-12
+            SBDashBoardComponent *component = [%c(SBDashBoardComponent) homeAffordance];
+            component = [component identifier:[self appearanceIdentifier]];
+            component = [component priority:1];
+            component = [component value:@(YES)];
+
+            [components addObject:component];
+        }
+    } 
+
+    return [components copy];
+}
+
+- (_UILegibilitySettings *)legibilitySettings {
+    return nil;
+}
+
+- (UIColor *)backgroundColor {
     return nil;
 }
 
@@ -634,6 +704,9 @@
         // Only iOS 10+
         SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
         [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
+    } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+        CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+        [coverSheetViewController externalBehaviorProviderBehaviorChanged:self];
     }
 
     // Do some alpha thingies
@@ -749,6 +822,9 @@
                 // Only iOS 10+
                 SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
                 [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
+            } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+                CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+                [coverSheetViewController externalBehaviorProviderBehaviorChanged:self];
             }
         }
     }
