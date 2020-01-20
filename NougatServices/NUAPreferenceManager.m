@@ -41,8 +41,10 @@
         [center addObserver:self selector:@selector(preferencesWereUpdated) name:HBPreferencesDidChangeNotification object:nil];
         [self preferencesWereUpdated];
 
+        // Get toggle info
         [self refreshToggleInfo];
 
+        // Migrate if needed
         if ([self _hasLegacyPrefs]) {
             [self _migrateFromLegacyPrefs];
         }
@@ -78,8 +80,10 @@
         }
     }
 
+    // Update toggle info
     [self refreshToggleInfo];
 
+    // Publish changes
     NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor, @"textColor": _textColor};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
@@ -101,8 +105,8 @@
         HBLogError(@"%@", error);
     }
 
-    NSMutableArray<NSString *> *disabledToggles = [NSMutableArray array];
     // Construct disabled toggles
+    NSMutableArray<NSString *> *disabledToggles = [NSMutableArray array];
     for (NSString *identifier in _toggleInfoDictionary.allKeys) {
         if ([self.enabledToggles containsObject:identifier]) {
             continue;
@@ -165,7 +169,7 @@
 
 + (NSString *)carrierName {
     CTTelephonyNetworkInfo *networkInfo = [[CTTelephonyNetworkInfo alloc] init];
-    CTCarrier *carrier = [networkInfo subscriberCellularProvider];
+    CTCarrier *carrier = networkInfo.subscriberCellularProvider;
     return carrier.carrierName;
 }
 
