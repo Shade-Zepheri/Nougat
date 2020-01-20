@@ -1,14 +1,4 @@
-typedef NS_ENUM(NSInteger, UIApplicationSceneDeactivationReason) {
-    UIApplicationSceneDeactivationReasonSystemGesture,
-    UIApplicationSceneDeactivationReasonNotificationCenter,
-    UIApplicationSceneDeactivationReasonControlCenter,
-    UIApplicationSceneDeactivationReasonAppSwitcher,
-    UIApplicationSceneDeactivationReasonSiri,
-    UIApplicationSceneDeactivationReasonSystemAnimation,
-    UIApplicationSceneDeactivationReasonInteractiveBanner,
-    UIApplicationSceneDeactivationReasonSystemOverlay,
-    UIApplicationSceneDeactivationReasonKeyboardSuppression
-};
+#import <UIKit/UIApplicationSceneDeactivationReason.h>
 
 @interface FBUIApplicationSceneDeactivationAssertion : NSObject
 

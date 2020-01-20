@@ -1,10 +1,8 @@
 #import "NUANotificationShadeController.h"
 #import <Macros.h>
 #import <NougatServices/NougatServices.h>
-#import <FrontBoard/FBDisplayManager.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIApplication+Private.h>
-#import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
 #import <version.h>
 
@@ -64,15 +62,30 @@
 
         self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
 
-        //Create and add gesture
+        // Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
         [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
         _presentationGestureRecognizer.delegate = self;
-        [[FBSystemGestureManager sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
 
-        // Add assertion
-        _resignActiveAssertion = [[FBUIApplicationSceneDeactivationAssertion alloc] initWithReason:UIApplicationSceneDeactivationReasonControlCenter];
+        if (%c(_UISystemGestureManager)) {
+            // iOS 13
+            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplayWithIdentity:[%c(FBDisplayManager) mainIdentity]];
+        } else {
+            // iOS 10-12
+            [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
+        }
+
+        // Resign assertion
+        SBSceneManagerCoordinator *sceneManagerCoordinator = [%c(SBSceneManagerCoordinator) sharedInstance];
+        if ([manager respondsToSelector:@selector(sceneDeactivationManager)]) {
+            // iOS 13
+            UIApplicationSceneDeactivationManager *deactivationManager = sceneManagerCoordinator.sceneDeactivationManager;
+            _newResignActiveAssertion = [deactivationManager newAssertionWithReason:UIApplicationSceneDeactivationReasonControlCenter];
+        } else {
+            // iOS 12
+            _oldResignActiveAssertion = [[%c(FBUIApplicationSceneDeactivationAssertion) alloc] initWithReason:UIApplicationSceneDeactivationReasonControlCenter];
+        }
 
         // CC calls this in init so we will too
         [self view];
@@ -96,7 +109,13 @@
     }
 
     // Relinquish assertion
-    [_resignActiveAssertion relinquish];
+    if (_newResignActiveAssertion) {
+        // iOS 13
+        [_newResignActiveAssertion relinquish];
+    } else {
+        // iOS 10-12
+        [_oldResignActiveAssertion relinquish];
+    }
 }
 
 #pragma mark - View management
@@ -735,12 +754,18 @@
         SBSDisplayLayoutElement *sbsElement = (SBSDisplayLayoutElement *)element;
         sbsElement.fillsDisplayBounds = YES;
         sbsElement.level = _window.windowLevel;
-        sbsElement.layoutRole = SBSDisplayLayoutRoleOverlay;
+        sbsElement.layoutRole = 4;
         return sbsElement;
     }];
 
     // Aquire assertion
-    [_resignActiveAssertion acquire];
+    if (_newResignActiveAssertion) {
+        // iOS 13
+        [_newResignActiveAssertion acquire];
+    } else {
+        // iOS 10-12
+        [_oldResignActiveAssertion acquire];
+    }
 
     self.presented = YES;
 
@@ -813,7 +838,13 @@
             [self.displayLayoutElement deactivate];
 
             // Relinquish assertion
-            [_resignActiveAssertion relinquish];
+            if (_newResignActiveAssertion) {
+                // iOS 13
+                [_newResignActiveAssertion relinquish];
+            } else {
+                // iOS 10-12
+                [_oldResignActiveAssertion relinquish];
+            }
 
             [self _endAnimation];
 

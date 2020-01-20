@@ -6,6 +6,7 @@
 #import <FrontBoard/FrontBoard.h>
 #import <SpringBoard/SBIgnoredForAutorotationSecureWindow.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
+#import <UIKit/UIKit+Private.h>
 
 typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
     NUANotificationShadeStateDismissed,
@@ -16,7 +17,8 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
     SBWindow *_window;
     SBScreenEdgePanGestureRecognizer *_presentationGestureRecognizer;
     NUANotificationShadeViewController *_viewController;
-    FBUIApplicationSceneDeactivationAssertion *_resignActiveAssertion;
+    FBUIApplicationSceneDeactivationAssertion *_oldResignActiveAssertion;
+    UIApplicationSceneDeactivationAssertion *_newResignActiveAssertion;
     BOOL _isPresenting;
     BOOL _isDismissing;
     CGPoint _initalTouchLocation;
