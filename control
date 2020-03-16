@@ -10,4 +10,4 @@ Section: Tweaks
 Icon: file:///Library/PreferenceBundles/Nougat.bundle/icon@2x.png
 Depiction: https://shade-zepheri.github.io/depic/index.html?p=com.shade.nougat
 SileoDepiction: https://shade-zepheri.github.io/depic/com.shade.nougat/sileo.json
-Tag: compatible::ios10, compatible::ios11, compatible::ios12
+Tag: compatible::ios10, compatible::ios11, compatible::ios12, compatible::ios13

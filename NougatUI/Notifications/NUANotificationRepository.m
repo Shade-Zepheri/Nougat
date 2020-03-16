@@ -47,11 +47,29 @@
 
         NCNotificationSection *section = notificationSections[sectionIdentifier];
         NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
-        for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
-            // Apps can have different groups for notifications (eg: Followers and Likes groups)
-            NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
-            NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
-            notificationGroups[threadIdentifier] = notification;
+        if ([section respondsToSelector:@selector(coalescedNotifications)]) {
+            // iOS 10-12
+            for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
+                // Apps can have different groups for notifications (eg: Followers and Likes groups)
+                NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
+                NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
+                notificationGroups[threadIdentifier] = notification;
+            }
+        } else {
+            // iOS 13+
+            for (NCNotificationRequest *request in section.requests.allValues) {
+                // Section contains all requests, sort based on threadID
+                NSString *threadIdentifier = request.threadIdentifier;
+                if (!notificationGroups[threadIdentifier]) {
+                    // Create new notification entry
+                    NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromRequest:request];
+                    notificationGroups[threadIdentifier] = notification;
+                } else {
+                    NUACoalescedNotification *notification = notificationGroups[threadIdentifier];
+                    [notification updateWithNewRequest:request];
+                    notificationGroups[threadIdentifier] = notification;
+                }
+            }
         }
 
         notifications[sectionIdentifier] = [notificationGroups copy];

@@ -63,7 +63,7 @@
         self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
 
         // Create and add gesture
-        _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:) type:UIScreenEdgePanRecognizerTypeOther];
+        _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
         [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
         _presentationGestureRecognizer.delegate = self;
