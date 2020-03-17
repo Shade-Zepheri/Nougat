@@ -1,5 +1,5 @@
 --- !tapi-tbd-v2
-archs:                 [ armv7, arm64, arm64e ]
+archs:                 [ armv7, arm64, arm64e, x86_64 ]
 uuids:                 [ 'arm64e: 312F7354-B5CA-3020-89CE-24C91F3FFE4A' ]
 platform:              ios
 flags:                 [ flat_namespace ]
@@ -8,7 +8,7 @@ current-version:       0
 compatibility-version: 0
 objc-constraint:       retain_release
 exports:
-  - archs:              [ armv7, arm64, arm64e ]
+  - archs:              [ armv7, arm64, arm64e, x86_64 ]
     symbols:            [ _FBApp, _FBAppLibraryLoggingSubsystem, _FBApplicationBadgeValueAccessEntitlement,
                           _FBApplicationDataStoreRepositoryServerMessageReceivedNotification,
                           _FBApplicationDataStoreRepositoryServerMessageReceivedNotificationUserInfoKeyMessageType,
@@ -34,9 +34,7 @@ exports:
                           _FBServiceClientAuthenticatorErrorProcessKey, _FBShutdownEntitlement, _FBStringForInstallPhase,
                           _FBStringForInstallState, _FBStringForInstallType, _FBSystemAppBundleID, _FBSystemAppClass, _FBSystemAppMain,
                           _FBSystemAppMainSceneIdentifier, _FBSystemAppProcessAssertionsEntitlement,
-                          _FBSystemGestureLocationForTouchInView, _FBSystemGestureLocationInView,
-                          _FBSystemGesturePreviousLocationForTouchInView, _FBSystemGestureTranslationInView,
-                          _FBSystemGestureVelocityInView, _FBTMilestoneSynchronizedCommit,
+                          _FBSystemGestureLocationForTouchInView, _FBSystemGesturePreviousLocationForTouchInView, _FBTMilestoneSynchronizedCommit,
                           _FBTransactionErrorReasonProcessLaunchFailed, _FBTransactionErrorReasonSceneUpdateFailed,
                           _FBUIWindowSceneWorkspaceIdentifier, _FBUnlimitedProcessAssertionsEntitlement, _FBWorkspaceLogCommon,
                           _FBWorkspaceLogScene, _FBWorkspaceLogSceneDeactivation, _FBWorkspaceLogSceneHost, _FBWorkspaceLogSceneLayout,

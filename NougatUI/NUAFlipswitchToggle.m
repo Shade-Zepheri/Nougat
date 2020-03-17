@@ -35,7 +35,7 @@
         [self.toggleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
         _switchIdentifier = identifier;
-        self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
+        self.switchState = [[NSClassFromString(@"FSSwitchPanel") sharedPanel] stateForSwitchIdentifier:identifier];
 
         // Create imageView
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -52,7 +52,7 @@
         [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
+        [center addObserver:self selector:@selector(switchesChangedState:) name:@"FSSwitchPanelSwitchStateChangedNotification" object:nil];
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
     }
 
@@ -97,7 +97,7 @@
 #pragma mark - Toggles
 
 - (void)toggleSwitchState {
-    FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
+    FSSwitchPanel *switchPanel = [NSClassFromString(@"FSSwitchPanel") sharedPanel];
 
     self.switchState = [switchPanel stateForSwitchIdentifier:self.switchIdentifier];
     [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:self.switchIdentifier];
@@ -152,13 +152,29 @@
 #pragma mark - Notifications
 
 - (void)switchesChangedState:(NSNotification *)notification {
-    NSString *changedSwitch = notification.userInfo[FSSwitchPanelSwitchIdentifierKey];
+    NSString *changedSwitch = notification.userInfo[@"switchIdentifier"];
     if (changedSwitch && ![changedSwitch isEqualToString:self.switchIdentifier]) {
         return;
     }
 
-    self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
+    self.switchState = [[NSClassFromString(@"FSSwitchPanel") sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
     [self _updateImageView:YES];
+}
+
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        self.toggleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+        [self _updateImageView:NO];
+    }
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {

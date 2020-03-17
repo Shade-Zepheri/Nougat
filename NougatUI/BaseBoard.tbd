@@ -1,5 +1,5 @@
 --- !tapi-tbd-v2
-archs:                 [ armv7, arm64, arm64e ]
+archs:                 [ armv7, arm64, arm64e, x86_64 ]
 uuids:                 [ 'arm64e: 491B1CCC-143B-3D9D-9B04-3CE4F7AC1CED' ]
 platform:              ios
 flags:                 [ flat_namespace ]
@@ -8,7 +8,7 @@ current-version:       0
 compatibility-version: 0
 objc-constraint:       retain_release
 exports:
-  - archs:              [ armv7, arm64, arm64e ]
+  - archs:              [ armv7, arm64, arm64e, x86_64 ]
     symbols:            [ _BSAbsoluteTimeFromMachTime, _BSActionClearResponseListenerWithToken,
                           _BSActionCreateResponseListenerWithHandler, _BSActionErrorDomain, _BSActionNotifyResponseListenerOfResponse,
                           _BSAffineTransformFromValue, _BSAsyncDispatchAsyncBlock, _BSAsyncDispatchBlock, _BSAtomicGetFlag,

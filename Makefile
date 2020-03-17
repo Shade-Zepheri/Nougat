@@ -1,5 +1,10 @@
-export TARGET = iphone:latest:10.0
-export ARCHS = armv7 arm64 arm64e
+ifeq ($(SIMULATOR),1)
+	export TARGET = simulator:clang:latest:10.0
+	export ARCHS = x86_64
+else
+	export TARGET = iphone:latest:10.0
+	export ARCHS = armv7 arm64 arm64e
+endif
 
 INSTALL_TARGET_PROCESSES = Preferences
 
