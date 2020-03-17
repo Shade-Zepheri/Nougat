@@ -325,7 +325,7 @@
     [self _setupViewForPresentation];
 
     // Begin presentation
-    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
+    CGPoint location = [gestureRecognizer locationInView:self.view];
     [self beginAnimationWithLocation:location];
 }
 
@@ -336,14 +336,14 @@
     }
 
     // Defer hard stuffs
-    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
+    CGPoint location = [gestureRecognizer locationInView:self.view];
     [self updateAnimationWithLocation:location];
 }
 
 - (void)_showNotificationShadeGestureEndedWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
     // Defer
-    CGPoint velocity = FBSystemGestureVelocityInView(gestureRecognizer, self.view);
-    CGPoint location = FBSystemGestureLocationInView(gestureRecognizer, self.view);
+    CGPoint location = [gestureRecognizer locationInView:self.view];
+    CGPoint velocity = [gestureRecognizer velocityInView:self.view];
     [self endAnimationWithVelocity:velocity location:location wasCancelled:NO completion:^{
         [self _endAnimation];
     }];
