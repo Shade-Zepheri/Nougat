@@ -60,7 +60,7 @@
 - (void)_createBatteryViews {
     // Bottom part
     self.bottomBatteryPart = [[UIView alloc] initWithFrame:CGRectZero];
-    self.bottomBatteryPart.backgroundColor = self.settings.usingDark ? [UIColor blackColor] : [UIColor whiteColor];
+    self.bottomBatteryPart.backgroundColor = self.settings.textColor;
     self.bottomBatteryPart.layer.cornerRadius = 1.0;
     self.bottomBatteryPart.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.bottomBatteryPart];
@@ -73,7 +73,7 @@
 
     // Top part
     self.topBatteryPart = [[UIView alloc] initWithFrame:CGRectZero];
-    self.topBatteryPart.backgroundColor = self.settings.usingDark ? [UIColor blackColor] : [UIColor whiteColor];
+    self.topBatteryPart.backgroundColor = self.settings.textColor;
     self.topBatteryPart.layer.cornerRadius = 0.5;
     self.topBatteryPart.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.topBatteryPart];
@@ -130,11 +130,27 @@
     return [UIImage imageNamed:name inBundle:bundle];
 }
 
-#pragma mark - Notifications
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        self.bottomBatteryPart.backgroundColor = self.settings.textColor;
+        self.topBatteryPart.backgroundColor = self.settings.textColor;
+
+        self.chargingImage.image = [self chargingBoltImage];
+    }
+}
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
-    self.bottomBatteryPart.backgroundColor = self.settings.usingDark ? [UIColor blackColor] : [UIColor whiteColor];
-    self.topBatteryPart.backgroundColor = self.settings.usingDark ? [UIColor blackColor] : [UIColor whiteColor];
+    self.bottomBatteryPart.backgroundColor = self.settings.textColor;
+    self.topBatteryPart.backgroundColor = self.settings.textColor;
 
     self.chargingImage.image = [self chargingBoltImage];
 }

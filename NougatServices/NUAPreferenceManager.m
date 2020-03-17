@@ -4,12 +4,18 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 
-@implementation NUAPreferenceManager {
+@interface NUAPreferenceManager () {
     HBPreferences *_preferences;
 
     NUADrawerTheme _currentTheme;
     NSMutableDictionary<NSString *, NUAToggleInfo *> *_toggleInfoDictionary;
 }
+
+@property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
+
+@end
+
+@implementation NUAPreferenceManager
 
 + (instancetype)sharedSettings {
     static NUAPreferenceManager *sharedInstance = nil;
@@ -33,6 +39,7 @@
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
+        [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
 
         NSArray<NSString *> *defaultToggleOrder = [[self class] _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
@@ -53,38 +60,89 @@
     return self;
 }
 
-#pragma mark - Callbacks
+#pragma mark - Properties
 
-- (void)preferencesWereUpdated {
+- (UIColor *)backgroundColor {
+    if (self.usesSystemAppearance) {
+        // Derive from system appearance
+        if (@available(iOS 13, *)) {
+            // To silence warnings
+            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            BOOL usingDarkAppearance = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+            return usingDarkAppearance ? PixelBackgroundColor : OreoBackgroundColor;
+        }
+    } 
+
+    // Derive manually
     switch (_currentTheme) {
-        case NUADrawerThemeNexus: {
-            _backgroundColor = NexusBackgroundColor;
-            _highlightColor = NexusTintColor;
-            _textColor = [UIColor whiteColor];
-            _usingDark = NO;
-            break;
-        }
-        case NUADrawerThemePixel: {
-            _backgroundColor = PixelBackgroundColor;
-            _highlightColor = PixelTintColor;
-            _textColor = [UIColor whiteColor];
-            _usingDark = NO;
-            break;
-        }
-        case NUADrawerThemeOreo: {
-            _backgroundColor = OreoBackgroundColor;
-            _highlightColor = OreoTintColor;
-            _textColor = [UIColor blackColor];
-            _usingDark = YES;
-            break;
+        case NUADrawerThemeNexus:
+            return NexusBackgroundColor;
+        case NUADrawerThemePixel:
+            return PixelBackgroundColor;
+        case NUADrawerThemeOreo:
+            return OreoBackgroundColor;
+    }
+}
+
+- (UIColor *)highlightColor {
+    if (self.usesSystemAppearance) {
+        // Derive from system appearance
+        if (@available(iOS 13, *)) {
+            // To silence warnings
+            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            BOOL usingDarkAppearance = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+            return usingDarkAppearance ? PixelTintColor : OreoTintColor;
         }
     }
 
+    // Derive manually
+    switch (_currentTheme) {
+        case NUADrawerThemeNexus:
+            return NexusTintColor;
+        case NUADrawerThemePixel:
+            return PixelTintColor;
+        case NUADrawerThemeOreo:
+            return OreoTintColor;
+    }
+}
+
+- (UIColor *)textColor {
+    if (self.usesSystemAppearance) {
+        // Derive from system appearance
+        if (@available(iOS 13, *)) {
+            // To silence warnings
+            return UIColor.labelColor;
+        }
+    }
+    
+    // Derive manually
+    return (_currentTheme == NUADrawerThemeOreo) ? [UIColor blackColor] : [UIColor whiteColor];
+}
+
+- (BOOL)isUsingDark {
+    if (self.usesSystemAppearance) {
+        // Derive from system appearance
+        if (@available(iOS 13, *)) {
+            // To silence warnings
+            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            return traitCollection.userInterfaceStyle == UIUserInterfaceStyleLight;
+        }
+    }
+
+    return _currentTheme == NUADrawerThemeOreo;
+}
+
+#pragma mark - Callbacks
+
+- (void)preferencesWereUpdated {
     // Update toggle info
     [self refreshToggleInfo];
 
-    // Publish changes
-    NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": _backgroundColor, @"tintColor": _highlightColor, @"textColor": _textColor};
+    // Publish general updates
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedPreferences" object:nil userInfo:nil];
+
+    // Publish appearance updates
+    NSDictionary<NSString *, UIColor *> *colorInfo = @{@"backgroundColor": self.backgroundColor, @"tintColor": self.highlightColor, @"textColor": self.textColor};
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedBackgroundColor" object:nil userInfo:colorInfo];
 }
 

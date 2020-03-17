@@ -119,7 +119,27 @@
     [[BSDateFormatterCache sharedInstance] resetFormattersIfNecessary];
 }
 
-#pragma mark - Notifications
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        UIColor *textColor = [NUAPreferenceManager sharedSettings].textColor;
+
+        self.carrierLabel.textColor = textColor;
+        if (self.batteryLabel) {
+            self.batteryLabel.textColor = textColor;
+        }
+
+        self.dateLabel.textColor = textColor;
+    }
+}
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
     NSDictionary *colorInfo = notification.userInfo;

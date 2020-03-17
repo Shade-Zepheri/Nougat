@@ -15,15 +15,18 @@ static NSString *const NUAPreferencesTogglesListKey = @"togglesList";
 static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 
 static NSString *const NUAPreferencesUsesExternalColorKey = @"colorflowEnabled";
+static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppearance";
 
 @interface NUAPreferenceManager : NSObject
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
 
 @property (getter=isEnabled, readonly, nonatomic) BOOL enabled;
-@property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
+
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
 @property (strong, readonly, nonatomic) UIColor *textColor;
+@property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
+
 @property (copy, readonly, nonatomic) NSArray<NSString *> *enabledToggles;
 @property (copy, readonly, nonatomic) NSArray<NSString *> *disabledToggles;
 

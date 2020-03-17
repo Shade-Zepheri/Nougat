@@ -24,7 +24,7 @@
         [self _populateToggles];
 
         // Register for notifications
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
     }
 
     return self;

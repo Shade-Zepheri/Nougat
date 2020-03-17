@@ -12,6 +12,8 @@
     <key>OREO</key>
     <string>Oreo</string>
 
+    <key>USE_SYSTEM_APPEARANCE</key>
+    <string>Use System Apperance Setting</string>
     <key>USE_COLORFLOW</key>
     <string>Use Colorflow Colors</string>
 

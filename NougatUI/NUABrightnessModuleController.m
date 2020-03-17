@@ -13,6 +13,8 @@
     return BKSDisplayBrightnessGetCurrent();
 }
 
+#pragma mark - UIViewController
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -67,6 +69,17 @@
     [super viewDidDisappear:animated];
 }
 
+- (void)dealloc {
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self];
+
+    if (_brightnessTransaction) {
+        CFRelease(_brightnessTransaction);
+    }
+}
+
+#pragma mark - Properties
+
 - (void)setRevealPercentage:(CGFloat)percent {
     _revealPercentage = percent;
 
@@ -75,6 +88,8 @@
     // Update slider alpha with delay
     self.slider.alpha = (percent - 0.5) * 2;
 }
+
+#pragma mark - Slider Delegate
 
 - (void)sliderDidBeginTracking:(UISlider *)slider {
     [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:YES];
@@ -98,12 +113,34 @@
     [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:NO];
 }
 
+#pragma mark - Notifications
+
 - (void)_noteScreenBrightnessDidChange:(NSNotification *)notification {
     if (self.slider.tracking) {
         return;
     }
 
     [self.slider setValue:[self backlightLevel] animated:NO];
+}
+
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
+
+        NSString *imageName = [NSString stringWithFormat:@"brightness-%@", [NUAPreferenceManager sharedSettings].usingDark ? @"dark" : @"light"];
+        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+        UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:bundle];
+        [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
+    }
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
@@ -115,15 +152,6 @@
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:bundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
-}
-
-- (void)dealloc {
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self];
-
-    if (_brightnessTransaction) {
-        CFRelease(_brightnessTransaction);
-    }
 }
 
 @end

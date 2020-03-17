@@ -1,9 +1,16 @@
 #import "NUARootListController.h"
+#import <Cephei/HBPreferences.h>
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
 #import <Preferences/PSSpecifier.h>
 #import <TechSupport/TSContactViewController.h>
 #import <UIKit/UIImage+Private.h>
+#import <version.h>
+
+@interface NUARootListController ()
+@property (strong, readonly, nonatomic) HBPreferences *preferences;
+
+@end
 
 @implementation NUARootListController
 
@@ -26,6 +33,10 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Set preferences
+        _preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
+
+        // Set appearance
         HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
         appearanceSettings.tintColor = [UIColor colorWithRed:0.04 green:0.28 blue:0.42 alpha:1.0];
         appearanceSettings.translucentNavigationBar = NO;
@@ -50,21 +61,47 @@
     static BOOL installed = NO;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        BOOL colorflow3 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
-        BOOL colorflow4 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
-        installed = colorflow3 || colorflow4;
+        BOOL hasColorflow3 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
+        BOOL hasColorflow4 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
+        BOOL hasColorflow5 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow5.dylib"];
+        installed = hasColorflow3 || hasColorflow4 || hasColorflow5;
     });
 
     return installed;
 }
 
-- (void)_configureColorflowSpecifier {
-    if ([self _hasColorflowInstalled]) {
-        // Colorflow installed
-        return;
+- (BOOL)_systemDarkmodeAvailable {
+    // Check stuffs once
+    static BOOL available = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        available = IS_IOS_OR_NEWER(iOS_13_0);
+    });
+
+    return available;
+}
+
+- (void)_modifySpecifierVisibility {
+    // Remove specifiers
+    if (![self _hasColorflowInstalled]) {
+        // Colorflow not installed
+        [self removeSpecifierID:@"ColorflowCell"];
     }
 
-    [self removeSpecifierID:@"ColorflowCell"];
+    if (![self _systemDarkmodeAvailable]) {
+        // Not iOS 13
+        [self removeSpecifierID:@"SystemAppearanceCell"];
+    }
+
+    // Disable segment controller if needed
+    BOOL usesSystemAppearance = [self.preferences boolForKey:@"usesSystemAppearance"];
+    PSSpecifier *appearanceSpecifier = [self specifierForID:@"AppearanceSettingCell"];
+    [appearanceSpecifier setProperty:@(!usesSystemAppearance) forKey:@"enabled"];
+}
+
+- (void)reloadSpecifiers {
+	[super reloadSpecifiers];
+	[self _modifySpecifierVisibility];
 }
 
 #pragma mark - UIViewController
@@ -73,7 +110,7 @@
     [super viewDidLoad];
 
     // Specifiers
-    [self _configureColorflowSpecifier];
+    [self _modifySpecifierVisibility];
 
     // Create header view
     UIView *headerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 200)];
@@ -90,11 +127,6 @@
     [self.headerImageView.bottomAnchor constraintEqualToAnchor:headerContainerView.bottomAnchor].active = YES;
 
     self.table.tableHeaderView = headerContainerView;
-}
-
-- (void)reloadSpecifiers {
-	[super reloadSpecifiers];
-	[self _configureColorflowSpecifier];
 }
 
 #pragma mark - UIScrollViewDelegate

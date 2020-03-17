@@ -1,6 +1,7 @@
 #import "NUANotificationTableViewCell.h"
 #import "NSDate+Elapsed.h"
 #import "UIImage+Average.h"
+#import <NougatServices/NUAPreferenceManager.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIImage+Private.h>
 #import <Macros.h>
@@ -85,8 +86,15 @@
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.titleLabel.textColor = [UIColor blackColor];
     self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Here we actually wanna use iOS 13's label color since the background will automatically change regardless of settings
+    if (@available(iOS 13, *)) {
+        // To silence warnings
+        self.titleLabel.textColor = UIColor.labelColor;
+    } else {
+        self.titleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    }
     [self.contentView addSubview:self.titleLabel];
 }
 
@@ -162,6 +170,21 @@
     [self _configureTitleText];
     [self _configureMessageText];
     [self _configureButtons];
+}
+
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        self.titleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    }
 }
 
 #pragma mark - Label management

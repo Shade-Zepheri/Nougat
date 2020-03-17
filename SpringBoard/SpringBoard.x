@@ -98,7 +98,7 @@ NUANotificationShadeController *notificationShade;
 
 %hook SBDashBoardViewController
 
-- (void)_presentModalViewController:(UIViewController *)modalViewController animated:(BOOL)animated completion:(id)completion {
+- (void)_presentModalViewController:(UIViewController *)modalViewController animated:(BOOL)animated completion:(void(^)(void))completion {
     %orig;
 
     if (!modalViewController) {
@@ -113,6 +113,7 @@ NUANotificationShadeController *notificationShade;
 #pragma mark - Gesture 
 
 CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
+    // _UIWindowConvertPointFromOrientationToOrientation
     CGFloat rotatedX = 0.0;
     CGFloat rotatedY = 0.0;
     UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
@@ -345,13 +346,11 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     // Init the rest
     %init(_ungrouped);
 
-    // Create our singleton
-    settings = [NUAPreferenceManager sharedSettings];
-
     // Register to tweak loads when springboard done launching
     NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
     id __block token = [center addObserverForName:UIApplicationDidFinishLaunchingNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
-        // Simply create singleton
+        // Create our singletons
+        settings = [NUAPreferenceManager sharedSettings];
         notificationShade = [NUANotificationShadeController defaultNotificationShade];
 
         // Deregister as only created once

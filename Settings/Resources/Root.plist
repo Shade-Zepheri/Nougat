@@ -43,6 +43,8 @@
             <string>com.shade.nougat/ReloadPrefs</string>
             <key>key</key>
             <string>darkVariant</string>
+            <key>id</key>
+			<string>AppearanceSettingCell</string>
             <key>validTitles</key>
             <array>
                 <string>NEXUS</string>
@@ -55,6 +57,22 @@
                 <integer>1</integer>
                 <integer>2</integer>
             </array>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <false/>
+            <key>defaults</key>
+            <string>com.shade.nougat</string>
+            <key>key</key>
+            <string>usesSystemAppearance</string>
+            <key>id</key>
+			<string>SystemAppearanceCell</string>
+            <key>label</key>
+            <string>USE_SYSTEM_APPEARANCE</string>
+            <key>PostNotification</key>
+            <string>com.shade.nougat/ReloadPrefs</string>
         </dict>
         <dict>
             <key>cell</key>

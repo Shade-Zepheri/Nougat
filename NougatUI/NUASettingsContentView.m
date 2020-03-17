@@ -198,12 +198,42 @@
     self.arrowView.transform = CGAffineTransformMakeRotation(angle);
 }
 
-#pragma mark - Notifications
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        self.dateLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+
+        _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
+
+        // Update imageView images
+        NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
+        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+
+        NSString *accountImage = [@"account" stringByAppendingString:imageStyle];
+        self.accountView.image = [UIImage imageNamed:accountImage inBundle:bundle];
+
+        NSString *nougatImage = [@"edit" stringByAppendingString:imageStyle];
+        self.nougatView.image = [UIImage imageNamed:nougatImage inBundle:bundle];
+
+        NSString *settingsImage = [@"settings" stringByAppendingString:imageStyle];
+        self.settingsView.image = [UIImage imageNamed:settingsImage inBundle:bundle];
+
+        NSString *arrowImage = [@"arrow" stringByAppendingString:imageStyle];
+        self.arrowView.image = [UIImage imageNamed:arrowImage inBundle:bundle];
+    }
+}
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
     NSDictionary<NSString *, UIColor *> *colorInfo = notification.userInfo;
-    UIColor *textColor = colorInfo[@"textColor"];
-    self.dateLabel.textColor = textColor;
+    self.dateLabel.textColor = colorInfo[@"textColor"];
 
     _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
 
