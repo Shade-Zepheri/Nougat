@@ -8,7 +8,7 @@
             <key>cell</key>
             <string>PSSwitchCell</string>
             <key>default</key>
-            <false/>
+            <true/>
             <key>defaults</key>
             <string>com.shade.nougat</string>
             <key>key</key>
