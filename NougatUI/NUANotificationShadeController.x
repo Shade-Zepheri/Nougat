@@ -311,7 +311,15 @@
 
 - (void)_showNotificationShadeGestureBeganWithGestureRecognizer:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
     // Disable icon editing
-    [[%c(SBIconController) sharedInstance] setIsEditing:NO];
+    SBIconController *iconController = [%c(SBIconController) sharedInstance];
+    if ([iconController respondsToSelector:@selector(setIsEditing:)]) {
+        // iOS 10-12
+        [iconController setIsEditing:NO];
+    } else {
+        // iOS 13
+        SBRootFolderController *rootFolderController = iconController.rootFolderController;
+        [rootFolderController setEditing:NO animated:YES];
+    }
 
     // Stop system gestures
     [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = YES;
