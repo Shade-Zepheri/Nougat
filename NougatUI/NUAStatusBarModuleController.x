@@ -49,7 +49,7 @@
     [self statusBarView].date = controller.currentDate;
 
     // Update Battery label
-    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel];
+    CGFloat currentPercent = [UIDevice currentDevice].batteryLevel;
     [self statusBarView].currentPercent = currentPercent;
 
     BOOL isCharging = [[%c(SBUIController) sharedInstance] isBatteryCharging];
@@ -123,8 +123,10 @@
 
     Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
     SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
+    // Probably not a retain cycle but lets play it safe
+    __weak __typeof(self) weakSelf = self;
     _timerToken = [timer startMinuteUpdatesWithHandler:^{
-        [self _updateTime];
+        [weakSelf _updateTime];
     }];
 }
 

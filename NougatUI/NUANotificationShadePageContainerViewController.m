@@ -170,11 +170,10 @@
 
             return;
         }
-
         
         fireTimes++;
         CGFloat t = fireTimes / 21.0;
-        CGFloat multiplier = [self _multiplerAdjustedWithEasing:t];
+        CGFloat multiplier = [weakSelf _multiplerAdjustedWithEasing:t];
 
         // Update proper height
         CGFloat newHeight = baseHeight + (difference * multiplier);
