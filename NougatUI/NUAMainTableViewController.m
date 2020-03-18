@@ -154,8 +154,6 @@
         return;
     }
 
-    HBLogWarn(@"[NUAREPO] Removed: %@", removedNotification);
-
     // Get old notification 
     NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
@@ -164,12 +162,8 @@
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
     [notifications removeObject:oldNotification];
 
-    HBLogWarn(@"[NUAREPO] Removed: %@", removedNotification);
-
     // Update ivar
     _notifications = [notifications copy];
-
-    HBLogWarn(@"[NUAREPO] New notifs: %@", notifications);
 
     // Update table
     [self.tableViewController.tableView beginUpdates];
@@ -389,7 +383,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NUACoalescedNotification *notification = _notifications[indexPath.row];
-    HBLogWarn(@"[NUAREPO] Notif for cell: %@", notification);
     if (notification.type == NUANotificationTypeMedia) {
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
