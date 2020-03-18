@@ -8,6 +8,9 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
+@property (strong, readonly, nonatomic) NUAPreferenceManager *settings;
+@property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
+
 @property (strong, nonatomic) UIImageView *artworkView;
 @property (strong, nonatomic) CAGradientLayer *gradientLayer;
 @property (strong, nonatomic) NUAMediaControlsView *controlsView;
@@ -35,9 +38,10 @@
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
         self.nowPlayingController.delegate = self;
 
-        // Register for notifications
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
-        [self.nowPlayingController _registerForNotifications];
+        // Set properties
+        self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
+        self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
+        self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
 
         // Create views
         [self setupViews];
@@ -234,6 +238,21 @@
 }
 
 #pragma mark - Notifications
+
+- (void)registerForMediaNotifications {
+    // Register for notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
+    [self.nowPlayingController _registerForNotifications];
+
+    // Update media info
+    [self updateMedia];
+}
+
+- (void)unregisterForMediaNotifications {
+    // Unregister for notifications
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
+    [self.nowPlayingController _unregisterForNotifications];
+}
 
 - (void)updateMedia {
     // Pass to view

@@ -19,7 +19,6 @@
 
         // Create now playing controller
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
         // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
@@ -265,8 +264,10 @@
         [self _loadNotificationsIfNecessary];
     });
 
-    // Cells notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_reloadForExpansion:) name:@"NUATableCellWantsReloadNotification" object:nil];
+    // Notifications
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(_reloadForExpansion:) name:@"NUATableCellWantsReloadNotification" object:nil];
+    [center addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
     // Update media if needed
     [self _updateMedia];
@@ -275,8 +276,10 @@
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
-    // Stop listening for cell notifs
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUATableCellWantsReloadNotification" object:nil];
+    // Stop listening for Notifs
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self name:@"NUATableCellWantsReloadNotification" object:nil];
+    [center removeObserver:self name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
     // Remove media cell if needed
     [self removeMediaCellIfNecessary];
@@ -298,7 +301,7 @@
 #pragma mark - Media
 
 - (BOOL)_mediaCellPresent {
-    if (!_notifications) {
+    if (!_notifications || _notifications.count == 0) {
         // Cant check something that doesnt exist
         return NO;
     }
@@ -320,8 +323,8 @@
     [mutableNotifications insertObject:mediaNotification atIndex:0];
     _notifications = [mutableNotifications copy];
 
-    // Just reload
-    [self.tableViewController.tableView reloadData];
+    // Reload row
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 - (void)removeMediaCellIfNecessary {
@@ -330,21 +333,38 @@
         return;
     }
 
-    // Remove media cell (why do i have to do this stuff)
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        // Reset
-        _notifications = nil;
-        [self.notificationRepository purgeAllNotifications];
+    // Remove media cell
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    [mutableNotifications removeObjectAtIndex:0];
+    _notifications = [mutableNotifications copy];
 
-        // Populate
-        [self _loadNotificationsIfNecessary];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.tableViewController.tableView reloadData];
-        });
-    });
+    // Reload row
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 #pragma mark - UITableViewDelegate
+
+- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (![cell isKindOfClass:[NUAMediaTableViewCell class]]) {
+        // Not media cell
+        return;
+    }
+
+    // Register media cell notifications
+    NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
+    [mediaCell registerForMediaNotifications];
+}
+
+- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (![cell isKindOfClass:[NUAMediaTableViewCell class]]) {
+        // Not media cell
+        return;
+    }
+
+    // Unregister media cell notifications
+    NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
+    [mediaCell unregisterForMediaNotifications];
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -377,9 +397,6 @@
         mediaCell.delegate = self;
         mediaCell.expanded = [_expandedCells containsObject:indexPath];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
-        mediaCell.metadata = self.nowPlayingController.currentNowPlayingMetadata;
-        mediaCell.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
-        mediaCell.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
 
         return mediaCell;
     }

@@ -5,12 +5,13 @@
 #import <NougatServices/NougatServices.h>
 
 @interface NUAMediaTableViewCell : NUATableViewCell <MPUNowPlayingDelegate>
-@property (strong, readonly, nonatomic) NUAPreferenceManager *settings;
 @property (getter=isPlaying, readonly, nonatomic) BOOL playing;
-@property (strong, nonatomic) UIImage *nowPlayingArtwork;
 
-@property (copy, nonatomic) NSString *nowPlayingAppDisplayID;
 @property (strong, nonatomic) MPUNowPlayingMetadata *metadata;
-@property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
+@property (strong, nonatomic) UIImage *nowPlayingArtwork;
+@property (copy, nonatomic) NSString *nowPlayingAppDisplayID;
+
+- (void)registerForMediaNotifications;
+- (void)unregisterForMediaNotifications;
 
 @end
