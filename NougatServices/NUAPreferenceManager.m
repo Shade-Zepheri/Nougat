@@ -48,13 +48,13 @@
         [center addObserver:self selector:@selector(preferencesWereUpdated) name:HBPreferencesDidChangeNotification object:nil];
         [self preferencesWereUpdated];
 
-        // Get toggle info
-        [self refreshToggleInfo];
-
         // Migrate if needed
         if ([self _hasLegacyPrefs]) {
             [self _migrateFromLegacyPrefs];
         }
+
+        // Get toggle info
+        [self refreshToggleInfo];
     }
 
     return self;
