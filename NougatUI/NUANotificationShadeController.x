@@ -1,6 +1,7 @@
 #import "NUANotificationShadeController.h"
 #import <Macros.h>
 #import <NougatServices/NougatServices.h>
+#import <SpringBoardHome/SpringBoardHome.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIStatusBar.h>
@@ -70,7 +71,7 @@
 
         if (%c(_UISystemGestureManager)) {
             // iOS 13
-            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplayWithIdentity:[%c(FBDisplayManager) mainIdentity]];
+            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer recognitionEvent:3 toDisplayWithIdentity:[%c(FBDisplayManager) mainIdentity]];
         } else {
             // iOS 10-12
             [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
@@ -697,11 +698,6 @@
 #pragma mark - Third stage animation helpers
 
 - (void)_prepareForPresentation {
-    if (_animationTimer) {
-        [_animationTimer invalidate];
-        _animationTimer = nil;
-    }
-
     [self _beginPresentation];
     self.animating = YES;
 }
