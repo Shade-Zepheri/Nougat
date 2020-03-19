@@ -1,4 +1,5 @@
 #import "NUARootListController.h"
+#import "PSSegmentTableCell+Enable.h"
 #import <Cephei/HBPreferences.h>
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
@@ -91,12 +92,17 @@
     if (![self _systemDarkmodeAvailable]) {
         // Not iOS 13
         [self removeSpecifierID:@"SystemAppearanceCell"];
-    }
+    } else {
+        // Disable segment controller if using system appearance
+        PSSpecifier *segmentControlSpecifier = [self specifierForID:@"AppearanceSettingCell"];
+        PSSegmentTableCell *segmentControlCell = (PSSegmentTableCell *)[self cachedCellForSpecifier:segmentControlSpecifier];
+        if (segmentControlCell.cellEnabled != ![self.preferences boolForKey:@"usesSystemAppearance"]) {
+            segmentControlCell.cellEnabled = ![self.preferences boolForKey:@"usesSystemAppearance"];
 
-    // Disable segment controller if needed
-    BOOL usesSystemAppearance = [self.preferences boolForKey:@"usesSystemAppearance"];
-    PSSpecifier *appearanceSpecifier = [self specifierForID:@"AppearanceSettingCell"];
-    [appearanceSpecifier setProperty:@(!usesSystemAppearance) forKey:@"enabled"];
+            // Reload change
+            [self reloadSpecifier:segmentControlSpecifier animated:YES];
+        }
+    }
 }
 
 - (void)reloadSpecifiers {
