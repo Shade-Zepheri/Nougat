@@ -288,8 +288,10 @@
 }
 
 - (void)_updateMedia {
-    // Media stuffs
+    // Make sure on the main thread since the notification is dispatched on a mediaremote thread
+    dispatch_async(dispatch_get_main_queue(), ^{
     [self insertMediaCellIfNeccessary];
+    });
 }
 
 #pragma mark - Media

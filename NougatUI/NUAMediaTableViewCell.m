@@ -45,9 +45,6 @@
 
         // Create views
         [self setupViews];
-
-        // Update
-        [self updateMedia];
     }
 
     return self;
@@ -255,10 +252,13 @@
 }
 
 - (void)updateMedia {
-    // Pass to view
-    self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
-    self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
-    self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
+    // Make sure on the main thread since the notification is dispatched on a mediaremote thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Pass down info
+        self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
+        self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
+        self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
+    });
 }
 
 #pragma mark - MPUNowPlayingDelegate
@@ -297,14 +297,13 @@
     if (self.settings.useExternalColor) {
         // Dont use our method if user wants colorflow
         [self updateTintsUsingColorfow:artworkImage];
-        return;
+    } else {
+        // Use built in methods
+        UIColor *backgroundColor = artworkImage.averageColor;
+        UIColor *tintColor = backgroundColor.accentColor;
+
+        [self _updateTintsWithBackgroundColor:backgroundColor tintColor:tintColor];
     }
-
-    // Get colors
-    UIColor *backgroundColor = artworkImage.averageColor;
-    UIColor *tintColor = backgroundColor.accentColor;
-
-    [self _updateTintsWithBackgroundColor:backgroundColor tintColor:tintColor];
 }
 
 #pragma mark - Colorflow
