@@ -72,7 +72,7 @@
 
 #pragma mark - Properties
 
-- (CGFloat)completeHeight {
+- (CGFloat)fullyPresentedHeight {
     NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
     if (togglesCount > 6) {
         return 500.0;
@@ -102,8 +102,8 @@
     [self.delegate contentViewControllerWantsExpansion:self];
 }
 
-- (CGFloat)moduleWantsNotificationShadeFullyPresentedHeight:(NUANotificationShadeModuleViewController *)module {
-    return [self.delegate contentViewControllerWantsFullyPresentedHeight:self];
+- (CGFloat)moduleWantsNotificationShadeInteractiveHeight:(NUANotificationShadeModuleViewController *)module {
+    return [self.delegate contentViewControllerRequestsInteractiveHeight:self];
 }
 
 @end

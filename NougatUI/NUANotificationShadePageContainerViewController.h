@@ -8,7 +8,8 @@
 @required
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController;
-- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController;
+- (CGFloat)containerViewControllerRequestsInteractiveHeight:(NUANotificationShadePageContainerViewController *)containerViewController;
+- (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedPresentedHeight:(CGFloat)presentedHeight;
 
 @end
 
@@ -25,6 +26,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePanelState) {
 @property (strong, readonly, nonatomic) UIPanGestureRecognizer *panGesture;
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (assign, nonatomic) CGFloat revealPercentage;
+@property (assign, readonly, nonatomic) CGFloat contentPresentedHeight;
 @property (readonly, nonatomic) NUANotificationShadePanelState panelState;
 
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate;

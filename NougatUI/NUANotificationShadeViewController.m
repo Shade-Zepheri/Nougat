@@ -113,7 +113,7 @@
     _containerViewController.presentedHeight = height;
 }
 
-- (CGFloat)completeHeight {
+- (CGFloat)fullyPresentedHeight {
     // Get from tableview + panel
     return self.tableViewController.contentHeight + 150.0;
 }
@@ -152,8 +152,13 @@
     [self.delegate notificationShadeViewControllerWantsDismissal:self];
 }
 
-- (CGFloat)containerViewControllerFullyPresentedHeight:(NUANotificationShadePageContainerViewController *)containerViewController {
-    return [self.delegate notificationShadeViewControllerWantsFullyPresentedHeight:self];
+- (CGFloat)containerViewControllerRequestsInteractiveHeight:(NUANotificationShadePageContainerViewController *)containerViewController {
+    return [self.delegate notificationShadeViewControllerRequestsInteractiveHeight:self];
+}
+
+- (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedPresentedHeight:(CGFloat)presentedHeight {
+    // Pass to blur view
+    _containerView.presentedHeight = presentedHeight;
 }
 
 #pragma mark - Table view delegate

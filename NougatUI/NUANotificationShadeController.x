@@ -411,7 +411,7 @@
     return ((_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged)) && !self.animating;
 }
 
-- (CGFloat)notificationShadeViewControllerWantsFullyPresentedHeight:(NUANotificationShadeViewController *)controller {
+- (CGFloat)notificationShadeViewControllerRequestsInteractiveHeight:(NUANotificationShadeViewController *)controller {
     return [self _yValueForPresented];
 }
 
@@ -680,7 +680,7 @@
 }
 
 - (CGFloat)_yValueForPresented {
-    CGFloat totalHeight = _viewController.completeHeight;
+    CGFloat totalHeight = _viewController.fullyPresentedHeight;
     CGFloat safeHeight = kScreenHeight - 100.0;
     return MIN(totalHeight, safeHeight);
 }

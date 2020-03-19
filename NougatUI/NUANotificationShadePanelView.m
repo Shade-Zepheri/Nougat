@@ -2,6 +2,11 @@
 #import <NougatServices/NougatServices.h>
 #import "Macros.h"
 
+@interface NUANotificationShadePanelView ()
+@property (strong, nonatomic) NSLayoutConstraint *heightConstraint;
+
+@end
+
 @implementation NUANotificationShadePanelView
 
 #pragma mark - Init
@@ -69,7 +74,7 @@
     _revealPercentage = percent;
 
     // Calculate height
-    CGFloat revealPortion = (self.completeHeight - 150.0) * percent;
+    CGFloat revealPortion = (self.fullyPresentedHeight - 150.0) * percent;
     self.heightConstraint.constant = revealPortion + 150.0;
 }
 

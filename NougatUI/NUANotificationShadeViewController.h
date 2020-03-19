@@ -12,7 +12,7 @@
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
-- (CGFloat)notificationShadeViewControllerWantsFullyPresentedHeight:(NUANotificationShadeViewController *)controller;
+- (CGFloat)notificationShadeViewControllerRequestsInteractiveHeight:(NUANotificationShadeViewController *)controller;
 
 @end
 
@@ -25,7 +25,7 @@
 @property (strong, readonly, nonatomic) NUAMainTableViewController *tableViewController;
 @property (weak, nonatomic) id<NUANotificationShadeViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
-@property (readonly, nonatomic) CGFloat completeHeight;
+@property (assign, readonly, nonatomic) CGFloat fullyPresentedHeight;
 
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion;
 

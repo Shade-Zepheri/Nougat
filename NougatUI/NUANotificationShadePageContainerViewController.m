@@ -3,6 +3,11 @@
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
+@interface NUANotificationShadePageContainerViewController ()
+@property (getter=isDismissing, assign, nonatomic) BOOL dismissing;
+
+@end
+
 @implementation NUANotificationShadePageContainerViewController
 
 #pragma mark - Initialization
@@ -10,6 +15,9 @@
 - (instancetype)initWithContentViewController:(UIViewController<NUANotificationShadePageContentProvider> *)viewController andDelegate:(id<NUANotificationShadePageContainerViewControllerDelegate>)delegate {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
+        // Set defaults
+        self.dismissing = NO;
+
         _contentViewController = viewController;
         _contentViewController.delegate = self;
 
@@ -31,7 +39,7 @@
     [self _panelView].contentView = self.contentViewController.view;
     [self.contentViewController didMoveToParentViewController:self];
 
-    [self _panelView].completeHeight = self.contentViewController.completeHeight;
+    [self _panelView].fullyPresentedHeight = self.contentViewController.fullyPresentedHeight;
 
     // Add pan gesture
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
@@ -57,40 +65,53 @@
     return self.contentViewController.revealPercentage;
 }
 
-- (void)setRevealPercentage:(CGFloat)percent {
-    self.contentViewController.revealPercentage = percent;
-    [self _panelView].revealPercentage = percent;
+- (void)setRevealPercentage:(CGFloat)percentage {
+    // Pass to views
+    self.contentViewController.revealPercentage = percentage;
+    [self _panelView].revealPercentage = percentage;
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
 
-    // Pass on to panel
+    // Pass on to views
     [self _panelView].inset = height;
+}
+
+- (CGFloat)contentPresentedHeight {
+    return self.contentViewController.fullyPresentedHeight;
 }
 
 #pragma mark - Delegate
 
 - (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely {
-    [self _updateExpandedHeight:150.0 baseHeight:self.presentedHeight];
+    __weak __typeof(self) weakSelf = self;
+    CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
+    [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:^{
+        if (!completely) {
+            return;
+        }
 
-    if (completely) {
-        [self.delegate containerViewControllerWantsDismissal:self];
-    }
+        // Dismiss entirely
+        [weakSelf.delegate containerViewControllerWantsDismissal:self];
+    }];
 }
 
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController {
-    CGFloat fullHeight = self.contentViewController.completeHeight;
-    [self _updateExpandedHeight:fullHeight baseHeight:self.presentedHeight];
+    CGFloat fullHeight = self.contentViewController.fullyPresentedHeight;
+    [self _updateExpandedHeight:fullHeight baseHeight:self.presentedHeight completion:nil];
 }
 
-- (CGFloat)contentViewControllerWantsFullyPresentedHeight:(UIViewController *)contentViewController {
-    return [self.delegate containerViewControllerFullyPresentedHeight:self];
+- (CGFloat)contentViewControllerRequestsInteractiveHeight:(UIViewController *)contentViewController {
+    return [self.delegate containerViewControllerRequestsInteractiveHeight:self];
 }
 
 - (void)handleDismiss {
+    // Allow dispatching of delegate methods
+    self.dismissing = YES;
+
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-    [self _updateExpandedHeight:150.0 baseHeight:baseHeight];
+    [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:nil];
 }
 
 #pragma mark - Gestures
@@ -139,9 +160,9 @@
     return 1 - yForX;
 }
 
-- (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight {
+- (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     // Pass through
-    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:nil];
+    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:completion];
 }
 
 - (void)_updatePresentedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
@@ -189,18 +210,34 @@
 #pragma mark - Presentation
 
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {
-    [self _updatePresentedHeight:finalHeight baseHeight:self.presentedHeight completion:completion];
+    [self _updatePresentedHeight:finalHeight baseHeight:self.presentedHeight completion:^{
+        // Add call to disable dispatching delegate methods
+        self.dismissing = NO;
+
+        if (!completion) {
+            return;
+        }
+
+        completion();
+    }];
 }
 
 - (void)_updatePresentedHeight:(CGFloat)height {
     self.presentedHeight = height;
+
+    if (!self.dismissing) {
+        // Dont dispatch delegate unless dismissing by tap
+        return;
+    }
+
+    [self.delegate containerViewController:self updatedPresentedHeight:height];
 }
 
 #pragma mark - Expansion
 
 - (void)_expandHeightWithTranslation:(CGPoint)translation {
     CGFloat newHeight = _initialHeight + translation.y;
-    CGFloat fullHeight = self.contentViewController.completeHeight;
+    CGFloat fullHeight = self.contentViewController.fullyPresentedHeight;
     if (newHeight > fullHeight) {
         // Apply slowdown
         newHeight = fullHeight + (newHeight - fullHeight) * 0.1;
@@ -215,7 +252,7 @@
     CGFloat newHeight = _initialHeight + translation.y;
     CGFloat projectedHeight = newHeight + [self project:velocity.y decelerationRate:0.998];
 
-    CGFloat fullHeight = self.contentViewController.completeHeight;
+    CGFloat fullHeight = self.contentViewController.fullyPresentedHeight;
     CGFloat expandTargetHeight = fullHeight * 0.7;
     CGFloat collapseTargetHeight = 150.0 * 1.4;
 
@@ -235,7 +272,7 @@
     }
 
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-    [self _updateExpandedHeight:targetHeight baseHeight:baseHeight];
+    [self _updateExpandedHeight:targetHeight baseHeight:baseHeight completion:nil];
 }
 
 - (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
@@ -245,7 +282,7 @@
 
 - (void)_updateExpandedHeight:(CGFloat)height {
     // Calculate and update percent
-    CGFloat fullHeight = self.contentViewController.completeHeight;
+    CGFloat fullHeight = self.contentViewController.fullyPresentedHeight;
     CGFloat expandedHeight = height - 150.0;
     CGFloat percent = expandedHeight / (fullHeight - 150);
     self.revealPercentage = percent;
