@@ -5,6 +5,7 @@
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIStatusBar.h>
+#import <math.h>
 #import <version.h>
 
 @implementation NUANotificationShadeController
@@ -275,11 +276,18 @@
         CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
         if (maxLeadingX > 5000.0) {
             // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
+            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
             maxLeadingX = kScreenWidth / 4;
         }
 
         // Get min trailing x taking into account orientation
         CGFloat minTrailingX = kScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame));
+        if (isnan(minTrailingX)) {
+            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
+            // Fall back to 1/4
+            minTrailingX = kScreenWidth - maxLeadingX;
+        }
+
         return location.x > maxLeadingX && location.x < minTrailingX;
     } else {
         // Regular old frames
