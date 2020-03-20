@@ -1,3 +1,5 @@
+commit_message: '[Localization] Update %language% translations'
+append_commit_message: false
 files:
   - source: /Settings/Resources/en.lproj/*strings
     translation: /Settings/Resources/%osx_code%/%original_file_name%
