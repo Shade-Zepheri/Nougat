@@ -60,8 +60,8 @@
 - (void)setPresentedHeight:(CGFloat)height {
     _presentedHeight = height;
     if (height < 150.0) {
-        // Only start to expand once panel in view
-        return;
+        // Since cant really return here, ensure proper height set
+        height = 150.0;
     }
 
     _heightConstraint.constant = height - 150.0;
@@ -248,7 +248,7 @@
 - (void)loadView {
     UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    _heightConstraint = [view.heightAnchor constraintEqualToConstant:20.0];
+    _heightConstraint = [view.heightAnchor constraintEqualToConstant:0.0];
     _heightConstraint.active = YES;
     self.view = view;
 }
