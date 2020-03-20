@@ -1,10 +1,10 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Bật Nougat";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
+"USE_SYSTEM_APPEARANCE" = "Phong cách mặc định của hệ thống";
 "USE_COLORFLOW" = "Use Colorflow Colors";
 
 "USER_GUIDE" = "User Guide";
