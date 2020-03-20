@@ -70,7 +70,7 @@
     [_containerViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 
     // Constrain width on ipads or set width on phones to device width;
-    CGFloat desiredWidth = 375.0;
+    CGFloat desiredWidth = MIN(414, kScreenWidth);
     [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWidth].active = YES;
 
     // Do something special with top because slide in from top
