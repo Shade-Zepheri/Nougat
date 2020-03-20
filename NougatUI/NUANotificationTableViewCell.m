@@ -198,15 +198,15 @@
 }
 
 - (void)_configureHeaderText {
-    // Attribute up
     NSString *displayName;
-    if ([self.notification.sectionID isEqualToString:@"Screen Recording"]) {
+    if ([self.notification.sectionID isEqualToString:@"Screen Recording"] || [self.notification.sectionID isEqualToString:@"com.apple.ReplayKitNotifications"]) {
         // Exception for screen recording, since it doesnt use a conventional bundle id
         displayName = @"Screen Recording";
     } else {
         displayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(self.notification.sectionID);
     }
 
+    // Attribute up
     NSString *elapsedTime = [self.notification.timestamp getElapsedTime];
     NSString *baseHeaderText = [NSString stringWithFormat:@"%@ • %@", displayName, elapsedTime];
 
