@@ -1,0 +1,5 @@
+files:
+  - source: /Settings/Resources/en.lproj/*strings
+    translation: /Settings/Resources/%osx_code%/%original_file_name%
+  - source: /Toggles/**/Resources/en.lproj/*.strings
+    translation: /Toggles/**/Resources/%osx_code%/%original_file_name%
