@@ -4,14 +4,14 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Phong cách mặc định của hệ thống";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "Dùng Phong cách mặc định của hệ thống";
+"USE_COLORFLOW" = "Dùng màu của Colorflow";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Hướng dẫn sử dụng";
+"SORT_ORDER" = "Sắp xếp thứ tự";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Thử ngay Nougat của Shade Zepheri. Sử dụng Trung tâm thông báo của Android trên HĐH iOS!";
 
-"SUPPORT" = "Support";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Hỗ trợ";
+"HELP_TRANSLATING" = "Hỗ trợ tôi dịch!";
+"SOURCE_CODE" = "Mã nguồn";
