@@ -108,11 +108,21 @@
     _notifications = [notifications copy];
 
     // Update table
+    void (^updateBlock)() = ^{
+        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    };
+
+    if (@available(iOS 11, *)) {
+        // Use the new and better performBatchUpdates
+        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    } else {
+        // Good old begin/endUpdates
     [self.tableViewController.tableView beginUpdates];
 
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        updateBlock();
 
     [self.tableViewController.tableView endUpdates];
+}
 }
 
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification updateIndex:(BOOL)updateIndex {
@@ -135,8 +145,7 @@
     _notifications = [notifications copy];
 
     // Update table
-    [self.tableViewController.tableView beginUpdates];
-
+    void (^updateBlock)() = ^{
     if (newIndex == oldIndex) {
         // Simply just reload the cell, no need to insert and delete
         [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -144,8 +153,19 @@
         [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
         [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
     }
+    };
+
+    if (@available(iOS 11, *)) {
+        // Use the new and better performBatchUpdates
+        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    } else {
+        // Good old begin/endUpdates
+        [self.tableViewController.tableView beginUpdates];
+
+        updateBlock();
 
     [self.tableViewController.tableView endUpdates];
+}
 }
 
 - (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification {
@@ -166,11 +186,21 @@
     _notifications = [notifications copy];
 
     // Update table
+    void (^updateBlock)() = ^{
+        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    };
+
+    if (@available(iOS 11, *)) {
+        // Use the new and better performBatchUpdates
+        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    } else {
+        // Good old begin/endUpdates
     [self.tableViewController.tableView beginUpdates];
 
-    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        updateBlock();
 
     [self.tableViewController.tableView endUpdates];
+}
 }
 
 - (NUACoalescedNotification *)coalescedNotificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
@@ -319,8 +349,22 @@
     [mutableNotifications insertObject:mediaNotification atIndex:0];
     _notifications = [mutableNotifications copy];
 
-    // Reload row
+    // Insert row
+    void (^updateBlock)() = ^{
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    };
+
+    if (@available(iOS 11, *)) {
+        // Use the new and better performBatchUpdates
+        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    } else {
+        // Good old begin/endUpdates
+        [self.tableViewController.tableView beginUpdates];
+
+        updateBlock();
+
+        [self.tableViewController.tableView endUpdates];
+    }
 }
 
 - (void)removeMediaCellIfNecessary {
@@ -334,8 +378,22 @@
     [mutableNotifications removeObjectAtIndex:0];
     _notifications = [mutableNotifications copy];
 
-    // Reload row
+    // Delete row
+    void (^updateBlock)() = ^{
     [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    };
+
+    if (@available(iOS 11, *)) {
+        // Use the new and better performBatchUpdates
+        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    } else {
+        // Good old begin/endUpdates
+        [self.tableViewController.tableView beginUpdates];
+
+        updateBlock();
+
+        [self.tableViewController.tableView endUpdates];
+    }
 }
 
 #pragma mark - UITableViewDelegate
