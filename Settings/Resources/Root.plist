@@ -137,6 +137,14 @@
         <dict>
             <key>cellClass</key>
             <string>HBLinkTableCell</string>
+            <key>label</key>
+            <string>HELP_TRANSLATING</string>
+            <key>url</key>
+            <string>https://crwd.in/nougat</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBLinkTableCell</string>
             <key>icon</key>
             <string>source.png</string>
             <key>label</key>
