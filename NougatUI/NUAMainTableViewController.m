@@ -423,12 +423,16 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == 0 && [self _mediaCellPresent]) {
-        // Is media cell
-        return;
-    }
+        // Launch music playing app
+        NSString *nowPlayingID = self.nowPlayingController.nowPlayingAppDisplayID;
+        [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:nowPlayingID suspended:NO];
 
+        // Dismiss nougat
+        [self.delegate tableViewControllerWantsDismissal:self];
+    } else {
     // Launch notif
     [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
+}
 }
 
 #pragma mark - UITableViewDataSource
