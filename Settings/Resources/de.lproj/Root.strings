@@ -1,4 +1,4 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Aktiviert";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
@@ -7,11 +7,11 @@
 "USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
 "USE_COLORFLOW" = "Use Colorflow Colors";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Handbuch";
+"SORT_ORDER" = "Sortierung";
 
 "SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
 
 "SUPPORT" = "Support";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"HELP_TRANSLATING" = "Hilf uns beim Übersetzen!";
+"SOURCE_CODE" = "Quellcode";
