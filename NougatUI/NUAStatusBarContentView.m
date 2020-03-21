@@ -2,6 +2,7 @@
 #import <BaseBoard/BaseBoard.h>
 #import <NougatServices/NougatServices.h>
 #import <UIKit/UIKit+Private.h>
+#import <sys/utsname.h>
 
 @implementation NUAStatusBarContentView
 
@@ -23,11 +24,26 @@
 
 #pragma mark - View creation
 
+- (NSString *)_carrierText {
+    if ([NUAPreferenceManager carrierName]) {
+        return [NUAPreferenceManager carrierName];
+    } else {
+        // Fallback to device type
+        struct utsname systemInfo;
+        uname(&systemInfo);
+        NSString *deviceName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+
+        // Trim numbers and comma from device name
+        NSCharacterSet *characterSet = [NSCharacterSet characterSetWithCharactersInString:@"123456789,"];
+        return [deviceName stringByTrimmingCharactersInSet:characterSet];
+    }
+}
+
 - (void)_createCarrierLabel {
     _carrierLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.carrierLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
     self.carrierLabel.textAlignment = NSTextAlignmentLeft;
-    self.carrierLabel.text = [NUAPreferenceManager carrierName];
+    self.carrierLabel.text = [self _carrierText];
     self.carrierLabel.font = [UIFont systemFontOfSize:15];
     [self addSubview:self.carrierLabel];
 
