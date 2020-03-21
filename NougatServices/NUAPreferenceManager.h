@@ -32,10 +32,11 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 
 @property (readonly, nonatomic) BOOL useExternalColor;
 
++ (BOOL)_deviceHasNotch;
++ (NSString *)carrierName;
+
 - (NSArray<NSString *> *)_installedToggleIdentifiers;
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;
 - (void)refreshToggleInfo;
-
-+ (NSString *)carrierName;
 
 @end

@@ -40,13 +40,12 @@
 }
 
 - (void)_createPercentLabel {
-    // Determine if percent hidden or not
-    Class baseStatusBar = NSClassFromString(@"UIStatusBar_Base");
-    BOOL hasModernStatusBar = ([baseStatusBar respondsToSelector:@selector(_statusBarImplementationClass)] && [baseStatusBar _statusBarImplementationClass] == NSClassFromString(@"UIStatusBar_Modern")) || ([baseStatusBar respondsToSelector:@selector(_implementationClass)] && [baseStatusBar _implementationClass] == NSClassFromString(@"UIStatusBar_Modern"));
-    if (baseStatusBar && hasModernStatusBar) {
+    // Since percent label would get cutoff by notch, dont add it on notched devices
+    if ([NUAPreferenceManager _deviceHasNotch]) {
         return;
     }
 
+    // Create label
     _batteryLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.batteryLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
     self.batteryLabel.textAlignment = NSTextAlignmentLeft;
