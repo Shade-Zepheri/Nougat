@@ -1,0 +1,17 @@
+language: objective-c
+osx_image: xcode11.3
+
+branches:
+  only:
+    - master
+
+env:
+  global:
+    - THEOS=theos
+
+script:
+- make package
+
+before_install:
+- brew install ldid
+- git clone --recursive https://github.com/Shade-Zepheri/theos.git $THEOS
