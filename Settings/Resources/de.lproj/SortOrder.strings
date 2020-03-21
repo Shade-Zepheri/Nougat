@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Füge neue Schalter zu Nougat hinzu oder bearbeite sie. Nougat kann maximal 9 Schalter anzeigen.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sortierung";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Löschen";
-"DISABLED_MODULES_SECTION_TITLE" = "Mehr Schalter";
-"ENABLED_MODULES_SECTION_TITLE" = "Angezeigt";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
+"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
+"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
+"ENABLED_MODULES_SECTION_TITLE" = "Include";
