@@ -1,4 +1,4 @@
-# Nougat ![Build Nougat](https://github.com/Shade-Zepheri/Nougat/workflows/Build%20Nougat/badge.svg) [![Crowdin](https://badges.crowdin.net/nougat/localized.svg)](https://crowdin.com/project/nougat)
+# Nougat ![Build Nougat](https://github.com/Shade-Zepheri/Nougat/workflows/Build%20Nougat/badge.svg) [![Build Status](https://travis-ci.org/Shade-Zepheri/Nougat.svg?branch=master)](https://travis-ci.org/Shade-Zepheri/Nougat) [![Crowdin](https://badges.crowdin.net/nougat/localized.svg)](https://crowdin.com/project/nougat)
 An almost 1:1 recreation of the Android notification panel from Android Oreo for iOS. Built to support iOS 10 up to iOS 13.3 on iPhones and iPads.
 
 ## Installation
