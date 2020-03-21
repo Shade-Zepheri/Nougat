@@ -26,7 +26,7 @@ jobs:
         THEOS: theos
       run: |
         brew install ldid
-        git clone --recursive https://github.com/theos/theos.git $THEOS
+        git clone --recursive https://github.com/Shade-Zepheri/theos.git $THEOS
         git submodule update --init --recursive
 
     # Build Package

@@ -11,7 +11,7 @@ NougatUI_PUBLIC_HEADERS = $(HEADERS)
 NougatUI_FRAMEWORKS = UIKit QuartzCore
 NougatUI_EXTRA_FRAMEWORKS = NougatServices
 NougatUI_LIBRARIES = flipswitch
-NougatUI_CFLAGS = -I../Headers -IMedia -INotifications -F$(THEOS_OBJ_DIR)
+NougatUI_CFLAGS = -I../Headers -IMedia -INotifications
 NougatUI_LDFLAGS = $(wildcard *.tbd)
 NougatUI_INSTALL_PATH = /usr/lib
 
