@@ -35,4 +35,4 @@ jobs:
     - name: Build Package
       env:
         THEOS: theos
-      run: make package
+      run: make
