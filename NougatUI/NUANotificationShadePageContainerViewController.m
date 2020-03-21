@@ -108,8 +108,6 @@
 
 - (void)handleDismiss {
     // Allow dispatching of delegate methods
-    self.dismissing = YES;
-
     CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
     [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:nil];
 }
@@ -210,6 +208,9 @@
 #pragma mark - Presentation
 
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {
+    // Allow delegates to adjust
+    self.dismissing = YES;
+
     [self _updatePresentedHeight:finalHeight baseHeight:self.presentedHeight completion:^{
         // Add call to disable dispatching delegate methods
         self.dismissing = NO;
