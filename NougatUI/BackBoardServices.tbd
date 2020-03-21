@@ -1,5 +1,5 @@
 --- !tapi-tbd-v2
-archs:                 [ armv7, arm64, arm64e, x86_64 ]
+archs:                 [ armv7, arm64, arm64e ]
 uuids:                 [ 'arm64e: EDDE35EE-B2FC-38AE-B65D-D86E6D3D10F0' ]
 platform:              ios
 flags:                 [ flat_namespace ]
@@ -8,7 +8,7 @@ current-version:       1
 compatibility-version: 0
 objc-constraint:       retain_release
 exports:
-  - archs:              [ armv7, arm64, arm64e, x86_64 ]
+  - archs:              [ armv7, arm64, arm64e ]
     symbols:            [ _BKAccelerometer_server, _BKAccelerometer_server_routine, _BKCreateMIGServerSource,
                           _BKCreateMIGServerSourceWithContext, _BKDefaultBrightness, _BKDefaultKeyALSEnabled,
                           _BKGetContextForCalloutCurrentMIGServerSource, _BKGetMachPortForMIGServerSource,

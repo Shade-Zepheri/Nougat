@@ -1,5 +1,5 @@
 --- !tapi-tbd-v2
-archs:                 [ armv7, arm64, arm64e, x86_64 ]
+archs:                 [ armv7, arm64, arm64e ]
 uuids:                 [ 'arm64e: 312F7354-B5CA-3020-89CE-24C91F3FFE4A' ]
 platform:              ios
 flags:                 [ flat_namespace ]
@@ -8,7 +8,7 @@ current-version:       0
 compatibility-version: 0
 objc-constraint:       retain_release
 exports:
-  - archs:              [ armv7, arm64, arm64e, x86_64 ]
+  - archs:              [ armv7, arm64, arm64e ]
     symbols:            [ _FBApp, _FBAppLibraryLoggingSubsystem, _FBApplicationBadgeValueAccessEntitlement,
                           _FBApplicationDataStoreRepositoryServerMessageReceivedNotification,
                           _FBApplicationDataStoreRepositoryServerMessageReceivedNotificationUserInfoKeyMessageType,
