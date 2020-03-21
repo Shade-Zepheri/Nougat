@@ -25,4 +25,21 @@
     return self;
 }
 
+#pragma mark - NSObject
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p; request = %@>", self.class, self, self.request];
+}
+
+- (BOOL)isEqual:(id)object {
+    if (!object || ![object isKindOfClass:self.class]) {
+        // Not the same object
+        return NO;
+    }
+
+    // Check if stored requests match, since isEqual is too picky
+    NUANotificationEntry *entry = (NUANotificationEntry *)object;
+    return [entry.request matchesRequest:self.request];
+}
+
 @end

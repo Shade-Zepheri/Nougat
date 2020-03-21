@@ -61,10 +61,25 @@
     return self;
 }
 
-#pragma mark - Description
+#pragma mark - NSObject
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message];
+}
+
+- (BOOL)isEqual:(id)object {
+    if (!object || ![object isKindOfClass:self.class]) {
+        // Not same class
+        return NO;
+    }
+
+    // Compare section and thread and entries
+    NUACoalescedNotification *notification = (NUACoalescedNotification *)object;
+    BOOL sameSection = [notification.sectionID isEqualToString:self.sectionID];
+    BOOL sameThread = [notification.threadID isEqualToString:self.threadID];
+    BOOL sameEntries = [notification.entries isEqualToArray:self.entries];
+
+    return sameSection && sameThread && sameEntries;
 }
 
 #pragma mark - Properties

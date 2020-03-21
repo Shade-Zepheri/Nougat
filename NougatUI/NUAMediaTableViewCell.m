@@ -50,6 +50,20 @@
     return self;
 }
 
+#pragma mark - NSObject
+
+- (BOOL)isEqual:(id)object {
+    if (!object || ![object isKindOfClass:self.class]) {
+        // Not same class
+        return NO;
+    }
+
+    // TLDR: all media cells are the same since only one exists
+    return YES;
+}
+
+#pragma mark - View Creation
+
 - (void)setupViews {
     [self _createArtworkView];
     [self _createGradientView];

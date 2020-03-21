@@ -34,6 +34,21 @@
     return self;
 }
 
+#pragma mark - NSObject
+
+- (BOOL)isEqual:(id)object {
+    if (!object || ![object isKindOfClass:self.class]) {
+        // Not same class
+        return NO;
+    }
+
+    // Compare stored notification
+    NUANotificationTableViewCell *tableViewCell = (NUANotificationTableViewCell *)object;
+    return [tableViewCell.notification isEqual:self.notification];
+}
+
+#pragma mark - View Creation
+
 - (void)createViews {
     [self _createAttachmentImageViewIfNecessary];
     [self _createTitleLabelIfNecessary];

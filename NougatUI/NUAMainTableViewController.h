@@ -14,16 +14,13 @@
 
 @end
 
-@interface NUAMainTableViewController : UIViewController <NUANotificationsObserver, NUATableViewCellDelegate, NUANotificationTableViewCellDelegate, UITableViewDataSource, UITableViewDelegate> {
-    NSLayoutConstraint *_heightConstraint;
-    NSArray<NUACoalescedNotification *> *_notifications;
-    NSMutableArray<NSIndexPath *> *_expandedCells;
-}
+@interface NUAMainTableViewController : UIViewController <NUANotificationsObserver, NUATableViewCellDelegate, NUANotificationTableViewCellDelegate, UITableViewDataSource, UITableViewDelegate>
 @property (strong, readonly, nonatomic) UITableViewController *tableViewController;
 @property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
 @property (strong, readonly, nonatomic) NUANotificationRepository *notificationRepository;
 @property (weak, nonatomic) id<NUAMainTableViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (readonly, nonatomic) CGFloat contentHeight;
+@property (strong, readonly, nonatomic) NSArray<NUACoalescedNotification *> *notifications;
 
 @end

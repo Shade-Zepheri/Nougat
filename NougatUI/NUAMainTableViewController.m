@@ -1,7 +1,16 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
 #import <MediaRemote/MediaRemote.h>
+#import <SpringBoard/SpringBoard.h>
 #import <Macros.h>
+
+@interface NUAMainTableViewController () {
+    NSMutableArray<NUATableViewCell *> *_expandedCells;
+    NSLayoutConstraint *_heightConstraint;
+}
+@property (assign, nonatomic) CGFloat removedHeight;
+
+@end
 
 @implementation NUAMainTableViewController
 
@@ -29,7 +38,7 @@
 }
 
 - (void)_loadNotificationsIfNecessary {
-    if (_notifications) {
+    if (self.notifications) {
         // Generate only once
         return;
     }
@@ -70,37 +79,47 @@
 #pragma mark - KVO
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
-    if ([keyPath isEqualToString:@"revealPercentage"]) {
-        // Adjust table frame
-        CGFloat revealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
-        CGFloat expandedHeight = 350 * revealPercentage;
+    if (![keyPath isEqualToString:@"revealPercentage"]) {
+        return;
+    }
 
-        CGFloat currentHeight = expandedHeight + self.presentedHeight;
-        CGFloat heightDifference = kScreenHeight - currentHeight;
-        if (heightDifference >= 200) {
-            // Have a tolerance to do nothing
-            return;
-        }
+    if (self.contentHeight + 500.0 <= kScreenHeight - 100) {
+        // Table is never going to expaind below cutoff
+        return;
+    }
 
+    // Adjust table frame
+    CGFloat revealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
+    CGFloat oldRevealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
+
+    CGFloat expandedHeight = 350 * revealPercentage;
+    CGFloat currentHeight = expandedHeight + self.presentedHeight;
+    CGFloat previousHeight = 350 * oldRevealPercentage + self.presentedHeight;
+
+    CGFloat heightDifference = kScreenHeight - currentHeight;
+    if (heightDifference < 100) {
+        // Remove height
         CGFloat extraHeight = 100 - heightDifference;
         self.presentedHeight -= extraHeight;
-    } else if ([keyPath isEqualToString:@"presentedHeight"]) {
-        // Update height
-        CGFloat presentedHeight = [change[NSKeyValueChangeNewKey] floatValue]; 
-        self.presentedHeight = presentedHeight;
+        self.removedHeight += extraHeight;
+    } else if (self.removedHeight > 0.0) {
+        // Add remaining back
+        CGFloat pannedHeight = previousHeight - currentHeight;
+        self.presentedHeight += pannedHeight;
+        self.removedHeight -= pannedHeight;
     }
 }
 
 #pragma mark - Observer
 
 - (void)notificationRepositoryAddedNotification:(NUACoalescedNotification *)newNotification {
-    if (!_notifications) {
+    if (!self.notifications) {
         // Notification shade hasnt been loaded
         return;
     }
 
     // Add new entry
-    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NSUInteger index = [self _mediaCellPresent] ? 1 : 0;
     [notifications insertObject:newNotification atIndex:index];
 
@@ -117,22 +136,22 @@
         [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
     } else {
         // Good old begin/endUpdates
-    [self.tableViewController.tableView beginUpdates];
+        [self.tableViewController.tableView beginUpdates];
 
         updateBlock();
 
-    [self.tableViewController.tableView endUpdates];
-}
+        [self.tableViewController.tableView endUpdates];
+    }
 }
 
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification updateIndex:(BOOL)updateIndex {
-    if (!_notifications) {
+    if (!self.notifications) {
         // Notification shade hasnt been loaded
         return;
     }
 
     // Get old notification 
-    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
 
     // Remove old and add new      
@@ -146,13 +165,13 @@
 
     // Update table
     void (^updateBlock)() = ^{
-    if (newIndex == oldIndex) {
-        // Simply just reload the cell, no need to insert and delete
-        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    } else {
-        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
+        if (newIndex == oldIndex) {
+            // Simply just reload the cell, no need to insert and delete
+            [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        } else {
+            [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        }
     };
 
     if (@available(iOS 11, *)) {
@@ -164,18 +183,18 @@
 
         updateBlock();
 
-    [self.tableViewController.tableView endUpdates];
-}
+        [self.tableViewController.tableView endUpdates];
+    }
 }
 
 - (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification {
-    if (!_notifications) {
+    if (!self.notifications) {
         // Notification shade hasnt been loaded
         return;
     }
 
     // Get old notification 
-    NSMutableArray<NUACoalescedNotification *> *notifications = [_notifications mutableCopy];
+    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
 
     // Remove old
@@ -195,16 +214,16 @@
         [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
     } else {
         // Good old begin/endUpdates
-    [self.tableViewController.tableView beginUpdates];
+        [self.tableViewController.tableView beginUpdates];
 
         updateBlock();
 
-    [self.tableViewController.tableView endUpdates];
-}
+        [self.tableViewController.tableView endUpdates];
+    }
 }
 
 - (NUACoalescedNotification *)coalescedNotificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
-    for (NUACoalescedNotification *notification in _notifications) {
+    for (NUACoalescedNotification *notification in self.notifications) {
         if (![notification.sectionID isEqualToString:sectionID] || ![notification.threadID isEqualToString:threadID]) {
             // Make sure its the same notification
             continue;
@@ -218,7 +237,7 @@
 
 - (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
     // Get associated entry
-    NUACoalescedNotification *notification = _notifications[indexPath.row];
+    NUACoalescedNotification *notification = self.notifications[indexPath.row];
     NUANotificationEntry *entry = notification.entries[0];
 
     // Get action
@@ -320,38 +339,38 @@
 - (void)_updateMedia {
     // Make sure on the main thread since the notification is dispatched on a mediaremote thread
     dispatch_async(dispatch_get_main_queue(), ^{
-    [self insertMediaCellIfNeccessary];
+        [self insertMediaCellIfNeccessary];
     });
 }
 
 #pragma mark - Media
 
 - (BOOL)_mediaCellPresent {
-    if (!_notifications || _notifications.count == 0) {
+    if (!self.notifications || self.notifications.count == 0) {
         // Cant check something that doesnt exist
         return NO;
     }
 
     // Since is always gonna be top notif, only check it
-    NUACoalescedNotification *topNotification = _notifications[0];
+    NUACoalescedNotification *topNotification = self.notifications[0];
     return topNotification.type == NUANotificationTypeMedia;
 }
 
 - (void)insertMediaCellIfNeccessary {
-    if ([self _mediaCellPresent] || !self.nowPlayingController.isPlaying || !_notifications) {
+    if ([self _mediaCellPresent] || !self.nowPlayingController.isPlaying || !self.notifications) {
         // cant add if already exists, or not playing, or if nothing to add to
         return;
     }
 
     // Add dummie to backng array
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
     NUACoalescedNotification *mediaNotification = [NUACoalescedNotification mediaNotification];
     [mutableNotifications insertObject:mediaNotification atIndex:0];
     _notifications = [mutableNotifications copy];
 
     // Insert row
     void (^updateBlock)() = ^{
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
     };
 
     if (@available(iOS 11, *)) {
@@ -374,13 +393,13 @@
     }
 
     // Remove media cell
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [_notifications mutableCopy];
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
     [mutableNotifications removeObjectAtIndex:0];
     _notifications = [mutableNotifications copy];
 
     // Delete row
     void (^updateBlock)() = ^{
-    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
     };
 
     if (@available(iOS 11, *)) {
@@ -430,15 +449,15 @@
         // Dismiss nougat
         [self.delegate tableViewControllerWantsDismissal:self];
     } else {
-    // Launch notif
-    [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
-}
+        // Launch notif
+        [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
+    }
 }
 
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _notifications.count;
+    return self.notifications.count;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -446,13 +465,13 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NUACoalescedNotification *notification = _notifications[indexPath.row];
+    NUACoalescedNotification *notification = self.notifications[indexPath.row];
     if (notification.type == NUANotificationTypeMedia) {
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
         // Provide basic information
         mediaCell.delegate = self;
-        mediaCell.expanded = [_expandedCells containsObject:indexPath];
+        mediaCell.expanded = [_expandedCells containsObject:mediaCell];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
 
         return mediaCell;
@@ -461,7 +480,7 @@
     NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
     cell.actionsDelegate = self;
     cell.delegate = self;
-    cell.expanded = [_expandedCells containsObject:indexPath];
+    cell.expanded = [_expandedCells containsObject:cell];
     cell.layoutMargins = UIEdgeInsetsZero;
     cell.notification = notification;
 
@@ -480,15 +499,26 @@
 
 - (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand; {
     // Add indexpath to expanded bois
-    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+    __block CGFloat addedHeight = 0.0;
     if (expand) {
-        [_expandedCells addObject:indexPath];
+        [_expandedCells addObject:cell];
+
+        // Set height to be added
+        addedHeight += 50.0;
     } else {
-        [_expandedCells removeObject:indexPath];
+        [_expandedCells removeObject:cell];
+
+        // Set height to be removed
+        addedHeight -= 50.0;
     }
 
     // Reload
-    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+
+    [UIView animateWithDuration:0.3 animations:^{
+        self.presentedHeight += addedHeight;
+    }];
 }
 
 - (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {
