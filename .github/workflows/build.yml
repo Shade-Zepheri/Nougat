@@ -6,7 +6,7 @@ name: Build Nougat
 # events but only for the master branch
 on:
   push:
-    branches: [ ci-test ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
