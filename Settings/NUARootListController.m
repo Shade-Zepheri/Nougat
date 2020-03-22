@@ -121,7 +121,7 @@
     // Create header view
     UIView *headerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 200)];
     self.headerImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.headerImageView.contentMode = UIViewContentModeScaleAspectFill;
+    self.headerImageView.contentMode = UIViewContentModeScaleAspectFit;
     self.headerImageView.image = [UIImage imageNamed:@"Header" inBundle:self.bundle];
     self.headerImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [headerContainerView addSubview:self.headerImageView];
