@@ -1,17 +1,12 @@
 #import "NUARootListController.h"
 #import "PSSegmentTableCell+Enable.h"
-#import <Cephei/HBPreferences.h>
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
-#import <Preferences/PSSpecifier.h>
+#import <Preferences/PSSpecifier+Private.h>
+#import <Preferences/PSSwitchTableCell+Private.h>
 #import <TechSupport/TSContactViewController.h>
 #import <UIKit/UIImage+Private.h>
 #import <version.h>
-
-@interface NUARootListController ()
-@property (strong, readonly, nonatomic) HBPreferences *preferences;
-
-@end
 
 @implementation NUARootListController
 
@@ -35,7 +30,7 @@
     self = [super init];
     if (self) {
         // Set preferences
-        _preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
+        _preferences = [NUAPreferenceManager sharedSettings];
 
         // Set appearance
         HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
@@ -92,17 +87,22 @@
     if (![self _systemDarkmodeAvailable]) {
         // Not iOS 13
         [self removeSpecifierID:@"SystemAppearanceCell"];
-    } else {
-        // Disable segment controller if using system appearance
-        PSSpecifier *segmentControlSpecifier = [self specifierForID:@"AppearanceSettingCell"];
-        PSSegmentTableCell *segmentControlCell = (PSSegmentTableCell *)[self cachedCellForSpecifier:segmentControlSpecifier];
-        if (segmentControlCell.cellEnabled != ![self.preferences boolForKey:@"usesSystemAppearance"]) {
-            segmentControlCell.cellEnabled = ![self.preferences boolForKey:@"usesSystemAppearance"];
-
-            // Reload change
-            [self reloadSpecifier:segmentControlSpecifier animated:YES];
-        }
     }
+
+    // Enable/Disable segment control
+    BOOL enabled = self.preferences.usesSystemAppearance;
+    [self _modifySegmentCellVisibility:!enabled];
+}
+
+- (void)_modifySegmentCellVisibility:(BOOL)enabled {
+    // Get specifier
+    PSSpecifier *segmentControlSpecifier = [self specifierForID:@"AppearanceSettingCell"];
+    if (!segmentControlSpecifier) {
+        return;
+    }
+
+    // Set disabled
+    segmentControlSpecifier.properties[PSEnabledKey] = @(enabled);
 }
 
 - (void)reloadSpecifiers {
@@ -137,21 +137,30 @@
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    // Update image offset
-    CGFloat offsetY = scrollView.contentOffset.y;
-    if (offsetY > 0) {
-        offsetY = 0;
-    }
-
-    self.headerImageView.frame = CGRectMake(0, offsetY, CGRectGetWidth(self.table.bounds), 200 - offsetY);
-}
-
 #pragma mark - Support
 
 - (void)showSupportEmailController {
     TSContactViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
     [self.navigationController pushViewController:supportController animated:YES];
+}
+
+#pragma mark - Preference Values
+
+- (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
+    PSSpecifier *appearanceSpecifier = [self specifierForID:@"SystemAppearanceCell"];
+    if (appearanceSpecifier) {
+        if ([specifier isEqualToSpecifier:appearanceSpecifier]) {
+            // Get enabled/disabled
+            PSSwitchTableCell *switchCell = (PSSwitchTableCell *)[self cachedCellForSpecifier:appearanceSpecifier];
+            BOOL enabled = [switchCell controlValue].boolValue;
+
+            // Set cell to disabled
+            [self _modifySegmentCellVisibility:!enabled];
+            [self reloadSpecifierID:@"AppearanceSettingCell" animated:YES];
+        }
+    }
+
+	[super setPreferenceValue:value specifier:specifier];
 }
 
 @end

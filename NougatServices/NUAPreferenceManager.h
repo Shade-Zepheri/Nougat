@@ -30,7 +30,8 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 @property (copy, readonly, nonatomic) NSArray<NSString *> *enabledToggles;
 @property (copy, readonly, nonatomic) NSArray<NSString *> *disabledToggles;
 
-@property (readonly, nonatomic) BOOL useExternalColor;
+@property (assign, readonly, nonatomic) BOOL useExternalColor;
+@property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
 
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;

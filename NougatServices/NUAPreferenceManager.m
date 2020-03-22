@@ -12,8 +12,6 @@
     NSMutableDictionary<NSString *, NUAToggleInfo *> *_toggleInfoDictionary;
 }
 
-@property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
-
 @end
 
 @implementation NUAPreferenceManager
