@@ -72,10 +72,10 @@
 
         if (%c(_UISystemGestureManager)) {
             // iOS 13
-            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer recognitionEvent:3 toDisplayWithIdentity:[%c(FBDisplayManager) mainIdentity]];
+            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer recognitionEvent:3 toDisplayWithIdentity:[FBDisplayManager mainIdentity]];
         } else {
             // iOS 10-12
-            [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[%c(FBDisplayManager) mainDisplay]];
+            [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[FBDisplayManager mainDisplay]];
         }
 
         // Resign assertion
@@ -758,6 +758,7 @@
         self.idleTimerDisableAssertion = [[%c(SBIdleTimerGlobalCoordinator) sharedInstance] acquireIdleTimerDisableAssertionForReason:@"Nougat Animating"];
     }
     
+    // Stop banners when presented
     [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
 
     // FBDisplayLayoutElement stuffs
@@ -830,7 +831,6 @@
             self.idleTimerDisableAssertion = nil;
         }
 
-        [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 
         if (dismissed) {
             // Dismissing
@@ -842,6 +842,9 @@
 
             // Unlock rotation
             [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:NO forReason:@"Nougat Visible"];
+
+            // Allow for banners
+            [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
 
             // Enable system gestures
             [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = NO;
