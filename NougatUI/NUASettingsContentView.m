@@ -1,5 +1,6 @@
 #import "NUASettingsContentView.h"
 #import <Macros.h>
+#import <FrontBoardServices/FBSSystemService.h>
 #import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 #import <version.h>
@@ -152,14 +153,26 @@
 
     // Open the bad boi
     NSURL *URL = [NSURL URLWithString:URLString];
-    [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:^(BOOL success) {
-        if (!success) {
-            // Failed
-            return;
-        }
-
+    [self _openURL:URL bundleIdentifier:@"com.apple.Preferences" completion:^{
         // Dismiss notification shade
         [self.delegate contentViewWantsNotificationShadeDismissal:self completely:YES];
+    }];
+}
+
+- (void)_openURL:(NSURL *)URL bundleIdentifier:(NSString *)bundleIdentifier completion:(void(^)(void))completion {
+    // Get FBSSystemService and send on client port
+	FBSSystemService *systemService = [FBSSystemService sharedService];
+	mach_port_t port = [systemService createClientPort];
+
+	[systemService openURL:URL application:bundleIdentifier options:@{
+		FBSOpenApplicationOptionKeyUnlockDevice: @YES
+	} clientPort:port withResult:^(NSError *error) {
+        if (error) {
+            // Print error
+            HBLogError(@"[Nougat] openURL error: %@", error);
+        }
+
+        completion();
     }];
 }
 
