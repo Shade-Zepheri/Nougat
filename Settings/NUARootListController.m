@@ -35,14 +35,11 @@
         // Set appearance
         HBAppearanceSettings *appearanceSettings = [[HBAppearanceSettings alloc] init];
         appearanceSettings.tintColor = [UIColor colorWithRed:0.04 green:0.28 blue:0.42 alpha:1.0];
-        appearanceSettings.translucentNavigationBar = NO;
         appearanceSettings.tableViewCellSeparatorColor = [UIColor clearColor];
-        appearanceSettings.largeTitleStyle = HBAppearanceSettingsLargeTitleStyleNever;
         self.hb_appearanceSettings = appearanceSettings;
 
-        // Disable large title
+        // Disable large title (iOS 11 only)
         if (@available(iOS 11, *)) {
-            // iOS 11 only
             self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
         }
     }
