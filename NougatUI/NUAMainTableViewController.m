@@ -5,8 +5,9 @@
 #import <Macros.h>
 
 @interface NUAMainTableViewController () {
-    NSMutableArray<NUATableViewCell *> *_expandedCells;
+    NSMutableArray<NUACoalescedNotification *> *_expandedNotifications;
     NSLayoutConstraint *_heightConstraint;
+    NUACoalescedNotification *_mediaNotification;
 }
 @property (assign, nonatomic) CGFloat removedHeight;
 
@@ -20,7 +21,8 @@
     self = [super init];
     if (self) {
         // Create defaults
-        _expandedCells = [NSMutableArray array];
+        _expandedNotifications = [NSMutableArray array];
+        _mediaNotification = [NUACoalescedNotification mediaNotification];
 
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -364,8 +366,7 @@
 
     // Add dummie to backng array
     NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
-    NUACoalescedNotification *mediaNotification = [NUACoalescedNotification mediaNotification];
-    [mutableNotifications insertObject:mediaNotification atIndex:0];
+    [mutableNotifications insertObject:_mediaNotification atIndex:0];
     _notifications = [mutableNotifications copy];
 
     // Insert row
@@ -471,7 +472,7 @@
 
         // Provide basic information
         mediaCell.delegate = self;
-        mediaCell.expanded = [_expandedCells containsObject:mediaCell];
+        mediaCell.expanded = [_expandedNotifications containsObject:notification];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
 
         return mediaCell;
@@ -480,7 +481,7 @@
     NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
     cell.actionsDelegate = self;
     cell.delegate = self;
-    cell.expanded = [_expandedCells containsObject:cell];
+    cell.expanded = [_expandedNotifications containsObject:notification];
     cell.layoutMargins = UIEdgeInsetsZero;
     cell.notification = notification;
 
@@ -497,28 +498,30 @@
 
 #pragma mark - Cells delegate
 
-- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand; {
-    // Add indexpath to expanded bois
-    __block CGFloat addedHeight = 0.0;
-    if (expand) {
-        [_expandedCells addObject:cell];
-
-        // Set height to be added
-        addedHeight += 50.0;
+- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand {
+    // Get notification
+    NUACoalescedNotification *notification; 
+    if ([cell isKindOfClass:[NUAMediaTableViewCell class]]) {
+        // Dealing with media class
+        notification = _mediaNotification;
     } else {
-        [_expandedCells removeObject:cell];
+        // Get cell's notification
+        NUANotificationTableViewCell *notificationCell = (NUANotificationTableViewCell *)cell;
+        notification = notificationCell.notification;
+    }
 
-        // Set height to be removed
-        addedHeight -= 50.0;
+    // Add/remove
+    if (expand) {
+        [_expandedNotifications addObject:notification];
+    } else {
+        [_expandedNotifications removeObject:notification];
     }
 
     // Reload
     NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
     [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
 
-    [UIView animateWithDuration:0.3 animations:^{
-        self.presentedHeight += addedHeight;
-    }];
+    self.presentedHeight += expand ? 50.0 : -50.0;
 }
 
 - (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {

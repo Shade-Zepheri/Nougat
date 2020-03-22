@@ -73,8 +73,13 @@
         return NO;
     }
 
-    // Compare section and thread and entries
     NUACoalescedNotification *notification = (NUACoalescedNotification *)object;
+    if (notification.type == NUANotificationTypeMedia && self.type == NUANotificationTypeMedia) {
+        // Dealing with media notifications, always equal
+        return YES;
+    }
+
+    // Compare section and thread and entries
     BOOL sameSection = [notification.sectionID isEqualToString:self.sectionID];
     BOOL sameThread = [notification.threadID isEqualToString:self.threadID];
     BOOL sameEntries = [notification.entries isEqualToArray:self.entries];
