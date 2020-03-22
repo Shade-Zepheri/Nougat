@@ -8,8 +8,6 @@ compatibility-version: 1
 objc-constraint:       retain_release
 exports:
   - archs:                [ armv7, arm64, arm64e ]
-    re-exports:           [ /System/Library/PrivateFrameworks/BaseBoard.framework/BaseBoard,
-                            /System/Library/PrivateFrameworks/BoardServices.framework/BoardServices ]
     symbols:              [ _CARenderServerCreateSnapshots,
                             _FBApplicationDataStoreServiceIdentifier,
                             _FBInstallTypeIsCloudDemoted, _FBLogAppDataStore,
