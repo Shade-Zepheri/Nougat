@@ -78,19 +78,29 @@
         return;
     }
 
-    if (![[UIApplication sharedApplication] canOpenURL:self.settingsURL]) {
-        return;
+    // Open the URL
+    NSURL *URL = [NSURL URLWithString:URLString];
+    [self _openURL:URL bundleIdentifier:@"com.apple.Preferences" completion:^{
+        // Dismiss notification shade
+        [self.delegate toggleWantsNotificationShadeDismissal:self];
+    }];
     }
 
-    // Open the bad boi
-    [[UIApplication sharedApplication] openURL:self.settingsURL options:@{} completionHandler:^(BOOL success) {
-        if (!success) {
-            // Failed
+- (void)_openURL:(NSURL *)URL bundleIdentifier:(NSString *)bundleIdentifier completion:(void(^)(void))completion {
+    // Get FBSSystemService and send on client port
+	FBSSystemService *systemService = [FBSSystemService sharedService];
+	mach_port_t port = [systemService createClientPort];
+
+	[systemService openURL:URL application:bundleIdentifier options:@{
+		FBSOpenApplicationOptionKeyUnlockDevice: @YES
+	} clientPort:port withResult:^(NSError *error) {
+        if (error) {
+            // Print error
+            HBLogError(@"[Nougat] openURL error: %@", error);
             return;
         }
 
-        // Dismiss notification shade
-        [self.delegate toggleWantsNotificationShadeDismissal:self];
+        completion();
     }];
 }
 

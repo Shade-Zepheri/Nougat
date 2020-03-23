@@ -170,6 +170,7 @@
         if (error) {
             // Print error
             HBLogError(@"[Nougat] openURL error: %@", error);
+            return;
         }
 
         completion();
