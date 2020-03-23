@@ -1,7 +1,9 @@
 #import "NUAFlipswitchToggle.h"
 #import <Flipswitch/Flipswitch.h>
+#import <FrontBoardServices/FBSSystemService.h>
 #import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
+#import <HBLog.h>
 
 @interface NUAFlipswitchToggle ()
 @property (strong, nonatomic) UIImageView *imageView;
@@ -79,8 +81,7 @@
     }
 
     // Open the URL
-    NSURL *URL = [NSURL URLWithString:URLString];
-    [self _openURL:URL bundleIdentifier:@"com.apple.Preferences" completion:^{
+    [self _openURL:self.settingsURL bundleIdentifier:@"com.apple.Preferences" completion:^{
         // Dismiss notification shade
         [self.delegate toggleWantsNotificationShadeDismissal:self];
     }];
