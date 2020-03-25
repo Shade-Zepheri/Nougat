@@ -159,7 +159,9 @@
             }
         }
     } else {
+        // Error, return
         HBLogError(@"%@", error);
+        return;
     }
 
     // Construct disabled toggles
@@ -198,10 +200,13 @@
         // Exception for low power, data, wifi
         if ([identifier isEqualToString:@"wifi"]) {
             [newTogglesList addObject:@"com.shade.nougat.WiFiToggle"];
+            continue;
         } else if ([identifier isEqualToString:@"cellular-data"]) {
             [newTogglesList addObject:@"com.shade.nougat.DataToggle"];
+            continue;
         } else if ([identifier isEqualToString:@"low-power"]) {
             [newTogglesList addObject:@"com.shade.nougat.BatterySaverToggle"];
+            continue;
         }
 
         // Get components

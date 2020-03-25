@@ -65,7 +65,6 @@
     self.tableViewController.tableView.delegate = self;
     self.tableViewController.tableView.estimatedRowHeight = [UIFont preferredFontForTextStyle:UIFontTextStyleBody].lineHeight;
 
-
     // Register custom cell class
     [self.tableViewController.tableView registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
 
