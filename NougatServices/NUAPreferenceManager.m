@@ -239,9 +239,14 @@
 
 - (void)_fixBrokenMigration {
     // Gotta fix my dumbness now
-    [self.enabledToggles removeObject:@"com.shade.nougat.CellularDataToggle"];
-    [self.enabledToggles removeObject:@"com.shade.nougat.LowPowerToggle"];
-    [self.enabledToggles removeObject:@"com.shade.nougat.WifiToggle"];
+    NSMutableArray<NSString *> *newTogglesList = [self.enabledToggles mutableCopy];
+    [newTogglesList removeObject:@"com.shade.nougat.CellularDataToggle"];
+    [newTogglesList removeObject:@"com.shade.nougat.LowPowerToggle"];
+    [newTogglesList removeObject:@"com.shade.nougat.WifiToggle"];
+
+    // Add to prefs
+    [_preferences setObject:[newTogglesList copy] forKey:NUAPreferencesTogglesListKey];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 #pragma mark - Convenience Methods
