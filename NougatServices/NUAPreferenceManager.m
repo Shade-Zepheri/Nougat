@@ -52,6 +52,11 @@
             [self _migrateFromLegacyPrefs];
         }
 
+        // Now check for my broken migration
+        if ([self _hasBrokenMigration]) {
+            [self _fixBrokenMigration];
+        }
+
         // Get toggle info
         [self refreshToggleInfo];
     }
@@ -225,6 +230,18 @@
     // Add to prefs
     [_preferences setObject:[newTogglesList copy] forKey:NUAPreferencesTogglesListKey];
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
+}
+
+- (BOOL)_hasBrokenMigration {
+    // Check if toggles list has old keys
+    return [self.enabledToggles containsObject:@"com.shade.nougat.CellularDataToggle"];
+}
+
+- (void)_fixBrokenMigration {
+    // Gotta fix my dumbness now
+    [self.enabledToggles removeObject:@"com.shade.nougat.CellularDataToggle"];
+    [self.enabledToggles removeObject:@"com.shade.nougat.LowPowerToggle"];
+    [self.enabledToggles removeObject:@"com.shade.nougat.WifiToggle"];
 }
 
 #pragma mark - Convenience Methods
