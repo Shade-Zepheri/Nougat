@@ -117,17 +117,23 @@
 
     // Create header view
     UIView *headerContainerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 200)];
-    self.headerImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    UIImage *headerImage = [UIImage imageNamed:@"Header" inBundle:self.bundle];
+    self.headerImageView = [[UIImageView alloc] initWithImage:headerImage];
     self.headerImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.headerImageView.image = [UIImage imageNamed:@"Header" inBundle:self.bundle];
     self.headerImageView.translatesAutoresizingMaskIntoConstraints = NO;
     [headerContainerView addSubview:self.headerImageView];
 
+    // Corner radius up on iPad
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        self.headerImageView.clipsToBounds = YES;
+        self.headerImageView._continuousCornerRadius = 10.0;
+    }
+
     // Constraint up
-    [self.headerImageView.topAnchor constraintEqualToAnchor:headerContainerView.topAnchor].active = YES;
-    [self.headerImageView.leadingAnchor constraintEqualToAnchor:headerContainerView.leadingAnchor].active = YES;
-    [self.headerImageView.trailingAnchor constraintEqualToAnchor:headerContainerView.trailingAnchor].active = YES;
-    [self.headerImageView.bottomAnchor constraintEqualToAnchor:headerContainerView.bottomAnchor].active = YES;
+    [self.headerImageView.centerXAnchor constraintEqualToAnchor:headerContainerView.centerXAnchor].active = YES;
+    [self.headerImageView.centerYAnchor constraintEqualToAnchor:headerContainerView.centerYAnchor].active = YES;
+    [self.headerImageView.widthAnchor constraintEqualToConstant:headerImage.size.width].active = YES;
+    [self.headerImageView.heightAnchor constraintEqualToConstant:headerImage.size.height].active = YES;
 
     self.table.tableHeaderView = headerContainerView;
 }
