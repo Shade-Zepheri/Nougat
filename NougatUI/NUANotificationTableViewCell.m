@@ -23,68 +23,89 @@
 
 #pragma mark - Init
 
-- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
-    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
-    if (self) {
-        // Create the things
-        [self createViews];
-        [self setupConstraints];
+- (void)dealloc {
+    // Reuse date label
+    [self _recycleDateLabel];
+}
+
+#pragma mark - View Management
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    // Create views
+    [self _createAttachmentImageViewIfNecessary];
+    [self _createTitleLabelIfNecessary];
+    [self _createDateLabelIfNecessary];
+    [self _createMessageLabelIfNecessary];
+    [self _createOptionsBarIfNecessary];
+    [self _configureHeaderText];
+}
+
+- (void)_createAttachmentImageViewIfNecessary {
+    if (self.attachmentImageView) {
+        // View already exists
+        return;
     }
 
-    return self;
+    [self _createAttachmentImageView];
+}
+
+- (void)_createTitleLabelIfNecessary {
+    if (self.titleLabel) {
+        // View already exists
+        return;
+    }
+
+    [self _createTitleLabel];
+}
+
+- (void)_createDateLabelIfNecessary {
+    if (self.dateLabel || !self.timestamp) {
+        // View already exists, or no notification
+        return;
+    }
+
+    [self _createDateLabel];
+}
+
+- (void)_createMessageLabelIfNecessary {
+    if (self.messageLabel) {
+        // View already exists
+        return;
+    }
+
+    [self _createMessageLabel];
+}
+
+- (void)_createOptionsBarIfNecessary {
+    if (self.optionsBar) {
+        // View already exists
+        return;
+    }
+
+    [self _createOptionsBar];
 }
 
 #pragma mark - View Creation
 
-- (void)createViews {
-    [self _createAttachmentImageViewIfNecessary];
-    [self _createTitleLabelIfNecessary];
-    [self _createMessageLabelIfNecessary];
-    [self _createOptionsBar];
-}
+- (void)_createAttachmentImageView {
+    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.attachmentImageView];
 
-- (void)setupConstraints {
+    // Constraints
     [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
     [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
     [self.attachmentImageView.heightAnchor constraintEqualToConstant:40.0].active = YES;
     self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
     self.attachmentConstraint.active = YES;
 
-    [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
-    [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
-    [self.titleLabel.heightAnchor constraintEqualToConstant:20.0].active = YES;
-    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-
-    [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:5.0].active = YES;
-    [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
-    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-
-    [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-    [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-    [self.optionsBar.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:100.0].active = YES;
-    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
-    self.optionsHeightConstraint.active = YES;
-
-    // Options buttons
-    [self.openButton.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
-    [self.openButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
-    [self.openButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
-
-    [self.clearButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:30.0].active = YES;
-    [self.clearButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
-    [self.clearButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+    // Configure content
+    [self _configureAttachment];
 }
 
-#pragma mark - Label views
-
-- (void)_createAttachmentImageViewIfNecessary {
-    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.contentView addSubview:self.attachmentImageView];
-}
-
-- (void)_createTitleLabelIfNecessary {
+- (void)_createTitleLabel {
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
@@ -98,28 +119,72 @@
         self.titleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
     }
     [self.contentView addSubview:self.titleLabel];
+
+    // Constraints
+    [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
+    [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.titleLabel.heightAnchor constraintEqualToConstant:20.0].active = YES;
+    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
+
+    // Configure content
+    [self _configureTitleText];
 }
 
-- (void)_createMessageLabelIfNecessary {
+- (void)_createDateLabel {
+    // Create date label
+    _dateLabel = [[NUADateLabelRepository sharedRepository] startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
+    self.dateLabel.delegate = self;
+    self.dateLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.dateLabel.numberOfLines = 1;
+    self.dateLabel.textColor = [UIColor grayColor];
+    self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.dateLabel];
+
+    // Contraints
+    [self.dateLabel.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:3.0].active = YES;
+    [self.dateLabel.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
+    [self.dateLabel.bottomAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor].active = YES;
+
+    // Change expand label constraints
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.dateLabel.trailingAnchor constant:3.0].active = YES;
+}
+
+- (void)_createMessageLabel {
     self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.messageLabel.textColor = [UIColor grayColor];
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.messageLabel];
+
+    // Constraints
+    [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:5.0].active = YES;
+    [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
+    [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
+
+    // Configure content
+    [self _configureMessageText];
 }
 
 - (void)_createOptionsBar {
     self.optionsBar = [[UIView alloc] initWithFrame:CGRectZero];
-    self.optionsBar.backgroundColor = OreoBackgroundColor;
+    self.optionsBar.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
     self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.optionsBar];
+
+    // Constraints
+    [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+    [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+    [self.optionsBar.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:100.0].active = YES;
+    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:self.expanded ? 50.0 : 0.0];
+    self.optionsHeightConstraint.active = YES;
 
     // Create buttons
     self.openButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.openButton addTarget:self action:@selector(didTapOpenButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.openButton setTitle:@"Open" forState:UIControlStateNormal];
-    self.openButton.hidden = YES;
+    self.openButton.hidden = !self.expanded;
     self.openButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.openButton sizeToFit];
@@ -128,11 +193,23 @@
     self.clearButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [self.clearButton addTarget:self action:@selector(didTapClearButton:) forControlEvents:UIControlEventTouchUpInside];
     [self.clearButton setTitle:@"Clear" forState:UIControlStateNormal];
-    self.clearButton.hidden = YES;
+    self.clearButton.hidden = !self.expanded;
     self.clearButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
     self.clearButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self.clearButton sizeToFit];
     [self.optionsBar addSubview:self.clearButton];
+
+    // Constraints
+    [self.openButton.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.openButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
+    [self.openButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+
+    [self.clearButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:30.0].active = YES;
+    [self.clearButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
+    [self.clearButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+
+    // Configure content
+    [self _configureButtons];
 }
 
 #pragma mark - Buttons
@@ -152,46 +229,62 @@
 - (void)setExpanded:(BOOL)expanded {
     [super setExpanded:expanded];
 
-    // Show buttons
-    self.openButton.hidden = !expanded;
-    self.clearButton.hidden = !expanded;
-
-    // Update options menu
-    self.optionsHeightConstraint.constant = expanded ? 50.0 : 0.0;
+    // Force layout
+    [self setNeedsLayout];
 }
 
 - (void)setNotification:(NUACoalescedNotification *)notification {
-    _notification = notification;
+    if ([notification isEqual:_notification]) {
+        // Same notification
+        return;
+    }
 
     // Configure stuffs
+    _notification = notification;
     _timestamp = notification.timestamp;
+    _tintColor = self.notification.icon.averageColor;
     self.glyphView.image = notification.icon;
 
-    [self _configureAttachment];
-    [self _configureHeaderText];
-    [self _configureTitleText];
-    [self _configureMessageText];
-    [self _configureButtons];
+    // Create views if needed
+    [self setNeedsLayout];
 }
 
-#pragma mark - Appearance Updates
+#pragma mark - Date Label
 
-- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
-    [super traitCollectionDidChange:previousTraitCollection];
+- (void)dateLabelDidChange:(NUARelativeDateLabel *)dateLabel {
+    // Resize and reload
+    [self.dateLabel sizeToFit];
+    [self setNeedsLayout];
+}
 
-    // Check if appearance changed
-    if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+- (void)_tearDownDateLabel {
+    [UIView performWithoutAnimation:^{
+        if (!self.dateLabel) {
+            // No label
             return;
         }
 
-        self.titleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
-    }
+        // Recycle
+        [self.dateLabel removeFromSuperview];
+        [self _recycleDateLabel];
+        _dateLabel = nil;
+    }];
+}
+
+- (void)_recycleDateLabel {
+    // Recycle
+    self.dateLabel.delegate = nil;
+    [[NUADateLabelRepository sharedRepository] recycleLabel:self.dateLabel];
 }
 
 #pragma mark - Label management
 
 - (void)_configureAttachment {
+    if (!self.notification) {
+        // No notification to configure from
+        return;
+    }
+
     self.attachmentImageView.image = self.notification.attachmentImage;
 
     // Update constraints
@@ -200,53 +293,71 @@
 }
 
 - (void)_configureHeaderText {
+    if (!self.notification) {
+        // No notification to configure from
+        return;
+    }
+
     NSString *displayName;
     if ([self.notification.sectionID isEqualToString:@"Screen Recording"] || [self.notification.sectionID isEqualToString:@"com.apple.ReplayKitNotifications"]) {
         // Exception for screen recording, since it doesnt use a conventional bundle id
-        displayName = @"Screen Recording";
+        // Get translation from CC bundle
+        NSBundle *screenRecordingBundle = [NSBundle bundleWithPath:@"/System/Library/ControlCenter/Bundles/ReplayKitModule.bundle"];
+        displayName = [screenRecordingBundle localizedStringForKey:@"CFBundleDisplayName" value:@"Screen Recording" table:@"InfoPlist"];
     } else {
         displayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(self.notification.sectionID);
     }
 
     // Attribute up
-    NSString *elapsedTime = [self.notification.timestamp getElapsedTime];
-    NSString *baseHeaderText = [NSString stringWithFormat:@"%@ • %@", displayName, elapsedTime];
-
+    NSString *baseHeaderText = [NSString stringWithFormat:@"%@ •", displayName];
     NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:baseHeaderText];
-
-    UIColor *textColor = self.notification.icon.averageColor;
-    _tintColor = textColor;
-
-    NSDictionary<NSAttributedStringKey, id> *attributes = @{NSForegroundColorAttributeName: textColor};
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{NSForegroundColorAttributeName: self.tintColor};
     [mutableAttributedString setAttributes:attributes range:NSMakeRange(0, displayName.length)];
 
     self.headerLabel.attributedText = [mutableAttributedString copy];
 }
 
 - (void)_configureTitleText {
+    if (!self.notification) {
+        // No notification to configure from
+        return;
+    }
+
     // Get info from first entry
     NSString *title = (self.notification.title) ? self.notification.title : self.notification.message;
     self.titleLabel.text = title;
 }
 
 - (void)_configureMessageText {
+    if (!self.notification) {
+        // No notification to configure from
+        return;
+    }
+
     // Get info from first entry
-    NSString *message = (self.notification.title) ? self.notification.message : @"Tap for more options.";
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *fallbackMessage = [bundle localizedStringForKey:@"TAP_FOR_MORE_OPTIONS" value:@"Tap for more options." table:@"Localizable"];
+    NSString *message = (self.notification.title) ? self.notification.message : fallbackMessage;
     self.messageLabel.text = message;
 }
 
 - (void)_configureButtons {
+    if (!self.tintColor) {
+        // No tint color to configure from
+        return;
+    }
+
     // Get image
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
 
     // Tint and set
-    UIImage *tintedImage = [baseImage _flatImageWithColor:_tintColor];
+    UIImage *tintedImage = [baseImage _flatImageWithColor:self.tintColor];
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 
     // Text buttons
-    [self.openButton setTitleColor:_tintColor forState:UIControlStateNormal];
-    [self.clearButton setTitleColor:_tintColor forState:UIControlStateNormal];
+    [self.openButton setTitleColor:self.tintColor forState:UIControlStateNormal];
+    [self.clearButton setTitleColor:self.tintColor forState:UIControlStateNormal];
 }
 
 @end

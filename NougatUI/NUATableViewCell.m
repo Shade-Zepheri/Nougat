@@ -63,9 +63,8 @@
     [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 
     [self.expandButton.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
-    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
+    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
 }
 
 #pragma mark - Reuse

@@ -6,5 +6,6 @@
 @property (readonly, nonatomic) UIImage *icon;
 @property (readonly, nonatomic) UIImage *attachmentImage;
 @property (readonly, nonatomic) NSDate *date;
+@property (readonly, nonatomic) NSTimeZone *timeZone;
 
 @end

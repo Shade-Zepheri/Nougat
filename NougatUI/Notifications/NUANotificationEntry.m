@@ -20,6 +20,7 @@
         _message = content.message;
         _icon = content.icon;
         _attachmentImage = content.attachmentImage;
+        _timeZone = content.timeZone;
     }
 
     return self;

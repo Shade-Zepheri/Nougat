@@ -79,12 +79,14 @@
         return YES;
     }
 
-    // Compare section and thread and entries
+    // Compare section, thread, title, message and entries
     BOOL sameSection = [notification.sectionID isEqualToString:self.sectionID];
     BOOL sameThread = [notification.threadID isEqualToString:self.threadID];
+    BOOL sameTitle = [notification.title isEqualToString:self.title];
+    BOOL sameMessage = [notification.message isEqualToString:self.message];
     BOOL sameEntries = [notification.entries isEqualToArray:self.entries];
 
-    return sameSection && sameThread && sameEntries;
+    return sameSection && sameThread  && sameTitle && sameMessage && sameEntries;
 }
 
 #pragma mark - Properties
@@ -123,10 +125,18 @@
 
 - (NSDate *)timestamp {
     if (!self.entries || self.empty) {
-        return [NSDate date];
+        return nil;
     }
 
     return self.entries[0].timestamp;
+}
+
+- (NSTimeZone *)timeZone {
+    if (!self.entries || self.empty) {
+        return nil;
+    }
+
+    return self.entries[0].timeZone;
 }
 
 - (BOOL)isEmpty {

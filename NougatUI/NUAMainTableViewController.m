@@ -479,11 +479,11 @@
     }
 
     NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
+    cell.notification = notification;
     cell.actionsDelegate = self;
     cell.delegate = self;
     cell.expanded = [_expandedNotifications containsObject:notification];
     cell.layoutMargins = UIEdgeInsetsZero;
-    cell.notification = notification;
 
     return cell;
 }

@@ -1,5 +1,6 @@
 #import "NUATableViewCell.h"
 #import "NUACoalescedNotification.h"
+#import "NUADateLabelRepository.h"
 #import "NUANotificationEntry.h"
 
 @class NUANotificationTableViewCell;
@@ -12,11 +13,12 @@
 
 @end
 
-@interface NUANotificationTableViewCell : NUATableViewCell
+@interface NUANotificationTableViewCell : NUATableViewCell <NUADateLabelDelegate>
 @property (weak, nonatomic) id<NUANotificationTableViewCellDelegate> actionsDelegate;
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 
-@property (readonly, nonatomic) NSDate *timestamp;
-@property (readonly, nonatomic) UIColor *tintColor;
+@property (strong, readonly, nonatomic) NUARelativeDateLabel *dateLabel;
+@property (strong, readonly, nonatomic) NSDate *timestamp;
+@property (strong, readonly, nonatomic) UIColor *tintColor;
 
 @end

@@ -7,7 +7,8 @@
 @property (copy, readonly, nonatomic) NSString *message;
 @property (readonly, nonatomic) UIImage *icon;
 @property (readonly, nonatomic) UIImage *attachmentImage;
-@property (strong, readonly, nonatomic) NSDate *timestamp;
+@property (readonly, nonatomic) NSDate *timestamp;
+@property (readonly, nonatomic) NSTimeZone *timeZone;
 
 + (instancetype)notificationEntryFromRequest:(NCNotificationRequest *)request;
 

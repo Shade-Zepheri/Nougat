@@ -100,7 +100,6 @@
     [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
 
     [self.contentView bringSubviewToFront:self.expandButton];
-    [self.expandButton.topAnchor constraintEqualToAnchor:self.headerLabel.topAnchor].active = YES;
     [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
 }
 
