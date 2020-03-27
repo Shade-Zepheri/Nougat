@@ -6,6 +6,7 @@
 #import <Preferences/PSSwitchTableCell+Private.h>
 #import <TechSupport/TSContactViewController.h>
 #import <UIKit/UIImage+Private.h>
+#import <UIKit/UIView+Internal.h>
 #import <version.h>
 
 @implementation NUARootListController

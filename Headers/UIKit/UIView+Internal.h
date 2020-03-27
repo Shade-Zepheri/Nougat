@@ -3,5 +3,4 @@
 @interface UIView ()
 @property (setter=_setContinuousCornerRadius:, assign, nonatomic) CGFloat _continuousCornerRadius;
 
-
 @end
