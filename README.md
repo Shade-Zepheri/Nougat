@@ -37,3 +37,9 @@ Crowdin is used in order to streamline and simplify the translating process.
 - If your language is already support, head to [https://crowdin.com/project/nougat](https://crowdin.com/project/nougat), select the desired language and begin translating.
 
 New strings may be potentially added over time, so make sure to keep an eye out for new versions to see if any were added.
+
+## License
+
+Nougat is [fair-code](https://faircode.io/) licensed under [**Apache 2.0 with Commons Clause**](https://github.com/Shade-Zepheri/Nougat/blob/master/LICENSE)
+
+What this basically boils down to is that the source is available to everyone, anyone can use and modify this project internally, however only I can "sell" this project.
