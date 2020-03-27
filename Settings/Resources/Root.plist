@@ -143,6 +143,14 @@
             <string>https://crwd.in/nougat</string>
         </dict>
         <dict>
+            <key>cell</key>
+            <string>PSLinkCell</string>
+            <key>detail</key>
+            <string>NUATranslatorsListController</string>
+            <key>label</key>
+            <string>TRANSLATORS</string>
+        </dict>
+        <dict>
             <key>cellClass</key>
             <string>HBLinkTableCell</string>
             <key>icon</key>
