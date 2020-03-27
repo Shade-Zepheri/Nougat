@@ -1,0 +1,8 @@
+// Dates
+"RELATIVE_DATE_PAST_SECONDS" = "now";
+"RELATIVE_DATE_PAST_MINUTES" = "%zdm";
+"RELATIVE_DATE_PAST_HOURS" = "%zdh";
+"RELATIVE_DATE_PAST_DAYS" = "%zdd";
+
+// Notification
+"TAP_FOR_MORE_OPTIONS" = "Tap for more options.";

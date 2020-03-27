@@ -1,17 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "تفعيل";
 
-"NEXUS" = "Nexus";
-"PIXEL" = "Pixel";
-"OREO" = "Oreo";
+"NEXUS" = "رابطة";
+"PIXEL" = "بكسل";
+"OREO" = "أوريو";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "استخدام إعداد مظهر النظام";
+"USE_COLORFLOW" = "استخدم ألوان Colorflow";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "دليل المستخدم";
+"SORT_ORDER" = "نظام الترتيب";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "جرب Nougat بواسطة شايد زيفيري. يمكنني استخدام لوحة إشعارات اندرويد بدون استخدام اندرويد!";
 
-"SUPPORT" = "Support";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "الدعم";
+"TRANSLATORS" = "Translators";
+"HELP_TRANSLATING" = "ساعد في الترجمة!";
+"SOURCE_CODE" = "مصدر الكود";

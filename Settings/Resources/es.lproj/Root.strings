@@ -1,17 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Activado";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "Usar apariencia de sistema";
+"USE_COLORFLOW" = "Usar colores de ColorFlow";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Guía de usuario";
+"SORT_ORDER" = "Sortear orden";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Chequea Nougat de Shade Zepher! Puedo usar el panel de notificaciones de Android sin siquiera usar Android!";
 
-"SUPPORT" = "Support";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Soporte";
+"TRANSLATORS" = "Translators";
+"HELP_TRANSLATING" = "Ayuda a transcribir!";
+"SOURCE_CODE" = "Código Fuente";
