@@ -1,4 +1,4 @@
-#import <Macros.h>
+#import "NUAAlertItem.h"
 #import <NougatServices/NougatServices.h>
 #import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
@@ -355,5 +355,17 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 
         // Deregister as only created once
         [center removeObserver:token];
+    }];
+
+    // Register to device unlock to prompt user
+    id __block promptToken = [center addObserverForName:@"SBHomescreenIconsDidAppearNotification" object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *notification) {
+        if (settings.firstTimeUser) {
+            // Show prompt
+            NUAAlertItem *alertItem = [NUAAlertItem userGuideAlertItem];
+            [alertItem show];
+        }
+
+        // Deregister as only needed once
+        [center removeObserver:promptToken];
     }];
 }

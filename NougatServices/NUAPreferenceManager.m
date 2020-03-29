@@ -36,6 +36,7 @@
         _preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
 
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
+        [_preferences registerBool:&_firstTimeUser default:YES forKey:NUAPreferencesFirstTimeUserKey];
         [_preferences registerInteger:(NSInteger *)&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
         [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
@@ -228,7 +229,7 @@
     }
 
     // Add to prefs
-    [_preferences setObject:[newTogglesList copy] forKey:NUAPreferencesTogglesListKey];
+    _preferences[NUAPreferencesTogglesListKey] = [newTogglesList copy];
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
@@ -245,7 +246,15 @@
     [newTogglesList removeObject:@"com.shade.nougat.WifiToggle"];
 
     // Add to prefs
-    [_preferences setObject:[newTogglesList copy] forKey:NUAPreferencesTogglesListKey];
+    _preferences[NUAPreferencesTogglesListKey] = [newTogglesList copy];
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
+}
+
+#pragma mark - First Time Helpers
+
+- (void)setHasBeenPrompted {
+    // Update prefs
+    _preferences[NUAPreferencesFirstTimeUserKey] = @(NO);
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 

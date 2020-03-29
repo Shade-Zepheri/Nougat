@@ -10,6 +10,8 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
 // Settings keys
 static NSString *const NUAPreferencesEnabledKey = @"enabled";
 
+static NSString *const NUAPreferencesFirstTimeUserKey = @"firstTimeUser";
+
 static NSString *const NUAPreferencesTogglesListKey = @"togglesList";
 
 static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
@@ -21,6 +23,8 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
 
 @property (getter=isEnabled, readonly, nonatomic) BOOL enabled;
+
+@property (getter=isFirstTimeUser, readonly, nonatomic) BOOL firstTimeUser;
 
 @property (strong, readonly, nonatomic) UIColor *backgroundColor;
 @property (strong, readonly, nonatomic) UIColor *highlightColor;
@@ -39,5 +43,7 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 - (NSArray<NSString *> *)_installedToggleIdentifiers;
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;
 - (void)refreshToggleInfo;
+
+- (void)setHasBeenPrompted;
 
 @end
