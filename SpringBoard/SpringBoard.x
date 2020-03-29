@@ -7,6 +7,7 @@
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
+#import <Macros.h>
 
 NUAPreferenceManager *settings;
 NUANotificationShadeController *notificationShade;
