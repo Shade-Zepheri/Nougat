@@ -34,33 +34,37 @@
     [super layoutSubviews];
 
     // Create views
-    [self _createAttachmentImageViewIfNecessary];
-    [self _createTitleLabelIfNecessary];
-    [self _createDateLabelIfNecessary];
-    [self _createMessageLabelIfNecessary];
-    [self _createOptionsBarIfNecessary];
+    [self _configureAttachmentImageViewIfNecessary];
+    [self _configureTitleLabelIfNecessary];
+    [self _configureDateLabelIfNecessary];
+    [self _configureMessageLabelIfNecessary];
+    [self _configureOptionsBarIfNecessary];
+
+    // Configure content
     [self _configureHeaderText];
 }
 
-- (void)_createAttachmentImageViewIfNecessary {
-    if (self.attachmentImageView) {
-        // View already exists
-        return;
+- (void)_configureAttachmentImageViewIfNecessary {
+    if (!self.attachmentImageView) {
+        // Create view
+        [self _createAttachmentImageView];
     }
 
-    [self _createAttachmentImageView];
+    // Configure content
+    [self _configureAttachment];
 }
 
-- (void)_createTitleLabelIfNecessary {
-    if (self.titleLabel) {
-        // View already exists
-        return;
+- (void)_configureTitleLabelIfNecessary {
+    if (!self.titleLabel) {
+        // Create view
+        [self _createTitleLabel];
     }
 
-    [self _createTitleLabel];
+    // Configure content
+    [self _configureTitleText];
 }
 
-- (void)_createDateLabelIfNecessary {
+- (void)_configureDateLabelIfNecessary {
     if (self.dateLabel || !self.timestamp) {
         // View already exists, or no notification
         return;
@@ -69,22 +73,24 @@
     [self _createDateLabel];
 }
 
-- (void)_createMessageLabelIfNecessary {
-    if (self.messageLabel) {
-        // View already exists
-        return;
+- (void)_configureMessageLabelIfNecessary {
+    if (!self.messageLabel) {
+        // Create view
+        [self _createMessageLabel];
     }
 
-    [self _createMessageLabel];
+    // Configure content
+    [self _configureMessageText];
 }
 
-- (void)_createOptionsBarIfNecessary {
-    if (self.optionsBar) {
-        // View already exists
-        return;
+- (void)_configureOptionsBarIfNecessary {
+    if (!self.optionsBar) {
+        // Create view
+        [self _createOptionsBar];
     }
 
-    [self _createOptionsBar];
+    // Configure content
+    [self _configureButtons];
 }
 
 #pragma mark - View Creation
@@ -100,9 +106,6 @@
     [self.attachmentImageView.heightAnchor constraintEqualToConstant:40.0].active = YES;
     self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
     self.attachmentConstraint.active = YES;
-
-    // Configure content
-    [self _configureAttachment];
 }
 
 - (void)_createTitleLabel {
@@ -125,9 +128,6 @@
     [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.titleLabel.heightAnchor constraintEqualToConstant:20.0].active = YES;
     [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-
-    // Configure content
-    [self _configureTitleText];
 }
 
 - (void)_createDateLabel {
@@ -162,9 +162,6 @@
     [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
     [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-
-    // Configure content
-    [self _configureMessageText];
 }
 
 - (void)_createOptionsBar {
@@ -207,9 +204,6 @@
     [self.clearButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:30.0].active = YES;
     [self.clearButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
     [self.clearButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
-
-    // Configure content
-    [self _configureButtons];
 }
 
 #pragma mark - Buttons
@@ -277,7 +271,7 @@
     [[NUADateLabelRepository sharedRepository] recycleLabel:self.dateLabel];
 }
 
-#pragma mark - Label management
+#pragma mark - Content Management
 
 - (void)_configureAttachment {
     if (!self.notification) {
