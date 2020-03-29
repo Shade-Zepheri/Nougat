@@ -352,6 +352,13 @@
     // Text buttons
     [self.openButton setTitleColor:self.tintColor forState:UIControlStateNormal];
     [self.clearButton setTitleColor:self.tintColor forState:UIControlStateNormal];
+
+    // Show/hide
+    self.openButton.hidden = !self.expanded;
+    self.clearButton.hidden = !self.expanded;
+
+    // Update options menu
+    self.optionsHeightConstraint.constant = self.expanded ? 50.0 : 0.0;
 }
 
 @end
