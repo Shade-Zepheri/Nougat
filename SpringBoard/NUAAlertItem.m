@@ -52,9 +52,12 @@
                 return;
             }
 
-            // Set has seen user guide and dismiss
-            [[NUAPreferenceManager sharedSettings] setHasBeenPrompted];
-            [weakself dismiss];
+            // Make sure on main thread
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Set has seen user guide and dismiss
+                [[NUAPreferenceManager sharedSettings] setHasBeenPrompted];
+                [weakself dismiss];
+            });
         }];
     }];
     [[self alertController] addAction:confirmAction];
