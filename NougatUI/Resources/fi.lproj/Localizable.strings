@@ -1,13 +1,13 @@
 // Dates
-"RELATIVE_DATE_PAST_SECONDS" = "now";
-"RELATIVE_DATE_PAST_MINUTES" = "%zdm";
+"RELATIVE_DATE_PAST_SECONDS" = "nyt";
+"RELATIVE_DATE_PAST_MINUTES" = "%zdmin";
 "RELATIVE_DATE_PAST_HOURS" = "%zdh";
-"RELATIVE_DATE_PAST_DAYS" = "%zdd";
+"RELATIVE_DATE_PAST_DAYS" = "%zdpv";
 
 // Notification
-"TAP_FOR_MORE_OPTIONS" = "Tap for more options.";
+"TAP_FOR_MORE_OPTIONS" = "Lisäasetukset.";
 
 // Alert
-"USER_GUIDE_PROMPT" = "It appears that this is your first time using Nougat. Do you want to go through the user guide?";
-"DISMISS" = "Dismiss";
+"USER_GUIDE_PROMPT" = "Vaikuttaa että käytät Nougatia ensimmäistä kertaa. Haluatko tutustua käyttöohjeeseen?";
+"DISMISS" = "Hylkää";
 "CONFIRM" = "OK";
