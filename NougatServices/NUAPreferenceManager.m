@@ -255,7 +255,6 @@
 - (void)setHasBeenPrompted {
     // Update prefs
     _preferences[NUAPreferencesFirstTimeUserKey] = @(NO);
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 #pragma mark - Convenience Methods
