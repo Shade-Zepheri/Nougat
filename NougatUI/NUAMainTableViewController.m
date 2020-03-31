@@ -78,40 +78,6 @@
     _heightConstraint.constant = height - 150.0;
 }
 
-#pragma mark - KVO
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context {
-    if (![keyPath isEqualToString:@"revealPercentage"]) {
-        return;
-    }
-
-    if (self.contentHeight + 500.0 <= kScreenHeight - 100) {
-        // Table is never going to expaind below cutoff
-        return;
-    }
-
-    // Adjust table frame
-    CGFloat revealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
-    CGFloat oldRevealPercentage = [change[NSKeyValueChangeNewKey] floatValue]; 
-
-    CGFloat expandedHeight = 350 * revealPercentage;
-    CGFloat currentHeight = expandedHeight + self.presentedHeight;
-    CGFloat previousHeight = 350 * oldRevealPercentage + self.presentedHeight;
-
-    CGFloat heightDifference = kScreenHeight - currentHeight;
-    if (heightDifference < 100) {
-        // Remove height
-        CGFloat extraHeight = 100 - heightDifference;
-        self.presentedHeight -= extraHeight;
-        self.removedHeight += extraHeight;
-    } else if (self.removedHeight > 0.0) {
-        // Add remaining back
-        CGFloat pannedHeight = previousHeight - currentHeight;
-        self.presentedHeight += pannedHeight;
-        self.removedHeight -= pannedHeight;
-    }
-}
-
 #pragma mark - Observer
 
 - (void)notificationRepositoryAddedNotification:(NUACoalescedNotification *)newNotification {
@@ -311,7 +277,6 @@
 
     // Notifications
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center addObserver:self selector:@selector(_reloadForExpansion:) name:@"NUATableCellWantsReloadNotification" object:nil];
     [center addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
     // Update media if needed
@@ -323,7 +288,6 @@
 
     // Stop listening for Notifs
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    [center removeObserver:self name:@"NUATableCellWantsReloadNotification" object:nil];
     [center removeObserver:self name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
 
     // Remove media cell if needed
@@ -336,12 +300,6 @@
 }
 
 #pragma mark - Notifications
-
-- (void)_reloadForExpansion:(NSNotification *)notification {
-    // Simple reload
-    [self.tableViewController.tableView beginUpdates];
-    [self.tableViewController.tableView endUpdates];
-}
 
 - (void)_updateMedia {
     // Make sure on the main thread since the notification is dispatched on a mediaremote thread

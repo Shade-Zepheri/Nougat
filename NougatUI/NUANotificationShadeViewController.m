@@ -95,6 +95,7 @@
 
     [self.tableViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.tableViewController.view.topAnchor constraintEqualToAnchor:_containerViewController.view.bottomAnchor].active  = YES;
+}
 
 - (BOOL)_canShowWhileLocked {
     // New on iOS 13
