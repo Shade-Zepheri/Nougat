@@ -74,6 +74,9 @@
     // Pass to views
     self.contentViewController.revealPercentage = percentage;
     [self _panelView].revealPercentage = percentage;
+
+    // Pass to delegate
+    [self.delegate containerViewController:self updatedRevealPercentage:percentage];
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
@@ -216,9 +219,10 @@
     // Allow delegates to adjust
     self.dismissing = YES;
 
+    __weak __typeof(self) weakSelf = self;
     [self _updatePresentedHeight:finalHeight baseHeight:self.presentedHeight completion:^{
         // Add call to disable dispatching delegate methods
-        self.dismissing = NO;
+        weakSelf.dismissing = NO;
 
         if (!completion) {
             return;

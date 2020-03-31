@@ -10,7 +10,8 @@
 @protocol NUAMainTableViewControllerDelegate <NSObject>
 @required
 
-- (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)controller;
+- (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)tableViewController;
+- (CGFloat)tableViewControllerRequestsPanelContentHeight:(NUAMainTableViewController *)tableViewController;
 
 @end
 
@@ -22,6 +23,7 @@
 
 @property (weak, nonatomic) id<NUAMainTableViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
+@property (assign, nonatomic) CGFloat revealPercentage;
 @property (readonly, nonatomic) CGFloat contentHeight;
 
 @end

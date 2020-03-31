@@ -9,7 +9,6 @@
     NSLayoutConstraint *_heightConstraint;
     NUACoalescedNotification *_mediaNotification;
 }
-@property (assign, nonatomic) CGFloat removedHeight;
 
 @end
 
@@ -76,6 +75,30 @@
     }
 
     _heightConstraint.constant = height - 150.0;
+}
+
+- (void)setRevealPercentage:(CGFloat)revealPercentage {
+    _revealPercentage = revealPercentage;
+
+    // Adjust whether table should start cutting off
+    CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
+    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    if ((self.contentHeight + fullPanelHeight) <= safeAreaHeight) {
+        // No need to ever cutoff
+        return;
+    }
+
+    // Calculate cutoff
+    CGFloat originalPresentedHeight = MIN(safeAreaHeight, self.contentHeight + 150.0);
+    CGFloat addedHeight = ((fullPanelHeight - 150.0) * revealPercentage);
+    CGFloat totalHeight = originalPresentedHeight + addedHeight;
+    CGFloat heightToRemove = totalHeight - safeAreaHeight;
+    CGFloat newPresentedHeight = originalPresentedHeight - heightToRemove;
+    if (newPresentedHeight > originalPresentedHeight) {
+        newPresentedHeight = originalPresentedHeight;
+    }
+
+    self.presentedHeight = newPresentedHeight;
 }
 
 #pragma mark - Observer

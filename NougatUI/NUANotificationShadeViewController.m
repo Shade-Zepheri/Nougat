@@ -163,10 +163,20 @@
     self.tableViewController.presentedHeight = presentedHeight;
 }
 
+- (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedRevealPercentage:(CGFloat)revealPercentage {
+    // Pass to table
+    self.tableViewController.revealPercentage = revealPercentage;
+}
+
 #pragma mark - Table view delegate
 
-- (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)controller {
+- (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)tableViewController {
     [self.delegate notificationShadeViewControllerWantsDismissal:self];
+}
+
+- (CGFloat)tableViewControllerRequestsPanelContentHeight:(NUAMainTableViewController *)tableViewController {
+    // Get content height
+    return _containerViewController.contentPresentedHeight;
 }
 
 #pragma mark - Gestures
