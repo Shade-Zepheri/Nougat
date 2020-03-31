@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "הוסף ומיין פקדים נוספים שיופיעו ב-Nougat. Nougar מאפשר עד ל9 פקדים.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "סדר מיון";
+"CUSTOMIZE_TOGGLES_REMOVE" = "הסר";
+"DISABLED_MODULES_SECTION_TITLE" = "פקדים נוספים";
+"ENABLED_MODULES_SECTION_TITLE" = "כלול";
