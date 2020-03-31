@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Lisää ja järjestele kytkimiä Nougatiin. Nougat sallii maksimissaan 9 kytkintä.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Lajittelujärjestys";
+"CUSTOMIZE_TOGGLES_REMOVE" = "Poista";
+"DISABLED_MODULES_SECTION_TITLE" = "Lisää kytkimiä";
+"ENABLED_MODULES_SECTION_TITLE" = "Sisällytä";
