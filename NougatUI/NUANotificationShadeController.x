@@ -278,22 +278,27 @@
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
         CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
 
-        CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
+        // Check if within "left"
+        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+        CGFloat maxLeadingX = isRTL ? (kScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
         if (maxLeadingX > 5000.0) {
             // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
             // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
-            maxLeadingX = kScreenWidth / 4;
+            maxLeadingX = isRTL ? ((kScreenWidth * 3) / 4) : (kScreenWidth / 4);
         }
 
-        // Get min trailing x taking into account orientation
-        CGFloat minTrailingX = kScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame));
+        BOOL outsideLeftInset = isRTL ? (location.x < maxLeadingX) : (location.x > maxLeadingX);
+
+        // Check if within "right"
+        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (kScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
         if (isnan(minTrailingX)) {
             // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
             // Fall back to 1/4
             minTrailingX = kScreenWidth - maxLeadingX;
         }
 
-        return location.x > maxLeadingX && location.x < minTrailingX;
+        BOOL outsideRightInset = isRTL ? (location.x > minTrailingX) : (location.x < minTrailingX);
+        return outsideLeftInset && outsideRightInset;
     } else {
         // Regular old frames
         return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);

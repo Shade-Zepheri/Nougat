@@ -154,11 +154,14 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         return shouldBegin;
     }
 
-    // Manually override to only show on left 1/3 to prevent conflict with Nougat
+    // Manually override to only show on "left" 1/3 to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [gestureRecognizer locationInView:window];
     CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
-    return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
+
+    BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+    BOOL withinRegion = isRTL ? (correctedLocation.x > ((kScreenWidth * 2) / 3)) : (correctedLocation.x < (kScreenWidth / 3));
+    return withinRegion && shouldBegin;
 }
 
 %end
@@ -174,28 +177,32 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         return shouldBegin;
     }
 
-    // Manually override to only show on left 1/3 or on left notch inset to prevent conflict with Nougat
+    // Manually override to only show on "left" 1/3 or on "left" notch inset to prevent conflict with Nougat
     UIWindow *window = [[%c(SBUIController) sharedInstance] window];
     CGPoint location = [gestureRecognizer locationInView:window];
     CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
 
     // Check if notched or not
+    BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
 
-        CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
+        // Check if within inset
+        CGFloat maxLeadingX = isRTL ? (kScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
         if (maxLeadingX > 5000.0) {
             // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
-            maxLeadingX = kScreenWidth / 4;
+            maxLeadingX = isRTL ? ((kScreenWidth * 3) / 4) : (kScreenWidth / 4);
         }
 
-        return (correctedLocation.x < maxLeadingX) && shouldBegin;
+        BOOL withinRespectiveInset = isRTL ? (correctedLocation.x > maxLeadingX) : (correctedLocation.x < maxLeadingX);
+        return withinRespectiveInset && shouldBegin;
     } else {
         // Regular old frames if no notch
-        return (correctedLocation.x < (kScreenWidth / 3)) && shouldBegin;
+        BOOL insideRegion = isRTL ? (correctedLocation.x > ((kScreenWidth * 2) / 3)) : (correctedLocation.x < (kScreenWidth / 3));
+        return insideRegion && shouldBegin;
     }
 }
 
