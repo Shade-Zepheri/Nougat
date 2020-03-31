@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "הפעל";
 
-"NEXUS" = "Nexus";
-"PIXEL" = "Pixel";
-"OREO" = "Oreo";
+"NEXUS" = "נקסוס";
+"PIXEL" = "פיקסל";
+"OREO" = "אוראו";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "השתמש בהגדרות תצוגת המערכת";
+"USE_COLORFLOW" = "השתמש בצבעי Colorflow";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "הוראות שימוש";
+"SORT_ORDER" = "סדר מיון";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "תנסו את Nougat של Shade Zepheri. אפשר להשתמש במרכז ההתראות של אנדרואיד בלי להשתמש באנדרואיד!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "תמיכה";
+"TRANSLATORS" = "מתרגמים";
+"HELP_TRANSLATING" = "עזרו בתרגום!";
+"SOURCE_CODE" = "קוד מקור";
