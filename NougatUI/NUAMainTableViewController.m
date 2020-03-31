@@ -330,6 +330,11 @@
     [self removeMediaCellIfNecessary];
 }
 
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
+}
+
 #pragma mark - Notifications
 
 - (void)_reloadForExpansion:(NSNotification *)notification {

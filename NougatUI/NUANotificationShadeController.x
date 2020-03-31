@@ -212,6 +212,11 @@
     return NO;
 }
 
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
+}
+
 #pragma mark - Gesture management
 
 - (UIView *)viewForSystemGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {

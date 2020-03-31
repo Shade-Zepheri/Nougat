@@ -96,8 +96,9 @@
     [self.tableViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.tableViewController.view.topAnchor constraintEqualToAnchor:_containerViewController.view.bottomAnchor].active  = YES;
 
-    // KVO
-    [_containerViewController addObserver:self.tableViewController forKeyPath:@"revealPercentage" options:(NSKeyValueObservingOptionNew) context:NULL];
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
 }
 
 #pragma mark - Properties

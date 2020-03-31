@@ -59,6 +59,11 @@
     return (NUANotificationShadePanelView *)self.view;
 }
 
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
+}
+
 #pragma mark - Properties
 
 - (CGFloat)revealPercentage {

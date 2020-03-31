@@ -70,6 +70,11 @@
     _settingsModule.revealPercentage = 0.0;
 }
 
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
+}
+
 #pragma mark - Properties
 
 - (CGFloat)fullyPresentedHeight {

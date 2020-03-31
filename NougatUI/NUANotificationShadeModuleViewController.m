@@ -20,4 +20,11 @@
     return @"";
 }
 
+#pragma mark - UIViewController
+
+- (BOOL)_canShowWhileLocked {
+    // New on iOS 13
+    return YES;
+}
+
 @end
