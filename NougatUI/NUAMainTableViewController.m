@@ -246,21 +246,8 @@
     NUACoalescedNotification *notification = self.notifications[indexPath.row];
     NUANotificationEntry *entry = notification.entries[0];
 
-    // Get action
-    NCNotificationAction *action = nil;
-    if ([type isEqualToString:@"default"]) {
-        action = entry.request.defaultAction;
-    } else if ([type isEqualToString:@"clear"]) {
-        action = entry.request.clearAction;
-    }
-
-    if (!action) {
-        // No action
-        return;
-    }
-
     // Post to launch
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"type": type, @"action": action, @"request": entry.request}];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"type": type, @"request": entry.request}];
 
     if ([type isEqualToString:@"default"]) {
         // Dismiss
