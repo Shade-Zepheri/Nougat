@@ -1,4 +1,4 @@
-@class NCCoalescedNotification, NCNotificationListViewController, NCNotificationAction, NCNotificationRequest;
+@class NCCoalescedNotification, NCNotificationListViewController, NCNotificationAction, NCNotificationRequest, NCNotificationListCell;
 
 @protocol NCNotificationListViewControllerDestinationDelegate <NSObject>
 // Sooooooooooo many options here
@@ -10,5 +10,10 @@
 @property (weak, nonatomic) id<NCNotificationListViewControllerDestinationDelegate> destinationDelegate;
 
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification;
+
+- (NSIndexPath *)indexPathForNotificationRequest:(NCNotificationRequest *)notificationRequest;
+
+// Added by me
+- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request;
 
 @end

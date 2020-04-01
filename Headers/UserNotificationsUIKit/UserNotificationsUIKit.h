@@ -1,2 +1,6 @@
 #import "NCNotificationCombinedListViewController.h"
+#import "NCNotificationGroupList.h"
+#import "NCNotificationListCell.h"
+#import "NCNotificationMasterList.h"
 #import "NCNotificationStructuredListViewController.h"
+#import "NCNotificationStructuredSectionList.h"

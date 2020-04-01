@@ -238,17 +238,30 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 - (void)nua_executeAction:(NSNotification *)notification {
     // Parse for info
     NSString *type = notification.userInfo[@"type"];
-    NCNotificationAction *action = notification.userInfo[@"action"];
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
-    // Execute
-    id<NCNotificationListViewControllerDestinationDelegate> destinationDelegate = ((NCNotificationListViewController *)self).destinationDelegate;
-    [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
-
-    if ([type isEqualToString:@"clear"]) {
-        // Clear if needed
-        [self removeNotificationRequest:request forCoalescedNotification:nil];
+    // "Simply" get the cell and execute its action
+    NCNotificationListCell *listCell = [self nua_notificationListCellForRequest:request];
+    if ([type isEqualToString:@"default"]) {
+        // Perform default action
+        if ([listCell respondsToSelector:@selector(_executeDefaultAction)]) {
+            [listCell _executeDefaultAction];
+        } else {
+            [listCell cellOpenButtonPressed:nil];
+        }
+    } else if ([type isEqualToString:@"clear"]) {
+        // Perform clear action
+        if ([listCell respondsToSelector:@selector(_executeClearAction)]) {
+            [listCell _executeClearAction];
+        } else {
+            [listCell cellClearButtonPressed:nil];
+        }
     }
+}
+
+- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request {
+    NSIndexPath *indexPath = [self indexPathForNotificationRequest:request];
+    return (NCNotificationListCell *)[((NCNotificationListViewController *)self).collectionView cellForItemAtIndexPath:indexPath];
 }
 
 #pragma mark - Notification managements
@@ -299,17 +312,38 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 - (void)nua_executeAction:(NSNotification *)notification {
     // Parse for info
     NSString *type = notification.userInfo[@"type"];
-    NCNotificationAction *action = notification.userInfo[@"action"];
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
-    // Execute
-    id<NCNotificationStructuredListViewControllerDelegate> delegate = self.delegate;
-    [delegate notificationStructuredListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:NO withParameters:@{} completion:nil];
-
-    if ([type isEqualToString:@"clear"]) {
-        // Clear if needed
-        [self removeNotificationRequest:request];
+    // "Simply" get the cell and execute its action
+    NCNotificationListCell *listCell = [self nua_notificationListCellForRequest:request];
+    if ([type isEqualToString:@"default"]) {
+        // Perform default action
+        [listCell _executeDefaultAction];
+    } else if ([type isEqualToString:@"clear"]) {
+        // Perform clear action
+        [listCell _executeClearAction];
     }
+}
+
+%new
+- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request {
+    // Master list -> notificationSections -> [sections] foreach -> sectionListView -> visibleViews -> [listView] foreach -> visibleViews -> [notificationcell]
+    // Master list -> notificationSections -> [sections] foreach -> sectionListView -> notificationGroups -> [groupList] foreach -> _currentCellForNotificationRequest
+    NCNotificationMasterList *masterList = self.masterList;
+    for (NCNotificationStructuredSectionList *notificationSection in masterList.notificationSections) {
+        for (NCNotificationGroupList *notificationGroup in notificationSection.notificationGroups) {
+            NCNotificationListCell *listCell = [notificationGroup _currentCellForNotificationRequest:request];
+            if (!listCell) {
+                continue;
+            }
+
+            // Found the list cell
+            return listCell;
+        }
+    }
+
+    // return nothing by default
+    return nil;
 }
 
 #pragma mark - Notification managements
