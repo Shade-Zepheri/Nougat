@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Activat";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "Foloseste setarile de afisare ale sistemului";
+"USE_COLORFLOW" = "Foloseste culorile Colorflow";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Manual de utilizare";
+"SORT_ORDER" = "Sortare";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Iata Nougat creat de Shade Zepheri. Pot folosi bara de notificari ca pe Android pe iOS!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Suport";
+"TRANSLATORS" = "Traducatori";
+"HELP_TRANSLATING" = "Ajuta cu traducerea!";
+"SOURCE_CODE" = "Cod sursa";
