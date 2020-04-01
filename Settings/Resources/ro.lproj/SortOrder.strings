@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Adauga si aranjeaza butoanele aditionale care sa apara in Nougat. Sunt suportate pana la 9 butoane.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sortare";
+"CUSTOMIZE_TOGGLES_REMOVE" = "Sterge";
+"DISABLED_MODULES_SECTION_TITLE" = "Mai multe butoane";
 "ENABLED_MODULES_SECTION_TITLE" = "Include";
