@@ -8,7 +8,6 @@
     CIImage *outputImage = filter.outputImage;
 
     UInt8 bitmap[4];
-    // *** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '*** -[__NSPlaceholderDictionary initWithObjects:forKeys:count:]: attempt to insert nil object from objects[0]'
     CIContext *context = [CIContext contextWithOptions:@{kCIContextWorkingColorSpace: [NSNull null]}];
     CGRect bounds  = CGRectMake(0, 0, 1, 1);
     [context render:outputImage toBitmap:&bitmap rowBytes:4 bounds:bounds format:kCIFormatRGBA8 colorSpace:nil];

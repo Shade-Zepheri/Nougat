@@ -139,8 +139,6 @@
     self.table.tableHeaderView = headerContainerView;
 }
 
-#pragma mark - UIScrollViewDelegate
-
 #pragma mark - Support
 
 - (void)showSupportEmailController {

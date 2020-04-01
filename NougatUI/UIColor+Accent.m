@@ -14,12 +14,7 @@
     // Adjust brightness to 0.5
     return [UIColor colorWithHue:hue saturation:saturation brightness:0.5 alpha:alpha];
 }
-/*
-- (NSArray<UIColor *> *)tetradicColors {
-    // 
-    return @[[self colorWithHueOffset:0.25], [self colorWithHueOffset:0.5], [self colorWithHueOffset:0.75]];
-}
-*/
+
 - (UIColor *)colorWithHueOffset:(CGFloat)offset {
     CGFloat hue = 0.0;
     CGFloat saturation = 0.0;
