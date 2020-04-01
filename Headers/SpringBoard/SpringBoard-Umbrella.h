@@ -27,5 +27,6 @@
 #import "SBSceneManagerCoordinator.h"
 #import "SBScreenEdgePanGestureRecognizer+Private.h"
 #import "SBUIController+Private.h"
+#import "SBWindow+Private.h"
 #import "SBWindowHidingManager.h"
 #import "SpringBoard+Private.h"

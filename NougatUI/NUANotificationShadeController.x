@@ -841,6 +841,18 @@
             self.idleTimerDisableAssertion = nil;
         }
 
+        // Update providers
+        SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+        if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
+            // Only iOS 10+
+            SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
+            [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
+            [dashBoardViewController externalPresentationProviderPresentationChanged:self];
+        } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
+            CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
+            [coverSheetViewController externalBehaviorProviderBehaviorChanged:self];
+            [coverSheetViewController externalPresentationProviderPresentationChanged:self];
+        }
 
         if (dismissed) {
             // Dismissing
@@ -871,16 +883,17 @@
                 [_oldResignActiveAssertion relinquish];
             }
 
-            [self _endAnimation];
+            // Resign key window
+            if (@available(iOS 12, *)) {
+                [_window resignAsKeyWindow];
+            }
 
-            SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
-            if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
-                // Only iOS 10+
-                SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
-                [dashBoardViewController externalBehaviorProviderBehaviorChanged:self];
-            } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
-                CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
-                [coverSheetViewController externalBehaviorProviderBehaviorChanged:self];
+            [self _endAnimation];
+        } else {
+            // Guaranteed presented
+            if (IS_IOS_OR_NEWER(iOS_12_0)) {
+                // Only on iOS 12+
+                [_window makeKeyWindow];
             }
         }
     }
