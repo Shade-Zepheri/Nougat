@@ -151,6 +151,12 @@
     [notifications removeObject:oldNotification];
     [notifications insertObject:updatedNotification atIndex:newIndex];
 
+        // Update expansion status
+        if ([_expandedNotifications containsObject:oldNotification]) {
+            [_expandedNotifications removeObject:oldNotification];
+            [_expandedNotifications addObject:updatedNotification];
+        }
+
     // Update ivar
     _notifications = [notifications copy];
 
@@ -192,6 +198,9 @@
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
     [notifications removeObject:oldNotification];
 
+        // Update expansion status
+        [self notification:oldNotification shouldExpand:NO];
+
     // Update ivar
     _notifications = [notifications copy];
 
@@ -224,6 +233,12 @@
     }
 
     return nil;
+}
+
+- (NSIndexPath *)indexPathForNotification:(NUACoalescedNotification *)notification {
+    // Get index from array and return
+    NSUInteger index = [self.notifications indexOfObject:notification];
+    return [NSIndexPath indexPathForRow:index inSection:0];
 }
 
 - (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
@@ -400,6 +415,10 @@
 
         [self.tableViewController.tableView endUpdates];
     }
+
+    // Update expansion status
+    [self notification:_mediaNotification shouldExpand:NO];
+
 }
 
 #pragma mark - UITableViewDelegate
@@ -496,18 +515,27 @@
         notification = notificationCell.notification;
     }
 
+    // Pass along
+    [self notification:notification shouldExpand:expand];
+}
+
+- (void)notification:(NUACoalescedNotification *)notification shouldExpand:(BOOL)expand {
     // Add/remove
-    if (expand) {
+    if (expand && ![_expandedNotifications containsObject:notification]) {
         [_expandedNotifications addObject:notification];
-    } else {
+
+        // Reload
+        NSIndexPath *indexPath = [self indexPathForNotification:notification];
+        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+    } else if (!expand && [_expandedNotifications containsObject:notification]) {
         [_expandedNotifications removeObject:notification];
-    }
 
     // Reload
-    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
-    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
+        NSIndexPath *indexPath = [self indexPathForNotification:notification];
+        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 
-    self.presentedHeight += expand ? 50.0 : -50.0;
+    }
 }
 
 - (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {
