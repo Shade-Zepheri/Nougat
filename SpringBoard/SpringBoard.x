@@ -314,21 +314,34 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     NSString *type = notification.userInfo[@"type"];
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
-    // "Simply" get the cell and execute its action
     NCNotificationListCell *listCell = [self nua_notificationListCellForRequest:request];
     if ([type isEqualToString:@"default"]) {
         // Perform default action
-        [listCell _executeDefaultAction];
+        if (listCell) {
+            // Execute from cell
+            [listCell _executeDefaultAction];
+        } else {
+            // Manually call delegate methods
+            NCNotificationStructuredSectionList *notificationSection = self.masterList.notificationSections.lastObject;
+            NCNotificationGroupList *notificationGroup = notificationSection.notificationGroups.firstObject;
+            [notificationGroup _performDefaultActionForNotificationRequest:request withCompletion:nil];
+        }
     } else if ([type isEqualToString:@"clear"]) {
         // Perform clear action
-        [listCell _executeClearAction];
+        if (listCell) {
+            // Execute from cell
+            [listCell _executeClearAction];
+        } else {
+            // Call delegate methods manually
+            NCNotificationStructuredSectionList *notificationSection = self.masterList.notificationSections.lastObject;
+            NCNotificationGroupList *notificationGroup = notificationSection.notificationGroups.firstObject;
+            [notificationGroup _clearNotificationRequest:request withCompletion:nil];
+        }
     }
 }
 
 %new
 - (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request {
-    // Master list -> notificationSections -> [sections] foreach -> sectionListView -> visibleViews -> [listView] foreach -> visibleViews -> [notificationcell]
-    // Master list -> notificationSections -> [sections] foreach -> sectionListView -> notificationGroups -> [groupList] foreach -> _currentCellForNotificationRequest
     NCNotificationMasterList *masterList = self.masterList;
     for (NCNotificationStructuredSectionList *notificationSection in masterList.notificationSections) {
         for (NCNotificationGroupList *notificationGroup in notificationSection.notificationGroups) {
