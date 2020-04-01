@@ -1,13 +1,13 @@
 // Dates
-"RELATIVE_DATE_PAST_SECONDS" = "now";
+"RELATIVE_DATE_PAST_SECONDS" = "acum";
 "RELATIVE_DATE_PAST_MINUTES" = "%zdm";
 "RELATIVE_DATE_PAST_HOURS" = "%zdh";
-"RELATIVE_DATE_PAST_DAYS" = "%zdd";
+"RELATIVE_DATE_PAST_DAYS" = "%zdz";
 
 // Notification
-"TAP_FOR_MORE_OPTIONS" = "Tap for more options.";
+"TAP_FOR_MORE_OPTIONS" = "Atinge pentru mai multe optiuni.";
 
 // Alert
-"USER_GUIDE_PROMPT" = "It appears that this is your first time using Nougat. Do you want to go through the user guide?";
-"DISMISS" = "Dismiss";
+"USER_GUIDE_PROMPT" = "Se pare ca folosesti pentru prima data Nougat. Doresti sa citesti manualul de utilizare?";
+"DISMISS" = "Ignora";
 "CONFIRM" = "OK";
