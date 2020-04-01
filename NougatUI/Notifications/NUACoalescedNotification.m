@@ -170,7 +170,13 @@
 
     // Add to entries
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-    [entries insertObject:entry atIndex:0];
+    [entries addObject:entry];
+
+    // Sort entires
+    [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
+        return [entry2.timestamp compare:entry1.timestamp];
+    }];
+
     _entries = [entries copy];
 }
 
