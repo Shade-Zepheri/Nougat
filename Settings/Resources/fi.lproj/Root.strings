@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Käytössä";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "Käytä järjestelmän ulkoasuasetuksia";
+"USE_COLORFLOW" = "Käytä Colorflow-värejä";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Käyttöohje";
+"SORT_ORDER" = "Laijittelujärjestys";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Tutustu Nougatiin, jonka on luonut Shade Zepheri. Voin käyttää Androidin ilmoituskeskusta käyttämättä androidia!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Tuki";
+"TRANSLATORS" = "Kääntäjät";
+"HELP_TRANSLATING" = "Auta kääntämään!";
+"SOURCE_CODE" = "Lähdekoodi";
