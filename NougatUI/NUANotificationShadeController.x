@@ -53,7 +53,11 @@
             SBDashBoardViewController *dashBoardViewController = manager.dashBoardViewController;
             [dashBoardViewController registerExternalBehaviorProvider:self];
             [dashBoardViewController registerExternalPresentationProvider:self];
-            [dashBoardViewController registerExternalAppearanceProvider:self];
+
+            if ([dashBoardViewController respondsToSelector:@selector(registerExternalAppearanceProvider)]) {
+                // iOS 11+
+                [dashBoardViewController registerExternalAppearanceProvider:self];
+            }
         } else if ([manager respondsToSelector:@selector(coverSheetViewController)]) {
             // iOS 13
             CSCoverSheetViewController *coverSheetViewController = manager.coverSheetViewController;
