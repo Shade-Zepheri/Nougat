@@ -11,6 +11,10 @@
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView {
     NSArray<PSTableCell *> *visibleCells = [self table].visibleCells;
+    if (!visibleCells || visibleCells.count < 1) {
+        // No cells
+        return;
+    }
 
     // Check first cell
     [self checkIfCellIsVisible:visibleCells.firstObject inScrollView:scrollView];

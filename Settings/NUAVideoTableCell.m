@@ -3,7 +3,7 @@
 
 @implementation NUAVideoTableCell
 
-#pragma mark - Init
+#pragma mark - Initialization
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier specifier:(PSSpecifier *)specifier {
 	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier specifier:specifier];
@@ -22,7 +22,7 @@
         _player = [AVPlayer playerWithPlayerItem:self.playerItem];
         self.player.volume = 0.0;
         self.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
-        [self.player addObserver:self forKeyPath:@"status" options:0 context:nil];  
+        [self.player addObserver:self forKeyPath:@"status" options:0 context:nil];
 
         _playerLayer = [AVPlayerLayer playerLayerWithPlayer:self.player];
         self.playerLayer.frame = self.bounds;
@@ -44,6 +44,13 @@
 	self = [self initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil specifier:specifier];
 	return self;
 }
+
+- (void)dealloc {
+    // Unregister KVO
+    [self.player removeObserver:self forKeyPath:@"status" context:nil];
+}
+
+#pragma mark - View Management
 
 - (void)layoutSubviews {
     [super layoutSubviews];
