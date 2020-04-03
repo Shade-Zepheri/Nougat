@@ -4,6 +4,11 @@
 #import <UIKit/UIKit+Private.h>
 #import <sys/utsname.h>
 
+@interface NUAStatusBarContentView ()
+@property (strong, nonatomic) NSNumberFormatter *percentFormatter;
+
+@end
+
 @implementation NUAStatusBarContentView
 
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -11,6 +16,10 @@
     if (self) {
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+
+        // Create number formatter
+        self.percentFormatter = [[NSNumberFormatter alloc] init];
+        self.percentFormatter.numberStyle = NSNumberFormatterPercentStyle;
 
         // Create views
         [self _createCarrierLabel];
@@ -115,7 +124,7 @@
 
     // Pass to labels
     if (self.batteryLabel) {
-        self.batteryLabel.text = [NSString stringWithFormat:@"%g%%", currentPercent];
+        self.batteryLabel.text = [self.percentFormatter stringFromNumber:@(currentPercent)];
     }
 
     self.batteryView.currentPercent = currentPercent;
