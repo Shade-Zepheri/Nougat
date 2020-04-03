@@ -18,9 +18,53 @@
             <key>cellClass</key>
             <string>HBTwitterCell</string>
             <key>label</key>
+            <string>Finnish: Mikko Kalermo</string>
+            <key>user</key>
+            <string>kalermo</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
             <string>German: Simon</string>
             <key>user</key>
             <string>derinsiderx</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Hebrew: Aran Shavit</string>
+            <key>user</key>
+            <string>Aranshavit</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTitleValueCell</string>
+            <key>label</key>
+            <string>Japanese: Onoue Ryotaro</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Brazilian Portuguese: Guilherme Benites</string>
+            <key>user</key>
+            <string>benitesgui</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Romanian: Popescu Bogdan</string>
+            <key>user</key>
+            <string>PBDi4</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTitleValueCell</string>
+            <key>label</key>
+            <string>Russian: Gennady Koshkin</string>
         </dict>
         <dict>
             <key>cellClass</key>
