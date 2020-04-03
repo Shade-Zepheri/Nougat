@@ -205,16 +205,14 @@
         return;
     }
 
-    // Get old notification 
-    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
+    // Update expansion status
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
+    [self notification:oldNotification shouldExpand:NO reload:NO];
 
     // Remove old
+    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
     [notifications removeObject:oldNotification];
-
-        // Update expansion status
-        [self notification:oldNotification shouldExpand:NO];
 
     // Update ivar
     _notifications = [notifications copy];
@@ -248,6 +246,10 @@
     }
 
     return nil;
+}
+
+- (NUACoalescedNotification *)notificationForIndexPath:(NSIndexPath *)indexPath {
+    return self.notifications[indexPath.row];
 }
 
 - (NSIndexPath *)indexPathForNotification:(NUACoalescedNotification *)notification {
@@ -419,7 +421,7 @@
     }
 
     // Update expansion status
-    [self notification:_mediaNotification shouldExpand:NO];
+    [self notification:_mediaNotification shouldExpand:NO reload:NO];
 
 }
 
@@ -473,13 +475,13 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NUACoalescedNotification *notification = self.notifications[indexPath.row];
+    NUACoalescedNotification *notification = [self notificationForIndexPath:indexPath];
     if (notification.type == NUANotificationTypeMedia) {
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
         // Provide basic information
         mediaCell.delegate = self;
-        mediaCell.expanded = [_expandedNotifications containsObject:notification];
+        mediaCell.expanded = [self isNotificationExpanded:notification];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
 
         return mediaCell;
@@ -489,7 +491,7 @@
     cell.notification = notification;
     cell.actionsDelegate = self;
     cell.delegate = self;
-    cell.expanded = [_expandedNotifications containsObject:notification];
+    cell.expanded = [self isNotificationExpanded:notification];
     cell.layoutMargins = UIEdgeInsetsZero;
 
     return cell;
@@ -518,26 +520,48 @@
     }
 
     // Pass along
-    [self notification:notification shouldExpand:expand];
+    [self notification:notification shouldExpand:expand reload:YES];
 }
 
-- (void)notification:(NUACoalescedNotification *)notification shouldExpand:(BOOL)expand {
+- (void)notification:(NUACoalescedNotification *)notification shouldExpand:(BOOL)expand reload:(BOOL)reload {
     // Add/remove
-    if (expand && ![_expandedNotifications containsObject:notification]) {
+    if (expand && ![self isNotificationExpanded:notification]) {
+        // Add to expanded
         [_expandedNotifications addObject:notification];
+
+        // Update presented height
+        [UIView animateWithDuration:0.4 animations:^{
+            self.presentedHeight += 50.0;
+        }];
+
+        if (!reload) {
+            return;
+        }
 
         // Reload
         NSIndexPath *indexPath = [self indexPathForNotification:notification];
         [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-
-    } else if (!expand && [_expandedNotifications containsObject:notification]) {
+    } else if (!expand && [self isNotificationExpanded:notification]) {
+        // Add to expanded
         [_expandedNotifications removeObject:notification];
+
+        // Update presented height
+        [UIView animateWithDuration:0.4 animations:^{
+            self.presentedHeight -= 50.0;
+        }];
+
+        if (!reload) {
+            return;
+        }
 
     // Reload
         NSIndexPath *indexPath = [self indexPathForNotification:notification];
         [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-
     }
+}
+
+- (BOOL)isNotificationExpanded:(NUACoalescedNotification *)notification {
+    return [_expandedNotifications containsObject:notification];
 }
 
 - (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {
