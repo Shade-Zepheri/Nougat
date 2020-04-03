@@ -53,13 +53,8 @@
 #pragma mark - NSObject
 
 - (BOOL)isEqual:(id)object {
-    if (!object || ![object isKindOfClass:self.class]) {
-        // Not same class
-        return NO;
-    }
-
     // TLDR: all media cells are the same since only one exists
-    return YES;
+    return (object && [object isKindOfClass:self.class]);
 }
 
 #pragma mark - View Creation
@@ -87,6 +82,11 @@
     self.headerViewTrailingConstraint = [self.headerView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0];
     self.headerViewTrailingConstraint.active = NO;
 
+    // Finish base constraints
+    [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
+    [self.contentView bringSubviewToFront:self.expandButton];
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
+
     self.controlsViewConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
     self.controlsViewConstraint.active = YES;
 
@@ -94,13 +94,7 @@
     self.controlsViewTrailingConstraint.active = YES;
 
     self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor];
-    self.controlsViewLeadingConstraint.active = NO;
-
-    // Additional constraints
-    [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
-
-    [self.contentView bringSubviewToFront:self.expandButton];
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
+    self.controlsViewLeadingConstraint.active = NO;    
 }
 
 - (void)layoutSubviews {
@@ -277,19 +271,28 @@
 #pragma mark - MPUNowPlayingDelegate
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller nowPlayingInfoDidChange:(NSDictionary *)nowPlayingInfo {
-    // Parse and pass on
-    self.nowPlayingArtwork = controller.currentNowPlayingArtwork;
-    self.metadata = controller.currentNowPlayingMetadata;
+    // Ensure on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Parse and pass on
+        self.nowPlayingArtwork = controller.currentNowPlayingArtwork;
+        self.metadata = controller.currentNowPlayingMetadata;
+    });
 }
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller playbackStateDidChange:(BOOL)isPlaying {
-    // Pass to controls
-    self.controlsView.playing = isPlaying;
+    // Ensure on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Pass to controls
+        self.controlsView.playing = isPlaying;
+    });
 }
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller nowPlayingApplicationDidChange:(NSString *)nowPlayingAppDisplayID {
-    // Pass to header
-    self.nowPlayingAppDisplayID = nowPlayingAppDisplayID;
+    // Ensure on the main thread
+    dispatch_async(dispatch_get_main_queue(), ^{
+        // Pass to header
+        self.nowPlayingAppDisplayID = nowPlayingAppDisplayID;
+    });
 }
 
 - (void)nowPlayingControllerDidBeginListeningForNotifications:(MPUNowPlayingController *)controller {

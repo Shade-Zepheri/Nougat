@@ -43,6 +43,7 @@
 
         // Constrain the stacc
         [self.stackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        [self.stackView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
         [self.stackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     }
 
