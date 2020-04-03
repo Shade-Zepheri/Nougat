@@ -240,6 +240,7 @@
     self.glyphView.image = notification.icon;
 
     // Create views if needed
+    [self _tearDownDateLabel];
     [self setNeedsLayout];
 }
 
@@ -359,6 +360,13 @@
 
     // Update options menu
     self.optionsHeightConstraint.constant = self.expanded ? 50.0 : 0.0;
+
+    // Animate changes
+    [self setNeedsUpdateConstraints];
+
+    [UIView animateWithDuration:0.4 animations:^{
+        [self layoutIfNeeded];
+    }];
 }
 
 @end
