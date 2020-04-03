@@ -114,7 +114,9 @@
         NSArray *observers = [_observers.allObjects copy];
 
         for (id<NUANotificationsObserver> observer in observers) {
+            dispatch_async(dispatch_get_main_queue(), ^{
             handler(observer);
+            });
         }
     });
 }
@@ -176,13 +178,9 @@
     [notification updateWithNewRequest:request];
 
     // Observer
-    NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [observer notificationRepositoryUpdatedNotification:notification updateIndex:YES];
-        });
-    };
-
-    [self notifyObserversUsingBlock:handlerBlock];
+    [self notifyObserversUsingBlock:^(id<NUANotificationsObserver> observer) {
+        [observer notificationRepositoryUpdatedNotification:notification removedRequest:NO];
+    }];
 
     // Figure out what to do with return value
     return YES;
@@ -217,13 +215,9 @@
     }
 
     // Observer
-    NUANotificationsObserverHandler handlerBlock = ^(id<NUANotificationsObserver> observer) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    [self notifyObserversUsingBlock:^(id<NUANotificationsObserver> observer) {
             [observer notificationRepositoryAddedNotification:notification];
-        });
-    };
-
-    [self notifyObserversUsingBlock:handlerBlock];
+    }];
 
     return YES;
 }
@@ -268,16 +262,12 @@
 
         // Adjust handler
         handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            dispatch_async(dispatch_get_main_queue(), ^{
                 [observer notificationRepositoryRemovedNotification:notification];
-            });
         };
     } else {
         // Notification was simply modified
         handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [observer notificationRepositoryUpdatedNotification:notification updateIndex:NO];
-            });
+            [observer notificationRepositoryUpdatedNotification:notification removedRequest:YES];
         };
     }
 

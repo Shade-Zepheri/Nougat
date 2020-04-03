@@ -135,7 +135,7 @@
     }
 }
 
-- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification updateIndex:(BOOL)updateIndex {
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification removedRequest:(BOOL)removedRequest {
     if (!self.notifications) {
         // Notification shade hasnt been loaded
         return;
@@ -145,30 +145,45 @@
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
 
+    // Update expansion status
+    if ([_expandedNotifications containsObject:oldNotification]) {
+        [_expandedNotifications removeObject:oldNotification];
+        [_expandedNotifications addObject:updatedNotification];
+    }
+
     // Remove old and add new      
     NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
-    NSUInteger newIndex = updateIndex ? ([self _mediaCellPresent] ? 1 : 0) : oldIndex;
+    NSUInteger newIndex = 0;
     [notifications removeObject:oldNotification];
-    [notifications insertObject:updatedNotification atIndex:newIndex];
+    if (removedRequest) {
+        // Add and sort
+        [notifications addObject:updatedNotification];
 
-        // Update expansion status
-        if ([_expandedNotifications containsObject:oldNotification]) {
-            [_expandedNotifications removeObject:oldNotification];
-            [_expandedNotifications addObject:updatedNotification];
+        // Sort via date
+        [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+            return [notification2.timestamp compare:notification1.timestamp];
+        }];
+
+        newIndex = [notifications indexOfObject:updatedNotification];
+    } else {
+        // Simply add to top
+        newIndex = [self _mediaCellPresent] ? 1 : 0;
+    [notifications insertObject:updatedNotification atIndex:newIndex];
         }
 
     // Update ivar
     _notifications = [notifications copy];
 
     // Update table
-    void (^updateBlock)() = ^{
         if (newIndex == oldIndex) {
             // Simply just reload the cell, no need to insert and delete
             [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        } else {
+        return;
+    }
+
+    void (^updateBlock)() = ^{
             [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
             [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
     };
 
     if (@available(iOS 11, *)) {
