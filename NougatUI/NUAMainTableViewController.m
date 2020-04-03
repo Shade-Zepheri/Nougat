@@ -133,6 +133,9 @@
 
         [self.tableViewController.tableView endUpdates];
     }
+
+    // Update height
+    [self _resizeTableForExpansion:YES forNotification:YES];
 }
 
 - (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification removedRequest:(BOOL)removedRequest {
@@ -233,6 +236,31 @@
 
         [self.tableViewController.tableView endUpdates];
     }
+
+    // Update presented height
+    [self _resizeTableForExpansion:NO forNotification:YES];
+}
+
+- (void)_resizeTableForExpansion:(BOOL)expand forNotification:(BOOL)forNotification {
+    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    CGFloat proposedHeightToAdd = forNotification ? (expand ? 100.0 : -100.0) : (expand ? 50.0 : 50.0);
+    CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
+    CGFloat currentPanelHeight = ((fullPanelHeight - 150.0) * self.revealPercentage) + 150.0;
+    CGFloat currentPresentedHeight = currentPanelHeight + self.contentHeight;
+    CGFloat proposedNewHeight = currentPresentedHeight + proposedHeightToAdd;
+    if (proposedNewHeight >= safeAreaHeight) {
+        // Any changes would be beyond safe area, return
+        return;
+    }
+
+    // Calculate how much to add/subtract
+    CGFloat expandableHeight = safeAreaHeight - (currentPresentedHeight);
+    CGFloat actualHeightToAdd = expand ? MIN(proposedHeightToAdd, expandableHeight) : MAX(proposedHeightToAdd, expandableHeight);
+
+    // Animate
+    [UIView animateWithDuration:0.4 animations:^{
+        self.presentedHeight += actualHeightToAdd;
+    }];
 }
 
 - (NUACoalescedNotification *)coalescedNotificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
@@ -397,6 +425,9 @@
 
         [self.tableViewController.tableView endUpdates];
     }
+
+    // Update presented height
+    [self _resizeTableForExpansion:YES forNotification:YES];
 }
 
 - (void)removeMediaCellIfNecessary {
@@ -430,6 +461,8 @@
     // Update expansion status
     [self notification:_mediaNotification shouldExpand:NO reload:NO];
 
+    // Update presented height
+    [self _resizeTableForExpansion:NO forNotification:YES];
 }
 
 #pragma mark - UITableViewDelegate
@@ -537,9 +570,7 @@
         [_expandedNotifications addObject:notification];
 
         // Update presented height
-        [UIView animateWithDuration:0.4 animations:^{
-            self.presentedHeight += 50.0;
-        }];
+        [self _resizeTableForExpansion:YES forNotification:NO];
 
         if (!reload) {
             return;
@@ -553,9 +584,7 @@
         [_expandedNotifications removeObject:notification];
 
         // Update presented height
-        [UIView animateWithDuration:0.4 animations:^{
-            self.presentedHeight -= 50.0;
-        }];
+        [self _resizeTableForExpansion:NO forNotification:NO];
 
         if (!reload) {
             return;
