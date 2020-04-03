@@ -1,13 +1,13 @@
 // Dates
-"RELATIVE_DATE_PAST_SECONDS" = "now";
-"RELATIVE_DATE_PAST_MINUTES" = "%zdm";
-"RELATIVE_DATE_PAST_HOURS" = "%zdh";
-"RELATIVE_DATE_PAST_DAYS" = "%zdd";
+"RELATIVE_DATE_PAST_SECONDS" = "сейчас";
+"RELATIVE_DATE_PAST_MINUTES" = "%zdм";
+"RELATIVE_DATE_PAST_HOURS" = "%zdч";
+"RELATIVE_DATE_PAST_DAYS" = "%zdд";
 
 // Notification
-"TAP_FOR_MORE_OPTIONS" = "Tap for more options.";
+"TAP_FOR_MORE_OPTIONS" = "Нажмите, чтобы узнать больше.";
 
 // Alert
-"USER_GUIDE_PROMPT" = "It appears that this is your first time using Nougat. Do you want to go through the user guide?";
-"DISMISS" = "Dismiss";
-"CONFIRM" = "OK";
+"USER_GUIDE_PROMPT" = "Похоже, что это ваше первое использование Nougat. Хотите посмотреть руководство пользователя?";
+"DISMISS" = "Отклонить";
+"CONFIRM" = "ОК";
