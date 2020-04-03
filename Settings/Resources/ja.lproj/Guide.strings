@@ -1,4 +1,4 @@
-"BEHAVIOR_TEXT" = "Behavior: Nougat is revealed as part of a two part gesture. First revealing it up in a quick settings state, and is constricted to that state. Once in the quick settings state, you can either to choose to continue to expand, or dismiss it. As you approach the boundaries, Nougat will rubberband in a familiar iOS style. You can also tap anywhere outside the panel to quickly dismiss Nougat.";
-"FEATURES_TEXT" = "Features: Nougat presents the user with useful information along with convenient shortcuts. Tapping on the toggles will enable or disable said toggle, and long pressing will take the user to the toggles respective panel if applicable. On the bottom settings bar, there are shortcuts for the iCloud settings panel, the Nougat settings panel, the main settings panel and a button to quickly change Nougat's presented state.";
-"INVOKE_TEXT" = "Invoking: Slide down from the middle of the top to invoke Nougat. Swiping down from the left third of the screen yields the Notification Center and on devices with a notch, the Control Center gesture remains the same.";
-"USER_GUIDE" = "User Guide";
+"BEHAVIOR_TEXT" = "動作: Nougat では2つの部分からなるジェスチャーの一部として表示されます。\n最初にクイック設定の状態で開始します。\nクイック設定状態では、展開し続けるか閉じるかの1つに選択できます。\n境界線に近づくと、Nought では、iOSスタイルで表示します。\nまた、パネルの外側をタップすれば、素早くNougatを閉じることができます。";
+"FEATURES_TEXT" = "特徴: Nougatは便利なショートカットとともに、便利な情報を提供します。 トグルをタップするとトグルの有効化・無効化ができ、長押しするとトグルのパネルに移動します。 下部の設定バーには、iCloud設定パネル、Nougat設定パネル、メイン設定パネル、Nougatの表示状態を素早く変更するボタンのショートカットがあります。";
+"INVOKE_TEXT" = "呼び出し: 画面上部の中央から下にスライドして、Nougatを呼び出せます。画面の3分の1以上スワイプすると通知センターが表示されます。\nノッチデバイスのコントロールセンターの呼び出しはそのままになっています";
+"USER_GUIDE" = "ユーザーガイド";

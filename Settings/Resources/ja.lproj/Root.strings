@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "有効";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "システムの外観設定";
+"USE_COLORFLOW" = "カラーフローの色を使う";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "ユーザーガイド";
+"SORT_ORDER" = "設定順";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Shade ZepheriのNougatを調べてみてください‼︎\nAndroidを使わずに、Androidの通知センターを使えます‼︎";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "サポート";
+"TRANSLATORS" = "翻訳者達";
+"HELP_TRANSLATING" = "翻訳を手伝ってください!";
+"SOURCE_CODE" = "ソースコード";

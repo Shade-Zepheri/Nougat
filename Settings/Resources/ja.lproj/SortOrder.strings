@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Nougatに表示されるトグルを追加して並び替えられます。 Nougatでは最大9個のトグルを使用することができます。";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "並び替え";
+"CUSTOMIZE_TOGGLES_REMOVE" = "消去";
+"DISABLED_MODULES_SECTION_TITLE" = "多くのトグル";
+"ENABLED_MODULES_SECTION_TITLE" = "含む";
