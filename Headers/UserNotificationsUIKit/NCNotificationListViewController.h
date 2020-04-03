@@ -1,8 +1,11 @@
 @class NCCoalescedNotification, NCNotificationListViewController, NCNotificationAction, NCNotificationRequest, NCNotificationListCell;
 
 @protocol NCNotificationListViewControllerDestinationDelegate <NSObject>
-// Sooooooooooo many options here
-- (void)notificationListViewController:(NCNotificationListViewController *)listViewController requestsExecuteAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request requestAuthentication:(BOOL)requestAuthentication withParameters:(NSDictionary *)parameters completion:(void(^)())completion;
+// iOS 11-12
+- (void)notificationListViewController:(NCNotificationListViewController *)listViewController requestsExecuteAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request requestAuthentication:(BOOL)requestAuthentication withParameters:(NSDictionary *)parameters completion:(void(^)(void))completion;
+
+// iOS 10
+- (void)notificationListViewController:(NCNotificationListViewController *)listViewController requestsExecuteAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request withParameters:(NSDictionary *)parameters completion:(void(^)(void))completion;
 
 @end
 
@@ -12,8 +15,5 @@
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification;
 
 - (NSIndexPath *)indexPathForNotificationRequest:(NCNotificationRequest *)notificationRequest;
-
-// Added by me
-- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request;
 
 @end
