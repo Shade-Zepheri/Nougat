@@ -240,28 +240,28 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     NSString *type = notification.userInfo[@"type"];
     NCNotificationRequest *request = notification.userInfo[@"request"];
 
-    // "Simply" get the cell and execute its action
-    NCNotificationListCell *listCell = [self nua_notificationListCellForRequest:request];
+    // Get action
+    NCNotificationAction *action = nil;
     if ([type isEqualToString:@"default"]) {
-        // Perform default action
-        if ([listCell respondsToSelector:@selector(_executeDefaultAction)]) {
-            [listCell _executeDefaultAction];
-        } else {
-            [listCell cellOpenButtonPressed:nil];
-        }
+        action = request.defaultAction;
     } else if ([type isEqualToString:@"clear"]) {
-        // Perform clear action
-        if ([listCell respondsToSelector:@selector(_executeClearAction)]) {
-            [listCell _executeClearAction];
-        } else {
-            [listCell cellClearButtonPressed:nil];
-        }
+        action = request.clearAction;
     }
-}
 
-- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request {
-    NSIndexPath *indexPath = [self indexPathForNotificationRequest:request];
-    return (NCNotificationListCell *)[((NCNotificationListViewController *)self).collectionView cellForItemAtIndexPath:indexPath];
+    if (!action) {
+        // There was no action, return
+        return;
+    }
+
+    // Manually call delegate methods
+    id<NCNotificationListViewControllerDestinationDelegate> destinationDelegate = ((NCNotificationListViewController *)self).destinationDelegate;
+    if ([destinationDelegate respondsToSelector:@selector(notificationListViewController:requestsExecuteAction:forNotificationRequest:withParameters:completion:)]) {
+        // iOS 10
+        [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request withParameters:@{} completion:nil];
+    } else {
+        // iOS 11-12
+        [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:YES withParameters:@{} completion:nil];
+    }
 }
 
 #pragma mark - Notification managements

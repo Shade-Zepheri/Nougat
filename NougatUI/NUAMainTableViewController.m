@@ -260,17 +260,24 @@
 
 - (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
     // Get associated entry
-    NUACoalescedNotification *notification = self.notifications[indexPath.row];
-    NUANotificationEntry *entry = notification.entries[0];
+    NUACoalescedNotification *notification = [self notificationForIndexPath:indexPath];
+    if (!notification || [notification isEqual:_mediaNotification]) {
+        // Invalid notification
+        return;
+    }
+
+    NUANotificationEntry *entry = notification.entries.firstObject;
 
     // Post to launch
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"type": type, @"request": entry.request}];
 
-    if ([type isEqualToString:@"default"]) {
+    if (![type isEqualToString:@"default"]) {
+        return;
+    }
+
         // Dismiss
         [self.delegate tableViewControllerWantsDismissal:self];
     }
-}
 
 #pragma mark - UIViewController
 
