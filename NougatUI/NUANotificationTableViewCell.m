@@ -146,7 +146,7 @@
     [self.dateLabel.bottomAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor].active = YES;
 
     // Change expand label constraints
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.dateLabel.trailingAnchor constant:3.0].active = YES;
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.dateLabel.trailingAnchor].active = YES;
 }
 
 - (void)_createMessageLabel {

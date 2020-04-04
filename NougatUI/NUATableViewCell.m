@@ -44,6 +44,7 @@
     // Manually layout by subclasses
     _expandButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.expandButton addTarget:self action:@selector(_expandCell:) forControlEvents:UIControlEventTouchUpInside];
+    self.expandButton.imageView.contentMode = UIViewContentModeCenter;
     self.expandButton.translatesAutoresizingMaskIntoConstraints = NO;
 
     // Set image
@@ -62,9 +63,9 @@
     [self.headerLabel.leadingAnchor constraintEqualToAnchor:self.glyphView.trailingAnchor constant:5.0].active = YES;
     [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 
-    [self.expandButton.topAnchor constraintEqualToAnchor:self.glyphView.topAnchor].active = YES;
-    [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
+    [self.expandButton.centerYAnchor constraintEqualToAnchor:self.glyphView.centerYAnchor].active = YES;
+    [self.expandButton.widthAnchor constraintEqualToConstant:36.0].active = YES;
+    [self.expandButton.heightAnchor constraintEqualToConstant:36.0].active = YES;
 }
 
 #pragma mark - Reuse

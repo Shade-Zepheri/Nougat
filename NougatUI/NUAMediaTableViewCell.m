@@ -85,7 +85,7 @@
     // Finish base constraints
     [self.headerLabel.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
     [self.contentView bringSubviewToFront:self.expandButton];
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:5.0].active = YES;
+    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:10.0].active = YES;
 
     self.controlsViewConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
     self.controlsViewConstraint.active = YES;
