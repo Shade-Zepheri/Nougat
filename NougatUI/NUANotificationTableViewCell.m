@@ -119,7 +119,7 @@
         // To silence warnings
         self.titleLabel.textColor = UIColor.labelColor;
     } else {
-        self.titleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+        self.titleLabel.textColor = UIColor.blackColor;
     }
     [self.contentView addSubview:self.titleLabel];
 
