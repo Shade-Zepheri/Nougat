@@ -70,7 +70,7 @@
     [horizontalStackView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
     [horizontalStackView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
     [horizontalStackView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.0].active = YES;
-    [horizontalStackView.widthAnchor constraintEqualToConstant:155.0].active = YES;
+    [horizontalStackView.widthAnchor constraintEqualToConstant:171.0].active = YES;
 
     _accountView = [self _imageViewForImageName:@"account"];
     self.accountView.alpha = 0.0;
@@ -88,12 +88,12 @@
 
     _settingsView = [self _imageViewForImageName:@"settings"];
     self.settingsView.tag = 3; // Use to identify which view tapped
-    [self.settingsView.widthAnchor constraintEqualToConstant:20.0].active = YES;
+    [self.settingsView.widthAnchor constraintEqualToConstant:24.0].active = YES;
     [horizontalStackView addArrangedSubview:self.settingsView];
 
     _arrowView = [self _imageViewForImageName:@"arrow"];
     self.arrowView.tag = 4; // Use to identify which view tapped
-    [self.arrowView.widthAnchor constraintEqualToConstant:20.0].active = YES;
+    [self.arrowView.widthAnchor constraintEqualToConstant:24.0].active = YES;
     [horizontalStackView addArrangedSubview:self.arrowView];
 }
 
@@ -164,16 +164,17 @@
 	FBSSystemService *systemService = [FBSSystemService sharedService];
 	mach_port_t port = [systemService createClientPort];
 
-	[systemService openURL:URL application:bundleIdentifier options:@{
-		FBSOpenApplicationOptionKeyUnlockDevice: @YES
-	} clientPort:port withResult:^(NSError *error) {
+	[systemService openURL:URL application:bundleIdentifier options:@{FBSOpenApplicationOptionKeyUnlockDevice: @YES} clientPort:port withResult:^(NSError *error) {
         if (error) {
             // Print error
             HBLogError(@"[Nougat] openURL error: %@", error);
             return;
         }
 
-        completion();
+        // Ensure on the main queue
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion();
+        });
     }];
 }
 
@@ -200,8 +201,8 @@
     _expandedPercent = percent;
 
     // Update constraints
-    _accountConstraint.constant = 20 * percent;
-    _preferencesConstraint.constant = 20 * percent;
+    _accountConstraint.constant = 24.0 * percent;
+    _preferencesConstraint.constant = 24.0 * percent;
 
     // Update alpha
     self.accountView.alpha = percent;
