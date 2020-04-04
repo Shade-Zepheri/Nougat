@@ -25,8 +25,8 @@
         // Figure out what to do here
         _timeZoneRelativeStartDate = [NSDate date];
 
-        // Register for notifications
-        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), (__bridge const void *)(self), handleSignificantTimeChange, CFSTR("SignificantTimeChangeNotification"), NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+        // Register for notification
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_handleSignificantTimeChange:) name:UIApplicationSignificantTimeChangeNotification object:nil];
     }
 
     return self;
@@ -40,13 +40,12 @@
 
 #pragma mark - Notifications
 
-void handleSignificantTimeChange(CFNotificationCenterRef center, void *observer, CFNotificationName name, const void *object, CFDictionaryRef userInfo) {
+- (void)_handleSignificantTimeChange:(NSNotification *)notification {
     // Reset timer and update
-    NUARelativeDateLabel *label = (__bridge NUARelativeDateLabel *)observer;
-    [label _invalidateTimer];
+    [self _invalidateTimer];
 
-    [label update];
-    [label _configureTimer];
+    [self update];
+    [self _configureTimer];
 }
 
 #pragma mark - Reuse
