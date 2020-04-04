@@ -586,23 +586,17 @@
         return;
     }
 
+    // Animate out
     self.animating = YES;
     self.state = NUANotificationShadeStateDismissed;
 
-    // Animate out
-    CGFloat height = [self _yValueForDismissed];
-    if (animated) {
+    // Pass to view controller
         __weak __typeof(self) weakSelf = self;
-        [_viewController updateToFinalPresentedHeight:height completion:^{
+    [_viewController dismissAnimated:animated completion:^{
             [weakSelf _finishAnimationWithCompletion:nil];
         }];
-    } else {
-        [self _updatePresentedHeight:height];
-        [self _finishAnimationWithCompletion:nil];
-    }
 }
 
-/*
 - (void)presentAnimated:(BOOL)animated {
     // Show quick settings
     if (self.state == NUANotificationShadeStatePresented) {
@@ -617,16 +611,15 @@
     // Animate in
     CGFloat height = [self _yValueForPresented];
     if (animated) {
-        CGFloat baseHeight = _viewController.presentedHeight;
-        [self _updatePresentedHeightGradually:height baseHeight:baseHeight completion:^{
-            [self _finishAnimationWithCompletion:nil];
+        __weak __typeof(self) weakSelf = self;
+        [_viewController updateToFinalPresentedHeight:height completion:^{
+            [weakSelf _finishAnimationWithCompletion:nil];
         }];
     } else {
         [self _updatePresentedHeight:height];
         [self _finishAnimationWithCompletion:nil];
     }
 }
-*/
 
 #pragma mark - Second stage animation helpers
 

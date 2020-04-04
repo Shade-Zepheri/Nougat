@@ -193,7 +193,7 @@
 
 - (void)_handleTapGesture:(UITapGestureRecognizer *)recognizer {
     // Defer the gesture to the main controller
-    [_containerViewController handleDismiss];
+    [_containerViewController handleDismiss:YES];
     [self.delegate notificationShadeViewController:self handleTap:recognizer];
 }
 
@@ -223,6 +223,24 @@
     }
 
     return allowGesture;
+}
+
+#pragma mark - Animation Finishers
+
+- (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion {
+    // Collapse panel
+    [_containerViewController handleDismiss:animated];
+
+    // Dismiss panel
+    if (animated) {
+        [self updateToFinalPresentedHeight:0 completion:completion];
+    } else {
+        self.presentedHeight = 0.0;
+
+        if (completion) {
+            completion();
+        }
+    }
 }
 
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {

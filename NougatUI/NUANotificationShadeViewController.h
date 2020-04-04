@@ -27,6 +27,7 @@
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (assign, readonly, nonatomic) CGFloat fullyPresentedHeight;
 
+- (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion;
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion;
 
 @end

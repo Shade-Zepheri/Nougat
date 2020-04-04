@@ -114,10 +114,14 @@
     return [self.delegate containerViewControllerRequestsInteractiveHeight:self];
 }
 
-- (void)handleDismiss {
+- (void)handleDismiss:(BOOL)animated {
     // Allow dispatching of delegate methods
-    CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-    [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:nil];
+    if (animated) {
+        CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
+        [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:nil];
+    } else {
+        [self _updateExpandedHeight:150.0];
+    }
 }
 
 #pragma mark - Gestures
