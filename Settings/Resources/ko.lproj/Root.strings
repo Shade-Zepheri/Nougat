@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "사용함";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "시스템 외관 설정 사용";
+"USE_COLORFLOW" = "Colorflow 색상 사용";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "사용자 도움말";
+"SORT_ORDER" = "정렬 순서";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Shade Zepheri의 Nougat을 써봐요. 안드로이드 없이 안드로이드 알림 패널을 쓸 수 있어요!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "지원";
+"TRANSLATORS" = "번역자";
+"HELP_TRANSLATING" = "번역에 도움을 주세요!";
+"SOURCE_CODE" = "소스 코드";
