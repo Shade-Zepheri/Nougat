@@ -1,5 +1,4 @@
 #import "NUARelativeDateLabel.h"
-#import "NSDate+Elapsed.h"
 
 @interface NUARelativeDateLabel () {
     BOOL _isCollectingUpdates;
@@ -75,7 +74,7 @@
     }
 
     // Get components from proposed timezone
-    NSCalendar *calendar = [[self class] _currentCalendar];
+    NSCalendar *calendar = [self.class _currentCalendar];
     calendar.timeZone = timeZone;
     NSDateComponents *components = [calendar components:(NSCalendarUnitEra | NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond) fromDate:date];
 
@@ -115,8 +114,8 @@
 
 #pragma mark - Timer
 
-- (NSTimeInterval)_calculateIntervalFrom:(NSDate *)startDate toDate:(NSDate *)toDate {
-    NSDateComponents *dateComponents = [[[self class] _currentCalendar] components:(NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond) fromDate:startDate toDate:toDate options:0];
+- (NSTimeInterval)_calculateIntervalFromStartDate:(NSDate *)startDate toDate:(NSDate *)toDate {
+    NSDateComponents *dateComponents = [[self.class _currentCalendar] components:(NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond) fromDate:startDate toDate:toDate options:0];
     NSTimeInterval baseInterval = 0.0;
 
     NSInteger days = dateComponents.day;
@@ -143,7 +142,7 @@
 
 - (void)_configureTimer {
     // Figure out update time
-    NSTimeInterval updateInterval = [self _calculateIntervalFrom:self.timeZoneRelativeStartDate toDate:[NSDate date]];
+    NSTimeInterval updateInterval = [self _calculateIntervalFromStartDate:self.timeZoneRelativeStartDate toDate:[NSDate date]];
 
     // Create timer
     _updateTimer = [NSTimer timerWithTimeInterval:updateInterval target:self selector:@selector(_updateTimerFired:) userInfo:nil repeats:NO];
@@ -214,6 +213,31 @@
 
 #pragma mark - Lable Management
 
+- (NSString *)constructLabelString {
+    NSDateComponents *dateComponents = [[self.class _currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute fromDate:self.timeZoneRelativeStartDate toDate:[NSDate date] options:0];
+
+    NSBundle *localizationBundle = [NSBundle bundleForClass:self.class];
+    NSInteger days = dateComponents.day;
+    if (days > 0) {
+        NSString *baseFormat = [localizationBundle localizedStringForKey:@"RELATIVE_DATE_PAST_DAYS" value:@"%zdd" table:@"Localizable"];
+        return [NSString stringWithFormat:baseFormat, days];
+    }
+
+    NSInteger hours = dateComponents.hour;
+    if (hours > 0) {
+        NSString *baseFormat = [localizationBundle localizedStringForKey:@"RELATIVE_DATE_PAST_HOURS" value:@"%zdh" table:@"Localizable"];
+        return [NSString stringWithFormat:baseFormat, hours];
+    }
+
+    NSInteger minutes = dateComponents.minute;
+    if (minutes > 0) {
+        NSString *baseFormat = [localizationBundle localizedStringForKey:@"RELATIVE_DATE_PAST_MINUTES" value:@"%zdm" table:@"Localizable"];
+        return [NSString stringWithFormat:baseFormat, minutes];
+    } 
+
+    return [localizationBundle localizedStringForKey:@"RELATIVE_DATE_PAST_SECONDS" value:@"now" table:@"Localizable"];
+}
+
 - (void)updateTextIfNecessary {
     // Queue an update
     [self updateTextIfNecessary:NO];
@@ -227,7 +251,7 @@
     }
 
     // Get string and update
-    NSString *newText = [self.timeZoneRelativeStartDate getElapsedTime];
+    NSString *newText = [self constructLabelString];
     if ([self.text isEqualToString:newText]) {
         // Same text, return
         return;

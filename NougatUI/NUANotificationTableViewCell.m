@@ -1,5 +1,4 @@
 #import "NUANotificationTableViewCell.h"
-#import "NSDate+Elapsed.h"
 #import "UIImage+Average.h"
 #import <NougatServices/NUAPreferenceManager.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
