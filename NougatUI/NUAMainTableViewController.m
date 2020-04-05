@@ -493,8 +493,13 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == 0 && [self _mediaCellPresent]) {
-        // Launch music playing app
         NSString *nowPlayingID = self.nowPlayingController.nowPlayingAppDisplayID;
+        if (!nowPlayingID) {
+            // No now playing app
+            return;
+        }
+
+        // Launch music playing app
         [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:nowPlayingID suspended:NO];
 
         // Dismiss nougat
