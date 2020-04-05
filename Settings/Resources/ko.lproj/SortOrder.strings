@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Nougat에 더 많은 토글을 추가하거나 관리합니다. Nougat은 최대 9개의 토글을 지원합니다.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "정렬 순서";
+"CUSTOMIZE_TOGGLES_REMOVE" = "제거";
+"DISABLED_MODULES_SECTION_TITLE" = "더 많은 토글들";
+"ENABLED_MODULES_SECTION_TITLE" = "포함";
