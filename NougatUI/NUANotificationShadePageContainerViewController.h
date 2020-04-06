@@ -8,7 +8,6 @@
 @required
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController;
-- (CGFloat)containerViewControllerRequestsInteractiveHeight:(NUANotificationShadePageContainerViewController *)containerViewController;
 - (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedPresentedHeight:(CGFloat)presentedHeight;
 - (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedRevealPercentage:(CGFloat)revealPercentage;
 

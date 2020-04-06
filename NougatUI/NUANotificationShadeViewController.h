@@ -12,7 +12,6 @@
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer;
 - (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handleTap:(UITapGestureRecognizer *)tapGestureRecognizer;
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
-- (CGFloat)notificationShadeViewControllerRequestsInteractiveHeight:(NUANotificationShadeViewController *)controller;
 
 @end
 

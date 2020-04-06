@@ -1,5 +1,4 @@
 #import "NUAModulesContainerViewController.h"
-#import "NUANotificationShadePanelView.h"
 
 @implementation NUAModulesContainerViewController
 
@@ -88,27 +87,27 @@
     }
 }
 
-- (void)setRevealPercentage:(CGFloat)percent {
-    _revealPercentage = percent;
+- (void)setRevealPercentage:(CGFloat)revealPercentage {
+    _revealPercentage = revealPercentage;
 
     // Pass percent to toggles
-    _brightnessModule.revealPercentage = percent;
-    _togglesModule.revealPercentage = percent;
-    _settingsModule.revealPercentage = percent;
+    _brightnessModule.revealPercentage = revealPercentage;
+    _togglesModule.revealPercentage = revealPercentage;
+    _settingsModule.revealPercentage = revealPercentage;
 }
 
 #pragma mark - Delegate
 
-- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)module completely:(BOOL)completely {
+- (void)moduleWantsNotificationShadeDismissal:(NUANotificationShadeModuleViewController *)moduleViewController completely:(BOOL)completely {
     [self.delegate contentViewControllerWantsDismissal:self completely:completely];
 }
 
-- (void)moduleWantsNotificationShadeExpansion:(NUANotificationShadeModuleViewController *)module {
+- (void)moduleWantsNotificationShadeExpansion:(NUANotificationShadeModuleViewController *)moduleViewController {
     [self.delegate contentViewControllerWantsExpansion:self];
 }
 
-- (CGFloat)moduleWantsNotificationShadeInteractiveHeight:(NUANotificationShadeModuleViewController *)module {
-    return [self.delegate contentViewControllerRequestsInteractiveHeight:self];
+- (CGFloat)moduleRequestsContainerHeightWhenFullyRevealed:(NUANotificationShadeModuleViewController *)moduleViewController {
+    return self.fullyPresentedHeight;
 }
 
 @end

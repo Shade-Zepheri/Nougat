@@ -433,10 +433,6 @@
     return ((_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged)) && !self.animating;
 }
 
-- (CGFloat)notificationShadeViewControllerRequestsInteractiveHeight:(NUANotificationShadeViewController *)controller {
-    return [self _yValueForPresented];
-}
-
 #pragma mark - Dashboard participating
 
 - (NSString *)dashBoardIdentifier {

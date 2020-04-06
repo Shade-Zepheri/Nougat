@@ -110,11 +110,7 @@
     [self _updateExpandedHeight:fullHeight baseHeight:self.presentedHeight completion:nil];
 }
 
-- (CGFloat)contentViewControllerRequestsInteractiveHeight:(UIViewController *)contentViewController {
-    return [self.delegate containerViewControllerRequestsInteractiveHeight:self];
-}
-
-- (void)handleDismiss:(BOOL)animated {
+- (void)handleDismiss:(BOOL)animated completion:(void(^)(void))completion {
     // Allow dispatching of delegate methods
     if (animated) {
         CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
