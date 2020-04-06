@@ -34,13 +34,17 @@
 
 #pragma mark - Properties
 
-- (void)setRevealPercentage:(CGFloat)percent {
-    _revealPercentage = percent;
-;
-    _heightConstraint.constant = (350.0 * percent) + 150.0;
+- (void)setRevealPercentage:(CGFloat)revealPercentage {
+    _revealPercentage = revealPercentage;
+
+    CGFloat defaultModuleHeight = [self.class defaultModuleHeight];
+    CGFloat completeContainerHeight = [self.delegate moduleRequestsContainerHeightWhenFullyRevealed:self];
+    CGFloat heightToAdd = (completeContainerHeight - 150.0) * revealPercentage;
+    CGFloat brightnessHeight = defaultModuleHeight * revealPercentage;
+    _heightConstraint.constant = defaultModuleHeight + heightToAdd - brightnessHeight;
 
     // Pass to view
-    [self _togglesContentView].expandedPercent = percent;
+    [self _togglesContentView].expandedPercent = revealPercentage;
 }
 
 #pragma mark - Delegate

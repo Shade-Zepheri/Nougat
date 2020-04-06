@@ -24,7 +24,7 @@
     
     self.view = view;
 
-    CGFloat defaultModuleHeight = [self.class defaultHeight];
+    CGFloat defaultModuleHeight = [self.class defaultModuleHeight];
     _heightConstraint = [view.heightAnchor constraintEqualToConstant:defaultModuleHeight];
     _heightConstraint.active = YES;
 }
