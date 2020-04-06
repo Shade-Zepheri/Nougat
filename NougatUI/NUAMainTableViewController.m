@@ -44,7 +44,7 @@
         return;
     }
 
-    // Fuck it just add all of them for now
+    // Add all entries from repository
     NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *allNotifications = self.notificationRepository.notifications;
     NSMutableArray<NUACoalescedNotification *> *notifications = [NSMutableArray array];
     for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in allNotifications.allValues) {
@@ -55,10 +55,14 @@
 
     // Sort via date
     [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
-        return [notification2.timestamp compare:notification1.timestamp];
+        return [notification1 compare:notification2];
     }];
 
+    // Set notifications
     _notifications = [notifications copy];
+
+    // Reload data
+    [self.tableViewController.tableView reloadData];
 }
 
 #pragma mark - Properties
@@ -111,28 +115,20 @@
 
     // Add new entry
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    NSUInteger index = [self _mediaCellPresent] ? 1 : 0;
-    [notifications insertObject:newNotification atIndex:index];
-
+    NSUInteger insertIndex = [self _indexForAddingNewNotification:newNotification];
+    if (insertIndex >= notifications.count) {
+        // Simply add to end
+        insertIndex = notifications.count;
+        [notifications addObject:newNotification];
+    } else {
+        [notifications insertObject:newNotification atIndex:insertIndex];
+    }
+    
     // Update ivar
     _notifications = [notifications copy];
 
     // Update table
-    void (^updateBlock)() = ^{
-        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    };
-
-    if (@available(iOS 11, *)) {
-        // Use the new and better performBatchUpdates
-        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
-    } else {
-        // Good old begin/endUpdates
-        [self.tableViewController.tableView beginUpdates];
-
-        updateBlock();
-
-        [self.tableViewController.tableView endUpdates];
-    }
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     // Update height
     [self _resizeTableForExpansion:YES forNotification:YES];
@@ -144,61 +140,28 @@
         return;
     }
 
-    // Get old notification 
+    // Get old index
+    NSIndexPath *oldIndexPath = [self indexPathForNotification:updatedNotification];
+
+    // Sort via date
+    // Since references, the notification in the array is already updated, all thats needed is to sort
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:updatedNotification.sectionID threadID:updatedNotification.threadID];
+    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+        return [notification2.timestamp compare:notification1.timestamp];
+    }];
 
-    // Update expansion status
-    if ([_expandedNotifications containsObject:oldNotification]) {
-        [_expandedNotifications removeObject:oldNotification];
-        [_expandedNotifications addObject:updatedNotification];
-    }
-
-    // Remove old and add new      
-    NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
-    NSUInteger newIndex = 0;
-    [notifications removeObject:oldNotification];
-    if (removedRequest) {
-        // Add and sort
-        [notifications addObject:updatedNotification];
-
-        // Sort via date
-        [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
-            return [notification2.timestamp compare:notification1.timestamp];
-        }];
-
-        newIndex = [notifications indexOfObject:updatedNotification];
-    } else {
-        // Simply add to top
-        newIndex = [self _mediaCellPresent] ? 1 : 0;
-    [notifications insertObject:updatedNotification atIndex:newIndex];
-        }
-
-    // Update ivar
     _notifications = [notifications copy];
 
+    // Get new index
+    NSIndexPath *newIndexPath = [self indexPathForNotification:updatedNotification];
+
     // Update table
-        if (newIndex == oldIndex) {
-            // Simply just reload the cell, no need to insert and delete
-            [self.tableViewController.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-        return;
-    }
-
-    void (^updateBlock)() = ^{
-            [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:newIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    };
-
-    if (@available(iOS 11, *)) {
-        // Use the new and better performBatchUpdates
-        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
+    if (newIndexPath.row == oldIndexPath.row) {
+        // Simply just reload the cell, no need to insert and delete
+        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     } else {
-        // Good old begin/endUpdates
-        [self.tableViewController.tableView beginUpdates];
-
-        updateBlock();
-
-        [self.tableViewController.tableView endUpdates];
+        // Just call move
+        [self.tableViewController.tableView moveRowAtIndexPath:oldIndexPath toIndexPath:newIndexPath];
     }
 }
 
@@ -209,33 +172,18 @@
     }
 
     // Update expansion status
-    NUACoalescedNotification *oldNotification = [self coalescedNotificationForSectionID:removedNotification.sectionID threadID:removedNotification.threadID];
-    [self notification:oldNotification shouldExpand:NO reload:NO];
+    // Due to reference stuff, updatedNotification and oldNotification are the same
+    [self notification:removedNotification shouldExpand:NO reload:NO];
 
-    // Remove old
+    // Remove old and update
+    NSIndexPath *oldIndexPath = [self indexPathForNotification:removedNotification];
+
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    NSUInteger oldIndex = [notifications indexOfObject:oldNotification];
-    [notifications removeObject:oldNotification];
-
-    // Update ivar
+    [notifications removeObject:removedNotification];
     _notifications = [notifications copy];
 
     // Update table
-    void (^updateBlock)() = ^{
-        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    };
-
-    if (@available(iOS 11, *)) {
-        // Use the new and better performBatchUpdates
-        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
-    } else {
-        // Good old begin/endUpdates
-        [self.tableViewController.tableView beginUpdates];
-
-        updateBlock();
-
-        [self.tableViewController.tableView endUpdates];
-    }
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[oldIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     // Update presented height
     [self _resizeTableForExpansion:NO forNotification:YES];
@@ -270,17 +218,11 @@
     }];
 }
 
-- (NUACoalescedNotification *)coalescedNotificationForSectionID:(NSString *)sectionID threadID:(NSString *)threadID {
-    for (NUACoalescedNotification *notification in self.notifications) {
-        if (![notification.sectionID isEqualToString:sectionID] || ![notification.threadID isEqualToString:threadID]) {
-            // Make sure its the same notification
-            continue;
-        }
-
-        return notification;
-    }
-
-    return nil;
+- (NSUInteger)_indexForAddingNewNotification:(NUACoalescedNotification *)notification {
+    // Compare notifications
+    return [self.notifications indexOfObject:notification inSortedRange:NSMakeRange(0, self.notifications.count) options:NSBinarySearchingInsertionIndex usingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+        return [notification1 compare:notification2];
+    }];
 }
 
 - (NUACoalescedNotification *)notificationForIndexPath:(NSIndexPath *)indexPath {
@@ -310,9 +252,9 @@
         return;
     }
 
-        // Dismiss
-        [self.delegate tableViewControllerWantsDismissal:self];
-    }
+    // Dismiss
+    [self.delegate tableViewControllerWantsDismissal:self];
+}
 
 #pragma mark - UIViewController
 
@@ -353,11 +295,8 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    // GCD this mug
-    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        // Populate
-        [self _loadNotificationsIfNecessary];
-    });
+    // Populate notifications
+    [self _loadNotificationsIfNecessary];
 
     // Notifications
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -395,13 +334,13 @@
 #pragma mark - Media
 
 - (BOOL)_mediaCellPresent {
-    if (!self.notifications || self.notifications.count == 0) {
+    if (!self.notifications || self.notifications.count < 1) {
         // Cant check something that doesnt exist
         return NO;
     }
 
-    // Since is always gonna be top notif, only check it
-    NUACoalescedNotification *topNotification = self.notifications[0];
+    // Check if first notification is media
+    NUACoalescedNotification *topNotification = self.notifications.firstObject;
     return topNotification.type == NUANotificationTypeMedia;
 }
 
@@ -417,21 +356,7 @@
     _notifications = [mutableNotifications copy];
 
     // Insert row
-    void (^updateBlock)() = ^{
-        [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    };
-
-    if (@available(iOS 11, *)) {
-        // Use the new and better performBatchUpdates
-        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
-    } else {
-        // Good old begin/endUpdates
-        [self.tableViewController.tableView beginUpdates];
-
-        updateBlock();
-
-        [self.tableViewController.tableView endUpdates];
-    }
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
 
     // Update presented height
     [self _resizeTableForExpansion:YES forNotification:YES];
@@ -443,31 +368,17 @@
         return;
     }
 
-    // Remove media cell
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
-    [mutableNotifications removeObjectAtIndex:0];
-    _notifications = [mutableNotifications copy];
-
-    // Delete row
-    void (^updateBlock)() = ^{
-        [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
-    };
-
-    if (@available(iOS 11, *)) {
-        // Use the new and better performBatchUpdates
-        [self.tableViewController.tableView performBatchUpdates:updateBlock completion:nil];
-    } else {
-        // Good old begin/endUpdates
-        [self.tableViewController.tableView beginUpdates];
-
-        updateBlock();
-
-        [self.tableViewController.tableView endUpdates];
-    }
-
     // Update expansion status
     [self notification:_mediaNotification shouldExpand:NO reload:NO];
 
+    // Remove media cell
+    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
+    [mutableNotifications removeObject:_mediaNotification];
+    _notifications = [mutableNotifications copy];
+
+    // Delete row
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+    
     // Update presented height
     [self _resizeTableForExpansion:NO forNotification:YES];
 }
@@ -580,32 +491,21 @@
     if (expand && ![self isNotificationExpanded:notification]) {
         // Add to expanded
         [_expandedNotifications addObject:notification];
-
-        // Update presented height
-        [self _resizeTableForExpansion:YES forNotification:NO];
-
-        if (!reload) {
-            return;
-        }
-
-        // Reload
-        NSIndexPath *indexPath = [self indexPathForNotification:notification];
-        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     } else if (!expand && [self isNotificationExpanded:notification]) {
         // Add to expanded
         [_expandedNotifications removeObject:notification];
+    }
 
-        // Update presented height
-        [self _resizeTableForExpansion:NO forNotification:NO];
+    // Update presented height
+    [self _resizeTableForExpansion:expand forNotification:NO];
 
-        if (!reload) {
-            return;
-        }
+    if (!reload) {
+        return;
+    }
 
     // Reload
-        NSIndexPath *indexPath = [self indexPathForNotification:notification];
-        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    }
+    NSIndexPath *indexPath = [self indexPathForNotification:notification];
+    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 - (BOOL)isNotificationExpanded:(NUACoalescedNotification *)notification {

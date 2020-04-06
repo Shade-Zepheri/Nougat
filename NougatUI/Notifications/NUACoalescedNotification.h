@@ -27,6 +27,8 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 
 + (instancetype)coalescedNotificationFromRequest:(NCNotificationRequest *)request;
 
+- (NSComparisonResult)compare:(NUACoalescedNotification *)notification;
+
 - (BOOL)containsRequest:(NCNotificationRequest *)request;
 
 - (void)updateWithNewRequest:(NCNotificationRequest *)request;

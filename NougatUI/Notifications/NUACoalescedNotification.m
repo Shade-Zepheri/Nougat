@@ -64,7 +64,7 @@
 #pragma mark - NSObject
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message];
+    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@; entries = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message, self.entries];
 }
 
 - (BOOL)isEqual:(id)object {
@@ -87,6 +87,19 @@
     BOOL sameEntries = [notification.entries isEqualToArray:self.entries];
 
     return sameSection && sameThread  && sameTitle && sameMessage && sameEntries;
+}
+
+- (NSComparisonResult)compare:(NUACoalescedNotification *)otherNotification {
+    if (self.type == NUANotificationTypeMedia) {
+        // We are the media notification, always be first
+        return NSOrderedAscending;
+    } else if (otherNotification.type == NUANotificationTypeMedia) {
+        // Other notification is media, it must be first
+        return NSOrderedDescending;
+    } else {
+        // Just compare timestamps
+        return [otherNotification.timestamp compare:self.timestamp];
+    }
 }
 
 #pragma mark - Properties
