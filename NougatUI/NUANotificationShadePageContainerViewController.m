@@ -70,13 +70,13 @@
     return self.contentViewController.revealPercentage;
 }
 
-- (void)setRevealPercentage:(CGFloat)percentage {
+- (void)setRevealPercentage:(CGFloat)revealPercentage {
     // Pass to views
-    self.contentViewController.revealPercentage = percentage;
-    [self _panelView].revealPercentage = percentage;
+    self.contentViewController.revealPercentage = revealPercentage;
+    [self _panelView].revealPercentage = revealPercentage;
 
     // Pass to delegate
-    [self.delegate containerViewController:self updatedRevealPercentage:percentage];
+    [self.delegate containerViewController:self updatedRevealPercentage:revealPercentage];
 }
 
 - (void)setPresentedHeight:(CGFloat)height {
@@ -106,17 +106,22 @@
 }
 
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController {
+    CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
     CGFloat fullHeight = self.contentViewController.fullyPresentedHeight;
-    [self _updateExpandedHeight:fullHeight baseHeight:self.presentedHeight completion:nil];
+    [self _updateExpandedHeight:fullHeight baseHeight:baseHeight completion:nil];
 }
 
 - (void)handleDismiss:(BOOL)animated completion:(void(^)(void))completion {
     // Allow dispatching of delegate methods
     if (animated) {
         CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
-        [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:nil];
+        [self _updateExpandedHeight:150.0 baseHeight:baseHeight completion:completion];
     } else {
         [self _updateExpandedHeight:150.0];
+
+        if (completion) {
+            completion();
+        }
     }
 }
 

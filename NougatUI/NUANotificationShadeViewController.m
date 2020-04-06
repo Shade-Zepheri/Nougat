@@ -189,7 +189,6 @@
 
 - (void)_handleTapGesture:(UITapGestureRecognizer *)recognizer {
     // Defer the gesture to the main controller
-    [_containerViewController handleDismiss:YES];
     [self.delegate notificationShadeViewController:self handleTap:recognizer];
 }
 
@@ -224,19 +223,20 @@
 #pragma mark - Animation Finishers
 
 - (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion {
-    // Collapse panel
-    [_containerViewController handleDismiss:animated];
+    // First collapse then dismiss
+    __weak __typeof(self) weakSelf = self;
+    [_containerViewController handleDismiss:animated completion:^{
+        // Dismiss panel
+        if (animated) {
+            [weakSelf updateToFinalPresentedHeight:0.0 completion:completion];
+        } else {
+            weakSelf.presentedHeight = 0.0;
 
-    // Dismiss panel
-    if (animated) {
-        [self updateToFinalPresentedHeight:0 completion:completion];
-    } else {
-        self.presentedHeight = 0.0;
-
-        if (completion) {
-            completion();
+            if (completion) {
+                completion();
+            }
         }
-    }
+    }];
 }
 
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion {
