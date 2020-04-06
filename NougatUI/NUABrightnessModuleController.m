@@ -83,7 +83,8 @@
 - (void)setRevealPercentage:(CGFloat)percent {
     _revealPercentage = percent;
 
-    _heightConstraint.constant = percent * 50.0;
+    CGFloat defaultModuleHeight = [self.class defaultModuleHeight];
+    _heightConstraint.constant = percent * defaultModuleHeight;
 
     // Update slider alpha with delay
     self.slider.alpha = (percent - 0.5) * 2;
