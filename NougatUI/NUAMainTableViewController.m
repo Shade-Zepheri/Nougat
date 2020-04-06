@@ -242,20 +242,26 @@
 }
 
 - (void)_resizeTableForExpansion:(BOOL)expand forNotification:(BOOL)forNotification {
-    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    // Calculate current heights
     CGFloat proposedHeightToAdd = forNotification ? (expand ? 100.0 : -100.0) : (expand ? 50.0 : -50.0);
     CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
     CGFloat currentPanelHeight = ((fullPanelHeight - 150.0) * self.revealPercentage) + 150.0;
-    CGFloat currentPresentedHeight = currentPanelHeight + self.contentHeight;
-    CGFloat proposedNewHeight = currentPresentedHeight + proposedHeightToAdd;
-    if (proposedNewHeight >= safeAreaHeight) {
+    CGFloat currentContentHeight = currentPanelHeight + self.contentHeight;
+    CGFloat proposedNewHeight = currentContentHeight + proposedHeightToAdd;
+
+    // Check if can expand/collapse
+    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    BOOL canExpand = currentContentHeight < safeAreaHeight;
+    BOOL canCollapse = proposedNewHeight < safeAreaHeight;
+    BOOL canResize = expand ? canExpand : canCollapse;
+    if (!canResize) {
         // Any changes would be beyond safe area, return
         return;
     }
 
     // Calculate how much to add/subtract
-    CGFloat expandableHeight = safeAreaHeight - (currentPresentedHeight);
-    CGFloat actualHeightToAdd = MIN(fabs(proposedHeightToAdd), fabs(expandableHeight));
+    CGFloat expandableHeight = expand ? (safeAreaHeight - currentContentHeight) : (safeAreaHeight - proposedNewHeight);
+    CGFloat actualHeightToAdd = MIN(fabs(proposedHeightToAdd), expandableHeight);
     actualHeightToAdd *= expand ? 1.0 : -1.0;
 
     // Animate
