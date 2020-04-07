@@ -163,7 +163,7 @@
 
 - (void)_createOptionsBar {
     self.optionsBar = [[UIView alloc] initWithFrame:CGRectZero];
-    self.optionsBar.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+    self.optionsBar.backgroundColor = self.notificationShadePreferences.backgroundColor;
     self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.optionsBar];
 

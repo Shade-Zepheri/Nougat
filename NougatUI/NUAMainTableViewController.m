@@ -405,6 +405,8 @@
     // Unregister media cell notifications
     NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
     [mediaCell unregisterForMediaNotifications];
+
+    // TODO: nilify text to save memory
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -446,11 +448,13 @@
         mediaCell.delegate = self;
         mediaCell.expanded = [self isNotificationExpanded:notification];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
+        mediaCell.notificationShadePreferences = self.notificationShadePreferences;
 
         return mediaCell;
     }
 
     NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
+    cell.notificationShadePreferences = self.notificationShadePreferences;
     cell.notification = notification;
     cell.actionsDelegate = self;
     cell.delegate = self;

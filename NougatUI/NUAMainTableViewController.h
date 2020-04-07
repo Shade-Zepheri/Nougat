@@ -3,6 +3,7 @@
 #import "NUANotificationRepository.h"
 #import "NUANotificationTableViewCell.h"
 #import "NUATableViewCell.h"
+#import <NougatServices/NougatServices.h>
 #import <MediaPlayerUI/MediaPlayerUI.h>
 
 @class NUAMainTableViewController;
@@ -16,6 +17,8 @@
 @end
 
 @interface NUAMainTableViewController : UIViewController <NUANotificationsObserver, NUATableViewCellDelegate, NUANotificationTableViewCellDelegate, UITableViewDataSource, UITableViewDelegate>
+@property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+
 @property (strong, readonly, nonatomic) UITableViewController *tableViewController;
 @property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
 @property (strong, readonly, nonatomic) NUANotificationRepository *notificationRepository;

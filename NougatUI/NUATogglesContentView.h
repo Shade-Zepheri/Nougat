@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import "NUANotificationShadeModuleView.h"
 #import "NUAToggleInstancesProvider.h"
 
 @class NUATogglesContentView;
@@ -9,7 +9,7 @@
 
 @end
 
-@interface NUATogglesContentView : UIView <NUAFlipswitchToggleDelegate> {
+@interface NUATogglesContentView : NUANotificationShadeModuleView <NUAFlipswitchToggleDelegate> {
     CGFloat _targetWidthConstant;
 
     NSArray<NUAFlipswitchToggle *> *_topRow;

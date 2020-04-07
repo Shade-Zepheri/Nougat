@@ -11,8 +11,8 @@
 
 @implementation NUAStatusBarContentView
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
+    self = [super initWithPreferences:preferences];
     if (self) {
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
@@ -34,8 +34,8 @@
 #pragma mark - View creation
 
 - (NSString *)_carrierText {
-    if ([NUAPreferenceManager carrierName]) {
-        return [NUAPreferenceManager carrierName];
+    if ([self.notificationShadePreferences.class carrierName]) {
+        return [self.notificationShadePreferences.class carrierName];
     } else {
         // Fallback to device type
         struct utsname systemInfo;
@@ -50,7 +50,7 @@
 
 - (void)_createCarrierLabel {
     _carrierLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.carrierLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    self.carrierLabel.textColor = self.notificationShadePreferences.textColor;
     self.carrierLabel.textAlignment = NSTextAlignmentLeft;
     self.carrierLabel.text = [self _carrierText];
     self.carrierLabel.font = [UIFont systemFontOfSize:15];
@@ -66,13 +66,13 @@
 
 - (void)_createPercentLabel {
     // Since percent label would get cutoff by notch, dont add it on notched devices
-    if ([NUAPreferenceManager _deviceHasNotch]) {
+    if ([self.notificationShadePreferences.class _deviceHasNotch]) {
         return;
     }
 
     // Create label
     _batteryLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.batteryLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    self.batteryLabel.textColor = self.notificationShadePreferences.textColor;
     self.batteryLabel.textAlignment = NSTextAlignmentLeft;
     self.batteryLabel.font = [UIFont systemFontOfSize:15];
     [self addSubview:self.batteryLabel];
@@ -87,7 +87,7 @@
 
 - (void)_createBatteryView {
     CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel] * 100;
-    _batteryView = [[NUABatteryView alloc] initWithFrame:CGRectZero andPercent:currentPercent];
+    _batteryView = [[NUABatteryView alloc] initWithFrame:CGRectZero andPercent:currentPercent preferences:self.notificationShadePreferences];
     [self addSubview:self.batteryView];
 
     // Constraints
@@ -98,7 +98,7 @@
 
 - (void)_createDateLabel {
     _dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.dateLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    self.dateLabel.textColor = self.notificationShadePreferences.textColor;
     self.dateLabel.textAlignment = NSTextAlignmentLeft;
     self.dateLabel.font = [UIFont systemFontOfSize:15];
     [self addSubview:self.dateLabel];
@@ -150,11 +150,11 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] || !self.notificationShadePreferences.usesSystemAppearance) {
             return;
         }
 
-        UIColor *textColor = [NUAPreferenceManager sharedSettings].textColor;
+        UIColor *textColor = self.notificationShadePreferences.textColor;
 
         self.carrierLabel.textColor = textColor;
         if (self.batteryLabel) {

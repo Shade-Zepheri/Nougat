@@ -1,10 +1,9 @@
 #import "NUANotificationShadeController.h"
-#import <Macros.h>
-#import <NougatServices/NougatServices.h>
 #import <SpringBoardHome/SpringBoardHome.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIStatusBar.h>
+#import <Macros.h>
 #import <math.h>
 #import <version.h>
 
@@ -40,6 +39,7 @@
     if (self) {
         // Set defaults
         self.state = NUANotificationShadeStateDismissed;
+        _preferences = NUAPreferenceManager.sharedSettings;
 
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -71,7 +71,7 @@
         // Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
-        [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
+            [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
         _presentationGestureRecognizer.delegate = self;
 
         if (%c(_UISystemGestureManager)) {
@@ -230,7 +230,7 @@
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
-    return [NUAPreferenceManager sharedSettings].enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+    return self.preferences.enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -391,11 +391,11 @@
 
 #pragma mark - Notification shade delegate
 
-- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)controller {
+- (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)notificationShadeViewController {
     [self dismissAnimated:YES];
 }
 
-- (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handlePan:(UIPanGestureRecognizer *)panGestureRecognizer {
+- (void)notificationShadeViewController:(NUANotificationShadeViewController *)notificationShadeViewController handlePan:(UIPanGestureRecognizer *)panGestureRecognizer {
     // Defer to use presentation methods (Note handles expanding further and dismissing)
     switch (panGestureRecognizer.state) {
         case UIGestureRecognizerStatePossible:
@@ -425,12 +425,16 @@
     }
 }
 
-- (void)notificationShadeViewController:(NUANotificationShadeViewController *)controller handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
+- (void)notificationShadeViewController:(NUANotificationShadeViewController *)notificationShadeViewController handleTap:(UITapGestureRecognizer *)tapGestureRecognizer {
     [self dismissAnimated:YES];
 }
 
-- (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)controller canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+- (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)notificationShadeViewController canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
     return ((_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged)) && !self.animating;
+}
+
+- (NUAPreferenceManager *)preferencesForNotificationShadeViewController:(NUANotificationShadeViewController *)notificationShadeViewController {
+    return self.preferences;
 }
 
 #pragma mark - Dashboard participating
@@ -587,10 +591,10 @@
     self.state = NUANotificationShadeStateDismissed;
 
     // Pass to view controller
-        __weak __typeof(self) weakSelf = self;
+    __weak __typeof(self) weakSelf = self;
     [_viewController dismissAnimated:animated completion:^{
-            [weakSelf _finishAnimationWithCompletion:nil];
-        }];
+        [weakSelf _finishAnimationWithCompletion:nil];
+    }];
 }
 
 - (void)presentAnimated:(BOOL)animated {

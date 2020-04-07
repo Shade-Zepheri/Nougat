@@ -17,11 +17,11 @@
 
 @implementation NUATogglesContentView
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
+    self = [super initWithPreferences:preferences];
     if (self) {
         // Load instance manager
-        _togglesProvider = [NUAToggleInstancesProvider defaultProvider];
+        _togglesProvider = [[NUAToggleInstancesProvider alloc] initWithPreferences:preferences];
 
         // Set properties
         _arranged = NO;
@@ -42,6 +42,7 @@
 
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
         toggle.delegate = self;
+        toggle.notificationShadePreferences = self.notificationShadePreferences;
     }
 
     if (self.togglesArray.count > 6) {

@@ -1,4 +1,4 @@
-#import <UIKit/UIKit.h>
+#import "NUANotificationShadeModuleView.h"
 
 @class NUASettingsContentView;
 
@@ -9,7 +9,7 @@
 
 @end
 
-@interface NUASettingsContentView : UIView {
+@interface NUASettingsContentView : NUANotificationShadeModuleView {
     NSDateFormatter *_dateFormatter;
     UIView *_dividerView;
     NSLayoutConstraint *_accountConstraint;

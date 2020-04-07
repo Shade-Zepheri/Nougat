@@ -21,10 +21,16 @@
         self.toggleLabel.alpha = 0.0;
         self.toggleLabel.font = [UIFont systemFontOfSize:12];
         self.toggleLabel.text = self.displayName;
-        self.toggleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
         self.toggleLabel.backgroundColor = [UIColor clearColor];
         self.toggleLabel.textAlignment = NSTextAlignmentCenter;
         [self addSubview:self.toggleLabel];
+
+        _switchIdentifier = identifier;
+#if TARGET_OS_SIMULATOR
+        self.switchState = [[NSClassFromString(@"FSSwitchPanel") sharedPanel] stateForSwitchIdentifier:identifier];
+#else
+        self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
+#endif
 
         // Gesture
         if (self.settingsURL) {
@@ -35,9 +41,6 @@
         // Constraints
         [self.toggleLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
         [self.toggleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-
-        _switchIdentifier = identifier;
-        self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
 
         // Create imageView
         self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -54,7 +57,11 @@
         [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+#if TARGET_OS_SIMULATOR
+        [center addObserver:self selector:@selector(switchesChangedState:) name:@"FSSwitchPanelSwitchStateChangedNotification" object:nil];
+#else
         [center addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
+#endif
         [center addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
     }
 
@@ -63,6 +70,15 @@
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"<%@: %p; switchIdentifier = %@>", self.class, self, self.switchIdentifier];
+}
+
+#pragma mark - Properties
+
+- (void)setNotificationShadePreferences:(NUAPreferenceManager *)preferences {
+    _notificationShadePreferences = preferences;
+
+    // Update text color now that we have our settings
+    self.toggleLabel.textColor = preferences.textColor;
 }
 
 #pragma mark - Ripple
@@ -85,7 +101,7 @@
         // Dismiss notification shade
         [self.delegate toggleWantsNotificationShadeDismissal:self];
     }];
-    }
+}
 
 - (void)_openURL:(NSURL *)URL bundleIdentifier:(NSString *)bundleIdentifier completion:(void(^)(void))completion {
     // Get FBSSystemService and send on client port
@@ -108,7 +124,11 @@
 #pragma mark - Toggles
 
 - (void)toggleSwitchState {
+#if TARGET_OS_SIMULATOR
+    FSSwitchPanel *switchPanel = [NSClassFromString(@"FSSwitchPanel") sharedPanel];
+#else
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
+#endif
 
     self.switchState = [switchPanel stateForSwitchIdentifier:self.switchIdentifier];
     [switchPanel setState:(self.switchState == FSSwitchStateOff) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:self.switchIdentifier];
@@ -117,7 +137,7 @@
 #pragma mark - Properties
 
 - (BOOL)isUsingDark {
-    return [NUAPreferenceManager sharedSettings].usingDark;
+    return self.notificationShadePreferences.usingDark;
 }
 
 - (BOOL)isInverted {
@@ -163,12 +183,20 @@
 #pragma mark - Notifications
 
 - (void)switchesChangedState:(NSNotification *)notification {
+#if TARGET_OS_SIMULATOR
+    NSString *changedSwitch = notification.userInfo[@"switchIdentifier"];
+#else
     NSString *changedSwitch = notification.userInfo[FSSwitchPanelSwitchIdentifierKey];
+#endif
     if (changedSwitch && ![changedSwitch isEqualToString:self.switchIdentifier]) {
         return;
     }
 
+#if TARGET_OS_SIMULATOR
+    self.switchState = [[NSClassFromString(@"FSSwitchPanel") sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
+#else
     self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
+#endif
     [self _updateImageView:YES];
 }
 
@@ -179,11 +207,11 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] || !self.notificationShadePreferences.usesSystemAppearance) {
             return;
         }
 
-        self.toggleLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+        self.toggleLabel.textColor = self.notificationShadePreferences.textColor;
         [self _updateImageView:NO];
     }
 }

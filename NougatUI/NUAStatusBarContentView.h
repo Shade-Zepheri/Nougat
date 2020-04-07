@@ -1,7 +1,7 @@
-#import <UIKit/UIKit.h>
+#import "NUANotificationShadeModuleView.h"
 #import "NUABatteryView.h"
 
-@interface NUAStatusBarContentView : UIView
+@interface NUAStatusBarContentView : NUANotificationShadeModuleView
 @property (strong, nonatomic) NSDate *date;
 @property (assign, nonatomic) CGFloat currentPercent;
 @property (getter=isCharging, assign, nonatomic) BOOL charging;

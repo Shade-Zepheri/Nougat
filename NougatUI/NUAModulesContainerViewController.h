@@ -14,6 +14,7 @@
     NUASettingsModuleController *_settingsModule;
 }
 
+@property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
 @property (weak, nonatomic) id<NUANotificationShadePageContentViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat revealPercentage;
 @property (readonly, nonatomic) CGFloat fullyPresentedHeight;

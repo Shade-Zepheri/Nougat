@@ -30,7 +30,7 @@
 #pragma mark - View management
 
 - (void)loadView {
-    NUANotificationShadePanelView *panelView = [[NUANotificationShadePanelView alloc] initWithDefaultSize];
+    NUANotificationShadePanelView *panelView = [[NUANotificationShadePanelView alloc] initWithPreferences:self.notificationShadePreferences];
     self.view = panelView;
 }
 
@@ -125,6 +125,10 @@
     }
 }
 
+- (NUAPreferenceManager *)notificationShadePreferences {
+    return [self.delegate notificationShadePreferences];
+}
+
 #pragma mark - Gestures
 
 - (void)_handlePanGesture:(UIPanGestureRecognizer *)recognizer {
@@ -173,8 +177,15 @@
 
 - (NSInteger)_numberOfFramesToAnimate {
     // We want the animation to last 1/3 sec, so the number of frames executed depends on the device refresh rate
-    NSInteger maximumFramesPerSecond = [UIScreen mainScreen].maximumFramesPerSecond;
-    return maximumFramesPerSecond / 3;
+    UIScreen *mainScreen = [UIScreen mainScreen];
+    if ([mainScreen respondsToSelector:@selector(maximumFramesPerSecond)]) {
+        // Actually applies
+        NSInteger maximumFramesPerSecond = mainScreen.maximumFramesPerSecond;
+        return maximumFramesPerSecond / 2.4;
+    } else {
+        // Doesn't apply on < iOS 10.3
+        return 25; 
+    }
 }
 
 - (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {

@@ -1,4 +1,5 @@
 #import "NUARippleButton.h"
+#import <NougatServices/NougatServices.h>
 
 @class NUAFlipswitchToggle;
 
@@ -19,6 +20,8 @@
 @property (copy, readonly, nonatomic) NSString *displayName;
 @property (strong, readonly, nonatomic) UIImage *icon;
 @property (strong, readonly, nonatomic) UIImage *selectedIcon;
+
+@property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
 
 - (instancetype)initWithSwitchIdentifier:(NSString *)identifier;
 

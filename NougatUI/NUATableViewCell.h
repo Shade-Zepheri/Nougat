@@ -1,4 +1,5 @@
 #import <UIKit/UIKit.h>
+#import <NougatServices/NougatServices.h>
 
 @class NUATableViewCell;
 
@@ -12,6 +13,8 @@
 @interface NUATableViewCell : UITableViewCell
 @property (weak, nonatomic) id<NUATableViewCellDelegate> delegate;
 @property (getter=isExpanded, nonatomic) BOOL expanded;
+
+@property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
 
 @property (strong, readonly, nonatomic) UIImageView *glyphView;
 @property (strong, readonly, nonatomic) UILabel *headerLabel;

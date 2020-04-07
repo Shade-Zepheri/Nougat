@@ -11,12 +11,13 @@
 
 #pragma mark - Init
 
-- (instancetype)initWithDefaultSize {
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
     self = [super initWithFrame:CGRectZero];
     if (self) {
         // Init properities
+        _notificationShadePreferences = preferences;
         self.inset = 0.0;
-        self.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+        self.backgroundColor = preferences.backgroundColor;
         self.translatesAutoresizingMaskIntoConstraints = NO;
 
         // Constraint
@@ -38,11 +39,11 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] || !self.notificationShadePreferences.usesSystemAppearance) {
             return;
         }
 
-        self.backgroundColor = [NUAPreferenceManager sharedSettings].backgroundColor;
+        self.backgroundColor = self.notificationShadePreferences.backgroundColor;
     }
 }
 

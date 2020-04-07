@@ -7,7 +7,6 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
-@property (strong, readonly, nonatomic) NUAPreferenceManager *settings;
 @property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
 
 @property (strong, nonatomic) UIImageView *artworkView;
@@ -30,9 +29,6 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        // Settings
-        _settings = [NUAPreferenceManager sharedSettings];
-
         // Register as delegate
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
         self.nowPlayingController.delegate = self;
@@ -315,7 +311,7 @@
 #pragma mark - Default Color Provider
 
 - (void)updateTintsFromImage:(UIImage *)artworkImage {
-    if (self.settings.useExternalColor) {
+    if (self.notificationShadePreferences.useExternalColor) {
         // Dont use our method if user wants colorflow
         [self updateTintsUsingColorfow:artworkImage];
     } else {

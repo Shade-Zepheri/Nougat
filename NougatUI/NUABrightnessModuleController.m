@@ -1,6 +1,5 @@
 #import "NUABrightnessModuleController.h"
 #import "NUANotificationShadeController.h"
-#import <NougatServices/NougatServices.h>
 #import <UIKit/UIImage+Private.h>
 
 @implementation NUABrightnessModuleController
@@ -30,10 +29,10 @@
     self.slider.continuous = YES;
     self.slider.minimumValue = 0;
     self.slider.maximumValue = 1;
-    self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
+    self.slider.minimumTrackTintColor = self.notificationShadePreferences.highlightColor;
     self.slider.alpha = 0.0;
 
-    NSString *imageName = [NSString stringWithFormat:@"brightness-%@", [NUAPreferenceManager sharedSettings].usingDark ? @"dark" : @"light"];
+    NSString *imageName = [NSString stringWithFormat:@"brightness-%@", self.notificationShadePreferences.usingDark ? @"dark" : @"light"];
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:bundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
@@ -131,13 +130,14 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] || !self.notificationShadePreferences.usesSystemAppearance) {
+            // Not different color, nor using system appearance
             return;
         }
 
-        self.slider.minimumTrackTintColor = [NUAPreferenceManager sharedSettings].highlightColor;
+        self.slider.minimumTrackTintColor = self.notificationShadePreferences.highlightColor;
 
-        NSString *imageName = [NSString stringWithFormat:@"brightness-%@", [NUAPreferenceManager sharedSettings].usingDark ? @"dark" : @"light"];
+        NSString *imageName = [NSString stringWithFormat:@"brightness-%@", self.notificationShadePreferences.usingDark ? @"dark" : @"light"];
         NSBundle *bundle = [NSBundle bundleForClass:[self class]];
         UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:bundle];
         [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];
@@ -149,7 +149,7 @@
 
     self.slider.minimumTrackTintColor = colorInfo[@"tintColor"];
 
-    NSString *imageName = [NSString stringWithFormat:@"brightness-%@", [NUAPreferenceManager sharedSettings].usingDark ? @"dark" : @"light"];
+    NSString *imageName = [NSString stringWithFormat:@"brightness-%@", self.notificationShadePreferences.usingDark ? @"dark" : @"light"];
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     UIImage *thumbImage = [UIImage imageNamed:imageName inBundle:bundle];
     [self.slider setThumbImage:thumbImage forState:UIControlStateNormal];

@@ -84,6 +84,7 @@
 - (void)_loadExtensionsTable {
     _tableViewController = [[NUAMainTableViewController alloc] init];
     self.tableViewController.delegate = self;
+    self.tableViewController.notificationShadePreferences = self.notificationShadePreferences;
 
     // Add as child
     [self addChildViewController:self.tableViewController];
@@ -162,6 +163,10 @@
 - (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedRevealPercentage:(CGFloat)revealPercentage {
     // Pass to table
     self.tableViewController.revealPercentage = revealPercentage;
+}
+
+- (NUAPreferenceManager *)notificationShadePreferences {
+    return [self.delegate preferencesForNotificationShadeViewController:self];
 }
 
 #pragma mark - Table view delegate

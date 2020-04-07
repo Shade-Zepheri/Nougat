@@ -7,8 +7,8 @@
 
 @implementation NUASettingsContentView
 
-- (instancetype)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
+    self = [super initWithPreferences:preferences];
     if (self) {
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
@@ -29,7 +29,7 @@
 
 - (void)_createDivider {
     _dividerView = [[UIView alloc] initWithFrame:CGRectZero];
-    _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
+    _dividerView.backgroundColor = self.notificationShadePreferences.usingDark ? OreoDividerColor : [UIColor clearColor];
     [self addSubview:_dividerView];
 
     // Constraints
@@ -43,7 +43,7 @@
 
 - (void)_createDateLabel {
     _dateLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.dateLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+    self.dateLabel.textColor = self.notificationShadePreferences.textColor;
     self.dateLabel.textAlignment = NSTextAlignmentLeft;
     self.dateLabel.font = [UIFont systemFontOfSize:15];
     [self addSubview:self.dateLabel];
@@ -110,7 +110,7 @@
     tapGesture.numberOfTapsRequired = 1;
     [imageView addGestureRecognizer:tapGesture];
 
-    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
+    NSString *imageStyle = self.notificationShadePreferences.usingDark ? @"-dark" : @"-light";
     imageName = [imageName stringByAppendingString:imageStyle];
 
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
@@ -220,16 +220,16 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] || !self.notificationShadePreferences.usesSystemAppearance) {
             return;
         }
 
-        self.dateLabel.textColor = [NUAPreferenceManager sharedSettings].textColor;
+        self.dateLabel.textColor = self.notificationShadePreferences.textColor;
 
-        _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
+        _dividerView.backgroundColor = self.notificationShadePreferences.usingDark ? OreoDividerColor : [UIColor clearColor];
 
         // Update imageView images
-        NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
+        NSString *imageStyle = self.notificationShadePreferences.usingDark ? @"-dark" : @"-light";
         NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 
         NSString *accountImage = [@"account" stringByAppendingString:imageStyle];
@@ -250,10 +250,10 @@
     NSDictionary<NSString *, UIColor *> *colorInfo = notification.userInfo;
     self.dateLabel.textColor = colorInfo[@"textColor"];
 
-    _dividerView.backgroundColor = [NUAPreferenceManager sharedSettings].usingDark ? OreoDividerColor : [UIColor clearColor];
+    _dividerView.backgroundColor = self.notificationShadePreferences.usingDark ? OreoDividerColor : [UIColor clearColor];
 
     // Update imageView images
-    NSString *imageStyle = [NUAPreferenceManager sharedSettings].usingDark ? @"-dark" : @"-light";
+    NSString *imageStyle = self.notificationShadePreferences.usingDark ? @"-dark" : @"-light";
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 
     NSString *accountImage = [@"account" stringByAppendingString:imageStyle];

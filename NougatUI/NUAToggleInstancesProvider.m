@@ -3,22 +3,12 @@
 
 @implementation NUAToggleInstancesProvider
 
-#pragma mark - Init
-
-+ (instancetype)defaultProvider {
-    static NUAToggleInstancesProvider *sharedInstance;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[self alloc] initWithPreferences:[NUAPreferenceManager sharedSettings]];
-    });
-
-    return sharedInstance;
-}
+#pragma mark - Initialization
 
 - (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
     self = [super init];
     if (self) {
-        self.preferences = preferences;
+        _notificationShadePreferences = preferences;
         _toggleInstances = [NSArray array];
 
         [self _populateToggles];
@@ -35,9 +25,9 @@
 - (void)_populateToggles {
     NSMutableArray<NUAFlipswitchToggle *> *populatedToggles = [NSMutableArray array];
 
-    NSArray<NSString *> *enabledToggles = self.preferences.enabledToggles;
+    NSArray<NSString *> *enabledToggles = self.notificationShadePreferences.enabledToggles;
     for (NSString *identifier in enabledToggles) {
-        NUAToggleInfo *info = [self.preferences toggleInfoForIdentifier:identifier];
+        NUAToggleInfo *info = [self.notificationShadePreferences toggleInfoForIdentifier:identifier];
         if (!info) {
             continue;
         }

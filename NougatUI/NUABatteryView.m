@@ -11,11 +11,11 @@
 
 @implementation NUABatteryView
 
-- (instancetype)initWithFrame:(CGRect)frame andPercent:(CGFloat)percent {
+- (instancetype)initWithFrame:(CGRect)frame andPercent:(CGFloat)percent preferences:(NUAPreferenceManager *)preferences {
     self = [super initWithFrame:frame];
     if (self) {
         // Settings items
-        _settings = [NUAPreferenceManager sharedSettings];
+        _notificationShadePreferences = preferences;
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
 
         // View Constraints
@@ -60,7 +60,7 @@
 - (void)_createBatteryViews {
     // Bottom part
     self.bottomBatteryPart = [[UIView alloc] initWithFrame:CGRectZero];
-    self.bottomBatteryPart.backgroundColor = self.settings.textColor;
+    self.bottomBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
     self.bottomBatteryPart.layer.cornerRadius = 1.0;
     self.bottomBatteryPart.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.bottomBatteryPart];
@@ -73,7 +73,7 @@
 
     // Top part
     self.topBatteryPart = [[UIView alloc] initWithFrame:CGRectZero];
-    self.topBatteryPart.backgroundColor = self.settings.textColor;
+    self.topBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
     self.topBatteryPart.layer.cornerRadius = 0.5;
     self.topBatteryPart.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.topBatteryPart];
@@ -124,7 +124,7 @@
 
 - (UIImage *)chargingBoltImage {
     NSString *name = @"charging-";
-    NSString *imageStyle = self.settings.usingDark ? @"light" : @"dark";
+    NSString *imageStyle = self.notificationShadePreferences.usingDark ? @"light" : @"dark";
     name = [name stringByAppendingString:imageStyle];
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     return [UIImage imageNamed:name inBundle:bundle];
@@ -137,20 +137,20 @@
 
     // Check if appearance changed
     if (@available(iOS 13, *)) {
-        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection] ||!self.notificationShadePreferences.usesSystemAppearance) {
             return;
         }
 
-        self.bottomBatteryPart.backgroundColor = self.settings.textColor;
-        self.topBatteryPart.backgroundColor = self.settings.textColor;
+        self.bottomBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
+        self.topBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
 
         self.chargingImage.image = [self chargingBoltImage];
     }
 }
 
 - (void)backgroundColorDidChange:(NSNotification *)notification {
-    self.bottomBatteryPart.backgroundColor = self.settings.textColor;
-    self.topBatteryPart.backgroundColor = self.settings.textColor;
+    self.bottomBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
+    self.topBatteryPart.backgroundColor = self.notificationShadePreferences.textColor;
 
     self.chargingImage.image = [self chargingBoltImage];
 }

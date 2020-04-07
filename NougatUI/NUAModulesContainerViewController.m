@@ -77,7 +77,7 @@
 #pragma mark - Properties
 
 - (CGFloat)fullyPresentedHeight {
-    NSUInteger togglesCount = [NUAPreferenceManager sharedSettings].enabledToggles.count;
+    NSUInteger togglesCount = self.notificationShadePreferences.enabledToggles.count;
     if (togglesCount > 6) {
         return 500.0;
     } else if (togglesCount > 3) {
@@ -108,6 +108,10 @@
 
 - (CGFloat)moduleRequestsContainerHeightWhenFullyRevealed:(NUANotificationShadeModuleViewController *)moduleViewController {
     return self.fullyPresentedHeight;
+}
+
+- (NUAPreferenceManager *)notificationShadePreferences {
+    return [self.delegate notificationShadePreferences];
 }
 
 @end
