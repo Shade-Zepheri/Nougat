@@ -41,7 +41,7 @@
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
         [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
 
-        NSArray<NSString *> *defaultToggleOrder = [[self class] _defaultEnabledToggles];
+        NSArray<NSString *> *defaultToggleOrder = [self.class _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -72,7 +72,7 @@
         // Derive from system appearance
         if (@available(iOS 13, *)) {
             // To silence warnings
-            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            UITraitCollection *traitCollection = UITraitCollection.currentTraitCollection;
             BOOL usingDarkAppearance = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
             return usingDarkAppearance ? PixelBackgroundColor : OreoBackgroundColor;
         }
@@ -94,7 +94,7 @@
         // Derive from system appearance
         if (@available(iOS 13, *)) {
             // To silence warnings
-            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            UITraitCollection *traitCollection = UITraitCollection.currentTraitCollection;
             BOOL usingDarkAppearance = traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
             return usingDarkAppearance ? PixelTintColor : OreoTintColor;
         }
@@ -129,7 +129,7 @@
         // Derive from system appearance
         if (@available(iOS 13, *)) {
             // To silence warnings
-            UITraitCollection *traitCollection = [UIScreen mainScreen].traitCollection;
+            UITraitCollection *traitCollection = UITraitCollection.currentTraitCollection;
             return traitCollection.userInterfaceStyle == UIUserInterfaceStyleLight;
         }
     }

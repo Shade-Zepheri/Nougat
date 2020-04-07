@@ -19,7 +19,7 @@
     [self _togglesContentView].delegate = self;
 
     // Register for notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -55,8 +55,8 @@
 
 #pragma mark - Notifications
 
-- (void)backgroundColorDidChange:(NSNotification *)notification {
-    // Defer to view
+- (void)preferencesDidChange:(NSNotification *)notification {
+    // Let view know
     [[self _togglesContentView] refreshToggleLayout];
 }
 
