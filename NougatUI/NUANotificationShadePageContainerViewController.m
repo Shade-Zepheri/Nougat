@@ -171,6 +171,12 @@
     return 1 - yForX;
 }
 
+- (NSInteger)_numberOfFramesToAnimate {
+    // We want the animation to last 1/3 sec, so the number of frames executed depends on the device refresh rate
+    NSInteger maximumFramesPerSecond = [UIScreen mainScreen].maximumFramesPerSecond;
+    return maximumFramesPerSecond / 3;
+}
+
 - (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     // Pass through
     [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:completion];
@@ -182,12 +188,13 @@
 }
 
 - (void)_updateHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight expand:(BOOL)expand completion:(void(^)(void))completion {
-    __block NSInteger fireTimes = 0;
+    __block NSInteger fireTimes = 1;
+    NSInteger numberOfFireTimes = [self _numberOfFramesToAnimate];
     __block CGFloat difference = targetHeight - baseHeight;
 
     __weak __typeof(self) weakSelf = self;
     [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == 20) {
+        if (fireTimes == numberOfFireTimes) {
             [displayLink invalidate];
 
             if (expand) {
@@ -203,11 +210,9 @@
             return;
         }
         
-        fireTimes++;
-        CGFloat t = fireTimes / 21.0;
-        CGFloat multiplier = [weakSelf _multiplerAdjustedWithEasing:t];
-
         // Update proper height
+        CGFloat t = fireTimes / (CGFloat)numberOfFireTimes;
+        CGFloat multiplier = [weakSelf _multiplerAdjustedWithEasing:t];
         CGFloat newHeight = baseHeight + (difference * multiplier);
 
         if (expand) {
@@ -215,6 +220,8 @@
         } else {
             [weakSelf _updatePresentedHeight:newHeight];
         }
+
+        fireTimes++;
     }];
 }
 
