@@ -170,7 +170,12 @@
 }
 
 - (BOOL)isPlaying {
-    return self.nowPlayingController.isPlaying;
+    return self.controlsView.playing;
+}
+
+- (void)setPlaying:(BOOL)playing {
+    // Pass to controls
+    self.controlsView.playing = playing;
 }
 
 - (void)setNowPlayingArtwork:(UIImage *)nowPlayingArtwork {    
@@ -265,6 +270,7 @@
         self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
         self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
         self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
+        self.playing = self.nowPlayingController.isPlaying;
     });
 }
 
@@ -283,7 +289,7 @@
     // Ensure on the main thread
     dispatch_async(dispatch_get_main_queue(), ^{
         // Pass to controls
-        self.controlsView.playing = isPlaying;
+        self.playing = isPlaying;
     });
 }
 
