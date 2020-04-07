@@ -1,6 +1,4 @@
 #import "NUANotificationTableViewCell.h"
-#import "UIImage+Average.h"
-#import <NougatServices/NUAPreferenceManager.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIImage+Private.h>
 #import <Macros.h>
@@ -235,8 +233,10 @@
     // Configure stuffs
     _notification = notification;
     _timestamp = notification.timestamp;
-    _tintColor = self.notification.icon.averageColor;
     self.glyphView.image = notification.icon;
+
+    // Get our color info
+    [self generateColorInfo];
 
     // Create views if needed
     [self _tearDownDateLabel];
@@ -271,6 +271,26 @@
     [[NUADateLabelRepository sharedRepository] recycleLabel:self.dateLabel];
 }
 
+#pragma mark - Color Info
+
+- (void)generateColorInfo {
+    // Check if info is cached or not
+    NUAImageColorCache *colorCache = NUAImageColorCache.sharedCache;
+    UIImage *iconImage = self.notification.icon;
+    if ([colorCache hasColorDataForImage:iconImage type:NUAImageColorInfoTypeAppIcon]) {
+        // Has data
+        _colorInfo = [colorCache cachedColorInfoForImage:iconImage type:NUAImageColorInfoTypeAppIcon];
+    } else {
+        // Generate
+        [colorCache cacheColorInfoForImage:iconImage type:NUAImageColorInfoTypeAppIcon completion:^(NUAImageColorInfo *colorInfo) {
+            _colorInfo = colorInfo;
+
+            // Refresh
+            [self setNeedsLayout];
+        }];
+    }
+}
+
 #pragma mark - Content Management
 
 - (void)_configureAttachment {
@@ -287,7 +307,7 @@
 }
 
 - (void)_configureHeaderText {
-    if (!self.notification) {
+    if (!self.notification || !self.colorInfo) {
         // No notification to configure from
         return;
     }
@@ -305,7 +325,7 @@
     // Attribute up
     NSString *baseHeaderText = [NSString stringWithFormat:@"%@ •", displayName];
     NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] initWithString:baseHeaderText];
-    NSDictionary<NSAttributedStringKey, id> *attributes = @{NSForegroundColorAttributeName: self.tintColor};
+    NSDictionary<NSAttributedStringKey, id> *attributes = @{NSForegroundColorAttributeName: self.colorInfo.primaryColor};
     [mutableAttributedString setAttributes:attributes range:NSMakeRange(0, displayName.length)];
 
     self.headerLabel.attributedText = [mutableAttributedString copy];
@@ -336,8 +356,8 @@
 }
 
 - (void)_configureButtons {
-    if (!self.tintColor) {
-        // No tint color to configure from
+    if (!self.colorInfo) {
+        // No color info
         return;
     }
 
@@ -346,12 +366,12 @@
     UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
 
     // Tint and set
-    UIImage *tintedImage = [baseImage _flatImageWithColor:self.tintColor];
+    UIImage *tintedImage = [baseImage _flatImageWithColor:self.colorInfo.primaryColor];
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 
     // Text buttons
-    [self.openButton setTitleColor:self.tintColor forState:UIControlStateNormal];
-    [self.clearButton setTitleColor:self.tintColor forState:UIControlStateNormal];
+    [self.openButton setTitleColor:self.colorInfo.primaryColor forState:UIControlStateNormal];
+    [self.clearButton setTitleColor:self.colorInfo.primaryColor forState:UIControlStateNormal];
 
     // Show/hide
     self.openButton.hidden = !self.expanded;
@@ -359,13 +379,6 @@
 
     // Update options menu
     self.optionsHeightConstraint.constant = self.expanded ? 50.0 : 0.0;
-
-    // Animate changes
-    [self setNeedsUpdateConstraints];
-
-    [UIView animateWithDuration:0.4 animations:^{
-        [self layoutIfNeeded];
-    }];
 }
 
 @end

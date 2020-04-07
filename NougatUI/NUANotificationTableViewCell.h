@@ -1,7 +1,7 @@
 #import "NUATableViewCell.h"
 #import "NUACoalescedNotification.h"
 #import "NUADateLabelRepository.h"
-#import "NUANotificationEntry.h"
+#import "NUAImageColorCache.h"
 
 @class NUANotificationTableViewCell;
 
@@ -19,6 +19,6 @@
 
 @property (strong, readonly, nonatomic) NUARelativeDateLabel *dateLabel;
 @property (strong, readonly, nonatomic) NSDate *timestamp;
-@property (strong, readonly, nonatomic) UIColor *tintColor;
+@property (strong, readonly, nonatomic) NUAImageColorInfo *colorInfo;
 
 @end

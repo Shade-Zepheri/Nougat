@@ -50,7 +50,7 @@
     return self;
 }
 
-- (void)createArrangedViews{
+- (void)createArrangedViews {
     // Controls
     self.likeButton = [UIButton buttonWithType:UIButtonTypeCustom];
     [self.likeButton addTarget:self action:@selector(likeTrack) forControlEvents:UIControlEventTouchUpInside];

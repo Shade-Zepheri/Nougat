@@ -1,8 +1,7 @@
 #import "NUAMediaTableViewCell.h"
+#import "NUAImageColorCache.h"
 #import "Media/NUAMediaControlsView.h"
 #import "Media/NUAMediaHeaderView.h"
-#import "UIColor+Accent.h"
-#import "UIImage+Average.h"
 #import <MediaRemote/MediaRemote.h>
 #import <SpringBoardServices/SpringBoardServices+Private.h>
 #import <UIKit/UIImage+Private.h>
@@ -321,10 +320,22 @@
         [self updateTintsUsingColorfow:artworkImage];
     } else {
         // Use built in methods
-        UIColor *backgroundColor = artworkImage.averageColor;
-        UIColor *tintColor = backgroundColor.accentColor;
+        [self updateTintsUsingCache:artworkImage];
+    }
+}
 
-        [self _updateTintsWithBackgroundColor:backgroundColor tintColor:tintColor];
+- (void)updateTintsUsingCache:(UIImage *)artworkImage {
+    // Use our own cache
+    NUAImageColorCache *colorCache = NUAImageColorCache.sharedCache;
+    if ([colorCache hasColorDataForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork]) {
+        // Has data
+        NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork];
+        [self _updateTintsWithBackgroundColor:colorInfo.primaryColor tintColor:colorInfo.accentColor];
+    } else {
+        // Generate
+        [colorCache cacheColorInfoForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork completion:^(NUAImageColorInfo *colorInfo) {
+            [self _updateTintsWithBackgroundColor:colorInfo.primaryColor tintColor:colorInfo.accentColor];
+        }];
     }
 }
 
