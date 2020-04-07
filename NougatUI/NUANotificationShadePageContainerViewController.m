@@ -178,11 +178,29 @@
 }
 
 - (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
+    if (baseHeight == targetHeight) {
+        // Already at target, no need to do anything
+        if (completion) {
+            completion();
+        }
+
+        return;
+    }
+
     // Pass through
     [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:completion];
 }
 
 - (void)_updatePresentedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
+    if (baseHeight == targetHeight) {
+        // Already at target, no need to do anything
+        if (completion) {
+            completion();
+        }
+
+        return;
+    }
+
     // Pass through
     [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:NO completion:completion];
 }
