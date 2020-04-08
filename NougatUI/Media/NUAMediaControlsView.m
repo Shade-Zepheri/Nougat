@@ -101,14 +101,16 @@
     _tintColor = color;
 
     // Colorize images
-    UIImage *skipButtonImage = [[UIImage imageNamed:@"Skip" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:color];
+    UIImage *skipButtonImage = [[UIImage imageNamed:@"Skip" inBundle:[NSBundle bundleForClass:self.class]] _flatImageWithColor:color];
     [self.skipButton setImage:skipButtonImage forState:UIControlStateNormal];
-    UIImage *rewindButtonImage = [[UIImage imageNamed:@"Rewind" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:color];
+
+    UIImage *rewindButtonImage = [[UIImage imageNamed:@"Rewind" inBundle:[NSBundle bundleForClass:self.class]] _flatImageWithColor:color];
     [self.rewindButton setImage:rewindButtonImage forState:UIControlStateNormal];
-    [self _updatePlayPauseImage:NO];
-    UIImage *likeButtonImage = [[UIImage imageNamed:@"Like" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:color];
+
+    UIImage *likeButtonImage = [[UIImage imageNamed:@"Like" inBundle:[NSBundle bundleForClass:self.class]] _flatImageWithColor:color];
     [self.likeButton setImage:likeButtonImage forState:UIControlStateNormal];
-    UIImage *dislikeButtonImage = [[UIImage imageNamed:@"Dislike" inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:color];
+
+    UIImage *dislikeButtonImage = [[UIImage imageNamed:@"Dislike" inBundle:[NSBundle bundleForClass:self.class]] _flatImageWithColor:color];
     [self.dislikeButton setImage:dislikeButtonImage forState:UIControlStateNormal];
 
     // Color play
@@ -116,23 +118,16 @@
 }
 
 - (void)_updatePlayPauseImage:(BOOL)animated {
-    UIImage *currentImage = self.playButton.currentImage;
+    // Get new image
     NSString *imageName = self.playing ? @"Pause" : @"Play";
-    UIImage *newImage = [[UIImage imageNamed:imageName inBundle:[NSBundle bundleForClass:[self class]]] _flatImageWithColor:self.tintColor];
+    UIImage *baseImage = [UIImage imageNamed:imageName inBundle:[NSBundle bundleForClass:self.class]];
+    UIImage *tintedImage = [baseImage _flatImageWithColor:self.tintColor];
 
-    if (animated) { 
-        CABasicAnimation *crossFade = [CABasicAnimation animationWithKeyPath:@"contents"];
-        crossFade.duration = 0.3;
-        crossFade.fromValue = (id)currentImage.CGImage;
-        crossFade.toValue = (id)newImage.CGImage;
-        crossFade.removedOnCompletion = NO;
-        crossFade.fillMode = kCAFillModeForwards;
-        [self.playButton.imageView.layer addAnimation:crossFade forKey:@"animateContents"];
-    }
-
-    //Make sure to add Image normally after so when the animation
-    //is done it is set to the new Image
-    [self.playButton setImage:newImage forState:UIControlStateNormal];
+    // Animate
+    CGFloat duration = animated ? 0.3 : 0.0;
+    [UIView transitionWithView:self.playButton duration:duration options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
+        [self.playButton setImage:tintedImage forState:UIControlStateNormal];
+    } completion:nil];
 }
 
 #pragma mark - Actions
@@ -145,7 +140,6 @@
     BOOL currentlyPlaying = self.playing;
     MRMediaRemoteCommand command = currentlyPlaying ? MRMediaRemoteCommandPause : MRMediaRemoteCommandPlay;
     MRMediaRemoteSendCommand(command, nil);
-    self.playing = !currentlyPlaying;   
 }
 
 - (void)skipTrack {
