@@ -45,13 +45,6 @@
     return self;
 }
 
-#pragma mark - NSObject
-
-- (BOOL)isEqual:(id)object {
-    // TLDR: all media cells are the same since only one exists
-    return (object && [object isKindOfClass:self.class]);
-}
-
 #pragma mark - View Creation
 
 - (void)setupViews {
@@ -152,6 +145,15 @@
     [self.contentView addSubview:self.controlsView];
 }
 
+#pragma mark - UITableViewCell 
+
+- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+
+    // Change album artwork alpha
+    self.artworkView.alpha = highlighted ? 0.23 : 1.0;
+}
+
 #pragma mark - Properties
 
 - (void)setExpanded:(BOOL)expanded {
@@ -174,6 +176,10 @@
 }
 
 - (void)setPlaying:(BOOL)playing {
+    if (playing == self.playing) {
+        return;
+    }
+
     // Pass to controls
     self.controlsView.playing = playing;
 }
