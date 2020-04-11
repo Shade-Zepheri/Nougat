@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Ajouter et organiser plusieurs raccourcis pour afficher par Nougat. L'appli affiche jusqu'à 9 raccourcis en maximum.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Trier par";
+"CUSTOMIZE_TOGGLES_REMOVE" = "Enlever";
+"DISABLED_MODULES_SECTION_TITLE" = "Plus de raccourcis";
+"ENABLED_MODULES_SECTION_TITLE" = "Ajouter";
