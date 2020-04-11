@@ -405,8 +405,6 @@
     // Unregister media cell notifications
     NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
     [mediaCell unregisterForMediaNotifications];
-
-    // TODO: nilify text to save memory
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
