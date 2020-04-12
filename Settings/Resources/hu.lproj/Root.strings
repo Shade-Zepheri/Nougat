@@ -1,18 +1,18 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Bekapcsolva";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Use System Apperance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"USE_SYSTEM_APPEARANCE" = "Használd a rendszerbeállításokat";
+"USE_COLORFLOW" = "Használd a Colorflor színeket";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Felhasználói Kézikönyv";
+"SORT_ORDER" = "Rendezés";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Próbáld ki a Nougat-ot Shade Zepheritől! Végre androidos értesítési panelt használhatok, Android nélkül!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Támogatás";
+"TRANSLATORS" = "Fordítók";
+"HELP_TRANSLATING" = "Segíts fordítani!";
+"SOURCE_CODE" = "Forráskód";
