@@ -4,7 +4,7 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "시스템 외관 설정 사용";
+"USE_SYSTEM_APPEARANCE" = "Use System Appearance Setting";
 "USE_COLORFLOW" = "Colorflow 색상 사용";
 
 "USER_GUIDE" = "사용자 도움말";
