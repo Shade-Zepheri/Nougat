@@ -4,7 +4,7 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Dùng Phong cách mặc định của hệ thống";
+"USE_SYSTEM_APPEARANCE" = "Use System Appearance Setting";
 "USE_COLORFLOW" = "Dùng màu của Colorflow";
 
 "USER_GUIDE" = "Hướng dẫn sử dụng";
