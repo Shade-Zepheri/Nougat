@@ -39,10 +39,26 @@
             <string>Aranshavit</string>
         </dict>
         <dict>
+            <key>cellClass</key>
+            <string>HBLinkTableCell</string>
+            <key>label</key>
+            <string>Hungarian: Muráncsik Sebestyén</string>
+            <key>url</key>
+            <string>http://pegazus.space/</string>
+        </dict>
+        <dict>
             <key>cell</key>
             <string>PSTitleValueCell</string>
             <key>label</key>
             <string>Japanese: Onoue Ryotaro</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Korean: Jinhyeok Lee</string>
+            <key>user</key>
+            <string>zenyr</string>
         </dict>
         <dict>
             <key>cellClass</key>
