@@ -24,6 +24,14 @@
         </dict>
         <dict>
             <key>cellClass</key>
+            <string>NUAInstagramCell</string>
+            <key>label</key>
+            <string>French: Elena</string>
+            <key>user</key>
+            <string>elena.cmp</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
             <string>HBTwitterCell</string>
             <key>label</key>
             <string>German: Simon</string>
