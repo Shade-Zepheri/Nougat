@@ -4,7 +4,7 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "システムの外観設定";
+"USE_SYSTEM_APPEARANCE" = "Use System Appearance Setting";
 "USE_COLORFLOW" = "カラーフローの色を使う";
 
 "USER_GUIDE" = "ユーザーガイド";
