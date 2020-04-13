@@ -158,16 +158,6 @@
             <key>label</key>
             <string>TRANSLATORS</string>
         </dict>
-        <dict>
-            <key>cellClass</key>
-            <string>HBLinkTableCell</string>
-            <key>icon</key>
-            <string>source.png</string>
-            <key>label</key>
-            <string>SOURCE_CODE</string>
-            <key>url</key>
-            <string>https://github.com/Shade-Zepheri/Nougat</string>
-        </dict>
     </array>
     <key>title</key>
     <string></string>
