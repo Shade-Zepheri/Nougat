@@ -13,7 +13,7 @@
 
 - (void)show {
     // Activate
-	[SBAlertItem activateAlertItem:self];
+    [SBAlertItem activateAlertItem:self];
 }
 
 #pragma mark - SBAlertItem
@@ -26,7 +26,7 @@
 
     NSBundle *localizationBundle = [NSBundle bundleWithIdentifier:@"com.shade.NougatUI"];
     NSString *fallbackMessage = @"It appears that this is your first time using Nougat. Do you want to go through the user guide?";
-	[self alertController].message = [localizationBundle localizedStringForKey:@"USER_GUIDE_PROMPT" value:fallbackMessage table:nil];
+    [self alertController].message = [localizationBundle localizedStringForKey:@"USER_GUIDE_PROMPT" value:fallbackMessage table:nil];
 
     // Add cancel action
     __weak __typeof(self) weakself = self;

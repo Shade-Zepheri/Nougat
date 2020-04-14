@@ -13,7 +13,13 @@
         _label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
         _label.numberOfLines = 0;
         _label.textAlignment = NSTextAlignmentCenter;
-        _label.textColor = [UIColor blackColor];
+
+        if (@available(iOS 13, *)) {
+            _label.textColor = [UIColor labelColor];
+        } else {
+            _label.textColor = [UIColor blackColor];
+        }
+
         [self addSubview:_label];
     }
 

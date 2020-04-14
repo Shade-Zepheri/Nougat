@@ -49,7 +49,6 @@
         // Create tableview
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [self.tableViewController setEditing:YES animated:NO];
-        [self addChildViewController:self.tableViewController];
     }
 
     return self;
@@ -60,7 +59,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Create header view
+    NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *fallbackText = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
+    headerView.text = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_HEADER" value:fallbackText table:@"SortOrder"];
+
     // Configure tableView
+    [self addChildViewController:self.tableViewController];
     self.tableViewController.tableView.dataSource = self;
     self.tableViewController.tableView.delegate = self;
     self.tableViewController.tableView.estimatedRowHeight = [UIFont preferredFontForTextStyle:UIFontTextStyleBody].lineHeight;
@@ -68,12 +74,12 @@
     // Register custom cell class
     [self.tableViewController.tableView registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
 
-    // Add eventual header view
-    NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *fallbackText = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-    headerView.text = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_HEADER" value:fallbackText table:@"SortOrder"];
+    // Update insets
+    CGFloat topInset = CGRectGetHeight(self.navigationController.navigationBar.frame);
+    UIEdgeInsets oldInsets = self.tableViewController.tableView.contentInset;
+    self.tableViewController.tableView.contentInset = UIEdgeInsetsMake(topInset, oldInsets.left, oldInsets.bottom, oldInsets.right);
 
+    // Add header view
     self.tableViewController.tableView.tableHeaderView = headerView;
     [headerView sizeToFit];
 
