@@ -61,6 +61,11 @@
 }
 
 - (void)recycleLabel:(NUARelativeDateLabel *)label {
+    if (!label) {
+        // Label doesnt exist anymore
+        return;
+    }
+
     // Recycle and add to set
     [label prepareForReuse];
 
