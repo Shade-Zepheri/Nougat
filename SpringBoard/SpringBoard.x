@@ -362,17 +362,17 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 #pragma mark - Notification managements
 
 - (void)insertNotificationRequest:(NCNotificationRequest *)request {
+    %orig;
+
     // Pass along to repository
     [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:nil];
-
-    %orig;
 }
 
 - (void)removeNotificationRequest:(NCNotificationRequest *)request {
+    %orig;
+
     // Pass along to repository
     [[NUANotificationRepository defaultRepository] removeNotificationRequest:request forCoalescedNotification:nil];
-
-    %orig;
 }
 
 %end

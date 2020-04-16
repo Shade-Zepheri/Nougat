@@ -147,7 +147,7 @@
     // Since references, the notification in the array is already updated, all thats needed is to sort
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
-        return [notification2.timestamp compare:notification1.timestamp];
+        return [notification1 compare:notification2];
     }];
 
     _notifications = [notifications copy];

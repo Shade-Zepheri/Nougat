@@ -1,5 +1,5 @@
 #import "NUANotificationTableViewCell.h"
-#import <SpringBoardServices/SpringBoardServices+Private.h>
+#import <MobileCoreServices/LSApplicationProxy.h>
 #import <UIKit/UIImage+Private.h>
 #import <Macros.h>
 
@@ -129,11 +129,11 @@
 
 - (void)_createDateLabel {
     // Create date label
-    _dateLabel = [[NUADateLabelRepository sharedRepository] startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
+    _dateLabel = [NUADateLabelRepository.sharedRepository startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
     self.dateLabel.delegate = self;
     self.dateLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.dateLabel.numberOfLines = 1;
-    self.dateLabel.textColor = [UIColor grayColor];
+    self.dateLabel.textColor = UIColor.grayColor;
     self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.dateLabel];
 
@@ -150,7 +150,7 @@
     self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
-    self.messageLabel.textColor = [UIColor grayColor];
+    self.messageLabel.textColor = UIColor.grayColor;
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.messageLabel];
 
@@ -268,7 +268,7 @@
 - (void)_recycleDateLabel {
     // Recycle
     self.dateLabel.delegate = nil;
-    [[NUADateLabelRepository sharedRepository] recycleLabel:self.dateLabel];
+    [NUADateLabelRepository.sharedRepository recycleLabel:self.dateLabel];
 }
 
 #pragma mark - Color Info
@@ -319,7 +319,9 @@
         NSBundle *screenRecordingBundle = [NSBundle bundleWithPath:@"/System/Library/ControlCenter/Bundles/ReplayKitModule.bundle"];
         displayName = [screenRecordingBundle localizedStringForKey:@"CFBundleDisplayName" value:@"Screen Recording" table:@"InfoPlist"];
     } else {
-        displayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(self.notification.sectionID);
+        // Too lazy/complicated to link against (Mobile)CoreServices
+        LSApplicationProxy *applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:self.notification.sectionID];
+        displayName = applicationProxy.localizedName;
     }
 
     // Attribute up
@@ -349,7 +351,7 @@
     }
 
     // Get info from first entry
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
     NSString *fallbackMessage = [bundle localizedStringForKey:@"TAP_FOR_MORE_OPTIONS" value:@"Tap for more options." table:@"Localizable"];
     NSString *message = (self.notification.title) ? self.notification.message : fallbackMessage;
     self.messageLabel.text = message;
@@ -362,7 +364,7 @@
     }
 
     // Get image
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
     UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
 
     // Tint and set
