@@ -42,7 +42,6 @@
 
     for (NUAFlipswitchToggle *toggle in self.togglesArray) {
         toggle.delegate = self;
-        toggle.notificationShadePreferences = self.notificationShadePreferences;
     }
 
     if (self.togglesArray.count > 6) {

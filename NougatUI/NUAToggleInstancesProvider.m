@@ -37,6 +37,9 @@
             continue;
         }
 
+        // Pass our preferences
+        toggle.notificationShadePreferences = self.notificationShadePreferences;
+
         [populatedToggles addObject:toggle];
     }
 

@@ -164,7 +164,7 @@
 	FBSSystemService *systemService = [FBSSystemService sharedService];
 	mach_port_t port = [systemService createClientPort];
 
-	[systemService openURL:URL application:bundleIdentifier options:@{FBSOpenApplicationOptionKeyUnlockDevice: @YES} clientPort:port withResult:^(NSError *error) {
+	[systemService openURL:URL application:bundleIdentifier options:@{FBSOpenApplicationOptionKeyUnlockDevice: @(YES)} clientPort:port withResult:^(NSError *error) {
         if (error) {
             // Print error
             HBLogError(@"[Nougat] openURL error: %@", error);

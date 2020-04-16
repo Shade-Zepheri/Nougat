@@ -77,8 +77,9 @@
 - (void)setNotificationShadePreferences:(NUAPreferenceManager *)preferences {
     _notificationShadePreferences = preferences;
 
-    // Update text color now that we have our settings
+    // Update text and images
     self.toggleLabel.textColor = preferences.textColor;
+    [self _updateImageView:NO];
 }
 
 #pragma mark - Ripple
@@ -108,16 +109,17 @@
 	FBSSystemService *systemService = [FBSSystemService sharedService];
 	mach_port_t port = [systemService createClientPort];
 
-	[systemService openURL:URL application:bundleIdentifier options:@{
-		FBSOpenApplicationOptionKeyUnlockDevice: @YES
-	} clientPort:port withResult:^(NSError *error) {
+	[systemService openURL:URL application:bundleIdentifier options:@{FBSOpenApplicationOptionKeyUnlockDevice: @(YES)} clientPort:port withResult:^(NSError *error) {
         if (error) {
             // Print error
             HBLogError(@"[Nougat] openURL error: %@", error);
             return;
         }
 
-        completion();
+        // Ensure on the main queue
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion();
+        });
     }];
 }
 
