@@ -1,10 +1,11 @@
 #import "NUANotificationShadePageContainerViewController.h"
-#import "NUADisplayLink.h"
+#import  "NUAPropertyAnimator.h"
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
 @interface NUANotificationShadePageContainerViewController ()
 @property (getter=isDismissing, assign, nonatomic) BOOL dismissing;
+@property (strong, nonatomic) NUAPropertyAnimator *propertyAnimator;
 
 @end
 
@@ -25,6 +26,11 @@
     }
 
     return self;
+}
+
+- (void)dealloc {
+    // Stop animating
+    [self _stopAnimating];
 }
 
 #pragma mark - View management
@@ -112,6 +118,9 @@
 }
 
 - (void)handleDismiss:(BOOL)animated completion:(void(^)(void))completion {
+    // Cancel existing animations
+    [self _stopAnimating];
+
     // Allow dispatching of delegate methods
     if (animated) {
         CGFloat baseHeight = CGRectGetHeight(self.view.bounds);
@@ -166,27 +175,45 @@
     }
 }
 
-#pragma mark - Helpers
+#pragma mark - Property Animator
 
-- (CGFloat)_multiplerAdjustedWithEasing:(CGFloat)t {
-    // Use material design spec bezier curve to get multiplier
-    CGFloat xForT = (0.6 * (1 - t) * t * t) + (1.2 * (1 - t) * (1 - t) * t) + ((1 - t) * (1 - t) * (1 - t));
-    CGFloat yForX = (3 * xForT * xForT * (1 - xForT)) + (xForT * xForT * xForT);
-    return 1 - yForX;
-}
+- (void)_startAnimatingWithDuration:(NSTimeInterval)duration initialValue:(CGFloat)initialValue finalValue:(CGFloat)finalValue expanding:(BOOL)expanding completion:(void(^)(void))completion {
+    // Create animator
+    __weak __typeof(self) weakSelf = self;
+    self.propertyAnimator = [[NUAPropertyAnimator alloc] initWithDuration:duration initialValue:initialValue finishedValue:finalValue animations:^(CGFloat newValue) {
+        if (expanding) {
+            [weakSelf _updateExpandedHeight:newValue];
+        } else {
+            [weakSelf _updatePresentedHeight:newValue];
+        }
+    }];
 
-- (NSInteger)_numberOfFramesToAnimate {
-    // We want the animation to last 1/3 sec, so the number of frames executed depends on the device refresh rate
-    UIScreen *mainScreen = [UIScreen mainScreen];
-    if ([mainScreen respondsToSelector:@selector(maximumFramesPerSecond)]) {
-        // Actually applies
-        NSInteger maximumFramesPerSecond = mainScreen.maximumFramesPerSecond;
-        return maximumFramesPerSecond / 2.4;
-    } else {
-        // Doesn't apply on < iOS 10.3
-        return 25; 
+    if (completion) {
+        // Add completion
+        [self.propertyAnimator addCompletion:^(BOOL finished) {
+            if (!finished) {
+                return;
+            }
+
+            completion();
+        }];
     }
+
+    // Start animator
+    [self.propertyAnimator startAnimation];
 }
+
+- (void)_stopAnimating {
+    if (!self.propertyAnimator) {
+        // Doesnt exist
+        return;
+    }
+
+    [self.propertyAnimator stopAnimation:YES];
+    self.propertyAnimator = nil;
+}
+
+#pragma mark - Helpers
 
 - (void)_updateExpandedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
     if (baseHeight == targetHeight) {
@@ -199,7 +226,7 @@
     }
 
     // Pass through
-    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:YES completion:completion];
+    [self _startAnimatingWithDuration:0.4 initialValue:baseHeight finalValue:targetHeight expanding:YES completion:completion];
 }
 
 - (void)_updatePresentedHeight:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight completion:(void(^)(void))completion {
@@ -213,45 +240,7 @@
     }
 
     // Pass through
-    [self _updateHeightGradually:targetHeight baseHeight:baseHeight expand:NO completion:completion];
-}
-
-- (void)_updateHeightGradually:(CGFloat)targetHeight baseHeight:(CGFloat)baseHeight expand:(BOOL)expand completion:(void(^)(void))completion {
-    __block NSInteger fireTimes = 1;
-    NSInteger numberOfFireTimes = [self _numberOfFramesToAnimate];
-    __block CGFloat difference = targetHeight - baseHeight;
-
-    __weak __typeof(self) weakSelf = self;
-    [NUADisplayLink displayLinkWithBlock:^(CADisplayLink *displayLink) {
-        if (fireTimes == numberOfFireTimes) {
-            [displayLink invalidate];
-
-            if (expand) {
-                [weakSelf _updateExpandedHeight:targetHeight];
-            } else {
-                [weakSelf _updatePresentedHeight:targetHeight];
-            }
-
-            if (completion) {
-                completion();
-            }
-
-            return;
-        }
-        
-        // Update proper height
-        CGFloat t = fireTimes / (CGFloat)numberOfFireTimes;
-        CGFloat multiplier = [weakSelf _multiplerAdjustedWithEasing:t];
-        CGFloat newHeight = baseHeight + (difference * multiplier);
-
-        if (expand) {
-            [weakSelf _updateExpandedHeight:newHeight];
-        } else {
-            [weakSelf _updatePresentedHeight:newHeight];
-        }
-
-        fireTimes++;
-    }];
+    [self _startAnimatingWithDuration:0.4 initialValue:baseHeight finalValue:targetHeight expanding:NO completion:completion];
 }
 
 #pragma mark - Presentation

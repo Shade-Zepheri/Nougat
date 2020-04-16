@@ -1,5 +1,4 @@
 #import <UIKit/UIKit.h>
-#import "NUADisplayLink.h"
 #import "NUANotificationShadeViewController.h"
 #import <BaseBoard/BaseBoard.h>
 #import <CoverSheet/CoverSheet.h>
