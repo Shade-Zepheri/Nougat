@@ -3,7 +3,7 @@
 #import "Media/NUAMediaControlsView.h"
 #import "Media/NUAMediaHeaderView.h"
 #import <MediaRemote/MediaRemote.h>
-#import <SpringBoardServices/SpringBoardServices+Private.h>
+#import <MobileCoreServices/LSApplicationProxy.h>
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
@@ -235,9 +235,11 @@
 #pragma mark - Info label
 
 - (void)_updateHeaderLabelText {
-    // Construct strings
-    NSString *displayID = self.nowPlayingAppDisplayID ?: @"com.apple.Music";
-    NSString *appDisplayName = SBSCopyLocalizedApplicationNameForDisplayIdentifier(displayID);
+    // Construct strings, too lazy/complicated to link against (Mobile)CoreServices
+    NSString *identifier = self.nowPlayingAppDisplayID ?: @"com.apple.Music";
+
+    LSApplicationProxy *applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:identifier];
+    NSString *appDisplayName = applicationProxy.localizedName;
     self.headerLabel.text = [NSString stringWithFormat:@"%@ • %@", appDisplayName, self.metadata.album];
 }
 
