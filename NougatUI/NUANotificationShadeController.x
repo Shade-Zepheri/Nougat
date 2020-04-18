@@ -71,7 +71,10 @@
         // Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
         _presentationGestureRecognizer.edges = UIRectEdgeTop;
+        if ([_presentationGestureRecognizer respondsToSelector:@selector(sb_setStylusTouchesAllowed:)]) {
+            // Guard because removed in 13.4
             [_presentationGestureRecognizer sb_setStylusTouchesAllowed:NO];
+        }
         _presentationGestureRecognizer.delegate = self;
 
         if (%c(_UISystemGestureManager)) {
