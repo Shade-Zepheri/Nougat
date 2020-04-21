@@ -106,10 +106,17 @@
 
 - (NSString *)title {
     if (!self.entries || self.empty) {
+        // No entries
         return @"Title";
     }
 
-    return self.entries[0].title;
+    NSString *title = self.entries.firstObject.title;
+    if (!title) {
+        // No title
+        return @"Title";
+    }
+
+    return title;
 }
 
 - (NSString *)message {
@@ -117,15 +124,28 @@
         return @"Message";
     }
 
-    return self.entries[0].message;
+    NSString *message = self.entries.firstObject.message;
+    if (!message) {
+        // No title
+        return @"Message";
+    }
+
+    return message;
 }
 
 - (UIImage *)icon {
+    UIImage *backupIcon = [UIImage _applicationIconImageForBundleIdentifier:@"com.apple.Preferences" format:0 scale:[UIScreen mainScreen].scale];
     if (!self.entries || self.empty) {
-        return [UIImage _applicationIconImageForBundleIdentifier:@"com.apple.Preferences" format:0 scale:[UIScreen mainScreen].scale];
+        return backupIcon;
     }
 
-    return self.entries[0].icon;
+    UIImage *icon = self.entries.firstObject.icon;
+    if (!icon) {
+        // No title
+        return backupIcon;
+    }
+
+    return icon;
 }
 
 - (UIImage *)attachmentImage {
@@ -133,15 +153,21 @@
         return nil;
     }
 
-    return self.entries[0].attachmentImage;
+    return self.entries.firstObject.attachmentImage;
 }
 
 - (NSDate *)timestamp {
     if (!self.entries || self.empty) {
-        return nil;
+        return [NSDate date];
     }
 
-    return self.entries[0].timestamp;
+    NSDate *timestamp = self.entries.firstObject.timestamp;
+    if (!timestamp) {
+        // No title
+        return [NSDate date];
+    }
+
+    return timestamp;
 }
 
 - (NSTimeZone *)timeZone {
@@ -149,7 +175,7 @@
         return nil;
     }
 
-    return self.entries[0].timeZone;
+    return self.entries.firstObject.timeZone;
 }
 
 - (BOOL)isEmpty {
@@ -187,7 +213,7 @@
 
     // Sort entires
     [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
-        return [entry2.timestamp compare:entry1.timestamp];
+        return [entry1 compare:entry2];
     }];
 
     _entries = [entries copy];

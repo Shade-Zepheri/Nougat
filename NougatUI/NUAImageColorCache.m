@@ -68,6 +68,11 @@
 
 - (UIColor *)_averageColorForImage:(UIImage *)image {
     CIImage *inputImage = image.CIImage ?: [CIImage imageWithCGImage:image.CGImage];
+    if (!inputImage) {
+        // No image, fallback
+        return UIColor.grayColor;
+    }
+
     CIFilter *filter = [CIFilter filterWithName:@"CIAreaAverage" withInputParameters:@{kCIInputImageKey: inputImage, kCIInputExtentKey: [CIVector vectorWithCGRect:inputImage.extent]}];
     CIImage *outputImage = filter.outputImage;
 

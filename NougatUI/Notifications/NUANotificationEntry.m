@@ -43,4 +43,9 @@
     return [entry.request matchesRequest:self.request];
 }
 
+- (NSComparisonResult)compare:(NUANotificationEntry *)otherEntry {
+    // Just compare timestamps
+    return [otherEntry.timestamp compare:self.timestamp];
+}
+
 @end
