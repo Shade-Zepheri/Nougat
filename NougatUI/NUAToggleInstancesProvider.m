@@ -23,16 +23,16 @@
 #pragma mark - Toggles
 
 - (void)_populateToggles {
-    NSMutableArray<NUAFlipswitchToggle *> *populatedToggles = [NSMutableArray array];
+    NSMutableArray<NUAToggleButton *> *populatedToggles = [NSMutableArray array];
 
-    NSArray<NSString *> *enabledToggles = self.notificationShadePreferences.enabledToggles;
-    for (NSString *identifier in enabledToggles) {
+    NSArray<NSString *> *enabledToggleIdentifiers = self.notificationShadePreferences.enabledToggles;
+    for (NSString *identifier in enabledToggleIdentifiers) {
         NUAToggleInfo *info = [self.notificationShadePreferences toggleInfoForIdentifier:identifier];
         if (!info) {
             continue;
         }
 
-        NUAFlipswitchToggle *toggle = [self _createToggleFromInfo:info];
+        NUAToggleButton *toggle = [self _createToggleFromInfo:info];
         if (!toggle) {
             continue;
         }
@@ -46,7 +46,7 @@
     _toggleInstances = [populatedToggles copy];
 }
 
-- (NUAFlipswitchToggle *)_createToggleFromInfo:(NUAToggleInfo *)info {
+- (NUAToggleButton *)_createToggleFromInfo:(NUAToggleInfo *)info {
     NSBundle *bundle = [NSBundle bundleWithURL:info.bundleURL];
     if (!bundle) {
         return nil;

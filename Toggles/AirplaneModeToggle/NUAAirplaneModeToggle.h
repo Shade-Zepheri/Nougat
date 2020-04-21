@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUAAirplaneModeToggle : NUAFlipswitchToggle
+@interface NUAAirplaneModeToggle : NUAFlipswitchButton
 
 @end

@@ -28,9 +28,9 @@
     animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
     animation.type = kCATransitionFade;
     animation.duration = 0.25;
-    [self.toggleLabel.layer addAnimation:animation forKey:@"kCATransitionFade"];
+    [self.displayNameLabel.layer addAnimation:animation forKey:@"kCATransitionFade"];
 
-    self.toggleLabel.text = displayName;
+    self.displayNameLabel.text = displayName;
 }
 
 #pragma mark - Toggle

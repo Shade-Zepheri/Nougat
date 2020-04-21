@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUAHotspotToggle : NUAFlipswitchToggle
+@interface NUAHotspotToggle : NUAFlipswitchButton
 
 @end

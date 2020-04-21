@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUARotationLockToggle : NUAFlipswitchToggle
+@interface NUARotationLockToggle : NUAFlipswitchButton
 
 @end

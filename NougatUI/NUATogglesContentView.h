@@ -9,12 +9,12 @@
 
 @end
 
-@interface NUATogglesContentView : NUANotificationShadeModuleView <NUAFlipswitchToggleDelegate> {
+@interface NUATogglesContentView : NUANotificationShadeModuleView <NUAToggleButtonDelegate> {
     CGFloat _targetWidthConstant;
 
-    NSArray<NUAFlipswitchToggle *> *_topRow;
-    NSArray<NUAFlipswitchToggle *> *_middleRow;
-    NSArray<NUAFlipswitchToggle *> *_bottomRow;
+    NSArray<NUAToggleButton *> *_topRow;
+    NSArray<NUAToggleButton *> *_middleRow;
+    NSArray<NUAToggleButton *> *_bottomRow;
 }
 
 @property (weak, nonatomic) id<NUATogglesContentViewDelegate> delegate;
@@ -22,7 +22,7 @@
 @property (getter=isArranged, readonly, nonatomic) BOOL arranged;
 
 @property (strong, readonly, nonatomic) NUAToggleInstancesProvider *togglesProvider;
-@property (copy, nonatomic) NSArray<NUAFlipswitchToggle *> *togglesArray;
+@property (copy, nonatomic) NSArray<NUAToggleButton *> *togglesArray;
 
 - (void)_layoutToggles;
 - (void)refreshToggleLayout;

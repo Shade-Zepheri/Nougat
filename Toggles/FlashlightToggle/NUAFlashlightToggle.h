@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUAFlashlightToggle : NUAFlipswitchToggle
+@interface NUAFlashlightToggle : NUAFlipswitchButton
 
 @end

@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUABluetoothToggle : NUAFlipswitchToggle
+@interface NUABluetoothToggle : NUAFlipswitchButton
 
 @end

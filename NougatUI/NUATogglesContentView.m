@@ -40,7 +40,7 @@
 - (void)_populateToggles {
     self.togglesArray = self.togglesProvider.toggleInstances;
 
-    for (NUAFlipswitchToggle *toggle in self.togglesArray) {
+    for (NUAToggleButton *toggle in self.togglesArray) {
         toggle.delegate = self;
     }
 
@@ -83,7 +83,7 @@
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
-    for (NUAFlipswitchToggle *toggle in _topRow) {
+    for (NUAToggleButton *toggle in _topRow) {
         [self.topStackView addArrangedSubview:toggle];
     }
 
@@ -121,7 +121,7 @@
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
-    for (NUAFlipswitchToggle *toggle in _middleRow) {
+    for (NUAToggleButton *toggle in _middleRow) {
         [self.middleStackView addArrangedSubview:toggle];
     }
 }
@@ -143,7 +143,7 @@
     heightConstraint.active = YES;
     [self.heightConstraints addObject:heightConstraint];
 
-    for (NUAFlipswitchToggle *toggle in _bottomRow) {
+    for (NUAToggleButton *toggle in _bottomRow) {
         [self.bottomStackView addArrangedSubview:toggle];
         toggle.alpha = 0.0;
     }
@@ -210,7 +210,7 @@ CGFloat easingYForT(CGFloat t) {
 
 #pragma mark - Delegate
 
-- (void)toggleWantsNotificationShadeDismissal:(NUAFlipswitchToggle *)toggle {
+- (void)toggleWantsNotificationShadeDismissal:(NUAToggleButton *)toggleButton {
     [self.delegate contentViewWantsNotificationShadeDismissal:self];
 }
 
@@ -223,8 +223,8 @@ CGFloat easingYForT(CGFloat t) {
 
     // Delay appearance of labels
     CGFloat adjustedPercent = (percent - 0.75) * 4;
-    for (NUAFlipswitchToggle *toggle in self.togglesArray) {
-        toggle.toggleLabel.alpha = adjustedPercent;
+    for (NUAToggleButton *toggle in self.togglesArray) {
+        toggle.displayNameLabel.alpha = adjustedPercent;
 
         if (!_bottomRow || ![_bottomRow containsObject:toggle]) {
             continue;

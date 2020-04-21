@@ -1,5 +1,5 @@
 #import <NougatUI/NougatUI.h>
 
-@interface NUABatterySaverToggle : NUAFlipswitchToggle
+@interface NUABatterySaverToggle : NUAFlipswitchButton
 
 @end
