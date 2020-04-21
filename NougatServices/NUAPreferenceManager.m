@@ -3,6 +3,7 @@
 #import <Cephei/HBPreferences.h>
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
+#import <LocalAuthentication/LocalAuthentication.h>
 #import <UIKit/UIWindow+Private.h>
 
 @interface NUAPreferenceManager () {
@@ -261,9 +262,11 @@
 
 + (BOOL)_deviceHasNotch {
     if (@available(iOS 11, *)) {
-        // Still can be fooled by Little11/LittleX etc, need to find better method
-        CGFloat safeAreaBottomEdgeInset = [UIWindow keyWindow].safeAreaInsets.bottom ?: 0.0;
-        return safeAreaBottomEdgeInset > 0;
+        LAContext* context = [[LAContext alloc] init];
+        [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
+                             error:nil];
+                             
+        return [context biometryType] == LABiometryTypeFaceID;
     }
 
     // Doesn't apply to before iOS 11
