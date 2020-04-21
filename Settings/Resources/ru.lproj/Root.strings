@@ -4,15 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"USE_SYSTEM_APPEARANCE" = "Использовать Системное Оформление";
-"USE_COLORFLOW" = "Использовать Цвета Colorflow";
+"USE_SYSTEM_APPEARANCE" = "Использовать системное оформление";
+"USE_COLORFLOW" = "Использовать цвета Colorflow";
 
-"USER_GUIDE" = "Руководство Пользователя";
-"SORT_ORDER" = "Порядок Сортировки";
+"USER_GUIDE" = "Руководство пользователя";
+"SORT_ORDER" = "Порядок сортировки";
 
 "SHARE_TEXT" = "Зацени Nougat от Shade Zepheri. Я могу использовать панель уведомлений Android без использования Android!";
 
 "SUPPORT" = "Поддержка";
 "TRANSLATORS" = "Переводчики";
-"HELP_TRANSLATING" = "Помогите с Переводом!";
-"SOURCE_CODE" = "Исходный Код";
+"HELP_TRANSLATING" = "Помогите с переводом!";
+"SOURCE_CODE" = "Исходный код";
