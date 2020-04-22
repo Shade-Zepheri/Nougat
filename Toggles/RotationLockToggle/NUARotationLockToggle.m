@@ -22,12 +22,12 @@
 
 - (UIImage *)icon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    return [UIImage imageNamed:@"On" inBundle:bundle];
+    return [UIImage imageNamed:@"Off" inBundle:bundle];
 }
 
 - (UIImage *)selectedIcon {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *imageName = [NSString stringWithFormat:@"Off-%@", self.usingDark ? @"Dark" : @"Light"];
+    NSString *imageName = [NSString stringWithFormat:@"On-%@", self.usingDark ? @"Dark" : @"Light"];
     return [UIImage imageNamed:imageName inBundle:bundle];
 }
 

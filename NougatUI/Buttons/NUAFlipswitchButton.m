@@ -32,15 +32,34 @@
 
 - (BOOL)isSelected {
     // Override to use flipswitch state
-	return self.switchState == FSSwitchStateOn;
+    if (self.inverted) {
+        switch (self.switchState) {
+            case FSSwitchStateOff:
+                return YES;
+            case FSSwitchStateIndeterminate:
+            case FSSwitchStateOn:
+                return NO;
+        }
+    } else {
+        switch (self.switchState) {
+            case FSSwitchStateIndeterminate:
+            case FSSwitchStateOff:
+                return NO;
+            case FSSwitchStateOn:
+                return YES;
+        }
+    }
 }
 
 - (void)setSelected:(BOOL)selected {
+    // Determine state
+    FSSwitchState newState = selected ? (self.inverted ? FSSwitchStateOff : FSSwitchStateOn) : (self.inverted ? FSSwitchStateOn : FSSwitchStateOff);
+
     // Set flipswitch state
     FSSwitchPanel *switchPanel = [FSSwitchPanel sharedPanel];
 
     self.switchState = [switchPanel stateForSwitchIdentifier:self.switchIdentifier];
-    [switchPanel setState:(selected) ? FSSwitchStateOn : FSSwitchStateOff forSwitchIdentifier:self.switchIdentifier];
+    [switchPanel setState:newState forSwitchIdentifier:self.switchIdentifier];
 }
 
 #pragma mark - Notifications
@@ -53,7 +72,7 @@
 
     // Update state and refresh
     self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:self.switchIdentifier];
-    [self refreshImage];
+    [self refreshAppearance];
 }
 
 @end

@@ -112,20 +112,6 @@
     self.selected = !self.selected;
 }
 
-- (void)setSelected:(BOOL)selected {
-    if (selected == _selected) {
-        // No change
-        return;
-    }
-
-    _selected = selected;
-
-    // Update image
-    [self _updateImageView:YES];
-
-    // Change your state here
-}
-
 #pragma mark - Gesture
 
 - (void)handleLongPressGesture:(UILongPressGestureRecognizer *)gestureRecognizer {
@@ -161,15 +147,15 @@
 
 #pragma mark - Image management
 
-- (void)refreshImage {
-    // Simply defer to our method
+- (void)refreshAppearance {
+    // All we have to do is update image
+    // since the state is already set
     [self _updateImageView:YES];
 }
 
 - (void)_updateImageView:(BOOL)animated {
     // Get proper image
-    BOOL selected = (self.inverted) ? !self.selected : self.selected;
-    UIImage *glyph = (selected) ? self.selectedIcon : self.icon;
+    UIImage *glyph = (self.selected) ? self.selectedIcon : self.icon;
 
     // Animate transition
     CGFloat duration = animated ? 0.4 : 0.0;
