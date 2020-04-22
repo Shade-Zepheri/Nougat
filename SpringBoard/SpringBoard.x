@@ -209,173 +209,45 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
 %end
 %end
 
-#pragma mark - Notifications
+#pragma mark - Notification Retreval
 
-%group Pre13CoverSheet
-%hook NotificationListClass
-// Hook into to manage notification stuffs
+%hook NCNotificationStore
 
-- (instancetype)init {
-    self = %orig;
-    if (self) {
-        // Register for notifications
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(nua_executeAction:) name:@"NUANotificationLaunchNotification" object:nil];
-    }
-
-    return self;
-}
-
-- (void)dealloc {
-    // Deregister notification
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUANotificationLaunchNotification" object:nil];
-
-    %orig;
-}
-
-#pragma mark - Actions
-
-%new
-- (void)nua_executeAction:(NSNotification *)notification {
-    // Parse for info
-    NSString *type = notification.userInfo[@"type"];
-    NCNotificationRequest *request = notification.userInfo[@"request"];
-
-    // Get action
-    NCNotificationAction *action = nil;
-    if ([type isEqualToString:@"default"]) {
-        action = request.defaultAction;
-    } else if ([type isEqualToString:@"clear"]) {
-        action = request.clearAction;
-    }
-
-    if (!action) {
-        // There was no action, return
-        return;
-    }
-
-    // Manually call delegate methods
-    id<NCNotificationListViewControllerDestinationDelegate> destinationDelegate = ((NCNotificationListViewController *)self).destinationDelegate;
-    if ([destinationDelegate respondsToSelector:@selector(notificationListViewController:requestsExecuteAction:forNotificationRequest:withParameters:completion:)]) {
-        // iOS 10
-        [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request withParameters:@{} completion:nil];
-    } else {
-        // iOS 11-12
-        [destinationDelegate notificationListViewController:self requestsExecuteAction:action forNotificationRequest:request requestAuthentication:YES withParameters:@{} completion:nil];
-    }
-}
-
-#pragma mark - Notification managements
-
-- (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+- (BOOL)addNotificationRequest:(NCNotificationRequest *)request {
     BOOL orig = %orig;
 
     // Pass along to repository
-    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
-
+    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:nil];
     return orig;
 }
 
-- (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    // Pass along to repository
-    [[NUANotificationRepository defaultRepository] removeNotificationRequest:request forCoalescedNotification:coalescedNotification];
-
-    %orig;
-}
-
-%end
-%end
-
-// iOS 13 Notifications
-%group iOS13CoverSheet
-%hook NCNotificationStructuredListViewController
-
-- (instancetype)init {
-    self = %orig;
-    if (self) {
-        // Register for notifications
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(nua_executeAction:) name:@"NUANotificationLaunchNotification" object:nil];
-    }
-
-    return self;
-}
-
-- (void)dealloc {
-    // Deregister notification
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUANotificationLaunchNotification" object:nil];
-
-    %orig;
-}
-
-#pragma mark - Actions
-
-%new
-- (void)nua_executeAction:(NSNotification *)notification {
-    // Parse for info
-    NSString *type = notification.userInfo[@"type"];
-    NCNotificationRequest *request = notification.userInfo[@"request"];
-
-    NCNotificationListCell *listCell = [self nua_notificationListCellForRequest:request];
-    if ([type isEqualToString:@"default"]) {
-        // Perform default action
-        if (listCell) {
-            // Execute from cell
-            [listCell _executeDefaultAction];
-        } else {
-            // Manually call delegate methods
-            NCNotificationStructuredSectionList *notificationSection = self.masterList.notificationSections.lastObject;
-            NCNotificationGroupList *notificationGroup = notificationSection.notificationGroups.firstObject;
-            [notificationGroup _performDefaultActionForNotificationRequest:request withCompletion:nil];
-        }
-    } else if ([type isEqualToString:@"clear"]) {
-        // Perform clear action
-        if (listCell) {
-            // Execute from cell
-            [listCell _executeClearAction];
-        } else {
-            // Call delegate methods manually
-            NCNotificationStructuredSectionList *notificationSection = self.masterList.notificationSections.lastObject;
-            NCNotificationGroupList *notificationGroup = notificationSection.notificationGroups.firstObject;
-            [notificationGroup _clearNotificationRequest:request withCompletion:nil];
-        }
-    }
-}
-
-%new
-- (NCNotificationListCell *)nua_notificationListCellForRequest:(NCNotificationRequest *)request {
-    NCNotificationMasterList *masterList = self.masterList;
-    for (NCNotificationStructuredSectionList *notificationSection in masterList.notificationSections) {
-        for (NCNotificationGroupList *notificationGroup in notificationSection.notificationGroups) {
-            NCNotificationListCell *listCell = [notificationGroup _currentCellForNotificationRequest:request];
-            if (!listCell) {
-                continue;
-            }
-
-            // Found the list cell
-            return listCell;
-        }
-    }
-
-    // return nothing by default
-    return nil;
-}
-
-#pragma mark - Notification managements
-
-- (void)insertNotificationRequest:(NCNotificationRequest *)request {
-    %orig;
-
-    // Pass along to repository
-    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:nil];
-}
-
-- (void)removeNotificationRequest:(NCNotificationRequest *)request {
-    %orig;
+- (BOOL)removeNotificationRequest:(NCNotificationRequest *)request {
+    BOOL orig = %orig;
 
     // Pass along to repository
     [[NUANotificationRepository defaultRepository] removeNotificationRequest:request forCoalescedNotification:nil];
+    return orig;
 }
 
 %end
+
+#pragma mark - Notification Launching
+
+%hook SBNotificationBannerDestination
+
+%new
+- (void)nua_executeAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request {
+    // Simply add our helper here
+    id<NCNotificationDestinationDelegate> delegate = ((SBNotificationBannerDestination *)self).delegate;
+    if ([delegate respondsToSelector:@selector(destination:executeAction:forNotificationRequest:requestAuthentication:withParameters:completion:)]) {
+        // iOS 11+
+        [delegate destination:self executeAction:action forNotificationRequest:request requestAuthentication:YES withParameters:@{} completion:nil];
+    } else {
+        // iOS 10
+        [delegate destination:self executeAction:action forNotificationRequest:request withParameters:@{} completion:nil];
+    }
+}
+
 %end
 
 #pragma mark - Constructor
@@ -386,16 +258,6 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         %init(PreCoverSheet);
     } else {
         %init(CoverSheet);
-    }
-
-    // Figure out notification hooks
-    if (%c(NCNotificationStructuredListViewController)) {
-        // iOS 13+
-        %init(iOS13CoverSheet);
-    } else {
-        // iOS 12-
-        Class listClass = %c(NCNotificationCombinedListViewController) ?: %c(NCNotificationSectionListViewController);
-        %init(Pre13CoverSheet, NotificationListClass=listClass);
     }
 
     // Init the rest

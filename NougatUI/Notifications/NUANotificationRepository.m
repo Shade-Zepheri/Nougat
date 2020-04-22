@@ -89,7 +89,7 @@
 }
 
 - (NCNotificationStore *)_notificationStore {
-    SBNCNotificationDispatcher *notificationDispatcher = [(SpringBoard *)[UIApplication sharedApplication] notificationDispatcher]; 
+    SBNCNotificationDispatcher *notificationDispatcher = ((SpringBoard *)UIApplication.sharedApplication).notificationDispatcher; 
     SBDashBoardNotificationDispatcher *destination = notificationDispatcher.dashBoardDestination;
     NCNotificationDispatcher *dispatcher = destination.delegate;
     return dispatcher.notificationStore;

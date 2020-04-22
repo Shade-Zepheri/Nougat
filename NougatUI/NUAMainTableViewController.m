@@ -1,7 +1,7 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
 #import <MediaRemote/MediaRemote.h>
-#import <SpringBoard/SpringBoard.h>
+#import <SpringBoard/SpringBoard-Umbrella.h>
 #import <Macros.h>
 
 @interface NUAMainTableViewController () {
@@ -14,7 +14,7 @@
 
 @implementation NUAMainTableViewController
 
-#pragma mark - Init
+#pragma mark - Initialization
 
 - (instancetype)init {
     self = [super init];
@@ -31,7 +31,7 @@
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
 
         // Notifications
-        _notificationRepository = [NUANotificationRepository defaultRepository];
+        _notificationRepository = NUANotificationRepository.defaultRepository;
         [self.notificationRepository addObserver:self];
     }
 
@@ -235,6 +235,14 @@
     return [NSIndexPath indexPathForRow:index inSection:0];
 }
 
+#pragma mark - Notification Launching
+
+- (SBNotificationBannerDestination *)_bannerDestination {
+    // Provide easy access to it
+    SBNCNotificationDispatcher *notificationDispatcher = ((SpringBoard *)UIApplication.sharedApplication).notificationDispatcher; 
+    return notificationDispatcher.bannerDestination;
+}
+
 - (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
     // Get associated entry
     NUACoalescedNotification *notification = [self notificationForIndexPath:indexPath];
@@ -243,16 +251,29 @@
         return;
     }
 
+    // Determine action
     NUANotificationEntry *entry = notification.entries.firstObject;
+    NCNotificationRequest *request = entry.request;
+    NCNotificationAction *action = nil;
+    if ([type isEqualToString:@"default"]) {
+        action = request.defaultAction;
+    } else if ([type isEqualToString:@"clear"]) {
+        action = request.clearAction;
+    }
 
-    // Post to launch
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationLaunchNotification" object:nil userInfo:@{@"type": type, @"request": entry.request}];
+    if (!action) {
+        return;
+    }
+
+    // Call our helper method
+    SBNotificationBannerDestination *bannerDestination = [self _bannerDestination];
+    [bannerDestination nua_executeAction:action forNotificationRequest:request];
 
     if (![type isEqualToString:@"default"]) {
         return;
     }
 
-    // Dismiss
+    // Dismiss if needed
     [self.delegate tableViewControllerWantsDismissal:self];
 }
 

@@ -20,6 +20,7 @@
 #import "SBLockScreenManager+Private.h"
 #import "SpringBoard/SBMainDisplaySystemGestureManager.h"
 #import "SBNCNotificationDispatcher.h"
+#import "SBNotificationBannerDestination.h"
 #import "SBNotificationCenterController+Private.h"
 #import "SBNotificationDestination.h"
 #import "SBOrientationLockManager+Private.h"
