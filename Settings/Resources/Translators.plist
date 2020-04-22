@@ -85,10 +85,12 @@
             <string>PBDi4</string>
         </dict>
         <dict>
-            <key>cell</key>
-            <string>PSTitleValueCell</string>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
             <key>label</key>
             <string>Russian: Gennady Koshkin</string>
+            <key>user</key>
+            <string>gkeep_</string>
         </dict>
         <dict>
             <key>cellClass</key>
