@@ -262,11 +262,12 @@
 
 + (BOOL)_deviceHasNotch {
     if (@available(iOS 11, *)) {
-        LAContext* context = [[LAContext alloc] init];
-        [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics 
-                             error:nil];
-                             
-        return [context biometryType] == LABiometryTypeFaceID;
+        // Devices with FaceID have notch, except for ipads
+        BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+
+        LAContext *context = [[LAContext alloc] init];
+        [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+        return context.biometryType == LABiometryTypeFaceID && !isIPad;
     }
 
     // Doesn't apply to before iOS 11
