@@ -4,11 +4,11 @@
 // Our lovely constants
 static const CGFloat NUAExpandRippleBeyondSurface = 10;
 static const CGFloat NUARippleStartingScale = 0.6;
-static const CGFloat NUARippleTouchDownDuration = 0.225;
-static const CGFloat NUARippleTouchUpDuration = 0.15;
-static const CGFloat NUARippleFadeInDuration = 0.075;
-static const CGFloat NUARippleFadeOutDuration = 0.075;
-static const CGFloat NUARippleFadeOutDelay = 0.15;
+static const NSTimeInterval NUARippleTouchDownDuration = 0.4;
+static const NSTimeInterval NUARippleTouchUpDuration = 0.15;
+static const NSTimeInterval NUARippleFadeInDuration = 0.083;
+static const NSTimeInterval NUARippleFadeOutDuration = 0.075;
+static const NSTimeInterval NUARippleFadeOutDelay = 0.15;
 
 static NSString *const NUARippleLayerOpacityAnimationString = @"opacity";
 static NSString *const NUARippleLayerPositionAnimationString = @"position";
