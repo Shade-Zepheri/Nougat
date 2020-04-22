@@ -113,7 +113,7 @@
     NSString *title = self.entries.firstObject.title;
     if (!title) {
         // No title
-        return @"Title";
+        return @"";
     }
 
     return title;
