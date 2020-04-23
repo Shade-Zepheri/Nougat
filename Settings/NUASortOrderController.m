@@ -12,7 +12,7 @@
     self = [super init];
     if (self) {
         // Configure viewcontroller
-        NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+        NSBundle *bundle = [NSBundle bundleForClass:self.class];
         self.title = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_TITLE" value:@"Sort Order" table:@"SortOrder"];
 
         if (@available(iOS 11, *)) {
@@ -61,7 +61,7 @@
 
     // Create header view
     NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
     NSString *fallbackText = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
     headerView.text = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_HEADER" value:fallbackText table:@"SortOrder"];
 
@@ -140,7 +140,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
     switch (section) {
         case 0:
             return [bundle localizedStringForKey:@"ENABLED_MODULES_SECTION_TITLE" value:@"Include" table:@"SortOrder"];
@@ -229,7 +229,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
     return [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_REMOVE" value:@"Remove" table:@"SortOrder"];
 }
 

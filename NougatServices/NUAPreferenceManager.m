@@ -160,10 +160,13 @@
     NSArray<NSURL *> *bundleURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:togglesURL includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
     if (bundleURLs) {
         for (NSURL *bundleURL in bundleURLs) {
-            NUAToggleInfo *info = [NUAToggleInfo toggleInfoWithBundleURL:bundleURL];
-            if (info) {
-                _toggleInfoDictionary[info.identifier] = info;
+            NUAToggleInfo *info = [NUAToggleInfo toggleInfoForBundleAtURL:bundleURL];
+            if (!info) {
+                continue;
             }
+
+            // Add to dict
+            _toggleInfoDictionary[info.identifier] = info;
         }
     } else {
         // Error, return
@@ -188,7 +191,7 @@
     return _toggleInfoDictionary[identifier];
 }
 
-- (NSArray<NSString *> *)_installedToggleIdentifiers {
+- (NSArray<NSString *> *)_availableToggleIdentifiers {
     return _toggleInfoDictionary.allKeys;
 }
 

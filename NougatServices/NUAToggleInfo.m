@@ -3,37 +3,51 @@
 
 @implementation NUAToggleInfo
 
-#pragma mark - Init
+#pragma mark - Class Helpers
 
-+ (instancetype)toggleInfoWithBundleURL:(NSURL *)bundleURL {
-    return [[self alloc] initWithBundleURL:bundleURL];
++ (BOOL)_isCompatibleWithVersion:(NSString *)version {
+    // Check version number
+    NSString *currentVersion = UIDevice.currentDevice.systemVersion;
+    return [currentVersion compare:version options:NSNumericSearch] != NSOrderedAscending;
 }
 
-- (instancetype)initWithBundleURL:(NSURL *)bundleURL {
+#pragma mark - Initialization
+
++ (instancetype)toggleInfoForBundleAtURL:(NSURL *)bundleURL {
+    // Do some checking first
+    NSDictionary<NSString *, id> *infoDictionary = (__bridge_transfer NSDictionary *)CFBundleCopyInfoDictionaryInDirectory((__bridge CFURLRef)bundleURL);
+    NSString *identifier = infoDictionary[@"CFBundleIdentifier"];
+    NSString *minimumVersion = infoDictionary[@"MinimumOSVersion"];
+    if (!identifier || ![self _isCompatibleWithVersion:minimumVersion]) {
+        // No identifier, or not supported
+        return nil;
+    } else {
+        // Pass to init
+        NSString *displayName = infoDictionary[@"CFBundleDisplayName"];
+        return [[self alloc] _initWithIdentifier:identifier displayName:displayName toggleBundleURL:bundleURL];
+    }
+}
+
+- (instancetype)_initWithIdentifier:(NSString *)identifier displayName:(NSString *)displayName toggleBundleURL:(NSURL *)bundleURL {
     self = [super init];
     if (self) {
-        _bundleURL = bundleURL;
+        // Set defaults
+        _identifier = [identifier copy];
+        _displayName = [displayName copy];
+        _bundleURL = [bundleURL copy];
 
+        // Get icon
         NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
-        _identifier = [bundle objectForInfoDictionaryKey:@"CFBundleIdentifier"];
-        _displayName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+        UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
+        if (!settingsIcon) {
+            // Provide fallback icon
+            settingsIcon = [UIImage imageNamed:@"FallbackSettingsIcon" inBundle:[NSBundle bundleForClass:self.class]];
+        }
+
+        _settingsIcon = settingsIcon;
     }
 
     return self;
-}
-
-#pragma mark - Properties
-
-- (UIImage *)settingsIcon {
-    // Init on demand because init is called from ctor and creating images causes crashes
-    NSBundle *bundle = [NSBundle bundleWithURL:self.bundleURL];
-    UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
-    if (!settingsIcon) {
-        // Provide fallback icon
-        settingsIcon = [UIImage imageNamed:@"FallbackSettingsIcon" inBundle:[NSBundle bundleForClass:[self class]]];
-    }
-
-    return settingsIcon;
 }
 
 @end

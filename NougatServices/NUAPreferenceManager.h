@@ -40,7 +40,7 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;
 
-- (NSArray<NSString *> *)_installedToggleIdentifiers;
+- (NSArray<NSString *> *)_availableToggleIdentifiers;
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;
 - (void)refreshToggleInfo;
 
