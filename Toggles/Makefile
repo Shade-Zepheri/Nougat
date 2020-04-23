@@ -5,6 +5,7 @@ export ADDITIONAL_CFLAGS += -I../../Headers
 SUBPROJECTS += AirplaneModeToggle
 SUBPROJECTS += BatterySaverToggle
 SUBPROJECTS += BluetoothToggle
+SUBPROJECTS += DarkThemeToggle
 SUBPROJECTS += DataToggle
 SUBPROJECTS += DoNotDisturbToggle
 SUBPROJECTS += FlashlightToggle
