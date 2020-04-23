@@ -15,6 +15,7 @@
 @property (strong, readonly, nonatomic) UILabel *displayNameLabel;
 
 @property (getter=isSelected, nonatomic) BOOL selected;
+@property (getter=isEnabled, nonatomic) BOOL enabled;
 
 @property (getter=isInverted, readonly, nonatomic) BOOL inverted;
 @property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;

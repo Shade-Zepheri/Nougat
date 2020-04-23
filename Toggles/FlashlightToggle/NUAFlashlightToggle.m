@@ -6,7 +6,31 @@
 #pragma mark - Init
 
 - (instancetype)init {
-    return [super initWithSwitchIdentifier:@"com.a3tweaks.switch.flashlight"];
+    self = [super initWithSwitchIdentifier:@"com.a3tweaks.switch.flashlight"];
+    if (self) {
+        // If applicable, register for availability notifications (iOS 11+)
+        SBUIFlashlightController *flashlightController = [NSClassFromString(@"SBUIFlashlightController") sharedInstance];
+        if (flashlightController) {
+            [flashlightController addObserver:self];
+        }
+    }
+
+    return self;
+}
+
+#pragma mark - Flashlight Observer
+
+- (void)flashlightAvailabilityDidChange:(BOOL)available {
+    // Make sure on main queue
+    dispatch_assert_queue(dispatch_get_main_queue());
+
+    // Disable if not available
+    self.enabled = available;
+}
+
+- (void)flashlightLevelDidChange:(CGFloat)newLevel {
+    // Do nothing, flipswitch handles that
+    return;
 }
 
 #pragma mark - Toggle

@@ -1,6 +1,8 @@
 #import "NUARippleButton.h"
 
-@interface NUARippleButton ()
+@interface NUARippleButton () {
+    CGFloat _enabledAlpha;
+}
 @property (strong, nonatomic) NUADynamicRippleView *rippleView;
 
 @end
@@ -24,6 +26,10 @@
 }
 
 - (void)_setupDefaults {
+    // Set default values
+    _disabledAlpha = 0.12;
+    _enabledAlpha = self.alpha;
+
     // Disable default highlight state.
     self.adjustsImageWhenHighlighted = NO;
     self.showsTouchWhenHighlighted = NO;
@@ -140,11 +146,24 @@
 
 #pragma mark - UIControl Methods
 
+- (void)setEnabled:(BOOL)enabled {
+    // Make sure our method called
+    [self setEnabled:enabled animated:NO];
+}
+
+- (void)setEnabled:(BOOL)enabled animated:(BOOL)animated {
+    [super setEnabled:enabled];
+
+    // Update settings
+    [self updateAfterStateChange:animated];
+}
+
 - (void)setHighlighted:(BOOL)highlighted {
     [super setHighlighted:highlighted];
 
     // Pass to ripple view
     self.rippleView.rippleHighlighted = highlighted;
+    [self updateAfterStateChange:NO];
 }
 
 - (void)setSelected:(BOOL)selected {
@@ -152,6 +171,15 @@
 
     // Pass to ripple view
     self.rippleView.selected = selected;
+    [self updateAfterStateChange:NO];
+}
+
+- (void)updateAfterStateChange:(BOOL)animated {
+    // Update our alpha
+    CGFloat duration = animated ? 0.2 : 0.0;
+    [UIView animateWithDuration:duration animations:^{
+        self.alpha = self.enabled ? _enabledAlpha : self.disabledAlpha;
+    }];
 }
 
 @end

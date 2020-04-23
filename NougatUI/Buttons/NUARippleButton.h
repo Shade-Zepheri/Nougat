@@ -6,6 +6,7 @@
 @property (assign, nonatomic) NUARippleStyle rippleStyle;
 @property (strong, nonatomic) UIColor *rippleColor;
 
+@property (nonatomic) CGFloat disabledAlpha;
 @property (nonatomic) UIEdgeInsets touchAreaInsets;
 
 #pragma mark - Disables

@@ -81,6 +81,19 @@
     [self _updateImageView:NO];
 }
 
+- (BOOL)isEnabled {
+    // Defer to control
+    return self.rippleButton.enabled;
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    // Disable button
+    self.rippleButton.enabled = enabled;
+
+    // Fade ourselves
+    self.alpha = enabled ? 1.0 : 0.12;
+}
+
 - (BOOL)isUsingDark {
     return self.notificationShadePreferences.usingDark;
 }
