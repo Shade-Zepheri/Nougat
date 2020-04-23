@@ -23,21 +23,21 @@
         return nil;
     } else {
         // Pass to init
-        NSString *displayName = infoDictionary[@"CFBundleDisplayName"];
-        return [[self alloc] _initWithIdentifier:identifier displayName:displayName toggleBundleURL:bundleURL];
+        return [[self alloc] _initWithIdentifier:identifier toggleBundleURL:bundleURL];
     }
 }
 
-- (instancetype)_initWithIdentifier:(NSString *)identifier displayName:(NSString *)displayName toggleBundleURL:(NSURL *)bundleURL {
+- (instancetype)_initWithIdentifier:(NSString *)identifier toggleBundleURL:(NSURL *)bundleURL {
     self = [super init];
     if (self) {
         // Set defaults
         _identifier = [identifier copy];
-        _displayName = [displayName copy];
         _bundleURL = [bundleURL copy];
 
-        // Get icon
-        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        // Get additional info from bundle
+        NSBundle *bundle = [NSBundle bundleWithURL:_bundleURL];
+        _displayName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+
         UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
         if (!settingsIcon) {
             // Provide fallback icon
