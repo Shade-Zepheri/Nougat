@@ -63,7 +63,7 @@
 
 - (NSURL *)settingsURL {
     // Display and Brightness
-    return [NSURL URLWithString:@"prefs:root=Bluetooth"];
+    return [NSURL URLWithString:@"prefs:root=DISPLAY"];
 }
 
 - (UIImage *)icon {
