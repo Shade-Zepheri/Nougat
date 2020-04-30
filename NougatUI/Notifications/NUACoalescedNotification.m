@@ -107,13 +107,13 @@
 - (NSString *)title {
     if (!self.entries || self.empty) {
         // No entries
-        return @"Title";
+        return nil;
     }
 
     NSString *title = self.entries.firstObject.title;
     if (!title) {
         // No title
-        return @"";
+        return nil;
     }
 
     return title;
