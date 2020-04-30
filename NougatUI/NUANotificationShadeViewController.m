@@ -1,5 +1,6 @@
 #import "NUANotificationShadeViewController.h"
 #import "NUAModulesContainerViewController.h"
+#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
@@ -70,7 +71,8 @@
     [_containerViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
 
     // Constrain width on ipads or set width on phones to device width;
-    CGFloat desiredWidth = MIN(414, kScreenWidth);
+    CGFloat portraitScreenWidth = CGRectGetWidth([UIScreen mainScreen]._referenceBounds);
+    CGFloat desiredWidth = MIN(414, portraitScreenWidth);
     [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWidth].active = YES;
 
     // Do something special with top because slide in from top
@@ -201,23 +203,15 @@
     // Check if gestures allowed
     BOOL allowGesture = [self.delegate notificationShadeViewController:self canHandleGestureRecognizer:gestureRecognizer];
     if (allowGesture) {
+        // Check if inside panel
         CGPoint location = [touch locationInView:self.view];
-        if (gestureRecognizer == _tapGesture) {
-            // Check if inside panel
-            CGRect panelFrame = [_containerViewController _panelView].frame;
-            CGRect convertedPanelFrame = [[_containerViewController _panelView] convertRect:panelFrame toView:self.view];
-            BOOL touchInsidePanel = CGRectContainsPoint(convertedPanelFrame, location);
+        CGRect panelFrame = _containerViewController.view.frame;
+        BOOL touchInsidePanel = CGRectContainsPoint(panelFrame, location);
 
-            // Check if inside table
-            CGRect tableFrame = self.tableViewController.view.frame;
-            BOOL touchInsideTable = CGRectContainsPoint(tableFrame, location);
-            allowGesture = !touchInsidePanel && !touchInsideTable;
-        } else if (gestureRecognizer == _panGesture) {
-            // Only allow dismiss when interacting outside of panel
-            CGRect panelFrame = [_containerViewController _panelView].frame;
-            CGRect convertedFrame = [[_containerViewController _panelView] convertRect:panelFrame toView:self.view];
-            allowGesture = !CGRectContainsPoint(convertedFrame, location);
-        }
+        // Check if inside table
+        CGRect tableFrame = self.tableViewController.view.frame;
+        BOOL touchInsideTable = CGRectContainsPoint(tableFrame, location);
+        allowGesture = !touchInsidePanel && !touchInsideTable;
     } else {
         allowGesture = NO;
     }

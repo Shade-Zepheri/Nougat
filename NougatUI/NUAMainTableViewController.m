@@ -3,6 +3,7 @@
 #import <MediaRemote/MediaRemote.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <Macros.h>
+#import <UIKitHelpers.h>
 
 @interface NUAMainTableViewController () {
     NSMutableArray<NUACoalescedNotification *> *_expandedNotifications;
@@ -25,14 +26,14 @@
 
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
-        [self addChildViewController:self.tableViewController];
+        [self addChildViewController:_tableViewController];
 
         // Create now playing controller
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
 
         // Notifications
-        _notificationRepository = NUANotificationRepository.defaultRepository;
-        [self.notificationRepository addObserver:self];
+        _notificationRepository = [NUANotificationRepository defaultRepository];
+        [_notificationRepository addObserver:self];
     }
 
     return self;
@@ -86,7 +87,7 @@
 
     // Adjust whether table should start cutting off
     CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
-    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    CGFloat safeAreaHeight = [self _bottomSafeArea];
     if ((self.contentHeight + fullPanelHeight) <= safeAreaHeight) {
         // No need to ever cutoff
         return;
@@ -103,6 +104,14 @@
     }
 
     self.presentedHeight = newPresentedHeight;
+}
+
+#pragma mark - Screen Bounds Helpers
+
+- (CGFloat)_bottomSafeArea {
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGFloat currentScreenHeight = NUAGetScreenHeightForOrientation(currentOrientation);
+    return currentScreenHeight - 100.0;
 }
 
 #pragma mark - Observer
@@ -198,7 +207,7 @@
     CGFloat proposedNewHeight = currentContentHeight + proposedHeightToAdd;
 
     // Check if can expand/collapse
-    CGFloat safeAreaHeight = kScreenHeight - 100.0;
+    CGFloat safeAreaHeight = [self _bottomSafeArea];
     BOOL canExpand = currentContentHeight < safeAreaHeight;
     BOOL canCollapse = proposedNewHeight < safeAreaHeight;
     BOOL canResize = expand ? canExpand : canCollapse;
@@ -448,6 +457,18 @@
     }
 }
 
+- (NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
+    // Add our swipe action
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+    NSString *localizedClear = [bundle localizedStringForKey:@"CLEAR" value:@"Clear" table:@"Localizable"];
+    __weak __typeof(self) weakSelf = self;
+    UITableViewRowAction *clearAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:localizedClear handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+        [weakSelf executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
+    }];
+
+    return @[clearAction];
+}
+
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -484,14 +505,15 @@
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return NO;
+    // Block actions on media cell
+    return !(indexPath.row == 0 && [self _mediaCellPresent]);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
     return NO;
 }
 
-#pragma mark - Cells delegate
+#pragma mark - Cells Delegate
 
 - (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand {
     // Get notification

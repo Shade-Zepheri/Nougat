@@ -7,6 +7,7 @@
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
+#import <UIKitHelpers.h>
 #import <Macros.h>
 
 NUAPreferenceManager *settings;
@@ -113,38 +114,6 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Gesture 
 
-CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
-    // _UIWindowConvertPointFromOrientationToOrientation
-    CGFloat rotatedX = 0.0;
-    CGFloat rotatedY = 0.0;
-    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    switch (orientation) {
-        case UIInterfaceOrientationUnknown:
-        case UIInterfaceOrientationPortrait: {
-            rotatedX = location.x;
-            rotatedY = location.y;
-            break;
-        }
-        case UIInterfaceOrientationPortraitUpsideDown: {
-            rotatedX = CGRectGetWidth([UIScreen mainScreen].bounds) - location.x;
-            rotatedY = CGRectGetHeight([UIScreen mainScreen].bounds) - location.y;
-            break;
-        }
-        case UIInterfaceOrientationLandscapeLeft: {
-            rotatedX = CGRectGetHeight([UIScreen mainScreen]._referenceBounds) - location.y;
-            rotatedY = location.x;
-            break;
-        }
-        case UIInterfaceOrientationLandscapeRight: {
-            rotatedX = location.y;
-            rotatedY = CGRectGetWidth([UIScreen mainScreen]._referenceBounds) - location.x;
-            break;
-        }
-    }
-
-    return CGPointMake(rotatedX, rotatedY);
-}
-
 %group PreCoverSheet
 %hook SBNotificationCenterController
 
@@ -154,13 +123,14 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         return shouldBegin;
     }
 
-    // Manually override to only show on "left" 1/3 to prevent conflict with Nougat
-    UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGPoint location = [gestureRecognizer locationInView:window];
-    CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
+    // Manually override to only invoke on corners to prevent conflict with Nougat
+    CGPoint location = [gestureRecognizer locationInView:nil];
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
 
-    BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-    BOOL withinRegion = isRTL ? (correctedLocation.x > ((kScreenWidth * 2) / 3)) : (correctedLocation.x < (kScreenWidth / 3));
+    // Adjust width for orientation
+    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
+    BOOL withinRegion = correctedLocation.x > ((currentScreenWidth * 2) / 3) || correctedLocation.x < (currentScreenWidth / 3);
     return withinRegion && shouldBegin;
 }
 
@@ -178,12 +148,12 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
     }
 
     // Manually override to only show on "left" 1/3 or on "left" notch inset to prevent conflict with Nougat
-    UIWindow *window = [[%c(SBUIController) sharedInstance] window];
-    CGPoint location = [gestureRecognizer locationInView:window];
-    CGPoint correctedLocation = adjustTouchLocationForActiveOrientation(location);
+    CGPoint location = [gestureRecognizer locationInView:nil];
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
+    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
 
     // Check if notched or not
-    BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
@@ -191,18 +161,19 @@ CGPoint adjustTouchLocationForActiveOrientation(CGPoint location) {
         CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
 
         // Check if within inset
-        CGFloat maxLeadingX = isRTL ? (kScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
+        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
         if (maxLeadingX > 5000.0) {
             // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
-            maxLeadingX = isRTL ? ((kScreenWidth * 3) / 4) : (kScreenWidth / 4);
+            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
         }
 
         BOOL withinRespectiveInset = isRTL ? (correctedLocation.x > maxLeadingX) : (correctedLocation.x < maxLeadingX);
         return withinRespectiveInset && shouldBegin;
     } else {
         // Regular old frames if no notch
-        BOOL insideRegion = isRTL ? (correctedLocation.x > ((kScreenWidth * 2) / 3)) : (correctedLocation.x < (kScreenWidth / 3));
-        return insideRegion && shouldBegin;
+        BOOL withinRegion = correctedLocation.x > ((currentScreenWidth * 2) / 3) || correctedLocation.x < (currentScreenWidth / 3);
+        return withinRegion && shouldBegin;
     }
 }
 

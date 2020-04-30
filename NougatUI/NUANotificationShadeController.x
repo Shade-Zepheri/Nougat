@@ -5,6 +5,7 @@
 #import <UIKit/UIStatusBar.h>
 #import <Macros.h>
 #import <math.h>
+#import <UIKitHelpers.h>
 #import <version.h>
 
 @implementation NUANotificationShadeController
@@ -38,8 +39,8 @@
     self = [super init];
     if (self) {
         // Set defaults
-        self.state = NUANotificationShadeStateDismissed;
-        _preferences = NUAPreferenceManager.sharedSettings;
+        _state = NUANotificationShadeStateDismissed;
+        _preferences = [NUAPreferenceManager sharedSettings];
 
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
@@ -66,7 +67,7 @@
             [coverSheetViewController registerExternalAppearanceProvider:self];
         }
 
-        self.displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
+        _displayLayoutElement = [[FBDisplayLayoutElement alloc] initWithDisplayType:FBSDisplayTypeMain identifier:@"NUANotificationShade" elementClass:[SBSDisplayLayoutElement class]];
 
         // Create and add gesture
         _presentationGestureRecognizer = [[%c(SBScreenEdgePanGestureRecognizer) alloc] initWithTarget:self action:@selector(_handleShowNotificationShadeGesture:)];
@@ -245,39 +246,17 @@
 }
 
 - (CGPoint)_locationOfTouchInActiveInterfaceOrientation:(UITouch *)touch gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // Adjust for orientation
     CGPoint location = [touch locationInView:nil];
-
-    CGFloat rotatedX = 0.0;
-    CGFloat rotatedY = 0.0;
-    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    switch (orientation) {
-        case UIInterfaceOrientationUnknown:
-        case UIInterfaceOrientationPortrait: {
-            rotatedX = location.x;
-            rotatedY = location.y;
-            break;
-        }
-        case UIInterfaceOrientationPortraitUpsideDown: {
-            rotatedX = CGRectGetWidth([UIScreen mainScreen].bounds) - location.x;
-            rotatedY = CGRectGetHeight([UIScreen mainScreen].bounds) - location.y;
-            break;
-        }
-        case UIInterfaceOrientationLandscapeLeft: {
-            rotatedX = CGRectGetHeight([UIScreen mainScreen]._referenceBounds) - location.y;
-            rotatedY = location.x;
-            break;
-        }
-        case UIInterfaceOrientationLandscapeRight: {
-            rotatedX = location.y;
-            rotatedY = CGRectGetWidth([UIScreen mainScreen]._referenceBounds) - location.x;
-            break;
-        }
-    }
-
-    return CGPointMake(rotatedX, rotatedY);
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    return NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
+    // Get proper width
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
+
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
@@ -287,28 +266,28 @@
 
         // Check if within "left"
         BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-        CGFloat maxLeadingX = isRTL ? (kScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
+        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
         if (maxLeadingX > 5000.0) {
             // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
             // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
-            maxLeadingX = isRTL ? ((kScreenWidth * 3) / 4) : (kScreenWidth / 4);
+            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
         }
 
         BOOL outsideLeftInset = isRTL ? (location.x < maxLeadingX) : (location.x > maxLeadingX);
 
         // Check if within "right"
-        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (kScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
+        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (currentScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
         if (isnan(minTrailingX)) {
             // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
             // Fall back to 1/4
-            minTrailingX = kScreenWidth - maxLeadingX;
+            minTrailingX = currentScreenWidth - maxLeadingX;
         }
 
         BOOL outsideRightInset = isRTL ? (location.x > minTrailingX) : (location.x < minTrailingX);
         return outsideLeftInset && outsideRightInset;
     } else {
         // Regular old frames
-        return location.x > (kScreenWidth / 3) && location.x < (kScreenWidth * 2 / 3);
+        return location.x > (currentScreenWidth / 3) && location.x < (currentScreenWidth * 2 / 3);
     }
 }
 
@@ -698,8 +677,11 @@
 }
 
 - (CGFloat)_yValueForPresented {
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGFloat currentScreenHeight = NUAGetScreenHeightForOrientation(currentOrientation);
+
     CGFloat totalHeight = _viewController.fullyPresentedHeight;
-    CGFloat safeHeight = kScreenHeight - 100.0;
+    CGFloat safeHeight = currentScreenHeight - 100.0;
     return MIN(totalHeight, safeHeight);
 }
 

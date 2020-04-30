@@ -2,6 +2,7 @@
 #import <Macros.h>
 #import <FrontBoardServices/FBSSystemService.h>
 #import <NougatServices/NougatServices.h>
+#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIImage+Private.h>
 #import <version.h>
 
@@ -179,6 +180,14 @@
 }
 
 - (void)_toggleNotificationShadeState {
+    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    BOOL isInLandscape = UIInterfaceOrientationIsLandscape(orientation);
+    if (!isIPad && isInLandscape) {
+        // Dont allow expansion on landscape iPhones
+        return;
+    }
+
     if (self.expandedPercent == 1.0) {
         // Collapse to quick view
         [self.delegate contentViewWantsNotificationShadeDismissal:self completely:NO];

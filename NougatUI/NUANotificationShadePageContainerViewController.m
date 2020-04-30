@@ -1,5 +1,6 @@
 #import "NUANotificationShadePageContainerViewController.h"
-#import  "NUAPropertyAnimator.h"
+#import "NUAPropertyAnimator.h"
+#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
@@ -175,6 +176,20 @@
     }
 }
 
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // Prevent on iPhones when in landscape
+    BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
+    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    BOOL isInLandscape = UIInterfaceOrientationIsLandscape(orientation);
+    return !(!isIPad && isInLandscape);
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    // Only allow touch inside of panel
+    CGPoint location = [touch locationInView:self.view];
+    return CGRectContainsPoint(self.view.frame, location);
+}
+
 #pragma mark - Property Animator
 
 - (void)_startAnimatingWithDuration:(NSTimeInterval)duration initialValue:(CGFloat)initialValue finalValue:(CGFloat)finalValue expanding:(BOOL)expanding completion:(void(^)(void))completion {
@@ -326,12 +341,6 @@
     CGFloat expandedHeight = height - 150.0;
     CGFloat percent = expandedHeight / (fullHeight - 150);
     self.revealPercentage = percent;
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    // Only allow touch inside of panel
-    CGPoint location = [touch locationInView:self.view];
-    return CGRectContainsPoint(self.view.frame, location);
 }
 
 @end

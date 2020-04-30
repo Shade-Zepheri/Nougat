@@ -1,9 +1,6 @@
 #import <HBLog.h>
 #import <theos/IOSMacros.h>
 
-#define kScreenWidth CGRectGetMaxX([UIScreen mainScreen].bounds)
-#define kScreenHeight CGRectGetMaxY([UIScreen mainScreen].bounds)
-
 #define NUALogCurrentMethod HBLogDebug(@"[Nougat] Method called: %@", NSStringFromSelector(_cmd))
 
 #define NexusBackgroundColor [UIColor colorWithRed:0.15 green:0.20 blue:0.22 alpha:1.0]
