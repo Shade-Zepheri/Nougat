@@ -249,7 +249,7 @@
     // Adjust for orientation
     CGPoint location = [touch locationInView:nil];
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    return NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
+    return NUAConvertPointFromOrientationToOrientation(location, self.view.bounds.size, UIInterfaceOrientationPortrait, currentOrientation);
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {

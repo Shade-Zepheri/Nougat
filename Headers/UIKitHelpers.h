@@ -7,37 +7,58 @@
  * @c fromOrientation to the coordinate system of @c toOrientation
  *
  * @param location The given location
+ * @param bounds The portrait size of the containing rect containing the point
  * @param fromOrientation The prior orientation
  * @param toOrientation The current orientation
  * @return The location translated the current orientation
  */
-static inline CGPoint NUAConvertPointFromOrientationToOrientation(CGPoint location, UIInterfaceOrientation fromOrientation, UIInterfaceOrientation toOrientation) {
+static inline CGPoint NUAConvertPointFromOrientationToOrientation(CGPoint location, CGSize bounds, UIInterfaceOrientation fromOrientation, UIInterfaceOrientation toOrientation) {
     if (fromOrientation == toOrientation) {
         return location;
     }
 
-    CGFloat rotatedX = 0.0;
-    CGFloat rotatedY = 0.0;
-    switch (toOrientation) {
+    CGFloat portraitX = location.x;
+    CGFloat portraitY = location.y;
+    switch (fromOrientation) {
         case UIInterfaceOrientationUnknown:
-        case UIInterfaceOrientationPortrait: {
-            rotatedX = location.x;
-            rotatedY = location.y;
+        case UIInterfaceOrientationPortrait:
             break;
-        }
         case UIInterfaceOrientationPortraitUpsideDown: {
-            rotatedX = CGRectGetWidth([UIScreen mainScreen].bounds) - location.x;
-            rotatedY = CGRectGetHeight([UIScreen mainScreen].bounds) - location.y;
+            portraitX = bounds.width - location.x;
+            portraitY = bounds.height - location.y;
             break;
         }
         case UIInterfaceOrientationLandscapeLeft: {
-            rotatedX = CGRectGetHeight([UIScreen mainScreen]._referenceBounds) - location.y;
-            rotatedY = location.x;
+            portraitX = location.y;
+            portraitY = bounds.height - location.x;
             break;
         }
         case UIInterfaceOrientationLandscapeRight: {
-            rotatedX = location.y;
-            rotatedY = CGRectGetWidth([UIScreen mainScreen]._referenceBounds) - location.x;
+            portraitX = bounds.width - location.y;
+            portraitY = location.x;
+            break;
+        }
+    }
+
+    CGFloat rotatedX = portraitX;
+    CGFloat rotatedY = portraitY;
+    switch (toOrientation) {
+        case UIInterfaceOrientationUnknown:
+        case UIInterfaceOrientationPortrait:
+            break;
+        case UIInterfaceOrientationPortraitUpsideDown: {
+            rotatedX = bounds.width - portraitX;
+            rotatedY = bounds.height - portraitY;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeLeft: {
+            rotatedX = bounds.height - portraitY;
+            rotatedY = portraitX;
+            break;
+        }
+        case UIInterfaceOrientationLandscapeRight: {
+            rotatedX = portraitY;
+            rotatedY = bounds.width - portraitX;
             break;
         }
     }
