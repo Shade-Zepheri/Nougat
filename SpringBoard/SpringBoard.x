@@ -126,7 +126,8 @@ NUANotificationShadeController *notificationShade;
     // Manually override to only invoke on corners to prevent conflict with Nougat
     CGPoint location = [gestureRecognizer locationInView:nil];
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
+    CGRect portraitScreenBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
+    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
 
     // Adjust width for orientation
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
@@ -150,7 +151,8 @@ NUANotificationShadeController *notificationShade;
     // Manually override to only show on "left" 1/3 or on "left" notch inset to prevent conflict with Nougat
     CGPoint location = [gestureRecognizer locationInView:nil];
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, UIInterfaceOrientationPortrait, currentOrientation);
+    CGRect portraitScreenBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
+    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
 
     // Check if notched or not
