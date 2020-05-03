@@ -78,13 +78,9 @@
         }
         _presentationGestureRecognizer.delegate = self;
 
-        if (%c(_UISystemGestureManager)) {
-            // iOS 13
-            [[%c(_UISystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer recognitionEvent:3 toDisplayWithIdentity:[FBDisplayManager mainIdentity]];
-        } else {
-            // iOS 10-12
-            [[%c(FBSystemGestureManager) sharedInstance] addGestureRecognizer:_presentationGestureRecognizer toDisplay:[FBDisplayManager mainDisplay]];
-        }
+        [[%c(SBSystemGestureManager) mainDisplayManager] addGestureRecognizer:_presentationGestureRecognizer withType:SBSystemGestureTypeShowNougat];
+
+        [self _setupGestureFailRelationships];
 
         // Resign assertion
         SBSceneManagerCoordinator *sceneManagerCoordinator = [%c(SBSceneManagerCoordinator) sharedInstance];
@@ -105,6 +101,9 @@
 }
 
 - (void)dealloc {
+    // Remove gesture recognizer
+    [[%c(SBSystemGestureManager) mainDisplayManager] removeGestureRecognizer:_presentationGestureRecognizer];
+
     SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
     if ([manager respondsToSelector:@selector(dashBoardViewController)]) {
         // Only iOS 10+
@@ -232,63 +231,31 @@
     return self.view;
 }
 
+- (void)_setupGestureFailRelationships {
+    // Coordinate with CoverSheet
+    SBCoverSheetPrimarySlidingViewController *coverSheetSlidingViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] coverSheetSlidingViewController];
+    UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
+    [self _requireGestureRecognizerToFailForPresentGestureRecognizer:edgePullGestureRecognizer];
+    
+    // Coordinate with CC Gesture
+    UIPanGestureRecognizer *statusBarPullGestureRecognizer = [[%c(SBControlCenterController) sharedInstance] statusBarPullGestureRecognizer];
+    [self _requireGestureRecognizerToFailForPresentGestureRecognizer:statusBarPullGestureRecognizer];
+}
+
+- (void)_requirePresentGestureRecognizerToFailForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // Have our gesture fail for other
+    [gestureRecognizer requireGestureRecognizerToFail:_presentationGestureRecognizer];
+}
+
+- (void)_requireGestureRecognizerToFailForPresentGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // Have other gesture fail for ours
+    [_presentationGestureRecognizer requireGestureRecognizerToFail:gestureRecognizer];
+}
+
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
+    // TODO: Optimize a bit
     return self.preferences.enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    // Get location of touch
-    CGPoint location = [self _locationOfTouchInActiveInterfaceOrientation:touch gestureRecognizer:gestureRecognizer];
-
-    // Only start if within the notch and CC isnt present
-    return [self _isLocationXWithinNotchRegion:location];
-}
-
-- (CGPoint)_locationOfTouchInActiveInterfaceOrientation:(UITouch *)touch gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    // Adjust for orientation
-    CGPoint location = [touch locationInView:nil];
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    return NUAConvertPointFromOrientationToOrientation(location, self.view.bounds.size, UIInterfaceOrientationPortrait, currentOrientation);
-}
-
-- (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
-    // Get proper width
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
-
-    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
-    if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
-        // Use notch insets
-        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
-        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
-        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
-
-        // Check if within "left"
-        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
-        if (maxLeadingX > 5000.0) {
-            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
-            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
-            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
-        }
-
-        BOOL outsideLeftInset = isRTL ? (location.x < maxLeadingX) : (location.x > maxLeadingX);
-
-        // Check if within "right"
-        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (currentScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
-        if (isnan(minTrailingX)) {
-            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
-            // Fall back to 1/4
-            minTrailingX = currentScreenWidth - maxLeadingX;
-        }
-
-        BOOL outsideRightInset = isRTL ? (location.x > minTrailingX) : (location.x < minTrailingX);
-        return outsideLeftInset && outsideRightInset;
-    } else {
-        // Regular old frames
-        return location.x > (currentScreenWidth / 3) && location.x < (currentScreenWidth * 2 / 3);
-    }
 }
 
 - (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)recognizer {
@@ -325,9 +292,6 @@
         SBRootFolderController *rootFolderController = iconController.rootFolderController;
         [rootFolderController setEditing:NO animated:YES];
     }
-
-    // Stop system gestures
-    [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = YES;
 
     // Begin presentation
     [self _beginAnimationWithGestureRecognizer:gestureRecognizer];
@@ -849,9 +813,6 @@
 
             // Allow for banners
             [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
-
-            // Enable system gestures
-            [%c(SBSystemGestureManager) mainDisplayManager].systemGesturesDisabledForAccessibility = NO;
 
             // Deactivate displayLayoutElement
             [self.displayLayoutElement deactivate];

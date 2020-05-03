@@ -112,7 +112,34 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-#pragma mark - Gesture 
+#pragma mark - Reveal Gesture
+
+%hookf(NSString *, "_SBAnalyticsNameForSystemGestureType", SBSystemGestureType type) {
+    // Gotta override this because Springboard
+    if (type == SBSystemGestureTypeShowNougat) {
+        return @"Nougat";
+    } else {
+        return %orig;
+    }
+}
+
+#pragma mark - Gesture Inhibition
+
+%hook SBControlCenterController
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    BOOL shouldBegin = %orig;
+    if (gestureRecognizer != self.statusBarPullGestureRecognizer || !settings.enabled) {
+        // Only override present gesture
+        return shouldBegin;
+    }
+
+    // Don't begin gesture if presented
+    BOOL nougatPresented = notificationShade.presented;
+    return !nougatPresented && shouldBegin;
+}
+
+%end
 
 %group PreCoverSheet
 %hook SBNotificationCenterController
@@ -148,14 +175,32 @@ NUANotificationShadeController *notificationShade;
         return shouldBegin;
     }
 
-    // Manually override to only show on "left" 1/3 or on "left" notch inset to prevent conflict with Nougat
+    // Don't begin gesture if presented
+    BOOL nougatPresented = notificationShade.presented;
+
+    // Only begin if within region
+    CGPoint location = [self nua_locationOfTouchInActiveInterfaceOrientation:gestureRecognizer];
+    BOOL withinRegion = [self nua_isLocationXWithinLeadingStatusBarRegion:location];
+
+    return !nougatPresented && withinRegion && shouldBegin;
+}
+
+%new
+- (CGPoint)nua_locationOfTouchInActiveInterfaceOrientation:(UIGestureRecognizer *)gestureRecognizer {
+    // Adjust for orientation
     CGPoint location = [gestureRecognizer locationInView:nil];
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
     CGRect portraitScreenBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
-    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
+    return NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
+}
+
+%new
+- (BOOL)nua_isLocationXWithinLeadingStatusBarRegion:(CGPoint)location {
+    // Get proper width
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
 
-    // Check if notched or not
+    // Check if in leading region
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
@@ -170,12 +215,10 @@ NUANotificationShadeController *notificationShade;
             maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
         }
 
-        BOOL withinRespectiveInset = isRTL ? (correctedLocation.x > maxLeadingX) : (correctedLocation.x < maxLeadingX);
-        return withinRespectiveInset && shouldBegin;
+        return isRTL ? (location.x > maxLeadingX) : (location.x < maxLeadingX);
     } else {
         // Regular old frames if no notch
-        BOOL withinRegion = correctedLocation.x > ((currentScreenWidth * 2) / 3) || correctedLocation.x < (currentScreenWidth / 3);
-        return withinRegion && shouldBegin;
+        return location.x > ((currentScreenWidth * 2) / 3) || location.x < (currentScreenWidth / 3);
     }
 }
 

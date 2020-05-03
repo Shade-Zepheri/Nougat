@@ -40,5 +40,6 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
 - (BOOL)handleMenuButtonTap;
 
 - (void)dismissAnimated:(BOOL)animated;
+- (void)presentAnimated:(BOOL)animated;
 
 @end
