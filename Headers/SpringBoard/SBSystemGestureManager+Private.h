@@ -3,27 +3,27 @@
 // Holy crap so many
 typedef NS_ENUM(NSUInteger, SBSystemGestureType) {
     SBSystemGestureTypeNone,
-    SBSystemGestureTypeShowCoverSheet,
-    SBSystemGestureTypeDismissCoverSheet,
-    SBSystemGestureTypeDismissCoverSheetExtendedRegion,
+    SBSystemGestureTypeShowCoverSheet, // 1
+    SBSystemGestureTypeDismissCoverSheet, // 2
+    SBSystemGestureTypeDismissCoverSheetExtendedRegion, // 3
     SBSystemGestureTypeDismissSecureApp,
-    SBSystemGestureTypeShowNotifications,
-    SBSystemGestureTypeDismissBanner,
+    SBSystemGestureTypeShowNotifications, // 5
+    SBSystemGestureTypeDismissBanner, // 6
     SBSystemGestureTypeDismissLongLook,
-    SBSystemGestureTypeShowControlCenter,
-    SBSystemGestureTypeShowControlCenterFromStatusBar,
-    SBSystemGestureTypeDismissControlCenter,
+    SBSystemGestureTypeShowControlCenter, // 8
+    SBSystemGestureTypeShowControlCenterFromStatusBar, // 9
+    SBSystemGestureTypeDismissControlCenter, // 10
     SBSystemGestureTypeScrunch,
     SBSystemGestureTypeResizeScene,
     SBSystemGestureTypeMoveSideApp,
-    SBSystemGestureTypeUnpinSideApp,
+    SBSystemGestureTypeUnpinSideApp, // 14
     SBSystemGestureTypePresentPiPApp,
     SBSystemGestureTypeMovePiPApp,
-    SBSystemGestureTypePinPiPApp,
+    SBSystemGestureTypePinPiPApp, // 17
     SBSystemGestureTypePiPBottomEdge,
     SBSystemGestureTypeDismissDock,
     SBSystemGestureTypeForceSwitcher,
-    SBSystemGestureTypeBottomEdgeSwitcher,
+    SBSystemGestureTypeBottomEdgeSwitcher, // 21
     SBSystemGestureTypeDismissModal,
     SBSystemGestureTypeDismissAlertItem,
     SBSystemGestureTypeDismissSheet,
@@ -84,5 +84,8 @@ typedef NS_ENUM(NSUInteger, SBSystemGestureType) {
 
 - (void)addGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer withType:(SBSystemGestureType)type;
 - (void)removeGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
+
+- (void)gestureRecognizerOfType:(SBSystemGestureType)type shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
+- (void)gestureRecognizerOfType:(SBSystemGestureType)type shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer;
 
 @end

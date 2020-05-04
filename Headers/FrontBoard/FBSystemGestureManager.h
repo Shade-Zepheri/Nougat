@@ -1,3 +1,4 @@
+#import <UIKit/UIKit.h>
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
@@ -9,6 +10,7 @@ __BEGIN_DECLS
 + (instancetype)sharedInstance;
 
 - (void)addGestureRecognizer:(UIGestureRecognizer *)recognizer toDisplay:(FBSDisplay *)display;
+- (void)removeGestureRecognizer:(UIGestureRecognizer *)recognizer fromDisplay:(FBSDisplay *)display;
 
 @end
 

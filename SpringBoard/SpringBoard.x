@@ -113,24 +113,13 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-#pragma mark - Reveal Gesture
-
-%hookf(NSString *, "_SBAnalyticsNameForSystemGestureType", SBSystemGestureType type) {
-    // Gotta override this because Springboard
-    if (type == SBSystemGestureTypeShowNougat) {
-        return @"Nougat";
-    } else {
-        return %orig;
-    }
-}
-
 #pragma mark - Gesture Inhibition
 
 %hook SBControlCenterController
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
-    if (gestureRecognizer != self.statusBarPullGestureRecognizer || !settings.enabled) {
+    if (!settings.enabled) {
         // Only override present gesture
         return shouldBegin;
     }
@@ -147,9 +136,13 @@ NUANotificationShadeController *notificationShade;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
-    if (!settings.enabled) {
+    SBScreenEdgePanGestureRecognizer *showSystemGestureRecognizer = [self valueForKey:@"_showSystemGestureRecognizer"];
+    if (gestureRecognizer != showSystemGestureRecognizer || !settings.enabled) {
         return shouldBegin;
     }
+
+    // Don't begin gesture if presented
+    BOOL nougatPresented = notificationShade.presented;
 
     // Manually override to only invoke on corners to prevent conflict with Nougat
     CGPoint location = [gestureRecognizer locationInView:nil];
@@ -160,7 +153,7 @@ NUANotificationShadeController *notificationShade;
     // Adjust width for orientation
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
     BOOL withinRegion = correctedLocation.x > ((currentScreenWidth * 2) / 3) || correctedLocation.x < (currentScreenWidth / 3);
-    return withinRegion && shouldBegin;
+    return !nougatPresented && withinRegion && shouldBegin;
 }
 
 %end
@@ -221,6 +214,23 @@ NUANotificationShadeController *notificationShade;
         // Regular old frames if no notch
         return location.x > ((currentScreenWidth * 2) / 3) || location.x < (currentScreenWidth / 3);
     }
+}
+
+%end
+
+%hook SBFluidSwitcherGestureManager
+
+- (BOOL)_shouldBeginBottomEdgePanGesture:(UIGestureRecognizer *)gestureRecognizer {
+    // Inhibit for Nougat, only needed on iOS 12+
+    BOOL shouldBegin = %orig;
+    if (!settings.enabled) {
+        // Only override present gesture
+        return shouldBegin;
+    }
+
+    // Don't begin gesture if presented
+    BOOL nougatPresented = notificationShade.presented;
+    return !nougatPresented && shouldBegin;
 }
 
 %end

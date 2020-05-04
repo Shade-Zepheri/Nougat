@@ -224,22 +224,56 @@
     return YES;
 }
 
-#pragma mark - Gesture management
-
-- (UIView *)viewForSystemGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
-    // SBSystemGestureRecognizerDelegate
-    return self.view;
-}
+#pragma mark Gesture Relationships
 
 - (void)_setupGestureFailRelationships {
-    // Coordinate with CoverSheet
-    SBCoverSheetPrimarySlidingViewController *coverSheetSlidingViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] coverSheetSlidingViewController];
-    UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
-    [self _requireGestureRecognizerToFailForPresentGestureRecognizer:edgePullGestureRecognizer];
+    // Coordinate with CoverSheet/NC
+    if (%c(SBCoverSheetPresentationManager)) {
+        // iOS 11-13
+        SBCoverSheetPrimarySlidingViewController *coverSheetSlidingViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] coverSheetSlidingViewController];
+        UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
+        [self _requireGestureRecognizerToFailForPresentGestureRecognizer:edgePullGestureRecognizer];
+    } else {
+        // iOS 10
+        SBNotificationCenterController *notificationCenterController = [%c(SBNotificationCenterController) sharedInstance];
+        SBScreenEdgePanGestureRecognizer *showSystemGestureRecognizer = [notificationCenterController valueForKey:@"_showSystemGestureRecognizer"];
+        [self _requireGestureRecognizerToFailForPresentGestureRecognizer:showSystemGestureRecognizer];
+    }
     
-    // Coordinate with CC Gesture
-    UIPanGestureRecognizer *statusBarPullGestureRecognizer = [[%c(SBControlCenterController) sharedInstance] statusBarPullGestureRecognizer];
-    [self _requireGestureRecognizerToFailForPresentGestureRecognizer:statusBarPullGestureRecognizer];
+    // Coordinate with CC Gesture if applicable
+    SBControlCenterController *controlCenterController = [%c(SBControlCenterController) sharedInstance];
+    if ([controlCenterController respondsToSelector:@selector(statusBarPullGestureRecognizer)] && controlCenterController.statusBarPullGestureRecognizer) {
+        UIPanGestureRecognizer *statusBarPullGestureRecognizer = controlCenterController.statusBarPullGestureRecognizer;
+        [self _requireGestureRecognizerToFailForPresentGestureRecognizer:statusBarPullGestureRecognizer];
+    }
+
+    // Coordinate with Reachability if applicable
+    SBReachabilityManager *reachabilityManager = [%c(SBReachabilityManager) sharedInstance];
+    if ([reachabilityManager respondsToSelector:@selector(dismissPanGestureRecognizer)]) {
+        // iOS 12-13
+        UIPanGestureRecognizer *dismissPanGestureRecognizer = reachabilityManager.dismissPanGestureRecognizer;
+        [self _requirePresentGestureRecognizerToFailForGestureRecognizer:dismissPanGestureRecognizer];
+    }
+
+    // Coordinate with PiP/Side Apps
+    SBSystemGestureManager *gestureManager = [%c(SBSystemGestureManager) mainDisplayManager];
+    if ([gestureManager respondsToSelector:@selector(gestureRecognizerOfType:shouldBeRequiredToFailByGestureRecognizer:)]) {
+        // iOS 13+
+        [gestureManager gestureRecognizerOfType:SBSystemGestureTypeUnpinSideApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+        [gestureManager gestureRecognizerOfType:SBSystemGestureTypePinPiPApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+    } else {
+        SBMainDisplaySceneLayoutViewController *sceneLayoutViewController;
+        if ([%c(SBSceneLayoutViewController) instancesRespondToSelector:@selector(mainDisplaySceneLayoutViewController)]) {
+            // iOS 11-12
+            sceneLayoutViewController = [%c(SBSceneLayoutViewController) mainDisplaySceneLayoutViewController];
+            [sceneLayoutViewController _requireUnpinPanSystemGestureRecognizerFailureForGestureRecognizer:_presentationGestureRecognizer];
+        } else {
+            // iOS 10
+            sceneLayoutViewController = [%c(SBSceneLayoutViewController) mainDisplayLayoutViewController];
+            UIGestureRecognizer *sideSwitcherRevealGesture = [sceneLayoutViewController sideSwitcherRevealGesture];
+            [self _requireGestureRecognizerToFailForPresentGestureRecognizer:sideSwitcherRevealGesture];
+        }   
+    }
 }
 
 - (void)_requirePresentGestureRecognizerToFailForGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
@@ -252,25 +286,32 @@
     [_presentationGestureRecognizer requireGestureRecognizerToFail:gestureRecognizer];
 }
 
+#pragma mark - Reveal Gesture
+
+- (UIView *)viewForSystemGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // SBSystemGestureRecognizerDelegate
+    return self.view;
+}
+
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Dont do anything if not enabled
-    // TODO: Optimize a bit
+    // TODO: Make more verbose
     return self.preferences.enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
 }
 
-- (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)recognizer {
+- (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {
     // Stealing stuff from SB's implementation of CC and NC and mashing them into a CCNC
-    switch (recognizer.state) {
+    switch (gestureRecognizer.state) {
         case UIGestureRecognizerStatePossible:
             break;
         case UIGestureRecognizerStateBegan:
-            [self _showNotificationShadeGestureBeganWithGestureRecognizer:recognizer];
+            [self _showNotificationShadeGestureBeganWithGestureRecognizer:gestureRecognizer];
             break;
         case UIGestureRecognizerStateChanged:
-            [self _showNotificationShadeGestureChangedWithGestureRecognizer:recognizer];
+            [self _showNotificationShadeGestureChangedWithGestureRecognizer:gestureRecognizer];
             break;
         case UIGestureRecognizerStateEnded:
-            [self _showNotificationShadeGestureEndedWithGestureRecognizer:recognizer];
+            [self _showNotificationShadeGestureEndedWithGestureRecognizer:gestureRecognizer];
             break;
         case UIGestureRecognizerStateCancelled:
             [self _showNotificationShadeGestureCancelled];
@@ -335,7 +376,7 @@
     [self _cancelAnimation];
 }
 
-#pragma mark - Notification shade delegate
+#pragma mark - Notification Shade Delegate
 
 - (void)notificationShadeViewControllerWantsDismissal:(NUANotificationShadeViewController *)notificationShadeViewController {
     [self dismissAnimated:YES];
@@ -376,6 +417,7 @@
 }
 
 - (BOOL)notificationShadeViewController:(NUANotificationShadeViewController *)notificationShadeViewController canHandleGestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // TODO Fix this
     return ((_presentationGestureRecognizer.state == UIGestureRecognizerStateBegan) ? NO : (_presentationGestureRecognizer.state != UIGestureRecognizerStateChanged)) && !self.animating;
 }
 
