@@ -9,6 +9,7 @@
 #import <UIKit/UIStatusBar.h>
 #import <UIKitHelpers.h>
 #import <Macros.h>
+#import <version.h>
 
 NUAPreferenceManager *settings;
 NUANotificationShadeController *notificationShade;
@@ -223,6 +224,18 @@ NUANotificationShadeController *notificationShade;
 }
 
 %end
+
+#pragma mark - Reveal Gesture
+
+%hookf(NSString *, SBAnalyticsNameForSystemGestureType, SBSystemGestureType type) {
+    // Gotta override this because Springboard
+    if (type == SBSystemGestureTypeShowNougat) {
+        return @"Nougat";
+    } else {
+        return %orig;
+    }
+}
+
 %end
 
 #pragma mark - Notification Retreval
@@ -269,6 +282,15 @@ NUANotificationShadeController *notificationShade;
 #pragma mark - Constructor
 
 %ctor {
+    // %hookf stuffs
+    MSImageRef springboardImage;
+    if (IS_IOS_OR_NEWER(iOS_13_0)) {
+        springboardImage = MSGetImageByName("/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard");
+    } else {
+        springboardImage = MSGetImageByName("/System/Library/CoreServices/SpringBoard.app/SpringBoard");
+    }    
+    void *SBAnalyticsNameForSystemGestureType = MSFindSymbol(springboardImage, "_SBAnalyticsNameForSystemGestureType");
+
     // Init hooks
     if (%c(SBNotificationCenterController)) {
         %init(PreCoverSheet);
