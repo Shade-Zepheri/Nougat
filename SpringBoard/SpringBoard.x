@@ -120,7 +120,7 @@ NUANotificationShadeController *notificationShade;
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
     if (!settings.enabled) {
-        // Only override present gesture
+        // Not enabled
         return shouldBegin;
     }
 
@@ -143,17 +143,7 @@ NUANotificationShadeController *notificationShade;
 
     // Don't begin gesture if presented
     BOOL nougatPresented = notificationShade.presented;
-
-    // Manually override to only invoke on corners to prevent conflict with Nougat
-    CGPoint location = [gestureRecognizer locationInView:nil];
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGRect portraitScreenBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
-    CGPoint correctedLocation = NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
-
-    // Adjust width for orientation
-    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
-    BOOL withinRegion = correctedLocation.x > ((currentScreenWidth * 2) / 3) || correctedLocation.x < (currentScreenWidth / 3);
-    return !nougatPresented && withinRegion && shouldBegin;
+    return !nougatPresented && shouldBegin;
 }
 
 %end
@@ -171,49 +161,7 @@ NUANotificationShadeController *notificationShade;
 
     // Don't begin gesture if presented
     BOOL nougatPresented = notificationShade.presented;
-
-    // Only begin if within region
-    CGPoint location = [self nua_locationOfTouchInActiveInterfaceOrientation:gestureRecognizer];
-    BOOL withinRegion = [self nua_isLocationXWithinLeadingStatusBarRegion:location];
-
-    return !nougatPresented && withinRegion && shouldBegin;
-}
-
-%new
-- (CGPoint)nua_locationOfTouchInActiveInterfaceOrientation:(UIGestureRecognizer *)gestureRecognizer {
-    // Adjust for orientation
-    CGPoint location = [gestureRecognizer locationInView:nil];
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGRect portraitScreenBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
-    return NUAConvertPointFromOrientationToOrientation(location, portraitScreenBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
-}
-
-%new
-- (BOOL)nua_isLocationXWithinLeadingStatusBarRegion:(CGPoint)location {
-    // Get proper width
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
-    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
-
-    // Check if in leading region
-    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
-    if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
-        // Use notch insets
-        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
-        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
-
-        // Check if within inset
-        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
-        if (maxLeadingX > 5000.0) {
-            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
-            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
-        }
-
-        return isRTL ? (location.x > maxLeadingX) : (location.x < maxLeadingX);
-    } else {
-        // Regular old frames if no notch
-        return location.x > ((currentScreenWidth * 2) / 3) || location.x < (currentScreenWidth / 3);
-    }
+    return !nougatPresented && shouldBegin;
 }
 
 %end

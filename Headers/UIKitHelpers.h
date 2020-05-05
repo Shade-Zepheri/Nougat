@@ -1,13 +1,12 @@
 #import <UIKit/UIKit.h>
 #import <UIKit/UIKit+Private.h>
-#import <math.h>
 
 /**
  * Converts the given `location` from the coordinate system of 
  * @c fromOrientation to the coordinate system of @c toOrientation
  *
  * @param location The given location
- * @param bounds The portrait size of the containing rect containing the point
+ * @param bounds The portrait size of the rect containing the point
  * @param fromOrientation The prior orientation
  * @param toOrientation The current orientation
  * @return The location translated the current orientation

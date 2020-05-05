@@ -232,12 +232,12 @@
         // iOS 11-13
         SBCoverSheetPrimarySlidingViewController *coverSheetSlidingViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] coverSheetSlidingViewController];
         UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
-        [self _requireGestureRecognizerToFailForPresentGestureRecognizer:edgePullGestureRecognizer];
+        [self _requirePresentGestureRecognizerToFailForGestureRecognizer:edgePullGestureRecognizer];
     } else {
         // iOS 10
         SBNotificationCenterController *notificationCenterController = [%c(SBNotificationCenterController) sharedInstance];
         SBScreenEdgePanGestureRecognizer *showSystemGestureRecognizer = [notificationCenterController valueForKey:@"_showSystemGestureRecognizer"];
-        [self _requireGestureRecognizerToFailForPresentGestureRecognizer:showSystemGestureRecognizer];
+        [self _requirePresentGestureRecognizerToFailForGestureRecognizer:showSystemGestureRecognizer];
     }
     
     // Coordinate with CC Gesture if applicable
@@ -297,6 +297,61 @@
     // Dont do anything if not enabled
     // TODO: Make more verbose
     return self.preferences.enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    // Get location of touch
+    CGPoint location = [self _locationOfTouchInActiveInterfaceOrientation:touch gestureRecognizer:gestureRecognizer];
+
+    // Only start if within the notch and CC isnt present
+    return [self _isLocationXWithinNotchRegion:location];
+}
+
+- (CGPoint)_locationOfTouchInActiveInterfaceOrientation:(UITouch *)touch gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer {
+    // Adjust for orientation
+    CGPoint location = [touch locationInView:nil];
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGRect portraitBounds = NUAScreenBoundsAdjustedForOrientation(UIInterfaceOrientationPortrait);
+    return NUAConvertPointFromOrientationToOrientation(location, portraitBounds.size, UIInterfaceOrientationPortrait, currentOrientation);
+}
+
+- (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
+    // Get proper width
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
+
+    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
+    if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
+        // Use notch insets
+        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
+
+        // Check if within "left"
+        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
+        if (maxLeadingX > 5000.0) {
+            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
+            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
+            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
+        }
+
+        BOOL outsideLeftInset = isRTL ? (location.x < maxLeadingX) : (location.x > maxLeadingX);
+
+        // Check if within "right"
+        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (currentScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
+        if (isnan(minTrailingX)) {
+            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
+            // Fall back to 1/4
+            minTrailingX = currentScreenWidth - maxLeadingX;
+        }
+
+        BOOL outsideRightInset = isRTL ? (location.x > minTrailingX) : (location.x < minTrailingX);
+        return outsideLeftInset && outsideRightInset;
+    } else {
+        // Regular old frames
+        return location.x > (currentScreenWidth / 3) && location.x < (currentScreenWidth * 2 / 3);
+    }
 }
 
 - (void)_handleShowNotificationShadeGesture:(SBScreenEdgePanGestureRecognizer *)gestureRecognizer {

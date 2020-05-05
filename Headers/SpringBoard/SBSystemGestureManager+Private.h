@@ -3,27 +3,27 @@
 // Holy crap so many
 typedef NS_ENUM(NSUInteger, SBSystemGestureType) {
     SBSystemGestureTypeNone,
-    SBSystemGestureTypeShowCoverSheet, // 1
-    SBSystemGestureTypeDismissCoverSheet, // 2
-    SBSystemGestureTypeDismissCoverSheetExtendedRegion, // 3
+    SBSystemGestureTypeShowCoverSheet,
+    SBSystemGestureTypeDismissCoverSheet,
+    SBSystemGestureTypeDismissCoverSheetExtendedRegion,
     SBSystemGestureTypeDismissSecureApp,
-    SBSystemGestureTypeShowNotifications, // 5
-    SBSystemGestureTypeDismissBanner, // 6
+    SBSystemGestureTypeShowNotifications,
+    SBSystemGestureTypeDismissBanner,
     SBSystemGestureTypeDismissLongLook,
-    SBSystemGestureTypeShowControlCenter, // 8
-    SBSystemGestureTypeShowControlCenterFromStatusBar, // 9
-    SBSystemGestureTypeDismissControlCenter, // 10
+    SBSystemGestureTypeShowControlCenter,
+    SBSystemGestureTypeShowControlCenterFromStatusBar,
+    SBSystemGestureTypeDismissControlCenter,
     SBSystemGestureTypeScrunch,
     SBSystemGestureTypeResizeScene,
     SBSystemGestureTypeMoveSideApp,
-    SBSystemGestureTypeUnpinSideApp, // 14
+    SBSystemGestureTypeUnpinSideApp,
     SBSystemGestureTypePresentPiPApp,
     SBSystemGestureTypeMovePiPApp,
-    SBSystemGestureTypePinPiPApp, // 17
+    SBSystemGestureTypePinPiPApp,
     SBSystemGestureTypePiPBottomEdge,
     SBSystemGestureTypeDismissDock,
     SBSystemGestureTypeForceSwitcher,
-    SBSystemGestureTypeBottomEdgeSwitcher, // 21
+    SBSystemGestureTypeBottomEdgeSwitcher,
     SBSystemGestureTypeDismissModal,
     SBSystemGestureTypeDismissAlertItem,
     SBSystemGestureTypeDismissSheet,
