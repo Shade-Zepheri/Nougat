@@ -239,7 +239,7 @@
         SBScreenEdgePanGestureRecognizer *showSystemGestureRecognizer = [notificationCenterController valueForKey:@"_showSystemGestureRecognizer"];
         [self _requirePresentGestureRecognizerToFailForGestureRecognizer:showSystemGestureRecognizer];
     }
-    
+
     // Coordinate with CC Gesture if applicable
     SBControlCenterController *controlCenterController = [%c(SBControlCenterController) sharedInstance];
     if ([controlCenterController respondsToSelector:@selector(statusBarPullGestureRecognizer)] && controlCenterController.statusBarPullGestureRecognizer) {
@@ -293,10 +293,117 @@
     return self.view;
 }
 
+- (BOOL)allowShowTransition {
+    // Check Policy
+    if ([[%c(SBLockStateAggregator) sharedInstance] hasAnyLockState]) {
+        SBMainDisplaySceneManager *sceneManager = [%c(SBSceneManagerCoordinator) mainDisplaySceneManager];
+        if ([sceneManager respondsToSelector:@selector(policyAggregator)]) {
+            // iOS 11
+            SBMainDisplayPolicyAggregator *policyAggregator = sceneManager.policyAggregator;
+            BOOL allowCoverSheet = [policyAggregator allowsCapability:SBPolicyCapabilityCoverSheet];
+            BOOL allowControlCenter = [policyAggregator allowsCapability:SBPolicyCapabilityControlCenter];
+            if (!allowCoverSheet || !allowControlCenter) {
+                // Not allowed by policy
+                return NO;
+            }
+        }
+    }
+
+    // Check for Banners
+    if ([[%c(SBBannerController) sharedInstance] isShowingModalBanner]) {
+        // Don't show if banner
+        return NO;
+    }
+
+    // Check if LS suppresses CC if applicable
+    SBLockScreenManager *lockScreenManager = [%c(SBLockScreenManager) sharedInstance];
+    if ([lockScreenManager respondsToSelector:@selector(lockScreenEnvironment)] && lockScreenManager.isUILocked) {
+        // iOS 13
+        id<SBLockScreenEnvironment> lockScreenEnvironment = lockScreenManager.lockScreenEnvironment;
+        id<SBLockScreenBehaviorSuppressing> behaviorSuppressor = lockScreenEnvironment.behaviorSuppressor;
+        if ([behaviorSuppressor suppressesControlCenter]) {
+            // Lockscreen suppresses CC
+            return NO;
+        }
+    }
+
+    // Check if overlay suppresses
+    SBMainWorkspace *mainWorkspace = [%c(SBWorkspace) mainWorkspace];
+    if ([mainWorkspace respondsToSelector:@selector(transientOverlayPresentationManager)]) {
+        // iOS 13
+        SBTransientOverlayPresentationManager *transientOverlayPresentationManager = mainWorkspace.transientOverlayPresentationManager;
+        if (transientOverlayPresentationManager.shouldDisableControlCenter || transientOverlayPresentationManager.shouldDisableCoverSheet) {
+            // Overlay prevents either CC or Coversheet, so we shall disable too
+            return NO;
+        }
+    }
+
+    // Check CC status
+    SBControlCenterController *controlCenterController = [%c(SBControlCenterController) sharedInstance];
+    if ([controlCenterController respondsToSelector:@selector(allowGestureForContentBelow)]) {
+        if (!controlCenterController.allowGestureForContentBelow) {
+            // CC is viisble
+            return NO;
+        }
+    } else if (controlCenterController.visible) {
+        // Don't show if visible
+        return NO;
+    }
+
+    // Check old NC status
+    if (%c(SBNotificationCenterController)) {
+        // iOS 10
+        if ([[%c(SBNotificationCenterController) sharedInstance] isVisible]) {
+            // Old NC is visible, don't show
+            return NO;
+        }
+    }
+
+    // Otherwise, allowed
+    return YES;
+}
+
+- (BOOL)allowShowTransitionSystemGesture {
+    BOOL isDismissedOrDismissing = _isDismissing || !self.presented;
+    if (isDismissedOrDismissing) {
+        // Check if allowed
+        return [self allowShowTransition];
+    }
+
+    // Otherwise, not allowed
+    return NO;
+}
+
+- (BOOL)_shouldAllowNotificationShadeGesture {
+    if (!self.preferences.enabled) {
+        // Tweak isn't enabled
+        return NO;
+    }
+
+    SBSystemGestureManager *gestureManager = [%c(SBSystemGestureManager) mainDisplayManager];
+    if (![gestureManager isGestureWithTypeAllowed:SBSystemGestureTypeShowNougat]) {
+        // System gesture is straight up not allowed
+        return NO;
+    }
+
+    if (![self allowShowTransitionSystemGesture]) {
+        // Notification shade isn't allowed
+        return NO;
+    }
+
+    // Otherwise, allowed
+    return YES;
+}
+
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    // Dont do anything if not enabled
-    // TODO: Make more verbose
-    return self.preferences.enabled && ![[%c(SBNotificationCenterController) sharedInstance] isVisible] && ![[%c(SBControlCenterController) sharedInstance] isVisible];
+    if (![self _shouldAllowNotificationShadeGesture]) {
+        // Gesture not allowed
+        return NO;
+    }
+
+    // TODO: Add more criteria
+    // Otherwise, allowed
+    return YES;
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
