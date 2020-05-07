@@ -16,6 +16,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 @property (readonly, nonatomic) UIImage *attachmentImage;
 @property (readonly, nonatomic) NSDate *timestamp;
 @property (readonly, nonatomic) NSTimeZone *timeZone;
+@property (strong, readonly, nonatomic) NUANotificationEntry *leadingNotificationEntry;
 @property (copy, readonly, nonatomic) NSArray<NUANotificationEntry *> *entries;
 @property (assign, nonatomic) NUANotificationType type;
 @property (getter=isEmpty, readonly, nonatomic) BOOL empty;

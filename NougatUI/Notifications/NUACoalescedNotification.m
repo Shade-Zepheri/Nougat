@@ -33,7 +33,7 @@
 
         // Sort entires
         [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
-            return [entry2.timestamp compare:entry1.timestamp];
+            return [entry1 compare:entry2];
         }];
         _entries = entries;
     }
@@ -110,7 +110,7 @@
         return nil;
     }
 
-    NSString *title = self.entries.firstObject.title;
+    NSString *title = self.leadingNotificationEntry.title;
     if (!title) {
         // No title
         return nil;
@@ -124,7 +124,7 @@
         return @"Message";
     }
 
-    NSString *message = self.entries.firstObject.message;
+    NSString *message = self.leadingNotificationEntry.message;
     if (!message) {
         // No title
         return @"Message";
@@ -139,7 +139,7 @@
         return backupIcon;
     }
 
-    UIImage *icon = self.entries.firstObject.icon;
+    UIImage *icon = self.leadingNotificationEntry.icon;
     if (!icon) {
         // No title
         return backupIcon;
@@ -153,7 +153,7 @@
         return nil;
     }
 
-    return self.entries.firstObject.attachmentImage;
+    return self.leadingNotificationEntry.attachmentImage;
 }
 
 - (NSDate *)timestamp {
@@ -161,7 +161,7 @@
         return [NSDate date];
     }
 
-    NSDate *timestamp = self.entries.firstObject.timestamp;
+    NSDate *timestamp = self.leadingNotificationEntry.timestamp;
     if (!timestamp) {
         // No title
         return [NSDate date];
@@ -175,67 +175,89 @@
         return nil;
     }
 
-    return self.entries.firstObject.timeZone;
+    return self.leadingNotificationEntry.timeZone;
 }
 
 - (BOOL)isEmpty {
     return self.entries.count < 1;
 }
 
-#pragma mark - Requests
+#pragma mark - Entry Helpers
+
+- (NUANotificationEntry *)leadingNotificationEntry {
+    // Simply return first object
+    return self.entries.firstObject;
+}
+
+- (NSUInteger)_existingIndexForNotificationEntry:(NUANotificationEntry *)entry {
+    return [self.entries indexOfObjectPassingTest:^(NUANotificationEntry *obj, NSUInteger idx, BOOL *stop) {
+        return [obj isEqual:entry];
+    }];
+}
+
+- (NSUInteger)_insertionIndexForNotificationEntry:(NUANotificationEntry *)entry {
+    return [self.entries indexOfObject:entry inSortedRange:NSMakeRange(0, self.entries.count) options:(NSBinarySearchingFirstEqual | NSBinarySearchingInsertionIndex) usingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
+        return [entry1 compare:entry2];
+    }];
+}
+
+#pragma mark - Entry Management
 
 - (BOOL)containsRequest:(NCNotificationRequest *)request {
-    for (NUANotificationEntry *entry in self.entries) {
-        // Since isEqual is too picky, i hate apple sometimes man
-        if (![entry.request matchesRequest:request]) {
-            continue;
-        }
-
-        return YES;
-    }
-
-    // Default no
-    return NO;
+    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+    return [self _existingIndexForNotificationEntry:entry] != NSNotFound;
 }
 
 - (void)updateWithNewRequest:(NCNotificationRequest *)request {
-    if ([self containsRequest:request]) {
-        // Already has request
+    // Construct entry and check if contains
+    if (![self containsRequest:request]) {
+        // New request
+        NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+        NSUInteger insertionIndex = [self _insertionIndexForNotificationEntry:entry];
+
+        NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
+        [entries insertObject:entry atIndex:insertionIndex];
+
+        _entries = [entries copy];
+    } else {
+        // Modify existing one
+        [self modifyExistingEntryWithRequest:request];
+    }
+}
+
+- (void)modifyExistingEntryWithRequest:(NCNotificationRequest *)request {
+    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+    NSUInteger existingIndex = [self _existingIndexForNotificationEntry:entry];
+    if (existingIndex == NSNotFound) {
+        // Guess we never had it, strange
         return;
     }
 
-    // Construct entry
-    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
-
-    // Add to entries
+    NSUInteger insertionIndex = [self _insertionIndexForNotificationEntry:entry];
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-    [entries addObject:entry];
-
-    // Sort entires
-    [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
-        return [entry1 compare:entry2];
-    }];
+    if (insertionIndex == existingIndex) {
+        // Same indicies
+        [entries replaceObjectAtIndex:insertionIndex withObject:entry];
+    } else {
+        // Remove old add new
+        [entries removeObjectAtIndex:existingIndex];
+        [entries insertObject:entry atIndex:insertionIndex];
+    }
 
     _entries = [entries copy];
 }
 
 - (void)removeRequest:(NCNotificationRequest *)request {
-    if (![self containsRequest:request]) {
+    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
+    NSUInteger existingIndex = [self _existingIndexForNotificationEntry:entry];
+    if (existingIndex == NSNotFound) {
         // Cant remove something i dont have
         return;
     }
 
+    // Remove object
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-    for (NUANotificationEntry *entry in [entries reverseObjectEnumerator]) {
-        // Reversed so no problemo
-        if (![entry.request matchesRequest:request]) {
-            // Doesnt have it
-            continue;
-        }
-
-        // Remove object
-        [entries removeObject:entry];
-    }
+    [entries removeObjectAtIndex:existingIndex];
 
     _entries = [entries copy];
 }
