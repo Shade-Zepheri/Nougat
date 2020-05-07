@@ -3,12 +3,6 @@
 #import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UserNotificationsKit/UserNotificationsKit.h>
-#import <UserNotificationsUIKit/UserNotificationsUIKit.h>
-#import <UIKit/UIApplication+Private.h>
-#import <UIKit/UIKit+Private.h>
-#import <UIKit/UIStatusBar.h>
-#import <UIKitHelpers.h>
-#import <Macros.h>
 #import <version.h>
 
 NUAPreferenceManager *settings;
@@ -198,41 +192,31 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Notification Retreval
 
-%hook NCNotificationStore
+%hook NCNotificationDestinationsRegistry
 
-- (BOOL)addNotificationRequest:(NCNotificationRequest *)request {
-    BOOL orig = %orig;
-
-    // Pass along to repository
-    [[NUANotificationRepository defaultRepository] insertNotificationRequest:request forCoalescedNotification:nil];
-    return orig;
-}
-
-- (BOOL)removeNotificationRequest:(NCNotificationRequest *)request {
-    BOOL orig = %orig;
-
-    // Pass along to repository
-    [[NUANotificationRepository defaultRepository] removeNotificationRequest:request forCoalescedNotification:nil];
-    return orig;
-}
-
-%end
-
-#pragma mark - Notification Launching
-
-%hook SBNotificationBannerDestination
-
-%new
-- (void)nua_executeAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request {
-    // Simply add our helper here
-    id<NCNotificationDestinationDelegate> delegate = ((SBNotificationBannerDestination *)self).delegate;
-    if ([delegate respondsToSelector:@selector(destination:executeAction:forNotificationRequest:requestAuthentication:withParameters:completion:)]) {
-        // iOS 11+
-        [delegate destination:self executeAction:action forNotificationRequest:request requestAuthentication:YES withParameters:@{} completion:nil];
-    } else {
-        // iOS 10
-        [delegate destination:self executeAction:action forNotificationRequest:request withParameters:@{} completion:nil];
+- (NSMutableSet<id<NCNotificationDestination>> *)_destinationsForRequestDestinations:(NSSet<NSString *> *)requestDestinations inDestinationDict:(NSMutableDictionary<NSString *, id<NCNotificationDestination>> *)destinationDict {
+    NSMutableSet<id<NCNotificationDestination>> *destinations = %orig;
+    if (![requestDestinations containsObject:@"BulletinDestinationNotificationCenter"] || !destinationDict[@"BulletinDestinationNotificationShade"]) {
+        // Doesn't apply, or we arent registered
+        return destinations;
     }
+
+    // Add ourselves
+    id<NCNotificationDestination> notificationShadeDestination = destinationDict[@"BulletinDestinationNotificationShade"];
+    [destinations addObject:notificationShadeDestination];
+    return destinations;
+}
+
+- (NSMutableSet<NSString *> *)destinationIdentifiersForRequestDestinations:(NSSet<NSString *> *)requestDestinations {
+    NSMutableSet<NSString *> *destinationIdentifiers = %orig;
+    if (![requestDestinations containsObject:@"BulletinDestinationNotificationCenter"] || !self.activeDestinations[@"BulletinDestinationNotificationShade"]) {
+        // Doesn't apply, or we arent active
+        return destinationIdentifiers;
+    }
+
+    // Add ourselves
+    [destinationIdentifiers addObject:@"BulletinDestinationNotificationShade"];
+    return destinationIdentifiers;
 }
 
 %end

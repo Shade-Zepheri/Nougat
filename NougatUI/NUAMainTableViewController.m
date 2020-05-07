@@ -246,12 +246,6 @@
 
 #pragma mark - Notification Launching
 
-- (SBNotificationBannerDestination *)_bannerDestination {
-    // Provide easy access to it
-    SBNCNotificationDispatcher *notificationDispatcher = ((SpringBoard *)UIApplication.sharedApplication).notificationDispatcher; 
-    return notificationDispatcher.bannerDestination;
-}
-
 - (void)executeNotificationAction:(NSString *)type forCellAtIndexPath:(NSIndexPath *)indexPath {
     // Get associated entry
     NUACoalescedNotification *notification = [self notificationForIndexPath:indexPath];
@@ -261,7 +255,7 @@
     }
 
     // Determine action
-    NUANotificationEntry *entry = notification.entries.firstObject;
+    NUANotificationEntry *entry = notification.leadingNotificationEntry;
     NCNotificationRequest *request = entry.request;
     NCNotificationAction *action = nil;
     if ([type isEqualToString:@"default"]) {
@@ -274,9 +268,8 @@
         return;
     }
 
-    // Call our helper method
-    SBNotificationBannerDestination *bannerDestination = [self _bannerDestination];
-    [bannerDestination nua_executeAction:action forNotificationRequest:request];
+    // Call the repository
+    [self.notificationRepository executeAction:action forNotificationRequest:request];
 
     if (![type isEqualToString:@"default"]) {
         return;

@@ -1,4 +1,5 @@
 #import "NUANotificationRepository.h"
+#import <FrontBoardServices/FrontBoardServices.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 
 @implementation NUANotificationRepository
@@ -21,78 +22,84 @@
         // Set defaults
         _observers = [NSHashTable weakObjectsHashTable];
         _notifications = [NSMutableDictionary dictionary];
-        _shouldRegenerate = YES;
 
         // Create threads
         dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_NEVER);
         dispatch_queue_attr_t calloutAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INTERACTIVE, 0);
         _callOutQueue = dispatch_queue_create("com.shade.nougat.notifications-provider.call-out", calloutAttributes);
 
-        // Load notifications
-        [self _populateNotificationsIfNecessary];
+        // Register as destination
+        SBNCNotificationDispatcher *notificationDispatcher = ((SpringBoard *)[UIApplication sharedApplication]).notificationDispatcher; 
+        NCNotificationDispatcher *dispatcher = notificationDispatcher.dispatcher;
+        [dispatcher registerDestination:self];
+        [dispatcher setDestination:self enabled:YES];
     }
 
     return self;
 }
 
-#pragma mark - Populating Notifications
+#pragma mark -  NCNotificationDestination
 
-- (void)_populateNotificationsIfNecessary {
-    if (!_shouldRegenerate) {
-        return;
-    }
-
-    // Reset flag
-    _shouldRegenerate = NO;
-
-    // Create dictionary
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [NSMutableDictionary dictionary];
-    NSMutableDictionary<NSString *, NCNotificationSection *> *notificationSections = [self _notificationStore].notificationSections;
-    for (NSString *sectionIdentifier in notificationSections.allKeys) {
-        if ([sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
-            // Exclude DND notification && wallet stuffs
-            continue;
-        }
-
-        NCNotificationSection *section = notificationSections[sectionIdentifier];
-        NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = [NSMutableDictionary dictionary];
-        if ([section respondsToSelector:@selector(coalescedNotifications)]) {
-            // iOS 10-12
-            for (NSString *threadIdentifier in section.coalescedNotifications.allKeys) {
-                // Apps can have different groups for notifications (eg: Followers and Likes groups)
-                NCCoalescedNotification *coalescedNotification = section.coalescedNotifications[threadIdentifier];
-                NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromNotification:coalescedNotification];
-                notificationGroups[threadIdentifier] = notification;
-            }
-        } else {
-            // iOS 13+
-            for (NCNotificationRequest *request in section.requests.allValues) {
-                // Section contains all requests, sort based on threadID
-                NSString *threadIdentifier = request.threadIdentifier;
-                if (!notificationGroups[threadIdentifier]) {
-                    // Create new notification entry
-                    NUACoalescedNotification *notification = [NUACoalescedNotification coalescedNotificationFromRequest:request];
-                    notificationGroups[threadIdentifier] = notification;
-                } else {
-                    NUACoalescedNotification *notification = notificationGroups[threadIdentifier];
-                    [notification updateWithNewRequest:request];
-                    notificationGroups[threadIdentifier] = notification;
-                }
-            }
-        }
-
-        notifications[sectionIdentifier] = [notificationGroups copy];
-    }
-
-    // Modify array synchronously
-    _notifications = [notifications copy];
+- (NSString *)identifier {
+    return @"BulletinDestinationNotificationShade";
 }
 
-- (NCNotificationStore *)_notificationStore {
-    SBNCNotificationDispatcher *notificationDispatcher = ((SpringBoard *)UIApplication.sharedApplication).notificationDispatcher; 
-    SBDashBoardNotificationDispatcher *destination = notificationDispatcher.dashBoardDestination;
-    NCNotificationDispatcher *dispatcher = destination.delegate;
-    return dispatcher.notificationStore;
+- (BOOL)canReceiveNotificationRequest:(NCNotificationRequest *)request {
+    // Basically always
+    return YES;
+}
+
+- (void)postNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Pass to our methods
+    [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+}
+
+- (void)modifyNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Pass to our methods
+    [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+}
+
+- (void)withdrawNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Pass to our methods
+    [self removeNotificationRequest:request forCoalescedNotification:coalescedNotification];
+}
+
+- (void)postNotificationRequest:(NCNotificationRequest *)request {
+    // Pass to our methods
+    [self insertNotificationRequest:request forCoalescedNotification:nil];
+}
+
+- (void)modifyNotificationRequest:(NCNotificationRequest *)request {
+    // Pass to our methods
+    [self insertNotificationRequest:request forCoalescedNotification:nil];
+}
+
+- (void)withdrawNotificationRequest:(NCNotificationRequest *)request {
+    // Pass to our methods
+    [self removeNotificationRequest:request forCoalescedNotification:nil];
+}
+
+#pragma mark - Notification Launching
+
+- (void)executeAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request {
+    // Find the proper method
+    if ([self.delegate respondsToSelector:@selector(destination:executeAction:forNotificationRequest:requestAuthentication:withParameters:completion:)]) {
+        // iOS 11+
+        [self.delegate destination:self executeAction:action forNotificationRequest:request requestAuthentication:YES withParameters:@{} completion:nil];
+    } else {
+        // iOS 10
+        [self.delegate destination:self executeAction:action forNotificationRequest:request withParameters:@{} completion:nil];
+    }
+}
+
+- (BSServiceConnectionEndpoint *)endpoint {
+    if (!NSClassFromString(@"BSServiceConnectionEndpoint")) {
+        // Doesn't apply
+        return nil;
+    }
+
+    NSString *serviceName = [FBSOpenApplicationService serviceName];
+    return [NSClassFromString(@"BSServiceConnectionEndpoint") endpointForMachName:@"com.apple.frontboard.systemappservices" service:serviceName instance:nil];
 }
 
 #pragma mark - Observers
@@ -260,9 +267,7 @@
 }
 
 - (void)purgeAllNotifications {
-    // Set needs regeneration
-    _shouldRegenerate = YES;
-    [self _populateNotificationsIfNecessary];
+    // TODO: Repurpose for clear all
 }
 
 @end

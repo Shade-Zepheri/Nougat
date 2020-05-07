@@ -1,11 +1,8 @@
-#import <UserNotificationsKit/NCNotificationDestinationDelegate.h>
+#import <UserNotificationsKit/NCNotificationDestination.h>
 
 @class NCNotificationAction, NCNotificationRequest;
 
-@interface SBNotificationBannerDestination : NSObject
+@interface SBNotificationBannerDestination : NSObject <NCNotificationDestination>
 @property (weak, nonatomic) id<NCNotificationDestinationDelegate> delegate;
-
-// Method added by Nougat
-- (void)nua_executeAction:(NCNotificationAction *)action forNotificationRequest:(NCNotificationRequest *)request;
 
 @end
