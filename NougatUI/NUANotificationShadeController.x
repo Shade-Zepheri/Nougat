@@ -271,7 +271,9 @@
             // iOS 10
             sceneLayoutViewController = [%c(SBSceneLayoutViewController) mainDisplayLayoutViewController];
             UIGestureRecognizer *sideSwitcherRevealGesture = [sceneLayoutViewController sideSwitcherRevealGesture];
-            [self _requireGestureRecognizerToFailForPresentGestureRecognizer:sideSwitcherRevealGesture];
+            if (sideSwitcherRevealGesture) {
+                [self _requireGestureRecognizerToFailForPresentGestureRecognizer:sideSwitcherRevealGesture];
+            }
         }   
     }
 }
@@ -301,7 +303,15 @@
             // iOS 11
             SBMainDisplayPolicyAggregator *policyAggregator = sceneManager.policyAggregator;
             BOOL allowCoverSheet = [policyAggregator allowsCapability:SBPolicyCapabilityCoverSheet];
-            BOOL allowControlCenter = [policyAggregator allowsCapability:SBPolicyCapabilityControlCenter];
+            BOOL allowControlCenter = YES;
+            if (%c(SBMainDisplayPolicyAggregator)) {
+                // iOS 11+
+                allowControlCenter = [policyAggregator allowsCapability:SBPolicyCapabilityControlCenter];
+            } else {
+                // iOS 10, different enum values
+                allowControlCenter = [policyAggregator allowsCapability:(SBPolicyCapabilityControlCenter - 1)];
+            }
+
             if (!allowCoverSheet || !allowControlCenter) {
                 // Not allowed by policy
                 return NO;
