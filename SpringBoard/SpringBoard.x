@@ -179,15 +179,20 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Reveal Gesture
 
-%hookf(NSString *, SBAnalyticsNameForSystemGestureType, SBSystemGestureType type) {
-    // Gotta override this because Springboard
-    if (type == SBSystemGestureTypeShowNougat) {
-        return @"Nougat";
+%hook PETGoalConversionEventTracker
+
+- (instancetype)initWithFeatureId:(NSString *)featureId opportunityEvent:(NSString *)opportunityEvent conversionEvent:(NSString *)conversionEvent registerProperties:(NSArray<id> *)registerProperties {
+    // Since SB hardcodes their values, we have to manually supply them here
+    if ([opportunityEvent isEqualToString:@"SGstart_"]) {
+        opportunityEvent = @"SGstart_Nougat";
+        conversionEvent = @"SGend_Nougat";
+        return %orig(featureId, opportunityEvent, conversionEvent, registerProperties);
     } else {
         return %orig;
     }
 }
 
+%end
 %end
 
 #pragma mark - Notification Retreval
@@ -224,15 +229,6 @@ NUANotificationShadeController *notificationShade;
 #pragma mark - Constructor
 
 %ctor {
-    // %hookf stuffs
-    MSImageRef springboardImage;
-    if (IS_IOS_OR_NEWER(iOS_13_0)) {
-        springboardImage = MSGetImageByName("/System/Library/PrivateFrameworks/SpringBoard.framework/SpringBoard");
-    } else {
-        springboardImage = MSGetImageByName("/System/Library/CoreServices/SpringBoard.app/SpringBoard");
-    }    
-    void *SBAnalyticsNameForSystemGestureType = MSFindSymbol(springboardImage, "_SBAnalyticsNameForSystemGestureType");
-
     // Init hooks
     if (%c(SBNotificationCenterController)) {
         %init(PreCoverSheet);
