@@ -1,5 +1,6 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
+#import "NUARippleButton.h"
 #import <MediaRemote/MediaRemote.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <Macros.h>
@@ -10,6 +11,8 @@
     NSLayoutConstraint *_heightConstraint;
     NUACoalescedNotification *_mediaNotification;
 }
+
+@property (strong, nonatomic) NUARippleButton *clearAllButton;
 
 @end
 
@@ -34,6 +37,8 @@
         // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
         [_notificationRepository addObserver:self];
+
+        // _SBBiometricEventMonitorHasAuthenticated
     }
 
     return self;
@@ -79,7 +84,7 @@
         height = 150.0;
     }
 
-    _heightConstraint.constant = height - 150.0;
+    _heightConstraint.constant = height - 95.0;
 }
 
 - (void)setRevealPercentage:(CGFloat)revealPercentage {
@@ -112,6 +117,17 @@
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
     CGFloat currentScreenHeight = NUAGetScreenHeightForOrientation(currentOrientation);
     return currentScreenHeight - 100.0;
+}
+
+- (BOOL)containsPoint:(CGPoint)point {
+    // Check our view
+    CGPoint convertedPoint = [self.view convertPoint:point fromView:self.view.superview];
+    BOOL insideTableView = CGRectContainsPoint(self.tableViewController.tableView.bounds, convertedPoint);
+
+    // Check the button
+    CGRect clearButtonFrame = self.clearAllButton.frame;
+    BOOL insideButton = CGRectContainsPoint(clearButtonFrame, convertedPoint);
+    return insideTableView || insideButton;
 }
 
 #pragma mark - Observer
@@ -229,7 +245,7 @@
 
 - (NSUInteger)_indexForAddingNewNotification:(NUACoalescedNotification *)notification {
     // Compare notifications
-    return [self.notifications indexOfObject:notification inSortedRange:NSMakeRange(0, self.notifications.count) options:NSBinarySearchingInsertionIndex usingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+    return [self.notifications indexOfObject:notification inSortedRange:NSMakeRange(0, self.notifications.count) options:(NSBinarySearchingFirstEqual | NSBinarySearchingInsertionIndex) usingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
         return [notification1 compare:notification2];
     }];
 }
@@ -284,7 +300,7 @@
 - (void)loadView {
     UIView *view = [[UIView alloc] initWithFrame:CGRectZero];
     view.translatesAutoresizingMaskIntoConstraints = NO;
-    _heightConstraint = [view.heightAnchor constraintEqualToConstant:0.0];
+    _heightConstraint = [view.heightAnchor constraintEqualToConstant:55.0];
     _heightConstraint.active = YES;
     self.view = view;
 }
@@ -306,13 +322,30 @@
 
     // // constraint up
     [self.tableViewController.tableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = YES;
-    [self.tableViewController.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = YES;
+    [self.tableViewController.tableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor constant:-55.0].active = YES;
     [self.tableViewController.tableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = YES;
     [self.tableViewController.tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
 
     // Register custom classes
     [self.tableViewController.tableView registerClass:[NUANotificationTableViewCell class] forCellReuseIdentifier:@"NotificationCell"];
     [self.tableViewController.tableView registerClass:[NUAMediaTableViewCell class] forCellReuseIdentifier:@"MediaCell"];
+
+    // Add clear all button
+    _clearAllButton = [[NUARippleButton alloc] init];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+    NSString *localizedClearAll = [bundle localizedStringForKey:@"CLEAR_ALL" value:@"Clear All" table:@"Localizable"];
+    [self.clearAllButton setTitle:localizedClearAll forState:UIControlStateNormal];
+    [self.clearAllButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [self.clearAllButton addTarget:self action:@selector(_handleClearButtonTouchUpInside:) forControlEvents:UIControlEventTouchUpInside];
+    self.clearAllButton.rippleStyle = NUARippleStyleUnbounded;
+    self.clearAllButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+    self.clearAllButton.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addSubview:self.clearAllButton];
+
+    // Button constraints
+    [self.clearAllButton.topAnchor constraintEqualToAnchor:self.tableViewController.tableView.bottomAnchor].active = YES;
+    [self.clearAllButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-5.0].active = YES;
+    [self.clearAllButton.heightAnchor constraintEqualToConstant:55.0].active = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -563,6 +596,18 @@
 
     // Launch notif
     [self executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
+}
+
+#pragma mark - Clear All Button
+
+- (void)_handleClearButtonTouchUpInside:(NUARippleButton *)button {
+    if (self.notifications.count == 0) {
+        // Nothing to remove
+        return;
+    }
+
+    // Clear all notifications
+    [self.notificationRepository purgeAllNotifications];
 }
 
 @end

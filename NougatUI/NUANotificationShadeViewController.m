@@ -95,7 +95,6 @@
 
     // Constraint up
     [self.tableViewController.view.widthAnchor constraintEqualToAnchor:_containerViewController.view.widthAnchor].active = YES;
-
     [self.tableViewController.view.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor].active = YES;
     [self.tableViewController.view.topAnchor constraintEqualToAnchor:_containerViewController.view.bottomAnchor].active  = YES;
 }
@@ -209,8 +208,7 @@
         BOOL touchInsidePanel = CGRectContainsPoint(panelFrame, location);
 
         // Check if inside table
-        CGRect tableFrame = self.tableViewController.view.frame;
-        BOOL touchInsideTable = CGRectContainsPoint(tableFrame, location);
+        BOOL touchInsideTable = [self.tableViewController containsPoint:location];
         allowGesture = !touchInsidePanel && !touchInsideTable;
     } else {
         allowGesture = NO;

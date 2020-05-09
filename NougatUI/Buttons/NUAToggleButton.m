@@ -1,6 +1,5 @@
 #import "NUAToggleButton.h"
 #import "NUARippleButton.h"
-
 #import <FrontBoardServices/FBSSystemService.h>
 #import <UIKit/UIImage+Private.h>
 #import <HBLog.h>
@@ -19,19 +18,19 @@
     self = [super init];
     if (self) {
         // Create ripple button
-        self.rippleButton = [[NUARippleButton alloc] init];
-        [self.rippleButton addTarget:self action:@selector(toggleSelectedState:) forControlEvents:UIControlEventTouchUpInside];
-        [self addSubview:self.rippleButton];
+        _rippleButton = [[NUARippleButton alloc] init];
+        [_rippleButton addTarget:self action:@selector(toggleSelectedState:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:_rippleButton];
 
         // Create toggle label
         _displayNameLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        self.displayNameLabel.translatesAutoresizingMaskIntoConstraints = NO;
-        self.displayNameLabel.alpha = 0.0;
-        self.displayNameLabel.font = [UIFont systemFontOfSize:12];
-        self.displayNameLabel.text = self.displayName;
-        self.displayNameLabel.backgroundColor = [UIColor clearColor];
-        self.displayNameLabel.textAlignment = NSTextAlignmentCenter;
-        [self addSubview:self.displayNameLabel];
+        _displayNameLabel.translatesAutoresizingMaskIntoConstraints = NO;
+        _displayNameLabel.alpha = 0.0;
+        _displayNameLabel.font = [UIFont systemFontOfSize:12];
+        _displayNameLabel.text = self.displayName;
+        _displayNameLabel.backgroundColor = [UIColor clearColor];
+        _displayNameLabel.textAlignment = NSTextAlignmentCenter;
+        [self addSubview:_displayNameLabel];
 
         // Gesture if there's a settings url
         if (self.settingsURL) {
@@ -40,25 +39,25 @@
         }
 
         // Constraints
-        [self.displayNameLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-        [self.displayNameLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+        [_displayNameLabel.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [_displayNameLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
 
         // Create imageView
-        self.imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-        self.imageView.translatesAutoresizingMaskIntoConstraints = NO;
-        self.imageView.contentMode = UIViewContentModeScaleAspectFit;
-        [self addSubview:self.imageView];
+        _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+        _imageView.translatesAutoresizingMaskIntoConstraints = NO;
+        _imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self addSubview:_imageView];
 
         [self _updateImageView:NO];
 
         // Constraints
-        [self.imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
-        [self.imageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
-        [self.imageView.widthAnchor constraintEqualToConstant:28].active = YES;
-        [self.imageView.heightAnchor constraintEqualToConstant:28].active = YES;
+        [_imageView.centerXAnchor constraintEqualToAnchor:self.centerXAnchor].active = YES;
+        [_imageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+        [_imageView.widthAnchor constraintEqualToConstant:28].active = YES;
+        [_imageView.heightAnchor constraintEqualToConstant:28].active = YES;
 
         // Register for notifications
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
     }
 
     return self;

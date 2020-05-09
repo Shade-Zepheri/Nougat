@@ -29,4 +29,6 @@
 @property (assign, nonatomic) CGFloat revealPercentage;
 @property (readonly, nonatomic) CGFloat contentHeight;
 
+- (BOOL)containsPoint:(CGPoint)point;
+
 @end

@@ -133,7 +133,7 @@
     });
 }
 
-#pragma mark - Notification management
+#pragma mark - Notification Management
 
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
     // Access notifications asynchronously
@@ -239,10 +239,8 @@
     // Determine action
     NUANotificationsObserverHandler handlerBlock = nil;
     if (notification.empty) {
-        // Access notifications serially
-        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
-
         // Notification is empty, remove entirely
+        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
         NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
         [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
 
@@ -266,8 +264,32 @@
     [self notifyObserversUsingBlock:handlerBlock];
 }
 
+#pragma mark - Notification Clearing
+
+- (NSMutableSet<NCNotificationRequest *> *)_allNotificationRequests {
+    // Query all requests
+    NSMutableSet<NCNotificationRequest *> *allRequests = [NSMutableSet set];
+    for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notifications.allValues) {
+        NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
+        for (NUACoalescedNotification *coalescedNotification in notificationThreads) {
+            for (NUANotificationEntry *entry in coalescedNotification.entries) {
+                [allRequests addObject:entry.request];
+            }
+        }
+    }
+
+    return allRequests;
+}
+
 - (void)purgeAllNotifications {
-    // TODO: Repurpose for clear all
+    // Call to delegate
+    NSMutableSet<NCNotificationRequest *> *allRequests = [self _allNotificationRequests];
+    [self.delegate destination:self requestsClearingNotificationRequests:allRequests];
+
+    // Clear table and dict
+    for (NCNotificationRequest *request in allRequests) {
+        [self removeNotificationRequest:request forCoalescedNotification:nil];
+    }
 }
 
 @end

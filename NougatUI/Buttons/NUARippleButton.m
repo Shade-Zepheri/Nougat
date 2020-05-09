@@ -14,6 +14,7 @@
 // Modifications copyright (C) 2020 Alfonso Gonzalez
 
 #import "NUARippleButton.h"
+#import <math.h>
 
 @interface NUARippleButton () {
     CGFloat _enabledAlpha;
@@ -21,6 +22,22 @@
 @property (strong, nonatomic) NUADynamicRippleView *rippleView;
 
 @end
+
+static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
+    if (CGRectIsNull(rect)) {
+        // No rect
+        return CGRectNull;
+    } else if (scale == 1.0) {
+        // Basically what CGRectIntegral is for
+        return CGRectIntegral(rect);
+    } else {
+        // Manually round
+        CGPoint originalOrigin = CGPointMake(CGRectGetMinX(rect), CGRectGetMinY(rect));
+        CGPoint newOrigin = CGPointMake(floor(originalOrigin.x * scale) / scale, floor(originalOrigin.y * scale) / scale);
+        CGSize adjustWidthHeight = CGSizeMake(originalOrigin.x - newOrigin.x, originalOrigin.y - newOrigin.y);
+        return CGRectMake(newOrigin.x, newOrigin.y, ceil((CGRectGetWidth(rect) + adjustWidthHeight.width) * scale) / scale, ceil((CGRectGetHeight(rect) + adjustWidthHeight.height) * scale) / scale);
+    }
+}
 
 @implementation NUARippleButton
 
@@ -105,8 +122,8 @@
     // Update ripple view frame
     self.rippleView.frame = CGRectStandardize(self.bounds);
 
-    // Some title label stuffs
-    // self.titleLabel.frame = MDCRectAlignToScale(self.titleLabel.frame, [UIScreen mainScreen].scale);
+    // Title label aligning
+    self.titleLabel.frame = rectAlignToScale(self.titleLabel.frame, [UIScreen mainScreen].scale);
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
