@@ -6,6 +6,9 @@
 
 // Notification
 "TAP_FOR_MORE_OPTIONS" = "탭하여 추가 옵션 확인.";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Nougat를 처음 사용하시는 것 같습니다. 사용자 가이드를 보시겠어요?";
