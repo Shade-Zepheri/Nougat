@@ -6,9 +6,9 @@
 
 // Notification
 "TAP_FOR_MORE_OPTIONS" = "Нажмите, чтобы узнать больше.";
-"OPEN" = "Open";
-"CLEAR" = "Clear";
-"CLEAR_ALL" = "Clear All";
+"OPEN" = "Открыть";
+"CLEAR" = "Очистить";
+"CLEAR_ALL" = "Очистить всё";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Похоже, что это ваше первое использование Nougat. Хотите посмотреть руководство пользователя?";
