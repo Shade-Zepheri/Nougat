@@ -1,3 +1,4 @@
+#import "SBAsynchronousRenderingAssertion.h"
 #import "SBBacklightController.h"
 #import "SBBannerController.h"
 #import "SBBulletinWindowController.h"

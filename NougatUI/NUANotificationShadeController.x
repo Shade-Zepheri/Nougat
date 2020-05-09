@@ -919,6 +919,11 @@
         return;
     }
 
+    // Async rendering assertion
+    if (!self.asynchronousRenderingAssertion && %c(SBAsynchronousRenderingAssertion)) {
+        self.asynchronousRenderingAssertion = [%c(SBAsynchronousRenderingAssertion) initWithReason:NSStringFromClass(self.class)];
+    }
+
     // Stop the Idle timer and banners while presenting
     SBBacklightController *controller = [%c(SBBacklightController) sharedInstance];
     if ([controller respondsToSelector:@selector(setIdleTimerDisabled:forReason:)]) {
@@ -929,7 +934,7 @@
     }
     
     // Stop banners when presented
-    [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Reveal"];
+    [[%c(SBBulletinWindowController) sharedInstance] setBusy:YES forReason:@"Nougat Visible"];
 
     // FBDisplayLayoutElement stuffs
     [self.displayLayoutElement activateWithBuilder:^FBSDisplayLayoutElement *(FBSDisplayLayoutElement *element) {
@@ -1022,11 +1027,17 @@
 
             self.presented = NO;
 
+            // Async rendering
+            if (%c(SBAsynchronousRenderingAssertion)) {
+                [self.asynchronousRenderingAssertion invalidate];
+                self.asynchronousRenderingAssertion = nil;
+            }
+
             // Unlock rotation
             [[%c(SBOrientationLockManager) sharedInstance] setLockOverrideEnabled:NO forReason:@"Nougat Visible"];
 
             // Allow for banners
-            [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Reveal"];
+            [[%c(SBBulletinWindowController) sharedInstance] setBusy:NO forReason:@"Nougat Visible"];
 
             // Deactivate displayLayoutElement
             [self.displayLayoutElement deactivate];

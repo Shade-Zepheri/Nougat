@@ -1,2 +1,2 @@
 #import "BSDateFormatterCache.h"
-#import "BSInvalidatable.h"
+#import "BSSimpleAssertion.h"
