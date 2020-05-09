@@ -15,10 +15,10 @@
     if (self) {
         // Set defaults
         _switchIdentifier = identifier;
-        self.switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
+        _switchState = [[FSSwitchPanel sharedPanel] stateForSwitchIdentifier:identifier];
 
         // Register for notifications
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(switchesChangedState:) name:FSSwitchPanelSwitchStateChangedNotification object:nil];
     }
 
     return self;

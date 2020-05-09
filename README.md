@@ -6,7 +6,7 @@ An almost 1:1 recreation of the Android notification panel from Android Nougat f
 
 ## Installation
 ### From an APT Repo
-Currently Nougat is in beta stage and available on my beta repo [here](https://shade-zepheri.github.io).
+Nougat is availble for purchase on [Chariz](https://chariz.com/buy/nougat).
 
 In the future, Nougat will be available on one of the default repo for purchase.
 
@@ -43,3 +43,7 @@ New strings may be potentially added over time, so make sure to keep an eye out 
 Nougat is [fair-code](https://faircode.io/) licensed under [**Apache 2.0 with Commons Clause**](https://github.com/Shade-Zepheri/Nougat/blob/master/LICENSE)
 
 What this basically boils down to is that the source is available to everyone, anyone can use and modify this project internally, however only I can "sell" this project.
+
+## Attributions
+
+Nougat uses modified components from [Material Components for iOS](), copyright the Material Components for iOS authors and licensed under Apache 2.0 without a NOTICE file.
