@@ -181,7 +181,7 @@
 
     // Observer
     [self notifyObserversUsingBlock:^(id<NUANotificationsObserver> observer) {
-        [observer notificationRepositoryUpdatedNotification:notification removedRequest:NO];
+        [observer notificationRepositoryUpdatedNotification:notification];
     }];
 
     // Figure out what to do with return value
@@ -256,7 +256,7 @@
     } else {
         // Notification was simply modified
         handlerBlock = ^(id<NUANotificationsObserver> observer) {
-            [observer notificationRepositoryUpdatedNotification:notification removedRequest:YES];
+            [observer notificationRepositoryUpdatedNotification:notification];
         };
     }
 

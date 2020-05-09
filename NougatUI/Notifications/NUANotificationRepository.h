@@ -7,7 +7,7 @@
 @protocol NUANotificationsObserver <NSObject>
 
 - (void)notificationRepositoryAddedNotification:(NUACoalescedNotification *)newNotification;
-- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification removedRequest:(BOOL)removedRequest;
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification;
 - (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification;
 
 @end

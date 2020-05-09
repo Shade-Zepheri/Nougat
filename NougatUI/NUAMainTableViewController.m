@@ -159,7 +159,7 @@
     [self _resizeTableForExpansion:YES forNotification:YES];
 }
 
-- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification removedRequest:(BOOL)removedRequest {
+- (void)notificationRepositoryUpdatedNotification:(NUACoalescedNotification *)updatedNotification {
     if (!self.notifications) {
         // Notification shade hasnt been loaded
         return;
