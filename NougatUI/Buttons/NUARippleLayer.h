@@ -23,6 +23,7 @@ typedef void (^NUARippleCompletionBlock)(void);
 @interface NUARippleLayer : CAShapeLayer
 @property (getter=isStartAnimationActive, readonly, nonatomic) BOOL startAnimationActive;
 @property (assign, nonatomic) CFTimeInterval rippleTouchDownStartTime;
+@property (assign, nonatomic) CGFloat maximumRadius;
 
 - (void)startRippleAtPoint:(CGPoint)point animated:(BOOL)animated;
 - (void)endRippleAnimated:(BOOL)animated completion:(NUARippleCompletionBlock)completion;

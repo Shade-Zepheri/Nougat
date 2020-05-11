@@ -20,8 +20,12 @@
 @property (assign, nonatomic) NUARippleStyle rippleStyle;
 @property (strong, nonatomic) UIColor *rippleColor;
 
+@property (assign, nonatomic) CGFloat maxRippleRadius;
 @property (nonatomic) CGFloat disabledAlpha;
 @property (nonatomic) UIEdgeInsets touchAreaInsets;
+
+- (UIColor *)imageTintColorForState:(UIControlState)state;
+- (void)setImageTintColor:(UIColor *)imageTintColor forState:(UIControlState)state;
 
 #pragma mark - Disables
 

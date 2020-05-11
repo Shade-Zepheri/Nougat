@@ -16,10 +16,11 @@
 #import "NUARippleButton.h"
 #import <math.h>
 
-@interface NUARippleButton () {
-    CGFloat _enabledAlpha;
-}
+@interface NUARippleButton ()
+@property (assign, nonatomic) CGFloat enabledAlpha;
+@property (assign, nonatomic) BOOL imageTintStatefulAPIEnabled;
 @property (strong, nonatomic) NUADynamicRippleView *rippleView;
+@property (strong, nonatomic) NSMutableDictionary<NSNumber *, UIColor *> *imageTintColors;
 
 @end
 
@@ -61,16 +62,19 @@ static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
     // Set default values
     _disabledAlpha = 0.12;
     _enabledAlpha = self.alpha;
+    _imageTintColors = [NSMutableDictionary dictionary];
 
     // Disable default highlight state.
     self.adjustsImageWhenHighlighted = NO;
     self.showsTouchWhenHighlighted = NO;
 
     // Create bounding path
+    self.layer.cornerRadius = 2.0;
     self.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.bounds cornerRadius:self.layer.cornerRadius].CGPath;
+    self.layer.shadowColor = [UIColor blackColor].CGColor;
 
     // Create ripple layer
-    self.rippleView = [[NUADynamicRippleView alloc] initWithFrame:self.bounds];
+    _rippleView = [[NUADynamicRippleView alloc] initWithFrame:self.bounds];
     self.rippleView.rippleColor = [UIColor colorWithWhite:1 alpha:0.12];
     [self insertSubview:self.rippleView belowSubview:self.imageView];
 
@@ -81,15 +85,10 @@ static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
     self.contentEdgeInsets = UIEdgeInsetsMake(8, 16, 8, 16);
 }
 
-- (void)dealloc {
-    // Remove observers
-    [self removeTarget:self action:NULL forControlEvents:UIControlEventAllEvents];
-}
-
 #pragma mark - Properties
 
 - (NUARippleStyle)rippleStyle {
-  return self.rippleView.rippleStyle;
+    return self.rippleView.rippleStyle;
 }
 
 - (void)setRippleStyle:(NUARippleStyle)rippleStyle {
@@ -103,12 +102,28 @@ static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
 }
 
 - (UIColor *)rippleColor {
-  return self.rippleView.rippleColor;
+    return self.rippleView.rippleColor;
 }
 
 - (void)setRippleColor:(UIColor *)rippleColor {
     // Pass to ripple view
     [self.rippleView setRippleColor:rippleColor forState:NUARippleStateHighlighted];
+}
+
+- (void)setMaxRippleRadius:(CGFloat)maxRippleRadius {
+    if (_maxRippleRadius == maxRippleRadius) {
+        // Nothing to change
+        return;
+    }
+
+    _maxRippleRadius = maxRippleRadius;
+    self.rippleView.maximumRadius = maxRippleRadius;
+}
+
+
+- (void)setDisabledAlpha:(CGFloat)disabledAlpha {
+    _disabledAlpha = disabledAlpha;
+    [self updateAlphaAndBackgroundColorAnimated:NO];
 }
 
 #pragma mark - UIView Methods
@@ -132,7 +147,7 @@ static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
         return CGRectContainsPoint(UIEdgeInsetsInsetRect(CGRectStandardize(self.bounds), self.touchAreaInsets), point);
     }
 
-    // Defer to nromal
+    // Defer to normal
     return [super pointInside:point withEvent:event];
 }
 
@@ -207,11 +222,39 @@ static inline CGRect rectAlignToScale(CGRect rect, CGFloat scale) {
 }
 
 - (void)updateAfterStateChange:(BOOL)animated {
+    // Pass to helpers
+    [self updateAlphaAndBackgroundColorAnimated:animated];
+    [self updateImageTintColor];
+}
+
+#pragma mark - Alpha
+
+- (void)updateAlphaAndBackgroundColorAnimated:(BOOL)animated {
     // Update our alpha
     CGFloat duration = animated ? 0.2 : 0.0;
     [UIView animateWithDuration:duration animations:^{
-        self.alpha = self.enabled ? _enabledAlpha : self.disabledAlpha;
+        self.alpha = self.enabled ? self.enabledAlpha : self.disabledAlpha;
     }];
+}
+
+#pragma mark - Image Tint Color
+
+- (UIColor *)imageTintColorForState:(UIControlState)state {
+    return self.imageTintColors[@(state)] ?: self.imageTintColors[@(UIControlStateNormal)];
+}
+
+- (void)setImageTintColor:(UIColor *)imageTintColor forState:(UIControlState)state {
+    self.imageTintColors[@(state)] = imageTintColor;
+    self.imageTintStatefulAPIEnabled = YES;
+    [self updateImageTintColor];
+}
+
+- (void)updateImageTintColor {
+    if (!self.imageTintStatefulAPIEnabled) {
+        return;
+    }
+
+    self.imageView.tintColor = [self imageTintColorForState:self.state];
 }
 
 @end

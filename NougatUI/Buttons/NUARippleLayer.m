@@ -29,6 +29,10 @@ static NSString *const NUARippleLayerOpacityAnimationString = @"opacity";
 static NSString *const NUARippleLayerPositionAnimationString = @"position";
 static NSString *const NUARippleLayerScaleAnimationString = @"transform.scale";
 
+static inline CGFloat defaultRippleRadius(CGRect rect) {
+    return hypot(CGRectGetMidX(rect), CGRectGetMidY(rect)) + NUAExpandRippleBeyondSurface;
+}
+
 @implementation NUARippleLayer
 
 #pragma mark - Layout
@@ -41,7 +45,7 @@ static NSString *const NUARippleLayerScaleAnimationString = @"transform.scale";
 }
 
 - (void)setPathFromRadii {
-    CGFloat radius = hypot(CGRectGetMidX(self.bounds), CGRectGetMidY(self.bounds)) + NUAExpandRippleBeyondSurface;
+    CGFloat radius = self.maximumRadius > 0 ? self.maximumRadius : defaultRippleRadius(self.bounds);
     CGRect ovalRect = CGRectMake(CGRectGetMidX(self.bounds) - radius, CGRectGetMidY(self.bounds) - radius, radius * 2, radius * 2);
     UIBezierPath *circlePath = [UIBezierPath bezierPathWithOvalInRect:ovalRect];
     self.path = circlePath.CGPath;

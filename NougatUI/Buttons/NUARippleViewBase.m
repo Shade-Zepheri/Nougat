@@ -217,6 +217,9 @@ static const CGFloat NUARippleFadeOutDelay = 0.15;
     [self updateRippleStyle];
     [self setColorForRippleLayer:rippleLayer];
     rippleLayer.frame = self.bounds;
+    if (self.rippleStyle == NUARippleStyleUnbounded) {
+        rippleLayer.maximumRadius = self.maximumRadius;
+    }
     [self.layer addSublayer:rippleLayer];
     [rippleLayer startRippleAtPoint:point animated:animated];
     self.activeRippleLayer = rippleLayer;

@@ -24,6 +24,7 @@ typedef NS_ENUM(NSUInteger, NUARippleStyle) {
 @property (assign, nonatomic) NUARippleStyle rippleStyle;
 @property (strong, nonatomic) UIColor *rippleColor;
 @property (strong, nonatomic) UIColor *activeRippleColor;
+@property (assign, nonatomic) CGFloat maximumRadius;
 
 - (void)cancelAllRipplesAnimated:(BOOL)animated;
 
