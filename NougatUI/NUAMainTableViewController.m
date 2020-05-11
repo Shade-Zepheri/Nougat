@@ -37,8 +37,6 @@
         // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
         [_notificationRepository addObserver:self];
-
-        // _SBBiometricEventMonitorHasAuthenticated
     }
 
     return self;
@@ -491,6 +489,8 @@
     UITableViewRowAction *clearAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:localizedClear handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         [weakSelf executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
     }];
+
+    clearAction.backgroundColor = self.notificationShadePreferences.backgroundColor;
 
     return @[clearAction];
 }

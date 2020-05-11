@@ -17,8 +17,9 @@
 @property (weak, nonatomic) id<NUANotificationTableViewCellDelegate> actionsDelegate;
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 
-@property (strong, readonly, nonatomic) NUARelativeDateLabel *dateLabel;
-@property (strong, readonly, nonatomic) NSDate *timestamp;
-@property (strong, readonly, nonatomic) NUAImageColorInfo *colorInfo;
+@property (copy, nonatomic) NSString *titleText;
+@property (copy, nonatomic) NSString *messageText;
+@property (strong, nonatomic) UIImage *attachmentImage;
+@property (strong, nonatomic) NSDate *timestamp;
 
 @end

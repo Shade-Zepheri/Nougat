@@ -65,8 +65,8 @@
     [self.artworkView.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
 
     // Header constraints
-    [self.headerView.topAnchor constraintEqualToAnchor:self.headerLabel.bottomAnchor constant:6.0].active = YES;
-    [self.headerView.leadingAnchor constraintEqualToAnchor:self.glyphView.leadingAnchor].active = YES;
+    [self.headerView.topAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:6.0].active = YES;
+    [self.headerView.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor].active = YES;
 
     self.headerViewDefaultTrailingConstraint = [self.headerView.trailingAnchor constraintLessThanOrEqualToAnchor:self.controlsView.leadingAnchor constant:-10.0];
     self.headerViewDefaultTrailingConstraint.active = YES;
@@ -75,18 +75,16 @@
     self.headerViewExpandedTrailingConstraint.active = NO;
 
     // Finish expand button constraints
-    [self.headerLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
-    [self.contentView bringSubviewToFront:self.expandButton];
-    [self.expandButton.leadingAnchor constraintEqualToAnchor:self.headerLabel.trailingAnchor constant:-5.0].active = YES;
+    [self.headerStackView.trailingAnchor constraintLessThanOrEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
 
     // Controls view constraints
-    self.controlsViewBottomConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
+    self.controlsViewBottomConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:5.0];
     self.controlsViewBottomConstraint.active = YES;
 
     self.controlsViewTrailingConstraint = [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor];
     self.controlsViewTrailingConstraint.active = YES;
 
-    self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor];
+    self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor];
     self.controlsViewLeadingConstraint.active = NO;    
 }
 
@@ -200,8 +198,7 @@
 
     // Update imageview
     [self _updateHeaderLabelText];
-    UIImage *appIcon = [UIImage _applicationIconImageForBundleIdentifier:nowPlayingAppDisplayID format:0 scale:[UIScreen mainScreen].scale];
-    self.glyphView.image = appIcon;
+    self.headerGlyph = [UIImage _applicationIconImageForBundleIdentifier:nowPlayingAppDisplayID format:0 scale:[UIScreen mainScreen].scale];
 }
 
 - (void)setMetadata:(MPUNowPlayingMetadata *)metadata {
@@ -219,17 +216,9 @@
     [self _updateBackgroundGradientWithColor:backgroundColor];
 
     // Set tint color
-    self.headerLabel.textColor = tintColor;
+    self.headerTint = tintColor;
     self.headerView.tintColor = tintColor;
     self.controlsView.tintColor = tintColor;
-
-    // Update button
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    UIImage *baseImage = [UIImage imageNamed:@"arrow-dark" inBundle:bundle];
-
-    // Tint and set
-    UIImage *tintedImage = [baseImage _flatImageWithColor:tintColor];
-    [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 }
 
 #pragma mark - Info label
@@ -240,7 +229,7 @@
 
     LSApplicationProxy *applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:identifier];
     NSString *appDisplayName = applicationProxy.localizedName;
-    self.headerLabel.text = [NSString stringWithFormat:@"%@ • %@", appDisplayName, self.metadata.album];
+    self.headerText = [NSString stringWithFormat:@"%@ • %@", appDisplayName, self.metadata.album];
 }
 
 #pragma mark - Notifications
@@ -300,21 +289,24 @@
 
 - (void)nowPlayingControllerDidBeginListeningForNotifications:(MPUNowPlayingController *)controller {
     // Do nothing
+    return;
 }
 
 - (void)nowPlayingControllerDidStopListeningForNotifications:(MPUNowPlayingController *)controller {
     // Do nothing
+    return;
 }
 
 - (void)nowPlayingController:(MPUNowPlayingController *)controller elapsedTimeDidChange:(double)elapsedTime {
     // Do nothing
+    return;
 }
 
 #pragma mark - Default Color Provider
 
 - (void)updateTintsFromImage:(UIImage *)artworkImage {
-    if (self.notificationShadePreferences.useExternalColor) {
-        // Dont use our method if user wants colorflow
+    if (self.notificationShadePreferences.useExternalColor && NSClassFromString(@"CFWBucket")) {
+        // Only use colorflow if it exists and selected
         [self updateTintsUsingColorfow:artworkImage];
     } else {
         // Use built in methods
@@ -324,7 +316,7 @@
 
 - (void)updateTintsUsingCache:(UIImage *)artworkImage {
     // Use our own cache
-    NUAImageColorCache *colorCache = NUAImageColorCache.sharedCache;
+    NUAImageColorCache *colorCache = [NUAImageColorCache sharedCache];
     if ([colorCache hasColorDataForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork]) {
         // Has data
         NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork];

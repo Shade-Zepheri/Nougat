@@ -16,8 +16,9 @@
 
 @property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
 
-@property (strong, readonly, nonatomic) UIImageView *glyphView;
-@property (strong, readonly, nonatomic) UILabel *headerLabel;
-@property (strong, readonly, nonatomic) UIButton *expandButton;
+@property (strong, readonly, nonatomic) UIStackView *headerStackView;
+@property (copy, nonatomic) NSString *headerText;
+@property (strong, nonatomic) UIImage *headerGlyph;
+@property (strong, nonatomic) UIColor *headerTint;
 
 @end
