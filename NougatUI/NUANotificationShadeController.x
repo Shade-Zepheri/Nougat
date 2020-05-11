@@ -90,7 +90,7 @@
             _newResignActiveAssertion = [deactivationManager newAssertionWithReason:UIApplicationSceneDeactivationReasonControlCenter];
         } else {
             // iOS 12
-            _oldResignActiveAssertion = [[%c(FBUIApplicationSceneDeactivationAssertion) alloc] initWithReason:UIApplicationSceneDeactivationReasonControlCenter];
+            _oldResignActiveAssertion = [(FBUIApplicationSceneDeactivationAssertion *)[%c(FBUIApplicationSceneDeactivationAssertion) alloc] initWithReason:UIApplicationSceneDeactivationReasonControlCenter];
         }
 
         // CC calls this in init so we will too
@@ -921,7 +921,7 @@
 
     // Async rendering assertion
     if (!self.asynchronousRenderingAssertion && %c(SBAsynchronousRenderingAssertion)) {
-        self.asynchronousRenderingAssertion = [%c(SBAsynchronousRenderingAssertion) initWithReason:NSStringFromClass(self.class)];
+        self.asynchronousRenderingAssertion = [(SBAsynchronousRenderingAssertion *)[%c(SBAsynchronousRenderingAssertion) alloc] initWithReason:NSStringFromClass(self.class)];
     }
 
     // Stop the Idle timer and banners while presenting
