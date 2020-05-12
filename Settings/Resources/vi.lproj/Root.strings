@@ -4,8 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "Dùng Phong cách mặc định của hệ thống";
 "USE_COLORFLOW" = "Dùng màu của Colorflow";
+
+"NOTIFICATIONS" = "NOTIFICATIONS";
+"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
+"ALWAYS" = "Always";
+"WHEN_UNLOCKED" = "When Unlocked";
+"NEVER" = "Never";
 
 "USER_GUIDE" = "Hướng dẫn sử dụng";
 "SORT_ORDER" = "Sắp xếp thứ tự";
