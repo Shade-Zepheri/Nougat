@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdי";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "הקש לאפשרויות נוספות.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
