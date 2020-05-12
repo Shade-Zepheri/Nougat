@@ -564,7 +564,8 @@
         [weakSelf executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
     }];
 
-    clearAction.backgroundColor = self.notificationShadePreferences.backgroundColor;
+    UIColor *actionColor = self.notificationShadePreferences.usingDark ? [UIColor colorWithRed: 0.93 green: 0.93 blue: 0.93 alpha: 1.00] : [UIColor colorWithRed: 0.07 green: 0.07 blue: 0.07 alpha: 1.00];
+    clearAction.backgroundColor = actionColor;
 
     return @[clearAction];
 }
