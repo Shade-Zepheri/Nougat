@@ -4,8 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "Usar apariencia de sistema";
 "USE_COLORFLOW" = "Usar colores de ColorFlow";
+
+"NOTIFICATIONS" = "NOTIFICATIONS";
+"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
+"ALWAYS" = "Always";
+"WHEN_UNLOCKED" = "When Unlocked";
+"NEVER" = "Never";
 
 "USER_GUIDE" = "Guía de usuario";
 "SORT_ORDER" = "Sortear orden";
