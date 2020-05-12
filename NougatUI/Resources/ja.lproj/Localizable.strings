@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zd 日";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "タップして、オプションを表示します";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
