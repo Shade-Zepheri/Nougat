@@ -20,12 +20,26 @@
 
 #pragma mark - Initialization
 
-- (instancetype)init {
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)notificationShadePreferences {
     self = [super init];
     if (self) {
-        // Create defaults
+        // Set defaults
+        _notificationShadePreferences = notificationShadePreferences;
         _expandedNotifications = [NSMutableArray array];
         _mediaNotification = [NUACoalescedNotification mediaNotification];
+
+        // Determine unlock defaults
+        switch (notificationShadePreferences.notificationPreviewSetting) {
+            case NUANotificationPreviewSettingAlways:
+                _UILocked = NO;
+                break;
+            case NUANotificationPreviewSettingWhenUnlocked:
+                _UILocked = [[NSClassFromString(@"SBLockScreenManager") sharedInstance] isUILocked];
+                break;
+            case NUANotificationPreviewSettingNever:
+                _UILocked = YES;
+                break;
+        }
 
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -37,6 +51,13 @@
         // Notifications
         _notificationRepository = [NUANotificationRepository defaultRepository];
         [_notificationRepository addObserver:self];
+
+        // Register for notifications
+        NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+        [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
+        [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
+        [center addObserver:self selector:@selector(_handleBiometricAuthenticated:) name:@"SBBiometricEventMonitorHasAuthenticated" object:nil];
+        [center addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
     }
 
     return self;
@@ -70,6 +91,18 @@
 }
 
 #pragma mark - Properties
+
+- (void)setUILocked:(BOOL)UILocked {
+    if (_UILocked == UILocked || self.notificationShadePreferences.notificationPreviewSetting != NUANotificationPreviewSettingWhenUnlocked) {
+        // Nothing to change, or never change
+        return;
+    }
+
+    _UILocked = UILocked;
+
+    // Reload cells
+    [self.tableViewController.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
 
 - (CGFloat)contentHeight {
     return self.tableViewController.tableView.contentSize.height;
@@ -385,6 +418,47 @@
     });
 }
 
+- (void)_handleBacklightFadeFinished:(NSNotification *)notification {
+    // Dismiss if screen is turned off
+    BOOL screenIsOn = ((SBBacklightController *)[NSClassFromString(@"SBBacklightController") sharedInstance]).screenIsOn;
+
+    if (!screenIsOn) {
+        self.UILocked = YES;
+    }
+}
+
+- (void)_handleUIDidLock:(NSNotification *)notification {
+    // Dismiss if screen is turned off
+    BOOL screenIsOn = ((SBBacklightController *)[NSClassFromString(@"SBBacklightController") sharedInstance]).screenIsOn;
+
+    if (screenIsOn) {
+        self.UILocked = YES;
+    }
+}
+
+- (void)_handleBiometricAuthenticated:(NSNotification *)notification {
+    // Authenticated, show
+    self.UILocked = NO;
+}
+
+- (void)preferencesDidChange:(NSNotification *)notification {
+    // Change UILock settings
+    switch (self.notificationShadePreferences.notificationPreviewSetting) {
+        case NUANotificationPreviewSettingAlways:
+            _UILocked = NO;
+            break;
+        case NUANotificationPreviewSettingWhenUnlocked:
+            _UILocked = [[NSClassFromString(@"SBLockScreenManager") sharedInstance] isUILocked];
+            break;
+        case NUANotificationPreviewSettingNever:
+            _UILocked = YES;
+            break;
+    }
+
+    // Update table
+    [self.tableViewController.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+}
+
 #pragma mark - Media
 
 - (BOOL)_mediaCellPresent {
@@ -525,6 +599,7 @@
     cell.actionsDelegate = self;
     cell.delegate = self;
     cell.expanded = [self isNotificationExpanded:notification];
+    cell.UILocked =  self.UILocked;
     cell.layoutMargins = UIEdgeInsetsZero;
 
     return cell;

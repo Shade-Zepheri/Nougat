@@ -39,6 +39,8 @@
         <dict>
             <key>cell</key>
             <string>PSGroupCell</string>
+            <key>label</key>
+            <string>APPEARANCE</string>
         </dict>
         <dict>
             <key>cell</key>
@@ -97,6 +99,32 @@
             <string>USE_COLORFLOW</string>
             <key>PostNotification</key>
             <string>com.shade.nougat/ReloadPrefs</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+            <key>label</key>
+            <string>NOTIFICATIONS</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSLinkListCell</string>
+            <key>default</key>
+            <integer>0</integer>
+            <key>defaults</key>
+            <string>com.shade.nougat</string>
+            <key>detail</key>
+            <string>PSListItemsController</string>
+            <key>PostNotification</key>
+            <string>com.shade.nougat/ReloadPrefs</string>
+            <key>key</key>
+            <string>notificationPreviewSetting</string>
+            <key>label</key>
+            <string>SHOW_NOTIFICATION_PREVIEW</string>
+            <key>titlesDataSource</key>
+            <string>_notificationPreviewSettingTitles</string>
+            <key>valuesDataSource</key>
+            <string>_notificationPreviewSettingValues</string>
         </dict>
         <dict>
             <key>cell</key>

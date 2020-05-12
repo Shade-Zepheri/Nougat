@@ -2,7 +2,6 @@
 #import "NUARippleButton.h"
 #import <MobileCoreServices/LSApplicationProxy.h>
 #import <UIKit/UIView+Internal.h>
-#import <Macros.h>
 
 @interface NUANotificationTableViewCell ()
 @property (strong, nonatomic) UIImageView *attachmentImageView;
@@ -184,6 +183,23 @@
 
 #pragma mark - Properties
 
+- (void)setUILocked:(BOOL)UILocked {
+    if (_UILocked == UILocked) {
+        // Nothing to change
+        return;
+    }
+
+    _UILocked = UILocked;
+
+    // Change and hide stuff
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+    NSString *hiddenTitleText = [bundle localizedStringForKey:@"NOTIFICATION" value:@"Notification" table:@"Localizable"];
+    NSString *realTitleText = self.notification.title ?: self.notification.message;
+    self.titleText = UILocked ? hiddenTitleText : realTitleText;
+    self.messageLabel.hidden = UILocked;
+    self.attachmentImageView.hidden = UILocked;
+}
+
 - (NSString *)titleText {
     return self.titleLabel.text;
 }
@@ -274,10 +290,11 @@
     _notification = notification;
     NSBundle *bundle = [NSBundle bundleForClass:self.class];
     NSString *titleText = notification.title ?: notification.message;
+    NSString *hiddenTitleText = [bundle localizedStringForKey:@"NOTIFICATION" value:@"Notification" table:@"Localizable"];
     NSString *fallbackMessage = [bundle localizedStringForKey:@"TAP_FOR_MORE_OPTIONS" value:@"Tap for more options." table:@"Localizable"];
     NSString *messageText = (notification.title) ? notification.message : fallbackMessage;
     self.attachmentImage = notification.attachmentImage;
-    self.titleText = titleText;
+    self.titleText = self.UILocked ? hiddenTitleText : titleText;
     self.messageText = messageText;
     self.headerGlyph = notification.icon;
     self.timestamp = notification.timestamp;

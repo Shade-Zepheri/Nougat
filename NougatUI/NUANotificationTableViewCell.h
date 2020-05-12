@@ -17,6 +17,7 @@
 @property (weak, nonatomic) id<NUANotificationTableViewCellDelegate> actionsDelegate;
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 
+@property (getter=isUILocked, nonatomic) BOOL UILocked;
 @property (copy, nonatomic) NSString *titleText;
 @property (copy, nonatomic) NSString *messageText;
 @property (strong, nonatomic) UIImage *attachmentImage;

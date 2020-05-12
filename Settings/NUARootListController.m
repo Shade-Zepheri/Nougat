@@ -2,11 +2,11 @@
 #import "PSSegmentTableCell+Enable.h"
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
-#import <Preferences/PSSpecifier+Private.h>
-#import <Preferences/PSSwitchTableCell+Private.h>
+#import <LocalAuthentication/LocalAuthentication.h>
+#import <Preferences/Preferences.h>
 #import <TechSupport/TSContactViewController.h>
+#import <UIKit/UIKit+Private.h>
 #import <UIKit/UIImage+Private.h>
-#import <UIKit/UIView+Internal.h>
 #import <version.h>
 
 @implementation NUARootListController
@@ -49,31 +49,6 @@
 }
 
 #pragma mark - Specifiers
-
-- (BOOL)_hasColorflowInstalled {
-    // Check stuffs once
-    static BOOL installed = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        BOOL hasColorflow3 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
-        BOOL hasColorflow4 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
-        BOOL hasColorflow5 = [[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow5.dylib"];
-        installed = hasColorflow3 || hasColorflow4 || hasColorflow5;
-    });
-
-    return installed;
-}
-
-- (BOOL)_systemDarkmodeAvailable {
-    // Check stuffs once
-    static BOOL available = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        available = IS_IOS_OR_NEWER(iOS_13_0);
-    });
-
-    return available;
-}
 
 - (void)_modifySpecifierVisibility {
     // Remove specifiers
@@ -146,6 +121,39 @@
     [self.navigationController pushViewController:supportController animated:YES];
 }
 
+#pragma mark - List Items Controller
+
+- (NSArray<NSString *> *)_notificationPreviewSettingTitles {
+    // Add defaults
+    NSMutableArray *titles = [NSMutableArray array];
+    NSBundle *bundle = [NSBundle bundleForClass:self.class];
+    NSString *localizedAlways = [bundle localizedStringForKey:@"ALWAYS" value:@"Always" table:@"Root"];
+    NSString *localizedNever = [bundle localizedStringForKey:@"NEVER" value:@"Never" table:@"Root"];
+    [titles addObject:localizedAlways];
+    [titles addObject:localizedNever];
+
+    if ([self _hasBiometrics]) {
+        // Add biometric dependent setting
+        NSString *localizedWhenUnlocked = [bundle localizedStringForKey:@"WHEN_UNLOCKED" value:@"When Unlocked" table:@"Root"];
+        [titles insertObject:localizedWhenUnlocked atIndex:1];
+    }
+
+    return [titles copy];
+}
+
+- (NSArray<NSNumber *> *)_notificationPreviewSettingValues {
+    NSMutableArray *values = [NSMutableArray array];
+    [values addObject:@(NUANotificationPreviewSettingAlways)];
+    [values addObject:@(NUANotificationPreviewSettingNever)];
+
+    if ([self _hasBiometrics]) {
+        // Add biometric dependent setting
+        [values insertObject:@(NUANotificationPreviewSettingWhenUnlocked) atIndex:1];
+    }
+
+    return [values copy];
+}
+
 #pragma mark - Preference Values
 
 - (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
@@ -163,6 +171,50 @@
     }
 
 	[super setPreferenceValue:value specifier:specifier];
+}
+
+#pragma mark - Helper Methods
+
+- (BOOL)_hasColorflowInstalled {
+    // Check stuffs once
+    static BOOL installed = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        BOOL hasColorflow3 = [fileManager fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow3.dylib"];
+        BOOL hasColorflow4 = [fileManager fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow4.dylib"];
+        BOOL hasColorflow5 = [fileManager fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/ColorFlow5.dylib"];
+        installed = hasColorflow3 || hasColorflow4 || hasColorflow5;
+    });
+
+    return installed;
+}
+
+- (BOOL)_systemDarkmodeAvailable {
+    // Check stuffs once
+    static BOOL available = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        available = IS_IOS_OR_NEWER(iOS_13_0);
+    });
+
+    return available;
+}
+
+- (BOOL)_hasBiometrics {
+    // Check stuffs once
+    static BOOL hasBiometrics = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (@available(iOS 11.2, *)) {
+            LAContext *context = [[LAContext alloc] init];
+            [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
+            hasBiometrics = context.biometryType != LABiometryTypeNone;
+        }
+    });
+
+    return hasBiometrics;
+
 }
 
 @end

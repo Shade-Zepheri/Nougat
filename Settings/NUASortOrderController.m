@@ -48,7 +48,7 @@
 
         // Create tableview
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        [self.tableViewController setEditing:YES animated:NO];
+        [_tableViewController setEditing:YES animated:NO];
     }
 
     return self;

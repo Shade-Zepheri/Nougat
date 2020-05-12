@@ -7,6 +7,12 @@ typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
     NUADrawerThemeOreo
 };
 
+typedef NS_ENUM(NSUInteger, NUANotificationPreviewSetting) {
+    NUANotificationPreviewSettingAlways,
+    NUANotificationPreviewSettingWhenUnlocked,
+    NUANotificationPreviewSettingNever
+};
+
 // Settings keys
 static NSString *const NUAPreferencesEnabledKey = @"enabled";
 
@@ -18,6 +24,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 
 static NSString *const NUAPreferencesUsesExternalColorKey = @"colorflowEnabled";
 static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppearance";
+static NSString *const NUAPreferencesNotificationPreviewSettingKey = @"notificationPreviewSetting";
 
 @interface NUAPreferenceManager : NSObject
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
@@ -36,6 +43,7 @@ static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppea
 
 @property (assign, readonly, nonatomic) BOOL useExternalColor;
 @property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
+@property (assign, readonly, nonatomic) NUANotificationPreviewSetting notificationPreviewSetting;
 
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;

@@ -84,9 +84,8 @@
 }
 
 - (void)_loadExtensionsTable {
-    _tableViewController = [[NUAMainTableViewController alloc] init];
+    _tableViewController = [[NUAMainTableViewController alloc] initWithPreferences:self.notificationShadePreferences];
     self.tableViewController.delegate = self;
-    self.tableViewController.notificationShadePreferences = self.notificationShadePreferences;
 
     // Add as child
     [self addChildViewController:self.tableViewController];
