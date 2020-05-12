@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zd일";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "탭하여 추가 옵션 확인.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
