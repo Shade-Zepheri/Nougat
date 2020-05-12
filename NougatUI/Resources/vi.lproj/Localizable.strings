@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdNG";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Chạm để mở rộng.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
