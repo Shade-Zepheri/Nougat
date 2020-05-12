@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdT";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Für mehr Optionen antippen.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
