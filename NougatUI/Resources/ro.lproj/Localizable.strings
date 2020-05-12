@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdz";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Atinge pentru mai multe optiuni.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
