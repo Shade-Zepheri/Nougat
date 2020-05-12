@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdд";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Нажмите, чтобы узнать больше.";
 "OPEN" = "Открыть";
 "CLEAR" = "Очистить";
