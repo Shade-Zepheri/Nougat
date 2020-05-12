@@ -5,6 +5,7 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdn.";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "További beállításokért kattintson.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
