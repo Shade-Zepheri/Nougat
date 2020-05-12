@@ -564,8 +564,14 @@
         [weakSelf executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
     }];
 
-    UIColor *actionColor = self.notificationShadePreferences.usingDark ? [UIColor colorWithRed: 0.93 green: 0.93 blue: 0.93 alpha: 1.00] : [UIColor colorWithRed: 0.07 green: 0.07 blue: 0.07 alpha: 1.00];
-    clearAction.backgroundColor = actionColor;
+    if (@available(iOS 13, *)) {
+        // Make options depend on light/dark
+        BOOL inDarkMode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+        clearAction.backgroundColor = inDarkMode ? [UIColor colorWithRed: 0.07 green: 0.07 blue: 0.07 alpha: 1.00] : [UIColor colorWithRed: 0.93 green: 0.93 blue: 0.93 alpha: 1.00];
+    } else {
+        // Always light
+        clearAction.backgroundColor = [UIColor colorWithRed: 0.93 green: 0.93 blue: 0.93 alpha: 1.00];
+    }
 
     return @[clearAction];
 }

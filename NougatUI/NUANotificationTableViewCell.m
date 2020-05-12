@@ -2,6 +2,7 @@
 #import "NUARippleButton.h"
 #import <MobileCoreServices/LSApplicationProxy.h>
 #import <UIKit/UIView+Internal.h>
+#import <Macros.h>
 
 @interface NUANotificationTableViewCell ()
 @property (strong, nonatomic) UIImageView *attachmentImageView;
@@ -121,9 +122,17 @@
 
     // Create bar
     self.optionsBar = [[UIView alloc] initWithFrame:CGRectZero];
-    self.optionsBar.backgroundColor = self.notificationShadePreferences.backgroundColor;
     self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.optionsBar];
+
+    if (@available(iOS 13, *)) {
+        // Make options depend on light/dark
+        BOOL inDarkMode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+        self.optionsBar.backgroundColor = inDarkMode ? PixelBackgroundColor : OreoBackgroundColor;
+    } else {
+        // Always light
+        self.optionsBar.backgroundColor = OreoBackgroundColor;
+    }
 
     // Constraints
     [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
@@ -379,6 +388,24 @@
     [self.openButton setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
     [self.clearButton setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
     [self setNeedsLayout];
+}
+
+#pragma mark - Appearance Updates
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+
+    // Check if appearance changed
+    if (@available(iOS 13, *)) {
+        if (![self.traitCollection hasDifferentColorAppearanceComparedToTraitCollection:previousTraitCollection]) {
+            return;
+        }
+
+        // Change option bar color to match system
+        BOOL inDarkMode = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+        UIColor *optionsBackgroundColor = inDarkMode ? PixelBackgroundColor : OreoBackgroundColor;
+        self.optionsBar.backgroundColor = optionsBackgroundColor;
+    }
 }
 
 @end
