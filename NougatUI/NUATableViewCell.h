@@ -12,6 +12,7 @@
 
 @interface NUATableViewCell : UITableViewCell
 @property (weak, nonatomic) id<NUATableViewCellDelegate> delegate;
+@property (getter=isExpandable, nonatomic) BOOL expandable;
 @property (getter=isExpanded, nonatomic) BOOL expanded;
 
 @property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;

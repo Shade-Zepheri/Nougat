@@ -14,6 +14,8 @@
 @property (strong, nonatomic) NUARippleButton *clearButton;
 
 @property (strong, nonatomic) NSLayoutConstraint *attachmentConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *optionsHeightConstraint;
+@property (strong, nonatomic) UIPanGestureRecognizer *expandGestureRecognizer;
 
 @end
 
@@ -42,7 +44,7 @@
     [self.contentView addSubview:self.attachmentImageView];
 
     // Constraints
-    [self.attachmentImageView.centerYAnchor constraintEqualToAnchor:self.contentView.centerYAnchor].active = YES;
+    [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor].active = YES;
     [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
     [self.attachmentImageView.heightAnchor constraintEqualToConstant:40.0].active = YES;
     self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
@@ -59,7 +61,6 @@
     self.dateLabel = [[NUADateLabelRepository sharedRepository] startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
     self.dateLabel.delegate = self;
     self.dateLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.dateLabel.numberOfLines = 1;
     self.dateLabel.textColor = [UIColor grayColor];
     self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -88,10 +89,9 @@
     }
     [self.contentView addSubview:self.titleLabel];
 
-    [self.titleLabel.topAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:10.0].active = YES;
+    [self.titleLabel.firstBaselineAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:20.0].active = YES;
     [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor].active = YES;
     [self.titleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-    [self.titleLabel.heightAnchor constraintEqualToConstant:20.0].active = YES;
 }
 
 - (void)_configureMessageLabelIfNecessary {
@@ -102,16 +102,16 @@
 
     // Create
     self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
     self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.messageLabel.numberOfLines = 2;
     self.messageLabel.textColor = [UIColor grayColor];
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.messageLabel];
 
-    [self.messageLabel.topAnchor constraintEqualToAnchor:self.titleLabel.bottomAnchor constant:2.0].active = YES;
+    [self.messageLabel.firstBaselineAnchor constraintEqualToAnchor:self.titleLabel.lastBaselineAnchor constant:20.0].active = YES;
     [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.titleLabel.leadingAnchor].active = YES;
     [self.messageLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
-    [self.messageLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 }
 
 - (void)_configureOptionsBarIfNecessary {
@@ -137,8 +137,13 @@
     // Constraints
     [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
     [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-    [self.optionsBar.topAnchor constraintEqualToAnchor:self.contentView.topAnchor constant:100.0].active = YES;
-    [self.optionsBar.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+
+    [self.optionsBar.topAnchor constraintEqualToAnchor:self.messageLabel.lastBaselineAnchor constant:15.0].active = YES;
+    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
+    self.optionsHeightConstraint.active = YES;
+
+    // Have cell height be determined by size of everything else
+    [self.contentView.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
 
     // Create buttons
     NSBundle *bundle = [NSBundle bundleForClass:self.class];
@@ -146,8 +151,8 @@
     self.openButton = [[NUARippleButton alloc] init];
     [self.openButton addTarget:self action:@selector(cellOpenButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.openButton setTitle:localizedOpen forState:UIControlStateNormal];
-    self.openButton.contentEdgeInsets = UIEdgeInsetsMake(8, 0, 8, 0);
-    self.openButton.hidden = !self.expanded;
+    self.openButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
+    self.openButton.hidden = YES;
     self.openButton.maxRippleRadius = 20.0;
     self.openButton.rippleStyle = NUARippleStyleUnbounded;
     self.openButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
@@ -159,8 +164,8 @@
     self.clearButton = [[NUARippleButton alloc] init];
     [self.clearButton addTarget:self action:@selector(cellClearButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self.clearButton setTitle:localizedClear forState:UIControlStateNormal];
-    self.clearButton.contentEdgeInsets = UIEdgeInsetsMake(8, 0, 8, 0);
-    self.clearButton.hidden = !self.expanded;
+    self.clearButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
+    self.clearButton.hidden = YES;
     self.clearButton.maxRippleRadius = 20.0;
     self.clearButton.rippleStyle = NUARippleStyleUnbounded;
     self.clearButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
@@ -188,6 +193,50 @@
 - (void)cellClearButtonPressed:(NUARippleButton *)button {
     // Defer to delegate
     [self.actionsDelegate notificationTableViewCellRequestsExecuteAlternateAction:self];
+}
+
+#pragma mark - Gesture Recognizer
+
+- (void)_handlePanGesture:(UIPanGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateEnded) {
+        // Only trigger on end
+        return;
+    }
+
+    // Determine if up or down
+    CGPoint velocity = [gestureRecognizer velocityInView:self.contentView];
+    BOOL expand = velocity.y > 0;
+    [self.delegate tableViewCell:self wantsExpansion:expand];
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        // Not dealing with pans
+        return NO;
+    }
+
+    // Only expand under certain criteria
+    UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+    CGPoint velocity = [panGestureRecognizer velocityInView:self.contentView];
+    if (fabs(velocity.x) > fabs(velocity.y)) {
+        // Horizontal pan, don't do anything
+        return NO;
+    }
+
+    CGPoint location = [panGestureRecognizer locationInView:self.contentView];
+    CGFloat labelHeight = CGRectGetHeight(self.contentView.bounds);
+    CGFloat projectedY = location.y + [self project:velocity.y decelerationRate:0.998];
+    return (fabs(projectedY) < (labelHeight * 1.69));
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    // Conflict with table scroll
+    return (gestureRecognizer == self.expandGestureRecognizer) && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]];
+}
+
+- (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
+    // From WWDC (UIScrollView.decelerationRate = 0.998)
+    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate);
 }
 
 #pragma mark - Properties
@@ -242,6 +291,16 @@
 
     // Update
     self.messageLabel.text = messageText;
+
+    // Manually derive message label
+    CGRect contentViewBounds = UIEdgeInsetsInsetRect(self.contentView.bounds, self.contentView.layoutMargins);
+    CGFloat trailingInset = (self.attachmentImage) ? 50.0 : 10.0;
+    CGFloat calculatedLabelWidth = CGRectGetWidth(contentViewBounds) - trailingInset;
+    CGSize boundingSize = CGSizeMake(calculatedLabelWidth, CGFLOAT_MAX);
+
+    // Determine if expandable
+    CGRect requiredLabelBounds = [messageText boundingRectWithSize:boundingSize options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) attributes:@{NSFontAttributeName: self.messageLabel.font} context:nil];
+    self.expandable = floor(CGRectGetHeight(requiredLabelBounds) / self.messageLabel.font.lineHeight) > 2;
     [self setNeedsLayout];
 }
 
@@ -279,11 +338,39 @@
     [self setNeedsLayout];
 }
 
+- (void)setExpandable:(BOOL)expandable {
+    [super setExpandable:expandable];
+
+    if (expandable && !self.expandGestureRecognizer) {
+        // Add gesture
+        self.expandGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
+        self.expandGestureRecognizer.delegate = self;
+        [self.contentView addGestureRecognizer:self.expandGestureRecognizer];
+    } else if (!expandable && self.expandGestureRecognizer) {
+        // Remove gesture
+        [self.contentView removeGestureRecognizer:self.expandGestureRecognizer];
+        self.expandGestureRecognizer.delegate = nil;
+        self.expandGestureRecognizer = nil;
+    }
+}
+
 - (void)setExpanded:(BOOL)expanded {
     [super setExpanded:expanded];
 
-    // Show/hide
     [self _configureOptionsBarIfNecessary];
+
+    if (!self.expandable) {
+        // No change, or not allowed
+        return;
+    }
+
+    // Configure constraints 
+    self.optionsHeightConstraint.constant = expanded ? 40.0 : 0.0;
+
+    // Configure message label
+    self.messageLabel.numberOfLines = expanded ? 0 : 2;
+
+    // Configure buttons
     self.openButton.hidden = !self.expanded;
     self.clearButton.hidden = !self.expanded;
     [self setNeedsLayout];

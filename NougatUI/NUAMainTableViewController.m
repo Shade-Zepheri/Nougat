@@ -342,7 +342,7 @@
     // Configure tableView
     self.tableViewController.tableView.dataSource = self;
     self.tableViewController.tableView.delegate = self;
-    self.tableViewController.tableView.estimatedRowHeight = 100.0;
+    self.tableViewController.tableView.estimatedRowHeight = 86.0;
     self.tableViewController.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableViewController.tableView.translatesAutoresizingMaskIntoConstraints = NO;
     self.tableViewController.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -640,12 +640,15 @@
 }
 
 - (void)notification:(NUACoalescedNotification *)notification shouldExpand:(BOOL)expand reload:(BOOL)reload {
+    if ((expand && [self isNotificationExpanded:notification]) || (!expand && ![self isNotificationExpanded:notification])) {
+        // Already expanded or normal
+        return;
+    }
+
     // Add/remove
-    if (expand && ![self isNotificationExpanded:notification]) {
-        // Add to expanded
+    if (expand) {
         [_expandedNotifications addObject:notification];
-    } else if (!expand && [self isNotificationExpanded:notification]) {
-        // Add to expanded
+    } else {
         [_expandedNotifications removeObject:notification];
     }
 

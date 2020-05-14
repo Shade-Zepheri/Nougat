@@ -3,8 +3,6 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUATableViewCell ()
-@property (strong, nonatomic) NSLayoutConstraint *heightConstraint;
-
 @property (strong, nonatomic) UIImageView *glyphView;
 @property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) NUARippleButton *expandButton;
@@ -19,11 +17,8 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         // Defaults
+        _expandable = NO;
         _expanded = NO;
-
-        // Do height constraint
-        _heightConstraint = [self.contentView.heightAnchor constraintEqualToConstant:100.0];
-        _heightConstraint.active = YES;
 
         // Finish setup
         [self _configureHeaderView];
@@ -60,6 +55,7 @@
     _expandButton = [[NUARippleButton alloc] init];
     [self.expandButton addTarget:self action:@selector(_handleExpandCell:) forControlEvents:UIControlEventTouchUpInside];
     self.expandButton.contentEdgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
+    self.expandButton.hidden = YES;
     self.expandButton.touchAreaInsets = UIEdgeInsetsMake(-10.0, -10.0, -10.0, -10.0);
     self.expandButton.rippleStyle = NUARippleStyleUnbounded;
     self.expandButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -108,6 +104,11 @@
 }
 
 - (void)setHeaderText:(NSString *)headerText {
+    if ([self.headerLabel.text isEqualToString:headerText]) {
+        // Same text
+        return;
+    }
+
     self.headerLabel.text = headerText;
 }
 
@@ -116,6 +117,11 @@
 }
 
 - (void)setHeaderGlyph:(UIImage *)headerGlyph {
+    if (self.glyphView.image == headerGlyph) {
+        // Same image
+        return;
+    }
+
     self.glyphView.image = headerGlyph;
 }
 
@@ -140,13 +146,27 @@
     [self.expandButton setImage:tintedImage forState:UIControlStateNormal];
 }
 
+- (void)setExpandable:(BOOL)expandable {
+    if (expandable == _expandable) {
+        // Nothing to change
+        return;
+    }
+
+    _expandable = expandable;
+
+    // Hide button
+    self.expandButton.hidden = !expandable;
+}
+
 - (void)setExpanded:(BOOL)expanded {
+    if (expanded == _expanded || !self.expandable) {
+        // No change, or not allowed
+        return;
+    }
+
     _expanded = expanded;
 
-    // Chnage constraints
-    self.heightConstraint.constant = expanded ? 150.0 : 100.0;
-
-    // Flip image
+    // Flip button image
     CGFloat angle = M_PI * [@(expanded) intValue];
     [UIView transitionWithView:self.expandButton.imageView duration:0.2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
         self.expandButton.imageView.transform = CGAffineTransformMakeRotation(angle);
