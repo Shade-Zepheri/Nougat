@@ -130,8 +130,7 @@ NUANotificationShadeController *notificationShade;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
-    SBScreenEdgePanGestureRecognizer *showSystemGestureRecognizer = [self valueForKey:@"_showSystemGestureRecognizer"];
-    if (gestureRecognizer != showSystemGestureRecognizer || !settings.enabled) {
+    if (!settings.enabled) {
         return shouldBegin;
     }
 
@@ -148,7 +147,7 @@ NUANotificationShadeController *notificationShade;
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     BOOL shouldBegin = %orig;
-    if (gestureRecognizer != self.presentGestureRecognizer || !settings.enabled) {
+    if (!settings.enabled) {
         // Only override present gesture
         return shouldBegin;
     }
