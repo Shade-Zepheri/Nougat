@@ -7,11 +7,13 @@
 @property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) NUARippleButton *expandButton;
 
+@property (strong, nonatomic) UIPanGestureRecognizer *expandGestureRecognizer;
+
 @end
 
 @implementation NUATableViewCell
 
-#pragma mark - Initializer
+#pragma mark - Initialization
 
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -156,6 +158,18 @@
 
     // Hide button
     self.expandButton.hidden = !expandable;
+
+    if (expandable && !self.expandGestureRecognizer) {
+        // Add gesture
+        self.expandGestureRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_handlePanGesture:)];
+        self.expandGestureRecognizer.delegate = self;
+        [self.contentView addGestureRecognizer:self.expandGestureRecognizer];
+    } else if (!expandable && self.expandGestureRecognizer) {
+        // Remove gesture
+        [self.contentView removeGestureRecognizer:self.expandGestureRecognizer];
+        self.expandGestureRecognizer.delegate = nil;
+        self.expandGestureRecognizer = nil;
+    }
 }
 
 - (void)setExpanded:(BOOL)expanded {
@@ -178,6 +192,50 @@
 - (void)_handleExpandCell:(NUARippleButton *)button {
     // Notify table
     [self.delegate tableViewCell:self wantsExpansion:!self.expanded];
+}
+
+#pragma mark - Gesture Recognizer
+
+- (void)_handlePanGesture:(UIPanGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateEnded || !self.expandable) {
+        // Only trigger on end, or not expandable
+        return;
+    }
+
+    // Determine if up or down
+    CGPoint velocity = [gestureRecognizer velocityInView:self.contentView];
+    BOOL expand = velocity.y > 0;
+    [self.delegate tableViewCell:self wantsExpansion:expand];
+}
+
+- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    if (![gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]]) {
+        // Not dealing with pans
+        return NO;
+    }
+
+    // Only expand under certain criteria
+    UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
+    CGPoint velocity = [panGestureRecognizer velocityInView:self.contentView];
+    if (fabs(velocity.x) > fabs(velocity.y)) {
+        // Horizontal pan, don't do anything
+        return NO;
+    }
+
+    CGPoint location = [panGestureRecognizer locationInView:self.contentView];
+    CGFloat labelHeight = CGRectGetHeight(self.contentView.bounds);
+    CGFloat projectedY = location.y + [self project:velocity.y decelerationRate:0.998];
+    return (fabs(projectedY) < (labelHeight * 1.69));
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    // Conflict with table scroll
+    return (gestureRecognizer == self.expandGestureRecognizer) && [otherGestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]];
+}
+
+- (CGFloat)project:(CGFloat)initialVelocity decelerationRate:(CGFloat)decelerationRate {
+    // From WWDC (UIScrollView.decelerationRate = 0.998)
+    return (initialVelocity / 1000.0) * decelerationRate / (1.0 - decelerationRate);
 }
 
 @end
