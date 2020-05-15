@@ -173,7 +173,7 @@
 }
 
 - (void)setExpanded:(BOOL)expanded {
-    if (expanded == _expanded || !self.expandable) {
+    if (expanded == _expanded) {
         // No change, or not allowed
         return;
     }
@@ -190,6 +190,11 @@
 #pragma mark - Button
 
 - (void)_handleExpandCell:(NUARippleButton *)button {
+    if (!self.expandable) {
+        // Do nothing
+        return;
+    }
+
     // Notify table
     [self.delegate tableViewCell:self wantsExpansion:!self.expanded];
 }

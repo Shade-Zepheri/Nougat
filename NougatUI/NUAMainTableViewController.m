@@ -668,19 +668,12 @@
     return [_expandedNotifications containsObject:notification];
 }
 
-- (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell {
-    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
+- (void)notificationTableViewCell:(NUANotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request {
+    // Call the repository
+    [self.notificationRepository executeAction:action forNotificationRequest:request];
 
-    // Launch notif
-    [self executeNotificationAction:@"default" forCellAtIndexPath:indexPath];
-}
-
-- (void)notificationTableViewCellRequestsExecuteAlternateAction:(NUANotificationTableViewCell *)cell {
-    // Figure this out
-    NSIndexPath *indexPath = [self.tableViewController.tableView indexPathForCell:cell];
-
-    // Launch notif
-    [self executeNotificationAction:@"clear" forCellAtIndexPath:indexPath];
+    // Dismiss
+    [self.delegate tableViewControllerWantsDismissal:self];
 }
 
 #pragma mark - Clear All Button

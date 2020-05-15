@@ -10,8 +10,7 @@
 @property (strong, nonatomic) UILabel *messageLabel;
 @property (strong, nonatomic) NUARelativeDateLabel *dateLabel;
 @property (strong, nonatomic) UIView *optionsBar;
-@property (strong, nonatomic) NUARippleButton *openButton;
-@property (strong, nonatomic) NUARippleButton *clearButton;
+@property (strong, nonatomic) UIStackView *optionsButtonStack;
 
 @property (strong, nonatomic) NSLayoutConstraint *attachmentConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *optionsHeightConstraint;
@@ -27,12 +26,13 @@
     [self _recycleDateLabel];
 }
 
-#pragma mark - View Creation
+#pragma mark - Reuse
 
-- (void)_configureAttachmentImageViewIfNecessary {
-    if (self.attachmentImageView) {
-        // Already exists
-        return;
+- (void)prepareForReuse {
+    [super prepareForReuse];
+
+    // Reset stuff
+    self.expanded = NO;
     }
 
     // Create
@@ -144,54 +144,18 @@
     // Have cell height be determined by size of everything else
     [self.contentView.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
 
-    // Create buttons
-    NSBundle *bundle = [NSBundle bundleForClass:self.class];
-    NSString *localizedOpen = [bundle localizedStringForKey:@"OPEN" value:@"Open" table:@"Localizable"];
-    self.openButton = [[NUARippleButton alloc] init];
-    [self.openButton addTarget:self action:@selector(cellOpenButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [self.openButton setTitle:localizedOpen forState:UIControlStateNormal];
-    self.openButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
-    self.openButton.hidden = YES;
-    self.openButton.maxRippleRadius = 20.0;
-    self.openButton.rippleStyle = NUARippleStyleUnbounded;
-    self.openButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    self.openButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.openButton sizeToFit];
-    [self.optionsBar addSubview:self.openButton];
+    // Create stack
+    _optionsButtonStack = [[UIStackView alloc] initWithFrame:CGRectZero];
+    self.optionsButtonStack.axis = UILayoutConstraintAxisHorizontal;
+    self.optionsButtonStack.alignment = UIStackViewAlignmentLastBaseline;
+    self.optionsButtonStack.distribution = UIStackViewDistributionEqualSpacing;
+    self.optionsButtonStack.spacing = 15.0;
+    self.optionsButtonStack.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.contentView addSubview:self.optionsButtonStack];
 
-    NSString *localizedClear = [bundle localizedStringForKey:@"CLEAR" value:@"Clear" table:@"Localizable"];
-    self.clearButton = [[NUARippleButton alloc] init];
-    [self.clearButton addTarget:self action:@selector(cellClearButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [self.clearButton setTitle:localizedClear forState:UIControlStateNormal];
-    self.clearButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
-    self.clearButton.hidden = YES;
-    self.clearButton.maxRippleRadius = 20.0;
-    self.clearButton.rippleStyle = NUARippleStyleUnbounded;
-    self.clearButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-    self.clearButton.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.clearButton sizeToFit];
-    [self.optionsBar addSubview:self.clearButton];
-
-    // Constraints
-    [self.openButton.leadingAnchor constraintEqualToAnchor:self.messageLabel.leadingAnchor].active = YES;
-    [self.openButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
-    [self.openButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
-
-    [self.clearButton.leadingAnchor constraintEqualToAnchor:self.openButton.trailingAnchor constant:30.0].active = YES;
-    [self.clearButton.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
-    [self.clearButton.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
-}
-
-#pragma mark - Buttons
-
-- (void)cellOpenButtonPressed:(NUARippleButton *)button {
-    // Defer to delegate
-    [self.actionsDelegate notificationTableViewCellRequestsExecuteDefaultAction:self];
-}
-
-- (void)cellClearButtonPressed:(NUARippleButton *)button {
-    // Defer to delegate
-    [self.actionsDelegate notificationTableViewCellRequestsExecuteAlternateAction:self];
+    [self.optionsButtonStack.leadingAnchor constraintEqualToAnchor:self.messageLabel.leadingAnchor].active = YES;
+    [self.optionsButtonStack.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
+    [self.optionsButtonStack.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
 }
 
 #pragma mark - Properties
@@ -211,6 +175,7 @@
     self.titleText = UILocked ? hiddenTitleText : realTitleText;
     self.messageLabel.hidden = UILocked;
     self.attachmentImageView.hidden = UILocked;
+    [self setNeedsLayout];
 }
 
 - (NSString *)titleText {
@@ -297,20 +262,16 @@
 
     [self _configureOptionsBarIfNecessary];
 
-    if (!self.expandable) {
-        // No change, or not allowed
-        return;
-    }
-
-    // Configure constraints 
+    // Configure options bar
+    if (self.hasActions) {
     self.optionsHeightConstraint.constant = expanded ? 40.0 : 0.0;
 
-    // Configure message label
-    self.messageLabel.numberOfLines = expanded ? 0 : 2;
+        // Reveal the buttons
+        for (UIView *view in self.optionsButtonStack.arrangedSubviews) {
+            view.hidden = !expanded;
+        }
+    }
 
-    // Configure buttons
-    self.openButton.hidden = !self.expanded;
-    self.clearButton.hidden = !self.expanded;
     [self setNeedsLayout];
 }
 
@@ -333,11 +294,69 @@
     self.headerGlyph = notification.icon;
     self.timestamp = notification.timestamp;
 
+    // Add actions if necessary
+    [self setupActionsFromNotification:notification];
+
     // // Update header text
     [self updateHeaderWithSectionID:notification.sectionID];
 
     // // Get our color info
     [self updateColorInfoFromNotification:notification];
+
+    // Update UI
+    [self setNeedsLayout];
+}
+
+#pragma mark - Notification Actions
+
+- (void)setupActionsFromNotification:(NUACoalescedNotification *)notification {
+    if (self.optionsButtonStack.arrangedSubviews.count > 0) {
+        // Remove old actions
+        for (UIView *view in self.optionsButtonStack.arrangedSubviews) {
+            [view removeFromSuperview];
+        }
+    }
+
+    NCNotificationRequest *request = notification.leadingNotificationEntry.request;
+    NSArray<NCNotificationAction *> *minimalActions = request.supplementaryActions[@"NCNotificationActionEnvironmentMinimal"];
+    if (!minimalActions || minimalActions.count == 0) {
+        // No supplemental actions
+        self.hasActions = NO;
+        return;
+    }
+
+    self.expandable = YES;
+    self.hasActions = YES;
+
+    // Add supplemental minimal actions
+    for (NCNotificationAction *action in minimalActions) {
+        // Create button
+        NUARippleButton *rippleButton = [[NUARippleButton alloc] init];
+        [rippleButton addTarget:self action:@selector(cellActionButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        [rippleButton setTitle:action.title forState:UIControlStateNormal];
+        rippleButton.contentEdgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
+        rippleButton.hidden = YES;
+        rippleButton.maxRippleRadius = 20.0;
+        rippleButton.rippleStyle = NUARippleStyleUnbounded;
+        rippleButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        [rippleButton sizeToFit];
+
+        // Add to stack
+        [self.optionsButtonStack addArrangedSubview:rippleButton];
+    }
+}
+
+- (void)cellActionButtonPressed:(NUARippleButton *)button {
+    // Get actions
+    NCNotificationRequest *request = self.notification.leadingNotificationEntry.request;
+    NSArray<NCNotificationAction *> *minimalActions = request.supplementaryActions[@"NCNotificationActionEnvironmentMinimal"];
+
+    // Get index or button
+    NSUInteger actionIndex = [self.optionsButtonStack.arrangedSubviews indexOfObject:button];
+    NCNotificationAction *action = minimalActions[actionIndex];
+
+    // Call delegate
+    [self.actionsDelegate notificationTableViewCell:self requestsExecuteAction:action fromNotificationRequest:request];
 }
 
 #pragma mark - Header Text
@@ -409,10 +428,10 @@
     self.headerTint = colorInfo.primaryColor;
 
     // Update buttons
-    [self _configureOptionsBarIfNecessary];
-    [self.openButton setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
-    [self.clearButton setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
-    [self setNeedsLayout];
+    NSArray<NUARippleButton *> *actionButtons = self.optionsButtonStack.arrangedSubviews;
+    for (NUARippleButton *button in actionButtons) {
+        [button setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
+    }
 }
 
 #pragma mark - Appearance Updates

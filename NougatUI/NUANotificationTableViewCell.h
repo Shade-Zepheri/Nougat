@@ -8,8 +8,7 @@
 @protocol NUANotificationTableViewCellDelegate <NSObject>
 @required
 
-- (void)notificationTableViewCellRequestsExecuteDefaultAction:(NUANotificationTableViewCell *)cell;
-- (void)notificationTableViewCellRequestsExecuteAlternateAction:(NUANotificationTableViewCell *)cell;
+- (void)notificationTableViewCell:(NUANotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request;
 
 @end
 
@@ -18,6 +17,7 @@
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 
 @property (getter=isUILocked, nonatomic) BOOL UILocked;
+@property (assign, nonatomic) BOOL hasActions;
 @property (copy, nonatomic) NSString *titleText;
 @property (copy, nonatomic) NSString *messageText;
 @property (strong, nonatomic) UIImage *attachmentImage;
