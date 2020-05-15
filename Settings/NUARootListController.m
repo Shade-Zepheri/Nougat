@@ -121,39 +121,6 @@
     [self.navigationController pushViewController:supportController animated:YES];
 }
 
-#pragma mark - List Items Controller
-
-- (NSArray<NSString *> *)_notificationPreviewSettingTitles {
-    // Add defaults
-    NSMutableArray *titles = [NSMutableArray array];
-    NSBundle *bundle = [NSBundle bundleForClass:self.class];
-    NSString *localizedAlways = [bundle localizedStringForKey:@"ALWAYS" value:@"Always" table:@"Root"];
-    NSString *localizedNever = [bundle localizedStringForKey:@"NEVER" value:@"Never" table:@"Root"];
-    [titles addObject:localizedAlways];
-    [titles addObject:localizedNever];
-
-    if ([self _hasBiometrics]) {
-        // Add biometric dependent setting
-        NSString *localizedWhenUnlocked = [bundle localizedStringForKey:@"WHEN_UNLOCKED" value:@"When Unlocked" table:@"Root"];
-        [titles insertObject:localizedWhenUnlocked atIndex:1];
-    }
-
-    return [titles copy];
-}
-
-- (NSArray<NSNumber *> *)_notificationPreviewSettingValues {
-    NSMutableArray *values = [NSMutableArray array];
-    [values addObject:@(NUANotificationPreviewSettingAlways)];
-    [values addObject:@(NUANotificationPreviewSettingNever)];
-
-    if ([self _hasBiometrics]) {
-        // Add biometric dependent setting
-        [values insertObject:@(NUANotificationPreviewSettingWhenUnlocked) atIndex:1];
-    }
-
-    return [values copy];
-}
-
 #pragma mark - Preference Values
 
 - (void)setPreferenceValue:(id)value specifier:(PSSpecifier *)specifier {
@@ -199,22 +166,6 @@
     });
 
     return available;
-}
-
-- (BOOL)_hasBiometrics {
-    // Check stuffs once
-    static BOOL hasBiometrics = NO;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        if (@available(iOS 11.2, *)) {
-            LAContext *context = [[LAContext alloc] init];
-            [context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil];
-            hasBiometrics = context.biometryType != LABiometryTypeNone;
-        }
-    });
-
-    return hasBiometrics;
-
 }
 
 @end

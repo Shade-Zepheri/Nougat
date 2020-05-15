@@ -3,6 +3,7 @@
 #import "NUARippleButton.h"
 #import <MediaRemote/MediaRemote.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
+#import <SpringBoardFoundation/SpringBoardFoundation.h>
 #import <Macros.h>
 #import <UIKitHelpers.h>
 
@@ -29,17 +30,7 @@
         _mediaNotification = [NUACoalescedNotification mediaNotification];
 
         // Determine unlock defaults
-        switch (notificationShadePreferences.notificationPreviewSetting) {
-            case NUANotificationPreviewSettingAlways:
-                _UILocked = NO;
-                break;
-            case NUANotificationPreviewSettingWhenUnlocked:
-                _UILocked = [[NSClassFromString(@"SBLockScreenManager") sharedInstance] isUILocked];
-                break;
-            case NUANotificationPreviewSettingNever:
-                _UILocked = YES;
-                break;
-        }
+        [self _evaluateLockState:nil];
 
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -54,10 +45,8 @@
 
         // Register for notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
-        [center addObserver:self selector:@selector(_handleUIDidLock:) name:@"SBLockScreenUIDidLockNotification" object:nil];
-        [center addObserver:self selector:@selector(_handleBiometricAuthenticated:) name:@"SBBiometricEventMonitorHasAuthenticated" object:nil];
-        [center addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
+        [center addObserver:self selector:@selector(_evaluateLockState:) name:@"SBFUserAuthenticationStateDidChangeNotification" object:nil];
+        [center addObserver:self selector:@selector(_evaluateLockState:) name:@"NUANotificationShadeChangedPreferences" object:nil];
     }
 
     return self;
@@ -93,15 +82,17 @@
 #pragma mark - Properties
 
 - (void)setUILocked:(BOOL)UILocked {
-    if (_UILocked == UILocked || self.notificationShadePreferences.notificationPreviewSetting != NUANotificationPreviewSettingWhenUnlocked) {
+    if (_UILocked == UILocked) {
         // Nothing to change, or never change
         return;
     }
 
     _UILocked = UILocked;
 
-    // Reload cells
-    [self.tableViewController.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+    // Reload cells if applicable
+    if (self.notifications) {
+        [self.tableViewController.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
+    }
 }
 
 - (CGFloat)contentHeight {
@@ -418,45 +409,21 @@
     });
 }
 
-- (void)_handleBacklightFadeFinished:(NSNotification *)notification {
-    // Dismiss if screen is turned off
-    BOOL screenIsOn = ((SBBacklightController *)[NSClassFromString(@"SBBacklightController") sharedInstance]).screenIsOn;
-
-    if (!screenIsOn) {
-        self.UILocked = YES;
-    }
-}
-
-- (void)_handleUIDidLock:(NSNotification *)notification {
-    // Dismiss if screen is turned off
-    BOOL screenIsOn = ((SBBacklightController *)[NSClassFromString(@"SBBacklightController") sharedInstance]).screenIsOn;
-
-    if (screenIsOn) {
-        self.UILocked = YES;
-    }
-}
-
-- (void)_handleBiometricAuthenticated:(NSNotification *)notification {
-    // Authenticated, show
-    self.UILocked = NO;
-}
-
-- (void)preferencesDidChange:(NSNotification *)notification {
+- (void)_evaluateLockState:(NSNotification *)notification {
     // Change UILock settings
     switch (self.notificationShadePreferences.notificationPreviewSetting) {
         case NUANotificationPreviewSettingAlways:
-            _UILocked = NO;
+            self.UILocked = NO;
             break;
-        case NUANotificationPreviewSettingWhenUnlocked:
-            _UILocked = [[NSClassFromString(@"SBLockScreenManager") sharedInstance] isUILocked];
+        case NUANotificationPreviewSettingWhenUnlocked: {
+            SBFUserAuthenticationController *authenticationController = ((SpringBoard *)[UIApplication sharedApplication]).authenticationController;
+            self.UILocked = ![authenticationController isAuthenticated];
             break;
+        }
         case NUANotificationPreviewSettingNever:
-            _UILocked = YES;
+            self.UILocked = YES;
             break;
     }
-
-    // Update table
-    [self.tableViewController.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 #pragma mark - Media
