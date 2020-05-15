@@ -10,6 +10,7 @@
 @property (readonly, nonatomic) NCNotificationAction *closeAction;
 @property (readonly, nonatomic) NCNotificationAction *defaultAction;
 @property (readonly, nonatomic) NCNotificationAction *silenceAction;
+@property (copy, readonly, nonatomic) NSDictionary<NSString *, NSArray<NCNotificationAction *> *> *supplementaryActions;
 
 - (BOOL)matchesRequest:(NCNotificationRequest *)request;
 

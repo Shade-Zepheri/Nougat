@@ -19,7 +19,20 @@
 
 @implementation NUANotificationTableViewCell
 
-#pragma mark - Dealloc
+#pragma mark - Initialization
+
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        // Create everything
+        [self _createAttachmentView];
+        [self _createTitleLabel];
+        [self _createMessageLabel];
+        [self _createOptionsBar];
+    }
+
+    return self;
+}
 
 - (void)dealloc {
     // Reuse date label
@@ -33,8 +46,11 @@
 
     // Reset stuff
     self.expanded = NO;
-    }
+}
 
+#pragma mark - View Creation
+
+- (void)_createAttachmentView {
     // Create
     self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.attachmentImageView.clipsToBounds = YES;
@@ -50,29 +66,7 @@
     self.attachmentConstraint.active = YES;
 }
 
-- (void)_configureDateLabelIfNecessary {
-    if (self.dateLabel) {
-        // View already exists, or no notification
-        return;
-    }
-
-    // Create date label
-    self.dateLabel = [[NUADateLabelRepository sharedRepository] startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
-    self.dateLabel.delegate = self;
-    self.dateLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-    self.dateLabel.textColor = [UIColor grayColor];
-    self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
-    // Add to header stack
-    [self.headerStackView insertArrangedSubview:self.dateLabel atIndex:3];
-}
-
-- (void)_configureTitleLabelIfNecessary {
-    if (self.titleLabel) {
-        // Already exists, or no attachment yet
-        return;
-    }
-
+- (void)_createTitleLabel {
     // Create
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
@@ -93,12 +87,7 @@
     [self.titleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
-- (void)_configureMessageLabelIfNecessary {
-    if (self.messageLabel) {
-        // Already exists, or no attachment yet
-        return;
-    }
-
+- (void)_createMessageLabel {
     // Create
     self.messageLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.messageLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote];
@@ -113,12 +102,7 @@
     [self.messageLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
-- (void)_configureOptionsBarIfNecessary {
-    if (self.optionsBar) {
-        // Already exists
-        return;
-    }
-
+- (void)_createOptionsBar {
     // Create bar
     self.optionsBar = [[UIView alloc] initWithFrame:CGRectZero];
     self.optionsBar.translatesAutoresizingMaskIntoConstraints = NO;
@@ -188,12 +172,8 @@
         return;
     }
 
-    // Create if needed
-    [self _configureTitleLabelIfNecessary];
-
     // Update
     self.titleLabel.text = titleText;
-    [self setNeedsLayout];
 }
 
 - (NSString *)messageText {
@@ -205,9 +185,6 @@
         // Same string
         return;
     }
-
-    // Create if needed
-    [self _configureMessageLabelIfNecessary];
 
     // Update
     self.messageLabel.text = messageText;
@@ -221,7 +198,6 @@
     // Determine if expandable
     CGRect requiredLabelBounds = [messageText boundingRectWithSize:boundingSize options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) attributes:@{NSFontAttributeName: self.messageLabel.font} context:nil];
     self.expandable = floor(CGRectGetHeight(requiredLabelBounds) / self.messageLabel.font.lineHeight) > 2;
-    [self setNeedsLayout];
 }
 
 - (UIImage *)attachmentImage {
@@ -234,19 +210,14 @@
         return;
     }
 
-    // Create if needed
-    [self _configureAttachmentImageViewIfNecessary];
-
     // Update image
     self.attachmentImageView.image = attachmentImage;
     CGFloat constant = (attachmentImage != nil) ? 40.0 : 0.0;
     self.attachmentConstraint.constant = constant;
-
-    [self setNeedsLayout];
 }
 
 - (void)setTimestamp:(NSDate *)timestamp {
-    if ([_timestamp isEqual:timestamp]) {
+    if ([_timestamp isEqualToDate:timestamp]) {
         // Same date
         return;
     }
@@ -255,16 +226,17 @@
     _timestamp = timestamp;
     [self _tearDownDateLabel];
     [self _configureDateLabelIfNecessary];
-    }
+}
 
 - (void)setExpanded:(BOOL)expanded {
     [super setExpanded:expanded];
 
-    [self _configureOptionsBarIfNecessary];
+    // Configure message label
+    self.messageLabel.numberOfLines = expanded ? 0 : 2;
 
     // Configure options bar
     if (self.hasActions) {
-    self.optionsHeightConstraint.constant = expanded ? 40.0 : 0.0;
+        self.optionsHeightConstraint.constant = expanded ? 40.0 : 0.0;
 
         // Reveal the buttons
         for (UIView *view in self.optionsButtonStack.arrangedSubviews) {
@@ -378,6 +350,23 @@
 }
 
 #pragma mark - Date Label
+
+- (void)_configureDateLabelIfNecessary {
+    if (self.dateLabel) {
+        // View already exists, or no notification
+        return;
+    }
+
+    // Create date label
+    self.dateLabel = [[NUADateLabelRepository sharedRepository] startLabelWithStartDate:self.timestamp timeZone:self.notification.timeZone];
+    self.dateLabel.delegate = self;
+    self.dateLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.dateLabel.textColor = [UIColor grayColor];
+    self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    // Add to header stack
+    [self.headerStackView insertArrangedSubview:self.dateLabel atIndex:3];
+}
 
 - (void)dateLabelDidChange:(NUARelativeDateLabel *)dateLabel {
     // Resize and reload
