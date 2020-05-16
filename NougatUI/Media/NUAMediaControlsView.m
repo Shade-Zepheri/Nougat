@@ -88,6 +88,7 @@
     // Show buttons
     self.likeButton.hidden = !expanded;
     self.dislikeButton.hidden = !expanded;
+    [self setNeedsLayout];
 }
 
 - (void)setPlaying:(BOOL)playing {

@@ -8,13 +8,16 @@
 
 @interface NUAMediaTableViewCell ()
 @property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
+@property (strong, nonatomic) NSLayoutConstraint *heightConstraint;
 
 @property (strong, nonatomic) UIImageView *artworkView;
 @property (strong, nonatomic) CAGradientLayer *gradientLayer;
+@property (strong, nonatomic) UILabel *albumLabel;
 @property (strong, nonatomic) NUAMediaControlsView *controlsView;
 @property (strong, nonatomic) NUAMediaHeaderView *headerView;
 
-@property (strong, nonatomic) NSLayoutConstraint *controlsViewBottomConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *controlsViewCollapsedTopConstraint;
+@property (strong, nonatomic) NSLayoutConstraint *controlsViewExpandedTopConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *controlsViewLeadingConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *controlsViewTrailingConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *headerViewDefaultTrailingConstraint;
@@ -38,6 +41,9 @@
         self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
         self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
 
+        _heightConstraint = [self.contentView.heightAnchor constraintEqualToConstant:90.0];
+        _heightConstraint.active = YES;
+
         // Create views
         [self setupViews];
     }
@@ -58,12 +64,6 @@
 }
 
 - (void)setupConstraints {
-    // Constrain the bad boys
-    [self.artworkView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-    [self.artworkView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-    [self.artworkView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
-    [self.artworkView.widthAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
-
     // Header constraints
     [self.headerView.topAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:6.0].active = YES;
     [self.headerView.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor].active = YES;
@@ -78,14 +78,20 @@
     [self.headerStackView.trailingAnchor constraintLessThanOrEqualToAnchor:self.artworkView.leadingAnchor constant:-10.0].active = YES;
 
     // Controls view constraints
-    self.controlsViewBottomConstraint = [self.controlsView.bottomAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:5.0];
-    self.controlsViewBottomConstraint.active = YES;
+    self.controlsViewCollapsedTopConstraint = [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.topAnchor];
+    self.controlsViewCollapsedTopConstraint.active = YES;
+
+    self.controlsViewExpandedTopConstraint = [self.controlsView.topAnchor constraintEqualToAnchor:self.headerView.bottomAnchor constant:5.0];
+    self.controlsViewExpandedTopConstraint.active = NO;
+
+    self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerView.leadingAnchor];
+    self.controlsViewLeadingConstraint.active = NO;
 
     self.controlsViewTrailingConstraint = [self.controlsView.trailingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor];
     self.controlsViewTrailingConstraint.active = YES;
 
-    self.controlsViewLeadingConstraint = [self.controlsView.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor];
-    self.controlsViewLeadingConstraint.active = NO;    
+    // Set expandable
+    self.expandable = YES;
 }
 
 - (void)layoutSubviews {
@@ -95,24 +101,22 @@
     self.gradientLayer.frame = self.artworkView.bounds;
 }
 
-#pragma mark - Media views
+#pragma mark - Media Views
 
 - (void)_createArtworkView {
     self.artworkView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.artworkView.contentMode = UIViewContentModeScaleAspectFit;
     self.artworkView.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.artworkView];
+
+    // Constraints
+    [self.artworkView.topAnchor constraintEqualToAnchor:self.contentView.topAnchor].active = YES;
+    [self.artworkView.bottomAnchor constraintEqualToAnchor:self.contentView.bottomAnchor].active = YES;
+    [self.artworkView.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+    [self.artworkView.widthAnchor constraintEqualToAnchor:self.contentView.heightAnchor].active = YES;
 }
 
 - (void)_createGradientView {
-    UIView *gradientView = [[UIView alloc] initWithFrame:CGRectZero];
-    [self.artworkView addSubview:gradientView];
-
-    [gradientView.topAnchor constraintEqualToAnchor:self.artworkView.topAnchor].active = YES;
-    [gradientView.bottomAnchor constraintEqualToAnchor:self.artworkView.bottomAnchor].active = YES;
-    [gradientView.leadingAnchor constraintEqualToAnchor:self.artworkView.leadingAnchor].active = YES;
-    [gradientView.trailingAnchor constraintEqualToAnchor:self.artworkView.trailingAnchor].active = YES;
-
     // Create layer
     self.gradientLayer = [CAGradientLayer layer];
     UIColor *baseColor = [UIColor whiteColor];
@@ -121,15 +125,7 @@
     self.gradientLayer.startPoint = CGPointMake(0.0, 0.0);
     self.gradientLayer.endPoint = CGPointMake(1.0, 0.0);
     self.gradientLayer.frame = self.artworkView.bounds;
-    [gradientView.layer addSublayer:self.gradientLayer];
-}
-
-- (void)_updateBackgroundGradientWithColor:(UIColor *)color {
-    self.backgroundColor = color;
-    self.gradientLayer.colors = @[(id)color.CGColor, (id)[color colorWithAlphaComponent:0.85].CGColor, (id)[color colorWithAlphaComponent:0.0].CGColor];
-
-    // Update frame for good measure
-    self.gradientLayer.frame = self.artworkView.bounds;
+    [self.artworkView.layer addSublayer:self.gradientLayer];
 }
 
 - (void)_createHeaderView {
@@ -157,6 +153,8 @@
 - (void)setExpanded:(BOOL)expanded {
     [super setExpanded:expanded];
 
+    self.heightConstraint.constant = expanded ? 135.0 : 90.0;
+
     self.controlsView.expanded = expanded;
 
     // Header constraints
@@ -164,9 +162,11 @@
     self.headerViewExpandedTrailingConstraint.active = expanded;
 
     // Controls constraints
-    self.controlsViewBottomConstraint.constant = expanded ? 55.0 : 5.0;
+    self.controlsViewCollapsedTopConstraint.active = !expanded;
+    self.controlsViewExpandedTopConstraint.active = expanded;
     self.controlsViewLeadingConstraint.active = expanded;
     self.controlsViewTrailingConstraint.active = !expanded;
+    [self setNeedsLayout];
 }
 
 - (BOOL)isPlaying {
@@ -180,6 +180,7 @@
 
     // Pass to controls
     self.controlsView.playing = playing;
+    [self setNeedsLayout];
 }
 
 - (void)setNowPlayingArtwork:(UIImage *)nowPlayingArtwork {    
@@ -191,6 +192,7 @@
 
     self.artworkView.image = nowPlayingArtwork;
     [self updateTintsFromImage:nowPlayingArtwork];
+    [self setNeedsLayout];
 }
 
 - (void)setNowPlayingAppDisplayID:(NSString *)nowPlayingAppDisplayID {
@@ -199,6 +201,7 @@
     // Update imageview
     [self _updateHeaderLabelText];
     self.headerGlyph = [UIImage _applicationIconImageForBundleIdentifier:nowPlayingAppDisplayID format:0 scale:[UIScreen mainScreen].scale];
+    [self setNeedsLayout];
 }
 
 - (void)setMetadata:(MPUNowPlayingMetadata *)metadata {
@@ -210,26 +213,38 @@
 
     // Update label
     [self _updateHeaderLabelText];
-}
-
-- (void)_updateTintsWithBackgroundColor:(UIColor *)backgroundColor tintColor:(UIColor *)tintColor {
-    [self _updateBackgroundGradientWithColor:backgroundColor];
-
-    // Set tint color
-    self.headerTint = tintColor;
-    self.headerView.tintColor = tintColor;
-    self.controlsView.tintColor = tintColor;
+    [self setNeedsLayout];
 }
 
 #pragma mark - Info label
 
 - (void)_updateHeaderLabelText {
-    // Construct strings, too lazy/complicated to link against (Mobile)CoreServices
+    // Get app display name
     NSString *identifier = self.nowPlayingAppDisplayID ?: @"com.apple.Music";
-
     LSApplicationProxy *applicationProxy = [NSClassFromString(@"LSApplicationProxy") applicationProxyForIdentifier:identifier];
     NSString *appDisplayName = applicationProxy.localizedName;
-    self.headerText = [NSString stringWithFormat:@"%@ • %@", appDisplayName, self.metadata.album];
+    self.headerText = appDisplayName;
+
+    // Set album name
+    [self _createAlbumLabelIfNecessary];
+    self.albumLabel.text = self.metadata.album;
+}
+
+- (void)_createAlbumLabelIfNecessary {
+    if (self.albumLabel) {
+        return;
+    }
+
+    // Create label
+    _albumLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.albumLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+    self.albumLabel.textColor = [UIColor grayColor];
+    self.albumLabel.translatesAutoresizingMaskIntoConstraints = NO;
+
+    [self.albumLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
+
+    // Add to stack
+    [self.headerStackView insertArrangedSubview:self.albumLabel atIndex:3];
 }
 
 #pragma mark - Notifications
@@ -302,7 +317,7 @@
     return;
 }
 
-#pragma mark - Default Color Provider
+#pragma mark - Colors
 
 - (void)updateTintsFromImage:(UIImage *)artworkImage {
     if (self.notificationShadePreferences.useExternalColor && NSClassFromString(@"CFWBucket")) {
@@ -329,7 +344,25 @@
     }
 }
 
-#pragma mark - Colorflow
+- (void)_updateTintsWithBackgroundColor:(UIColor *)backgroundColor tintColor:(UIColor *)tintColor {
+    [self _updateBackgroundGradientWithColor:backgroundColor];
+
+    // Set tint color
+    self.headerTint = tintColor;
+    self.albumLabel.textColor = tintColor;
+    self.headerView.tintColor = tintColor;
+    self.controlsView.tintColor = tintColor;
+}
+
+- (void)_updateBackgroundGradientWithColor:(UIColor *)color {
+    self.backgroundColor = color;
+    self.gradientLayer.colors = @[(id)color.CGColor, (id)[color colorWithAlphaComponent:0.85].CGColor, (id)[color colorWithAlphaComponent:0.0].CGColor];
+
+    // Update frame for good measure
+    self.gradientLayer.frame = self.artworkView.bounds;
+}
+
+#pragma mark - ColorFlow
 
 - (void)updateTintsUsingColorfow:(UIImage *)artworkImage {
     AnalyzedInfo info = [NSClassFromString(@"CFWBucket") analyzeImage:artworkImage resize:YES];
