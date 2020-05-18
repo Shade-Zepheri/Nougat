@@ -480,28 +480,6 @@
 
 #pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (![cell isKindOfClass:[NUAMediaTableViewCell class]]) {
-        // Not media cell
-        return;
-    }
-
-    // Register media cell notifications
-    NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
-    [mediaCell registerForMediaNotifications];
-}
-
-- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (![cell isKindOfClass:[NUAMediaTableViewCell class]]) {
-        // Not media cell
-        return;
-    }
-
-    // Unregister media cell notifications
-    NUAMediaTableViewCell *mediaCell = (NUAMediaTableViewCell *)cell;
-    [mediaCell unregisterForMediaNotifications];
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.row == 0 && [self _mediaCellPresent]) {
@@ -559,6 +537,7 @@
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
         // Provide basic information
+        mediaCell.nowPlayingController = self.nowPlayingController;
         mediaCell.delegate = self;
         mediaCell.expanded = [self isNotificationExpanded:notification];
         mediaCell.layoutMargins = UIEdgeInsetsZero;

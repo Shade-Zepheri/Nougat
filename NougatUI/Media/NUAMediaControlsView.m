@@ -21,6 +21,7 @@
     if (self) {
         // Defaults
         _expanded = NO;
+        _playing = NO;
 
         // Constraint up
         self.translatesAutoresizingMaskIntoConstraints = NO;
@@ -92,6 +93,11 @@
 }
 
 - (void)setPlaying:(BOOL)playing {
+    if (playing == _playing) {
+        // No change
+        return;
+    }
+
     _playing = playing;
 
     // Update views

@@ -7,7 +7,6 @@
 #import <UIKit/UIImage+Private.h>
 
 @interface NUAMediaTableViewCell ()
-@property (strong, readonly, nonatomic) MPUNowPlayingController *nowPlayingController;
 @property (strong, nonatomic) NSLayoutConstraint *heightConstraint;
 
 @property (strong, nonatomic) UIImageView *artworkView;
@@ -32,15 +31,6 @@
 - (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        // Register as delegate
-        _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
-        self.nowPlayingController.delegate = self;
-
-        // Set properties
-        self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
-        self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
-        self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
-
         _heightConstraint = [self.contentView.heightAnchor constraintEqualToConstant:90.0];
         _heightConstraint.active = YES;
 
@@ -174,21 +164,18 @@
 }
 
 - (void)setPlaying:(BOOL)playing {
-    if (playing == self.playing) {
-        return;
-    }
-
     // Pass to controls
     self.controlsView.playing = playing;
     [self setNeedsLayout];
 }
 
 - (void)setNowPlayingArtwork:(UIImage *)nowPlayingArtwork {    
-    _nowPlayingArtwork = nowPlayingArtwork;
-
-    if (!nowPlayingArtwork) {
+    if (!nowPlayingArtwork || nowPlayingArtwork == _nowPlayingArtwork) {
+        // Doesnt exist, or is the same
         return;
     }
+
+    _nowPlayingArtwork = nowPlayingArtwork;
 
     self.artworkView.image = nowPlayingArtwork;
     [self updateTintsFromImage:nowPlayingArtwork];
@@ -196,6 +183,11 @@
 }
 
 - (void)setNowPlayingAppDisplayID:(NSString *)nowPlayingAppDisplayID {
+    if ([nowPlayingAppDisplayID isEqualToString:_nowPlayingAppDisplayID]) {
+        // Same app
+        return;
+    }
+
     _nowPlayingAppDisplayID = nowPlayingAppDisplayID;
 
     // Update imageview
@@ -205,6 +197,11 @@
 }
 
 - (void)setMetadata:(MPUNowPlayingMetadata *)metadata {
+    if ([metadata isEqual:_metadata]) {
+        // Same metadata
+        return;
+    }
+
     _metadata = metadata;
 
     // Parse and pass to header
@@ -213,6 +210,24 @@
 
     // Update label
     [self _updateHeaderLabelText];
+    [self setNeedsLayout];
+}
+
+- (void)setNowPlayingController:(MPUNowPlayingController *)nowPlayingController {
+    if (nowPlayingController == _nowPlayingController) {
+        // same thing
+        return;
+    }
+
+    _nowPlayingController = nowPlayingController;
+    nowPlayingController.delegate = self;
+
+    // Update ourselves
+    self.metadata = nowPlayingController.currentNowPlayingMetadata;
+    self.nowPlayingArtwork = nowPlayingController.currentNowPlayingArtwork;
+    self.nowPlayingAppDisplayID = nowPlayingController.nowPlayingAppDisplayID;
+    self.playing = nowPlayingController.isPlaying;
+
     [self setNeedsLayout];
 }
 
@@ -247,37 +262,9 @@
     [self.headerStackView insertArrangedSubview:self.albumLabel atIndex:3];
 }
 
-#pragma mark - Notifications
-
-- (void)registerForMediaNotifications {
-    // Register for notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoDidChangeNotification object:nil];
-    [self.nowPlayingController _registerForNotifications];
-
-    // Update media info
-    [self updateMedia];
-}
-
-- (void)unregisterForMediaNotifications {
-    // Unregister for notifications
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
-    [self.nowPlayingController _unregisterForNotifications];
-}
-
-- (void)updateMedia {
-    // Make sure on the main thread since the notification is dispatched on a mediaremote thread
-    dispatch_async(dispatch_get_main_queue(), ^{
-        // Pass down info
-        self.nowPlayingArtwork = self.nowPlayingController.currentNowPlayingArtwork;
-        self.metadata = self.nowPlayingController.currentNowPlayingMetadata;
-        self.nowPlayingAppDisplayID = self.nowPlayingController.nowPlayingAppDisplayID;
-        self.playing = self.nowPlayingController.isPlaying;
-    });
-}
-
 #pragma mark - MPUNowPlayingDelegate
 
-- (void)nowPlayingController:(MPUNowPlayingController *)controller nowPlayingInfoDidChange:(NSDictionary *)nowPlayingInfo {
+- (void)nowPlayingController:(MPUNowPlayingController *)controller nowPlayingInfoDidChange:(NSDictionary<NSString *, id> *)nowPlayingInfo {
     // Ensure on the main thread
     dispatch_async(dispatch_get_main_queue(), ^{
         // Parse and pass on
@@ -300,21 +287,6 @@
         // Pass to header
         self.nowPlayingAppDisplayID = nowPlayingAppDisplayID;
     });
-}
-
-- (void)nowPlayingControllerDidBeginListeningForNotifications:(MPUNowPlayingController *)controller {
-    // Do nothing
-    return;
-}
-
-- (void)nowPlayingControllerDidStopListeningForNotifications:(MPUNowPlayingController *)controller {
-    // Do nothing
-    return;
-}
-
-- (void)nowPlayingController:(MPUNowPlayingController *)controller elapsedTimeDidChange:(double)elapsedTime {
-    // Do nothing
-    return;
 }
 
 #pragma mark - Colors
