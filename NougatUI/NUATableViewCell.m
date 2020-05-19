@@ -222,15 +222,15 @@
     // Only expand under certain criteria
     UIPanGestureRecognizer *panGestureRecognizer = (UIPanGestureRecognizer *)gestureRecognizer;
     CGPoint velocity = [panGestureRecognizer velocityInView:self.contentView];
-    if (fabs(velocity.x) > fabs(velocity.y)) {
-        // Horizontal pan, don't do anything
+    if (fabs(velocity.x) > fabs(velocity.y) || (velocity.y > 0) == self.expanded) {
+        // Horizontal pan or already in desired state, don't do anything
         return NO;
     }
 
     CGPoint location = [panGestureRecognizer locationInView:self.contentView];
     CGFloat labelHeight = CGRectGetHeight(self.contentView.bounds);
     CGFloat projectedY = location.y + [self project:velocity.y decelerationRate:0.998];
-    return (fabs(projectedY) < (labelHeight * 1.69));
+    return (fabs(projectedY) < (labelHeight * 1.65));
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
