@@ -5,7 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdpv";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Lisäasetukset.";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Vaikuttaa että käytät Nougatia ensimmäistä kertaa. Haluatko tutustua käyttöohjeeseen?";

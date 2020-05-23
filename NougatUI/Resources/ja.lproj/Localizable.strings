@@ -5,7 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zd 日";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "タップして、オプションを表示します";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Nougat を使うのは初めてのようですね!\nユーザガイドをご覧になりますか?";

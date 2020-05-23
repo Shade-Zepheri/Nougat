@@ -4,8 +4,15 @@
 "PIXEL" = "بكسل";
 "OREO" = "أوريو";
 
+"APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "استخدام إعداد مظهر النظام";
 "USE_COLORFLOW" = "استخدم ألوان Colorflow";
+
+"NOTIFICATIONS" = "NOTIFICATIONS";
+"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
+"ALWAYS" = "Always";
+"WHEN_UNLOCKED" = "When Unlocked";
+"NEVER" = "Never";
 
 "USER_GUIDE" = "دليل المستخدم";
 "SORT_ORDER" = "نظام الترتيب";

@@ -4,8 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"APPEARANCE" = "ВНЕШНИЙ ВИД";
 "USE_SYSTEM_APPEARANCE" = "Использовать системное оформление";
 "USE_COLORFLOW" = "Использовать цвета Colorflow";
+
+"NOTIFICATIONS" = "УВЕДОМЛЕНИЯ";
+"SHOW_NOTIFICATION_PREVIEW" = "Показывать превью";
+"ALWAYS" = "Всегда";
+"WHEN_UNLOCKED" = "Когда разблокирован";
+"NEVER" = "Никогда";
 
 "USER_GUIDE" = "Руководство пользователя";
 "SORT_ORDER" = "Порядок сортировки";

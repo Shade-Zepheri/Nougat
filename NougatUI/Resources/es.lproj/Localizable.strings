@@ -5,7 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdd";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Toca para más opciones.";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Parece que es tu primera vez usando Nougat. Quieres abrir la guía de usuario?";

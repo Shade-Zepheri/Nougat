@@ -5,7 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdn.";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "További beállításokért kattintson.";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Úgy tűnik, hogy első alkalommal használod a Nougat alkalmazást. Megnyissam a Felhasználói Kézikönyvet?";

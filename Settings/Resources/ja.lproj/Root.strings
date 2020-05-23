@@ -4,8 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "システムの外観設定";
 "USE_COLORFLOW" = "カラーフローの色を使う";
+
+"NOTIFICATIONS" = "NOTIFICATIONS";
+"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
+"ALWAYS" = "Always";
+"WHEN_UNLOCKED" = "When Unlocked";
+"NEVER" = "Never";
 
 "USER_GUIDE" = "ユーザーガイド";
 "SORT_ORDER" = "設定順";

@@ -5,7 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdz";
 
 // Notification
+"NOTIFICATION" = "Notification";
 "TAP_FOR_MORE_OPTIONS" = "Atinge pentru mai multe optiuni.";
+"OPEN" = "Open";
+"CLEAR" = "Clear";
+"CLEAR_ALL" = "Clear All";
 
 // Alert
 "USER_GUIDE_PROMPT" = "Se pare ca folosesti pentru prima data Nougat. Doresti sa citesti manualul de utilizare?";
