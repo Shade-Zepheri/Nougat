@@ -4,15 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"APPEARANCE" = "APPEARANCE";
+"APPEARANCE" = "MEGJELENÉS";
 "USE_SYSTEM_APPEARANCE" = "Használd a rendszerbeállításokat";
 "USE_COLORFLOW" = "Használd a Colorflor színeket";
 
-"NOTIFICATIONS" = "NOTIFICATIONS";
-"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
-"ALWAYS" = "Always";
-"WHEN_UNLOCKED" = "When Unlocked";
-"NEVER" = "Never";
+"NOTIFICATIONS" = "ÉRTESÍTÉSEK";
+"SHOW_NOTIFICATION_PREVIEW" = "Előnézet mutatása";
+"ALWAYS" = "Mindig";
+"WHEN_UNLOCKED" = "Feloldás után";
+"NEVER" = "Soha";
 
 "USER_GUIDE" = "Felhasználói Kézikönyv";
 "SORT_ORDER" = "Rendezés";
