@@ -4,15 +4,15 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"APPEARANCE" = "APPEARANCE";
+"APPEARANCE" = "APARÊNCIA";
 "USE_SYSTEM_APPEARANCE" = "Usar configuração de aparência do sistema";
 "USE_COLORFLOW" = "Usar Cores do Colorflow";
 
-"NOTIFICATIONS" = "NOTIFICATIONS";
-"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
-"ALWAYS" = "Always";
-"WHEN_UNLOCKED" = "When Unlocked";
-"NEVER" = "Never";
+"NOTIFICATIONS" = "NOTIFICAÇÕES";
+"SHOW_NOTIFICATION_PREVIEW" = "Mostrar Prévias";
+"ALWAYS" = "Sempre";
+"WHEN_UNLOCKED" = "Quando desbloqueado";
+"NEVER" = "Nunca";
 
 "USER_GUIDE" = "Guia do Usuário";
 "SORT_ORDER" = "Listar ordem por";
