@@ -178,17 +178,21 @@ NUANotificationShadeController *notificationShade;
 
 #pragma mark - Reveal Gesture
 
-%hook PETGoalConversionEventTracker
+%hook SBAnalyticsClientClass
 
-- (instancetype)initWithFeatureId:(NSString *)featureId opportunityEvent:(NSString *)opportunityEvent conversionEvent:(NSString *)conversionEvent registerProperties:(NSArray<id> *)registerProperties {
-    // Since SB hardcodes their values, we have to manually supply them here
-    if ([opportunityEvent isEqualToString:@"SGstart_"]) {
-        opportunityEvent = @"SGstart_Nougat";
-        conversionEvent = @"SGend_Nougat";
-        return %orig(featureId, opportunityEvent, conversionEvent, registerProperties);
-    } else {
-        return %orig;
+- (void)emitEvent:(NSUInteger)event withPayload:(NSDictionary<NSString *, id> *)payload {
+    // Block SB gesture analytics for Nougat
+    if (event == 12) {
+        // Gesture event
+        NSNumber *gestureTypeWrapper = payload[@"kSBSAnalyticsSystemGestureType"];
+        NSUInteger gestureType = gestureTypeWrapper.unsignedIntegerValue;
+        if (gestureType == 2323) {
+            // Is Nougat, stop
+            return;
+        }
     }
+
+    %orig;
 }
 
 %end
@@ -232,7 +236,8 @@ NUANotificationShadeController *notificationShade;
     if (%c(SBNotificationCenterController)) {
         %init(PreCoverSheet);
     } else {
-        %init(CoverSheet);
+        Class SBAnalyticsClass = %c(SBFAnalyticsClient) ?: %c(SBAnalyticsClient);
+        %init(CoverSheet, SBAnalyticsClientClass = SBAnalyticsClass);
     }
 
     // Init the rest
