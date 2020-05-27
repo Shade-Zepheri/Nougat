@@ -144,7 +144,7 @@
 - (BOOL)containsPoint:(CGPoint)point {
     // Check our view
     CGPoint convertedPoint = [self.view convertPoint:point fromView:self.view.superview];
-    BOOL insideTableView = CGRectContainsPoint(self.tableViewController.tableView.bounds, convertedPoint);
+    BOOL insideTableView = CGRectContainsPoint(self.tableViewController.tableView.frame, convertedPoint);
 
     // Check the button
     CGRect clearButtonFrame = self.clearAllButton.frame;
