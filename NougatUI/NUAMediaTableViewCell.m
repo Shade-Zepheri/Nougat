@@ -231,7 +231,7 @@
     [self setNeedsLayout];
 }
 
-#pragma mark - Info label
+#pragma mark - Info Label
 
 - (void)_updateHeaderLabelText {
     // Get app display name
@@ -270,6 +270,9 @@
         // Parse and pass on
         self.nowPlayingArtwork = controller.currentNowPlayingArtwork;
         self.metadata = controller.currentNowPlayingMetadata;
+
+        // Get liking state
+        [self updateLikingCapability:nowPlayingInfo];
     });
 }
 
@@ -341,6 +344,21 @@
     CFWColorInfo *colorInfo = [NSClassFromString(@"CFWColorInfo") colorInfoWithAnalyzedInfo:info];
 
     [self _updateTintsWithBackgroundColor:colorInfo.backgroundColor tintColor:colorInfo.primaryColor];
+}
+
+#pragma mark - Song Liking
+
+- (void)updateLikingCapability:(NSDictionary<NSString *, id> *)userInfo {
+    NSString *supportsLikingKey = (__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoSupportsIsLiked;
+    if (!userInfo[supportsLikingKey] || ![userInfo[supportsLikingKey] boolValue]) {
+        // No key, or doesnt support
+        self.controlsView.supportsLiking = NO;
+        return;
+    }
+
+    // Check if liked
+    NSString *isLikedKey = (__bridge_transfer NSString *)kMRMediaRemoteNowPlayingInfoSupportsIsLiked;
+    self.controlsView.liked = userInfo[isLikedKey] && [userInfo[isLikedKey] boolValue];
 }
 
 @end
