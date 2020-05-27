@@ -1,17 +1,17 @@
 // Dates
-"RELATIVE_DATE_PAST_SECONDS" = "now";
-"RELATIVE_DATE_PAST_MINUTES" = "%zdm";
-"RELATIVE_DATE_PAST_HOURS" = "%zdh";
-"RELATIVE_DATE_PAST_DAYS" = "%zdd";
+"RELATIVE_DATE_PAST_SECONDS" = "τώρα";
+"RELATIVE_DATE_PAST_MINUTES" = "%zdλεπτά";
+"RELATIVE_DATE_PAST_HOURS" = "%zdώρες";
+"RELATIVE_DATE_PAST_DAYS" = "%zdημέρες";
 
 // Notification
 "NOTIFICATION" = "Notification";
-"TAP_FOR_MORE_OPTIONS" = "Tap for more options.";
+"TAP_FOR_MORE_OPTIONS" = "Πατήστε για περισσότερες επιλογές.";
 "OPEN" = "Open";
 "CLEAR" = "Clear";
 "CLEAR_ALL" = "Clear All";
 
 // Alert
-"USER_GUIDE_PROMPT" = "It appears that this is your first time using Nougat. Do you want to go through the user guide?";
-"DISMISS" = "Dismiss";
-"CONFIRM" = "OK";
+"USER_GUIDE_PROMPT" = "Φαίνεται ότι είναι η πρώτη φορά που χρησιμοποιείτε το Nougat. Θέλετε να διαβάσετε τον οδηγό χρήσης;";
+"DISMISS" = "Απορρίψτε";
+"CONFIRM" = "Εντάξει";
