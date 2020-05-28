@@ -9,10 +9,10 @@ FRAMEWORK_NAME = NougatUI
 NougatUI_FILES = $(SOURCES)
 NougatUI_PUBLIC_HEADERS = $(HEADERS)
 NougatUI_FRAMEWORKS = UIKit QuartzCore
+NougatUI_PRIVATE_FRAMEWORKS = BackBoardServices BaseBoard FrontBoard FrontBoardServices MediaRemote SpringBoardServices
 NougatUI_EXTRA_FRAMEWORKS = NougatServices
 NougatUI_LIBRARIES = flipswitch
 NougatUI_CFLAGS = -I../Headers -IMedia -INotifications -IButtons
-NougatUI_LDFLAGS = $(wildcard *.tbd)
 NougatUI_INSTALL_PATH = /usr/lib
 
 include $(THEOS_MAKE_PATH)/framework.mk
