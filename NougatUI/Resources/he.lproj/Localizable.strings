@@ -5,11 +5,11 @@
 "RELATIVE_DATE_PAST_DAYS" = "%zdי";
 
 // Notification
-"NOTIFICATION" = "Notification";
+"NOTIFICATION" = "עדכונים";
 "TAP_FOR_MORE_OPTIONS" = "הקש לאפשרויות נוספות.";
-"OPEN" = "Open";
-"CLEAR" = "Clear";
-"CLEAR_ALL" = "Clear All";
+"OPEN" = "פתיחה";
+"CLEAR" = "נקה";
+"CLEAR_ALL" = "נקה הכל";
 
 // Alert
 "USER_GUIDE_PROMPT" = "נראה שזאת הפעם הראשונה שאת/ה משתמש/ת ב-Nougat. האם ברצונך לעבור על הוראות השימוש?";

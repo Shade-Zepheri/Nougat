@@ -4,15 +4,15 @@
 "PIXEL" = "פיקסל";
 "OREO" = "אוראו";
 
-"APPEARANCE" = "APPEARANCE";
+"APPEARANCE" = "מראה";
 "USE_SYSTEM_APPEARANCE" = "השתמש בהגדרות תצוגת המערכת";
 "USE_COLORFLOW" = "השתמש בצבעי Colorflow";
 
-"NOTIFICATIONS" = "NOTIFICATIONS";
-"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
-"ALWAYS" = "Always";
-"WHEN_UNLOCKED" = "When Unlocked";
-"NEVER" = "Never";
+"NOTIFICATIONS" = "עדכונים";
+"SHOW_NOTIFICATION_PREVIEW" = "הצג תצוגות מקדימות";
+"ALWAYS" = "תמיד";
+"WHEN_UNLOCKED" = "כשהמכשיר לא נעול";
+"NEVER" = "אף פעם";
 
 "USER_GUIDE" = "הוראות שימוש";
 "SORT_ORDER" = "סדר מיון";
