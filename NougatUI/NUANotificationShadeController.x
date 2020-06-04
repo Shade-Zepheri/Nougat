@@ -4,7 +4,6 @@
 #import <UIKit/UIApplication+Private.h>
 #import <UIKit/UIStatusBar.h>
 #import <Macros.h>
-#import <math.h>
 #import <UIKitHelpers.h>
 #import <version.h>
 
@@ -406,14 +405,8 @@
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    if (![self _shouldAllowNotificationShadeGesture]) {
-        // Gesture not allowed
-        return NO;
-    }
-
-    // TODO: Add more criteria
-    // Otherwise, allowed
-    return YES;
+    // Check if allowed
+    return [self _shouldAllowNotificationShadeGesture];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
@@ -440,31 +433,34 @@
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
     if (statusBar && [statusBar isKindOfClass:%c(UIStatusBar_Modern)]) {
         // Use notch insets
+        // Since we are deriving the trailing insets using the leading insets
+        // RTL and LTR must be seperately calculated
         UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
-        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
-        CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
+        if ([UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+            // Get trailing inset
+            CGRect trailingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingTrailingPartIdentifier"];
+            CGFloat minTrailingX = CGRectGetMaxX(trailingFrame);
+            if (minTrailingX > 5000.0) {
+                // Rect is infinite
+                minTrailingX = currentScreenWidth / 4;
+            }
 
-        // Check if within "left"
-        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - (CGRectGetMaxX(leadingFrame) - CGRectGetMinX(leadingFrame))) : CGRectGetMaxX(leadingFrame);
-        if (maxLeadingX > 5000.0) {
-            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
-            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
-            maxLeadingX = isRTL ? ((currentScreenWidth * 3) / 4) : (currentScreenWidth / 4);
+            // Calculate leading inset from trailing inset
+            CGFloat maxLeadingX = currentScreenWidth - minTrailingX;
+            return location.x < maxLeadingX && location.x > minTrailingX;
+        } else {
+            // Get trailing inset
+            CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+            CGFloat maxLeadingX = CGRectGetMaxX(leadingFrame);
+            if (maxLeadingX > 5000.0) {
+                // Rect is infinite
+                maxLeadingX = currentScreenWidth / 4;
+            }
+
+            // Calculate leading inset from trailing inset
+            CGFloat minTrailingX = currentScreenWidth - maxLeadingX;
+            return location.x > maxLeadingX && location.x < minTrailingX;
         }
-
-        BOOL outsideLeftInset = isRTL ? (location.x < maxLeadingX) : (location.x > maxLeadingX);
-
-        // Check if within "right"
-        CGFloat minTrailingX = isRTL ? CGRectGetMaxX(trailingFrame) : (currentScreenWidth - (CGRectGetMaxX(trailingFrame) - CGRectGetMinX(trailingFrame)));
-        if (isnan(minTrailingX)) {
-            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite, so results in nan
-            // Fall back to 1/4
-            minTrailingX = currentScreenWidth - maxLeadingX;
-        }
-
-        BOOL outsideRightInset = isRTL ? (location.x > minTrailingX) : (location.x < minTrailingX);
-        return outsideLeftInset && outsideRightInset;
     } else {
         // Regular old frames
         return location.x > (currentScreenWidth / 3) && location.x < (currentScreenWidth * 2 / 3);
