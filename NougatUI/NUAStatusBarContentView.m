@@ -1,8 +1,13 @@
 #import "NUAStatusBarContentView.h"
 #import <BaseBoard/BaseBoard.h>
 #import <NougatServices/NougatServices.h>
+#import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIKit+Private.h>
+#import <UIKit/UIStatusBar.h>
+#import <UIKit/UIApplication+Private.h>
 #import <sys/utsname.h>
+#import <math.h>
+#import <UIKitHelpers.h>
 
 @interface NUAStatusBarContentView ()
 @property (strong, nonatomic) NSNumberFormatter *percentFormatter;
@@ -31,37 +36,24 @@
     return self;
 }
 
-#pragma mark - View creation
-
-- (NSString *)_carrierText {
-    if ([self.notificationShadePreferences.class carrierName]) {
-        return [self.notificationShadePreferences.class carrierName];
-    } else {
-        // Fallback to device type
-        struct utsname systemInfo;
-        uname(&systemInfo);
-        NSString *deviceName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
-
-        // Trim numbers and comma from device name
-        NSCharacterSet *characterSet = [NSCharacterSet characterSetWithCharactersInString:@"123456789,"];
-        return [deviceName stringByTrimmingCharactersInSet:characterSet];
-    }
-}
+#pragma mark - View Creation
 
 - (void)_createCarrierLabel {
     _carrierLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+    self.carrierLabel.font = [UIFont systemFontOfSize:15];
+    self.carrierLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.carrierLabel.textColor = self.notificationShadePreferences.textColor;
     self.carrierLabel.textAlignment = NSTextAlignmentLeft;
     self.carrierLabel.text = [self _carrierText];
-    self.carrierLabel.font = [UIFont systemFontOfSize:15];
+    self.carrierLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.carrierLabel];
 
     // Constraints (Massive mess but keeps things clean)
-    self.carrierLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
     [self.carrierLabel.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
     [self.carrierLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.0].active = YES;
     [self.carrierLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
+    CGFloat leadingNotchInsetWidth = [self _leadingNotchInsetWidth];
+    [self.carrierLabel.widthAnchor constraintLessThanOrEqualToConstant:leadingNotchInsetWidth].active = YES;
 }
 
 - (void)_createPercentLabel {
@@ -75,11 +67,10 @@
     self.batteryLabel.textColor = self.notificationShadePreferences.textColor;
     self.batteryLabel.textAlignment = NSTextAlignmentLeft;
     self.batteryLabel.font = [UIFont systemFontOfSize:15];
+    self.batteryLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.batteryLabel];
 
     // Constraints
-    self.batteryLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
     [self.batteryLabel.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
     [self.batteryLabel.trailingAnchor constraintEqualToAnchor:self.batteryView.leadingAnchor].active = YES;
     [self.batteryLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
@@ -101,11 +92,10 @@
     self.dateLabel.textColor = self.notificationShadePreferences.textColor;
     self.dateLabel.textAlignment = NSTextAlignmentLeft;
     self.dateLabel.font = [UIFont systemFontOfSize:15];
+    self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:self.dateLabel];
 
     // Constraints
-    self.dateLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
     [self.dateLabel.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
     [self.dateLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.0].active = YES;
     [self.dateLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor].active = YES;
@@ -137,7 +127,7 @@
     self.batteryView.charging = isCharging;
 }
 
-#pragma mark - Time management
+#pragma mark - Time Management
 
 - (void)updateFormat {
     [[BSDateFormatterCache sharedInstance] resetFormattersIfNecessary];
@@ -174,6 +164,48 @@
         self.batteryLabel.textColor = textColor;
     }
     self.dateLabel.textColor = textColor;
+}
+
+#pragma mark - Helper Methods
+
+- (NSString *)_carrierText {
+    if ([self.notificationShadePreferences.class carrierName]) {
+        return [self.notificationShadePreferences.class carrierName];
+    } else {
+        // Fallback to device type
+        struct utsname systemInfo;
+        uname(&systemInfo);
+        NSString *deviceName = [NSString stringWithCString:systemInfo.machine encoding:NSUTF8StringEncoding];
+
+        // Trim numbers and comma from device name
+        NSCharacterSet *characterSet = [NSCharacterSet characterSetWithCharactersInString:@"123456789,"];
+        return [deviceName stringByTrimmingCharactersInSet:characterSet];
+    }
+}
+
+- (CGFloat)_leadingNotchInsetWidth {
+    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
+
+    UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;
+    if (statusBar && [statusBar isKindOfClass:NSClassFromString(@"UIStatusBar_Modern")]) {
+        // Use notch insets
+        UIStatusBar_Modern *modernStatusBar = (UIStatusBar_Modern *)statusBar;
+        CGRect leadingFrame = [modernStatusBar frameForPartWithIdentifier:@"fittingLeadingPartIdentifier"];
+        BOOL isRTL = [UIApplication sharedApplication].userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+        CGFloat maxLeadingX = isRTL ? (currentScreenWidth - CGRectGetMinX(leadingFrame)) : CGRectGetMaxX(leadingFrame);
+
+        if (fabs(maxLeadingX) > 5000.0) {
+            // Screen recording and carplay both cause the leading frame to be infinite, fallback to 1/4
+            // Also now on iOS 13, default statusbar is modern, and on non notch devices, rect is infinite
+            maxLeadingX = currentScreenWidth / 4;
+        }
+
+        return maxLeadingX;
+    } else {
+        // Regular old frames
+        return currentScreenWidth / 3;
+    }
 }
 
 @end
