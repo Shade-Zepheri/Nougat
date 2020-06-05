@@ -1,18 +1,18 @@
-#import "NUATableViewCell.h"
+#import "NUATableViewCellBase.h"
 #import "NUACoalescedNotification.h"
 #import "NUADateLabelRepository.h"
 #import "NUAImageColorCache.h"
 
-@class NUANotificationTableViewCell;
+@class NUASimpleNotificationTableViewCell;
 
 @protocol NUANotificationTableViewCellDelegate <NSObject>
 @required
 
-- (void)notificationTableViewCell:(NUANotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request;
+- (void)notificationTableViewCell:(NUASimpleNotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request;
 
 @end
 
-@interface NUANotificationTableViewCell : NUATableViewCell <NUADateLabelDelegate>
+@interface NUASimpleNotificationTableViewCell : NUATableViewCellBase <NUADateLabelDelegate>
 @property (weak, nonatomic) id<NUANotificationTableViewCellDelegate> actionsDelegate;
 @property (strong, nonatomic) NUACoalescedNotification *notification;
 

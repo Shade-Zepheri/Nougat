@@ -349,7 +349,8 @@
     [self.tableViewController.tableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = YES;
 
     // Register custom classes
-    [self.tableViewController.tableView registerClass:[NUANotificationTableViewCell class] forCellReuseIdentifier:@"NotificationCell"];
+    [self.tableViewController.tableView registerClass:[NUASimpleNotificationTableViewCell class] forCellReuseIdentifier:@"SimpleNotificationCell"];
+    [self.tableViewController.tableView registerClass:[NUAAttachmentNotificationTableViewCell class] forCellReuseIdentifier:@"AttachmentNotificationCell"];
     [self.tableViewController.tableView registerClass:[NUAMediaTableViewCell class] forCellReuseIdentifier:@"MediaCell"];
 
     // Add clear all button
@@ -546,16 +547,17 @@
         return mediaCell;
     }
 
-    NUANotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"NotificationCell" forIndexPath:indexPath];
-    cell.notificationShadePreferences = self.notificationShadePreferences;
-    cell.notification = notification;
-    cell.actionsDelegate = self;
-    cell.delegate = self;
-    cell.expanded = [self isNotificationExpanded:notification];
-    cell.UILocked =  self.UILocked;
-    cell.layoutMargins = UIEdgeInsetsZero;
+    NSString *reuseIdentifier = notification.hasAttachmentImage ? @"AttachmentNotificationCell" : @"SimpleNotificationCell";
+    NUASimpleNotificationTableViewCell *notificationCell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
+    notificationCell.notificationShadePreferences = self.notificationShadePreferences;
+    notificationCell.notification = notification;
+    notificationCell.actionsDelegate = self;
+    notificationCell.delegate = self;
+    notificationCell.expanded = [self isNotificationExpanded:notification];
+    notificationCell.UILocked =  self.UILocked;
+    notificationCell.layoutMargins = UIEdgeInsetsZero;
 
-    return cell;
+    return notificationCell;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -569,15 +571,15 @@
 
 #pragma mark - Cells Delegate
 
-- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand {
+- (void)tableViewCell:(NUATableViewCellBase *)tableViewCell wantsExpansion:(BOOL)expand {
     // Get notification
     NUACoalescedNotification *notification; 
-    if ([cell isKindOfClass:[NUAMediaTableViewCell class]]) {
+    if ([tableViewCell isKindOfClass:[NUAMediaTableViewCell class]]) {
         // Dealing with media class
         notification = _mediaNotification;
     } else {
         // Get cell's notification
-        NUANotificationTableViewCell *notificationCell = (NUANotificationTableViewCell *)cell;
+        NUASimpleNotificationTableViewCell *notificationCell = (NUASimpleNotificationTableViewCell *)tableViewCell;
         notification = notificationCell.notification;
     }
 
@@ -614,7 +616,7 @@
     return [_expandedNotifications containsObject:notification];
 }
 
-- (void)notificationTableViewCell:(NUANotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request {
+- (void)notificationTableViewCell:(NUASimpleNotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request {
     // Call the repository
     [self.notificationRepository executeAction:action forNotificationRequest:request];
 

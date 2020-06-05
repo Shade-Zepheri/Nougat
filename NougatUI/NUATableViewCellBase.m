@@ -1,8 +1,8 @@
-#import "NUATableViewCell.h"
+#import "NUATableViewCellBase.h"
 #import "NUARippleButton.h"
 #import <UIKit/UIImage+Private.h>
 
-@interface NUATableViewCell ()
+@interface NUATableViewCellBase ()
 @property (strong, nonatomic) UIImageView *glyphView;
 @property (strong, nonatomic) UILabel *headerLabel;
 @property (strong, nonatomic) NUARippleButton *expandButton;
@@ -11,7 +11,7 @@
 
 @end
 
-@implementation NUATableViewCell
+@implementation NUATableViewCellBase
 
 #pragma mark - Initialization
 
@@ -33,17 +33,12 @@
     // Glyph view
     _glyphView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self.glyphView.translatesAutoresizingMaskIntoConstraints = NO;
-
-    [self.glyphView.heightAnchor constraintEqualToConstant:18.0].active = YES;
     [self.glyphView.widthAnchor constraintEqualToConstant:18.0].active = YES;
 
     // Create header label
     _headerLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.headerLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.headerLabel.textColor = [UIColor grayColor];
-    self.headerLabel.translatesAutoresizingMaskIntoConstraints = NO;
-
-    [self.headerLabel.heightAnchor constraintEqualToConstant:18.0].active = YES;
 
     // Create "dummy" dot
     UILabel *dotLabel = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -51,7 +46,6 @@
     dotLabel.textColor = [UIColor grayColor];
     dotLabel.text = @"•";
     [dotLabel sizeToFit];
-    dotLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     // Create expand button
     _expandButton = [[NUARippleButton alloc] init];
@@ -68,7 +62,6 @@
     [self.expandButton setImage:baseImage forState:UIControlStateNormal];
 
     [self.expandButton.widthAnchor constraintEqualToConstant:18.0].active = YES;
-    [self.expandButton.heightAnchor constraintEqualToConstant:18.0].active = YES;
 
     // Create stack view
     _headerStackView = [[UIStackView alloc] initWithFrame:CGRectZero];
@@ -88,6 +81,7 @@
     // Create constraints
     [self.headerStackView.topAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.topAnchor constant:2.0].active = YES;
     [self.headerStackView.leadingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
+    [self.headerStackView.heightAnchor constraintEqualToConstant:18.0].active = YES;
 }
 
 #pragma mark - Reuse

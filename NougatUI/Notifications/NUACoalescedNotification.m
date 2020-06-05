@@ -148,6 +148,14 @@
     return icon;
 }
 
+- (BOOL)hasAttachmentImage {
+    if (!self.entries || self.empty) {
+        return NO;
+    }
+
+    return self.leadingNotificationEntry.hasAttachmentImage;
+}
+
 - (UIImage *)attachmentImage {
     if (!self.entries || self.empty) {
         return nil;
@@ -176,6 +184,22 @@
     }
 
     return self.leadingNotificationEntry.timeZone;
+}
+
+- (BOOL)hasCustomActions {
+    if (!self.entries || self.empty) {
+        return NO;
+    }
+
+    return self.leadingNotificationEntry.hasCustomActions;
+}
+
+- (NSArray<NCNotificationAction *> *)customActions {
+    if (!self.entries || self.empty) {
+        return nil;
+    }
+
+    return self.leadingNotificationEntry.customActions;
 }
 
 - (BOOL)isEmpty {

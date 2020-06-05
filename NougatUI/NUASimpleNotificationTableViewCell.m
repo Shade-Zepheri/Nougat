@@ -1,23 +1,19 @@
-#import "NUANotificationTableViewCell.h"
+#import "NUASimpleNotificationTableViewCell.h"
 #import "NUARippleButton.h"
 #import <MobileCoreServices/LSApplicationProxy.h>
-#import <UIKit/UIView+Internal.h>
 #import <Macros.h>
 
-@interface NUANotificationTableViewCell ()
-@property (strong, nonatomic) UIImageView *attachmentImageView;
+@interface NUASimpleNotificationTableViewCell ()
 @property (strong, nonatomic) UILabel *titleLabel;
 @property (strong, nonatomic) UILabel *messageLabel;
 @property (strong, nonatomic) NUARelativeDateLabel *dateLabel;
 @property (strong, nonatomic) UIView *optionsBar;
-@property (strong, nonatomic) UIStackView *optionsButtonStack;
-
-@property (strong, nonatomic) NSLayoutConstraint *attachmentConstraint;
 @property (strong, nonatomic) NSLayoutConstraint *optionsHeightConstraint;
+@property (strong, nonatomic) UIStackView *optionsButtonStack;
 
 @end
 
-@implementation NUANotificationTableViewCell
+@implementation NUASimpleNotificationTableViewCell
 
 #pragma mark - Initialization
 
@@ -25,10 +21,12 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         // Create everything
-        [self _createAttachmentView];
         [self _createTitleLabel];
         [self _createMessageLabel];
         [self _createOptionsBar];
+
+        // Constraints
+        [self setUpConstraints];
     }
 
     return self;
@@ -39,38 +37,14 @@
     [self _recycleDateLabel];
 }
 
-#pragma mark - Reuse
-
-- (void)prepareForReuse {
-    [super prepareForReuse];
-
-    // Reset stuff
-    self.expanded = NO;
-}
-
 #pragma mark - View Creation
-
-- (void)_createAttachmentView {
-    // Create
-    self.attachmentImageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    self.attachmentImageView.clipsToBounds = YES;
-    self.attachmentImageView._continuousCornerRadius = 3.0;
-    self.attachmentImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [self.contentView addSubview:self.attachmentImageView];
-
-    // Constraints
-    [self.attachmentImageView.topAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor].active = YES;
-    [self.attachmentImageView.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
-    [self.attachmentImageView.heightAnchor constraintEqualToConstant:40.0].active = YES;
-    self.attachmentConstraint = [self.attachmentImageView.widthAnchor constraintEqualToConstant:0.0];
-    self.attachmentConstraint.active = YES;
-}
 
 - (void)_createTitleLabel {
     // Create
     self.titleLabel = [[UILabel alloc] initWithFrame:CGRectZero];
     self.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
     self.titleLabel.lineBreakMode = NSLineBreakByTruncatingTail;
+    self.titleLabel.adjustsFontForContentSizeCategory = YES;
     self.titleLabel.translatesAutoresizingMaskIntoConstraints = NO;
 
     // Here we actually wanna use iOS 13's label color since the background will automatically change regardless of settings
@@ -81,10 +55,6 @@
         self.titleLabel.textColor = [UIColor blackColor];
     }
     [self.contentView addSubview:self.titleLabel];
-
-    [self.titleLabel.firstBaselineAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:20.0].active = YES;
-    [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.headerStackView.leadingAnchor].active = YES;
-    [self.titleLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
 - (void)_createMessageLabel {
@@ -94,12 +64,9 @@
     self.messageLabel.lineBreakMode = NSLineBreakByTruncatingTail;
     self.messageLabel.numberOfLines = 2;
     self.messageLabel.textColor = [UIColor grayColor];
+    self.messageLabel.adjustsFontForContentSizeCategory = YES;
     self.messageLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.messageLabel];
-
-    [self.messageLabel.firstBaselineAnchor constraintEqualToAnchor:self.titleLabel.lastBaselineAnchor constant:20.0].active = YES;
-    [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.titleLabel.leadingAnchor].active = YES;
-    [self.messageLabel.trailingAnchor constraintLessThanOrEqualToAnchor:self.attachmentImageView.leadingAnchor constant:-10.0].active = YES;
 }
 
 - (void)_createOptionsBar {
@@ -117,17 +84,6 @@
         self.optionsBar.backgroundColor = OreoBackgroundColor;
     }
 
-    // Constraints
-    [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
-    [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
-
-    [self.optionsBar.topAnchor constraintEqualToAnchor:self.messageLabel.lastBaselineAnchor constant:15.0].active = YES;
-    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
-    self.optionsHeightConstraint.active = YES;
-
-    // Have cell height be determined by size of everything else
-    [self.contentView.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
-
     // Create stack
     _optionsButtonStack = [[UIStackView alloc] initWithFrame:CGRectZero];
     self.optionsButtonStack.axis = UILayoutConstraintAxisHorizontal;
@@ -136,10 +92,39 @@
     self.optionsButtonStack.spacing = 15.0;
     self.optionsButtonStack.translatesAutoresizingMaskIntoConstraints = NO;
     [self.contentView addSubview:self.optionsButtonStack];
+}
 
+- (void)setUpConstraints {
+    // Title label
+    [self.titleLabel.leadingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.leadingAnchor].active = YES;
+    [self.titleLabel.firstBaselineAnchor constraintEqualToAnchor:self.headerStackView.bottomAnchor constant:20.0].active = YES;
+
+    // Message label
+    [self.messageLabel.leadingAnchor constraintEqualToAnchor:self.titleLabel.leadingAnchor].active = YES;
+    [self.messageLabel.firstBaselineAnchor constraintEqualToAnchor:self.titleLabel.lastBaselineAnchor constant:20.0].active = YES;
+
+    [self _setUpTrailingConstraints];
+
+    // Options bar
+    [self.optionsBar.leadingAnchor constraintEqualToAnchor:self.contentView.leadingAnchor].active = YES;
+    [self.optionsBar.trailingAnchor constraintEqualToAnchor:self.contentView.trailingAnchor].active = YES;
+    [self.optionsBar.topAnchor constraintEqualToAnchor:self.messageLabel.lastBaselineAnchor constant:15.0].active = YES;
+    self.optionsHeightConstraint = [self.optionsBar.heightAnchor constraintEqualToConstant:0.0];
+    self.optionsHeightConstraint.active = YES;
+
+    // Options stack
     [self.optionsButtonStack.leadingAnchor constraintEqualToAnchor:self.messageLabel.leadingAnchor].active = YES;
     [self.optionsButtonStack.topAnchor constraintEqualToAnchor:self.optionsBar.topAnchor].active = YES;
     [self.optionsButtonStack.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+
+    // Cell height
+    [self.contentView.bottomAnchor constraintEqualToAnchor:self.optionsBar.bottomAnchor].active = YES;
+}
+
+- (void)_setUpTrailingConstraints {
+    // Setup here,so subclasses can override
+    [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
+    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;;
 }
 
 #pragma mark - Properties
@@ -158,8 +143,6 @@
     NSString *realTitleText = self.notification.title ?: self.notification.message;
     self.titleText = UILocked ? hiddenTitleText : realTitleText;
     self.messageLabel.hidden = UILocked;
-    self.attachmentImageView.hidden = UILocked;
-    [self setNeedsLayout];
 }
 
 - (NSString *)titleText {
@@ -189,31 +172,10 @@
     // Update
     self.messageLabel.text = messageText;
 
-    // Manually derive message label
-    CGRect contentViewBounds = UIEdgeInsetsInsetRect(self.contentView.bounds, self.contentView.layoutMargins);
-    CGFloat trailingInset = (self.attachmentImage) ? 50.0 : 10.0;
-    CGFloat calculatedLabelWidth = CGRectGetWidth(contentViewBounds) - trailingInset;
-    CGSize boundingSize = CGSizeMake(calculatedLabelWidth, CGFLOAT_MAX);
-
     // Determine if expandable
+    CGSize boundingSize = CGSizeMake(CGRectGetWidth(self.messageLabel.bounds), CGFLOAT_MAX);
     CGRect requiredLabelBounds = [messageText boundingRectWithSize:boundingSize options:(NSStringDrawingUsesLineFragmentOrigin | NSStringDrawingUsesFontLeading) attributes:@{NSFontAttributeName: self.messageLabel.font} context:nil];
     self.expandable = floor(CGRectGetHeight(requiredLabelBounds) / self.messageLabel.font.lineHeight) > 2;
-}
-
-- (UIImage *)attachmentImage {
-    return self.attachmentImageView.image;
-}
-
-- (void)setAttachmentImage:(UIImage *)attachmentImage {
-    if (attachmentImage && self.attachmentImageView.image == attachmentImage) {
-        // Same image
-        return;
-    }
-
-    // Update image
-    self.attachmentImageView.image = attachmentImage;
-    CGFloat constant = (attachmentImage != nil) ? 40.0 : 0.0;
-    self.attachmentConstraint.constant = constant;
 }
 
 - (void)setTimestamp:(NSDate *)timestamp {
@@ -235,9 +197,8 @@
     self.messageLabel.numberOfLines = expanded ? 0 : 2;
 
     // Configure options bar
+    self.optionsHeightConstraint.constant = (expanded && self.hasActions) ? 38.0 : 0.0;
     if (self.hasActions) {
-        self.optionsHeightConstraint.constant = expanded ? 40.0 : 0.0;
-
         // Reveal the buttons
         for (UIView *view in self.optionsButtonStack.arrangedSubviews) {
             view.hidden = !expanded;
@@ -248,11 +209,6 @@
 }
 
 - (void)setNotification:(NUACoalescedNotification *)notification {
-    if ([notification isEqual:_notification]) {
-        // Same notification
-        return;
-    }
-
     // Configure content
     _notification = notification;
     NSBundle *bundle = [NSBundle bundleForClass:self.class];
@@ -260,7 +216,6 @@
     NSString *hiddenTitleText = [bundle localizedStringForKey:@"NOTIFICATION" value:@"Notification" table:@"Localizable"];
     NSString *fallbackMessage = [bundle localizedStringForKey:@"TAP_FOR_MORE_OPTIONS" value:@"Tap for more options." table:@"Localizable"];
     NSString *messageText = (notification.title) ? notification.message : fallbackMessage;
-    self.attachmentImage = notification.attachmentImage;
     self.titleText = self.UILocked ? hiddenTitleText : titleText;
     self.messageText = messageText;
     self.headerGlyph = notification.icon;
@@ -282,6 +237,7 @@
 #pragma mark - Notification Actions
 
 - (void)setupActionsFromNotification:(NUACoalescedNotification *)notification {
+    // Reset old buttons
     if (self.optionsButtonStack.arrangedSubviews.count > 0) {
         // Remove old actions
         for (UIView *view in self.optionsButtonStack.arrangedSubviews) {
@@ -289,10 +245,8 @@
         }
     }
 
-    NCNotificationRequest *request = notification.leadingNotificationEntry.request;
-    NSArray<NCNotificationAction *> *minimalActions = request.supplementaryActions[@"NCNotificationActionEnvironmentMinimal"];
-    if (!minimalActions || minimalActions.count == 0) {
-        // No supplemental actions
+    if (!notification.hasCustomActions) {
+        // No actions
         self.hasActions = NO;
         return;
     }
@@ -301,7 +255,7 @@
     self.hasActions = YES;
 
     // Add supplemental minimal actions
-    for (NCNotificationAction *action in minimalActions) {
+    for (NCNotificationAction *action in notification.customActions) {
         // Create button
         NUARippleButton *rippleButton = [[NUARippleButton alloc] init];
         [rippleButton addTarget:self action:@selector(cellActionButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -311,7 +265,6 @@
         rippleButton.maxRippleRadius = 20.0;
         rippleButton.rippleStyle = NUARippleStyleUnbounded;
         rippleButton.titleLabel.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-        [rippleButton sizeToFit];
 
         // Add to stack
         [self.optionsButtonStack addArrangedSubview:rippleButton];

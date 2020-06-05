@@ -13,9 +13,12 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 @property (copy, readonly, nonatomic) NSString *title;
 @property (copy, readonly, nonatomic) NSString *message;
 @property (readonly, nonatomic) UIImage *icon;
+@property (readonly, nonatomic) BOOL hasAttachmentImage;
 @property (readonly, nonatomic) UIImage *attachmentImage;
 @property (readonly, nonatomic) NSDate *timestamp;
 @property (readonly, nonatomic) NSTimeZone *timeZone;
+@property (readonly, nonatomic) BOOL hasCustomActions;
+@property (copy, readonly, nonatomic) NSArray<NCNotificationAction *> *customActions;
 @property (strong, readonly, nonatomic) NUANotificationEntry *leadingNotificationEntry;
 @property (copy, readonly, nonatomic) NSArray<NUANotificationEntry *> *entries;
 @property (assign, nonatomic) NUANotificationType type;
@@ -24,15 +27,13 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
 + (instancetype)mediaNotification;
 
 + (instancetype)coalescedNotificationFromNotification:(NCCoalescedNotification *)notification;
++ (instancetype)coalescedNotificationFromRequest:(NCNotificationRequest *)request;
 - (instancetype)initFromNotification:(NCCoalescedNotification *)notification;
 
-+ (instancetype)coalescedNotificationFromRequest:(NCNotificationRequest *)request;
-
-- (NSComparisonResult)compare:(NUACoalescedNotification *)otherNotification;
-
 - (BOOL)containsRequest:(NCNotificationRequest *)request;
-
 - (void)updateWithNewRequest:(NCNotificationRequest *)request;
 - (void)removeRequest:(NCNotificationRequest *)request;
+
+- (NSComparisonResult)compare:(NUACoalescedNotification *)otherNotification;
 
 @end

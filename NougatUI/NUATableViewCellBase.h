@@ -1,16 +1,16 @@
 #import <UIKit/UIKit.h>
 #import <NougatServices/NougatServices.h>
 
-@class NUATableViewCell;
+@class NUATableViewCellBase;
 
 @protocol NUATableViewCellDelegate <NSObject>
 @required
 
-- (void)tableViewCell:(NUATableViewCell *)cell wantsExpansion:(BOOL)expand;
+- (void)tableViewCell:(NUATableViewCellBase *)tableViewCell wantsExpansion:(BOOL)expand;
 
 @end
 
-@interface NUATableViewCell : UITableViewCell
+@interface NUATableViewCellBase : UITableViewCell
 @property (weak, nonatomic) id<NUATableViewCellDelegate> delegate;
 @property (getter=isExpandable, nonatomic) BOOL expandable;
 @property (getter=isExpanded, nonatomic) BOOL expanded;

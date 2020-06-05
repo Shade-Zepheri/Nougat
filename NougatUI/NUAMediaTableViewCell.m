@@ -214,11 +214,6 @@
 }
 
 - (void)setNowPlayingController:(MPUNowPlayingController *)nowPlayingController {
-    if (nowPlayingController == _nowPlayingController) {
-        // same thing
-        return;
-    }
-
     _nowPlayingController = nowPlayingController;
     nowPlayingController.delegate = self;
 

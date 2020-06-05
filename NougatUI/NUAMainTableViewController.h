@@ -1,8 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "NUACoalescedNotification.h"
 #import "NUANotificationRepository.h"
-#import "NUANotificationTableViewCell.h"
-#import "NUATableViewCell.h"
+#import "NUAAttachmentNotificationTableViewCell.h"
 #import <NougatServices/NougatServices.h>
 #import <MediaPlayerUI/MediaPlayerUI.h>
 

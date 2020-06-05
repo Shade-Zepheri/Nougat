@@ -21,9 +21,22 @@
         _icon = content.icon;
         _attachmentImage = content.attachmentImage;
         _timeZone = content.timeZone;
+
+        // Get actions
+        _customActions = request.supplementaryActions[@"NCNotificationActionEnvironmentMinimal"];
     }
 
     return self;
+}
+
+#pragma mark - Properties
+
+- (BOOL)hasAttachmentImage {
+    return self.attachmentImage != nil;
+}
+
+- (BOOL)hasCustomActions {
+    return self.customActions.count > 0;
 }
 
 #pragma mark - NSObject
