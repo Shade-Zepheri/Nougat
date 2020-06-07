@@ -17,6 +17,10 @@
 "USER_GUIDE" = "Guide d'Utilisation";
 "SORT_ORDER" = "Trier par";
 
+"COMPATIBILITY" = "COMPATIBILITY";
+"COMPATIBILITY_FOOTER" = "Enable if you have tweaks that cover up the status bar (e.g. Notchless or NoNotch). This hides the Nougat status bar module.";
+"HIDE_STATUS_BAR" = "Hide Status Bar";
+
 "SHARE_TEXT" = "Essaie l'appli de Nougat par Shade Zepheri. Vous pouvez utiliser le panneau de notification style Android sans utiliser un appareil Android !";
 
 "SUPPORT" = "Support";
