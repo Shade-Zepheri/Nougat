@@ -15,8 +15,6 @@
 @property (getter=isExpandable, nonatomic) BOOL expandable;
 @property (getter=isExpanded, nonatomic) BOOL expanded;
 
-@property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
-
 @property (strong, readonly, nonatomic) UIStackView *headerStackView;
 @property (copy, nonatomic) NSString *headerText;
 @property (strong, nonatomic) UIImage *headerGlyph;

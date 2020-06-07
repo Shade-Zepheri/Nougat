@@ -538,24 +538,23 @@
         NUAMediaTableViewCell *mediaCell = [tableView dequeueReusableCellWithIdentifier:@"MediaCell" forIndexPath:indexPath];
 
         // Provide basic information
-        mediaCell.nowPlayingController = self.nowPlayingController;
-        mediaCell.delegate = self;
-        mediaCell.expanded = [self isNotificationExpanded:notification];
         mediaCell.layoutMargins = UIEdgeInsetsZero;
+        mediaCell.nowPlayingController = self.nowPlayingController;
         mediaCell.notificationShadePreferences = self.notificationShadePreferences;
+        mediaCell.expanded = [self isNotificationExpanded:notification];
+        mediaCell.delegate = self;
 
         return mediaCell;
     }
 
     NSString *reuseIdentifier = notification.hasAttachmentImage ? @"AttachmentNotificationCell" : @"SimpleNotificationCell";
     NUASimpleNotificationTableViewCell *notificationCell = [tableView dequeueReusableCellWithIdentifier:reuseIdentifier forIndexPath:indexPath];
-    notificationCell.notificationShadePreferences = self.notificationShadePreferences;
+    notificationCell.layoutMargins = UIEdgeInsetsZero;
     notificationCell.notification = notification;
-    notificationCell.actionsDelegate = self;
-    notificationCell.delegate = self;
     notificationCell.expanded = [self isNotificationExpanded:notification];
     notificationCell.UILocked =  self.UILocked;
-    notificationCell.layoutMargins = UIEdgeInsetsZero;
+    notificationCell.actionsDelegate = self;
+    notificationCell.delegate = self;
 
     return notificationCell;
 }

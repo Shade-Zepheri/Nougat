@@ -8,6 +8,7 @@
 @property (getter=isPlaying, readonly, nonatomic) BOOL playing;
 
 @property (strong, nonatomic) MPUNowPlayingController *nowPlayingController;
+@property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
 @property (strong, nonatomic) MPUNowPlayingMetadata *metadata;
 @property (strong, nonatomic) UIImage *nowPlayingArtwork;
 @property (copy, nonatomic) NSString *nowPlayingAppDisplayID;
