@@ -25,6 +25,7 @@ static NSString *const NUAPreferencesCurrentThemeKey = @"darkVariant";
 static NSString *const NUAPreferencesUsesExternalColorKey = @"colorflowEnabled";
 static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppearance";
 static NSString *const NUAPreferencesNotificationPreviewSettingKey = @"notificationPreviewSetting";
+static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
 
 @interface NUAPreferenceManager : NSObject
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
@@ -44,6 +45,8 @@ static NSString *const NUAPreferencesNotificationPreviewSettingKey = @"notificat
 @property (assign, readonly, nonatomic) BOOL useExternalColor;
 @property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
 @property (assign, readonly, nonatomic) NUANotificationPreviewSetting notificationPreviewSetting;
+
+@property (assign, readonly, nonatomic) BOOL hideStatusBarModule;
 
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;

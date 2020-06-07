@@ -42,6 +42,7 @@
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
         [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
         [_preferences registerUnsignedInteger:&_notificationPreviewSetting default:NUANotificationPreviewSettingAlways forKey:NUAPreferencesNotificationPreviewSettingKey];
+        [_preferences registerBool:&_hideStatusBarModule default:NO forKey:NUAPreferencesHideStatusBarModuleKey];
 
         NSArray<NSString *> *defaultToggleOrder = [self.class _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];

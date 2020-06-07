@@ -165,6 +165,28 @@
         <dict>
             <key>cell</key>
             <string>PSGroupCell</string>
+            <key>label</key>
+            <string>COMPATIBILITY</string>
+            <key>footerText</key>
+            <string>COMPATIBILITY_FOOTER</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSSwitchCell</string>
+            <key>default</key>
+            <true/>
+            <key>defaults</key>
+            <string>com.shade.nougat</string>
+            <key>key</key>
+            <string>hideStatusBar</string>
+            <key>label</key>
+            <string>HIDE_STATUS_BAR</string>
+            <key>PostNotification</key>
+            <string>com.shade.nougat/ReloadPrefs</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
         </dict>
         <dict>
 			<key>cell</key>

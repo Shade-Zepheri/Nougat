@@ -17,8 +17,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    // Hide/Show view
+    self.view.alpha = self.notificationShadePreferences.hideStatusBarModule ? 0.0 : 1.0;
+
     // Register for notifications
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateFormat) name:@"BSDateTimeCacheChangedNotification" object:nil];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver:self selector:@selector(_updateFormat) name:@"BSDateTimeCacheChangedNotification" object:nil];
+    [center addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
 
     // Register for time updates    
     SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
@@ -172,6 +177,11 @@
 
     [self statusBarView].currentPercent = currentPercent;
     [self statusBarView].charging = isCharging;
+}
+
+- (void)preferencesDidChange:(NSNotification *)notification {
+    // Hide/Show view
+    self.view.alpha = self.notificationShadePreferences.hideStatusBarModule ? 0.0 : 1.0;
 }
 
 @end
