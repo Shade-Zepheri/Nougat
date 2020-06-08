@@ -124,7 +124,7 @@
 - (void)_setUpTrailingConstraints {
     // Setup here,so subclasses can override
     [self.titleLabel.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
-    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;;
+    [self.messageLabel.trailingAnchor constraintEqualToAnchor:self.contentView.layoutMarginsGuide.trailingAnchor].active = YES;
 }
 
 #pragma mark - Properties
@@ -204,8 +204,6 @@
             view.hidden = !expanded;
         }
     }
-
-    [self setNeedsLayout];
 }
 
 - (void)setNotification:(NUACoalescedNotification *)notification {
@@ -229,9 +227,6 @@
 
     // // Get our color info
     [self updateColorInfoFromNotification:notification];
-
-    // Update UI
-    [self setNeedsLayout];
 }
 
 #pragma mark - Notification Actions
@@ -274,7 +269,7 @@
 - (void)cellActionButtonPressed:(NUARippleButton *)button {
     // Get actions
     NCNotificationRequest *request = self.notification.leadingNotificationEntry.request;
-    NSArray<NCNotificationAction *> *minimalActions = request.supplementaryActions[@"NCNotificationActionEnvironmentMinimal"];
+    NSArray<NCNotificationAction *> *minimalActions = self.notification.customActions;
 
     // Get index or button
     NSUInteger actionIndex = [self.optionsButtonStack.arrangedSubviews indexOfObject:button];
