@@ -231,7 +231,7 @@
 
 - (void)_resizeTableForExpansion:(BOOL)expand forNotification:(BOOL)forNotification {
     // Calculate current heights
-    CGFloat proposedHeightToAdd = forNotification ? (expand ? 100.0 : -100.0) : (expand ? 50.0 : -50.0);
+    CGFloat proposedHeightToAdd = forNotification ? (expand ? 104.0 : -104.0) : (expand ? 38.0 : -38.0);
     CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
     CGFloat currentPanelHeight = ((fullPanelHeight - 150.0) * self.revealPercentage) + 150.0;
     CGFloat currentContentHeight = currentPanelHeight + self.contentHeight;
