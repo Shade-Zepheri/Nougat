@@ -190,26 +190,20 @@
     // Get old index
     NSIndexPath *oldIndexPath = [self indexPathForNotification:updatedNotification];
 
-    // Sort via date
-    // Since references, the notification in the array is already updated, all thats needed is to sort
+    // Remove and insert into proper index
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
-        return [notification1 compare:notification2];
-    }];
+    [notifications removeObject:updatedNotification];
 
+    NSUInteger insertIndex = [self _indexForAddingNewNotification:updatedNotification];
+    NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:insertIndex inSection:0];
+    [notifications insertObject:updatedNotification atIndex:insertIndex];
     _notifications = [notifications copy];
 
-    // Get new index
-    NSIndexPath *newIndexPath = [self indexPathForNotification:updatedNotification];
-
     // Update table
-    if (newIndexPath.row == oldIndexPath.row) {
-        // Simply just reload the cell, no need to insert and delete
-        [self.tableViewController.tableView reloadRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    } else {
-        // Just call move
-        [self.tableViewController.tableView moveRowAtIndexPath:oldIndexPath toIndexPath:newIndexPath];
-    }
+    [self.tableViewController.tableView beginUpdates];
+    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[oldIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableViewController.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+    [self.tableViewController.tableView endUpdates];
 }
 
 - (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification {
@@ -224,9 +218,8 @@
 
     // Remove old and update
     NSIndexPath *oldIndexPath = [self indexPathForNotification:removedNotification];
-
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    [notifications removeObject:removedNotification];
+    [notifications removeObjectAtIndex:oldIndexPath.row];
     _notifications = [notifications copy];
 
     // Update table
