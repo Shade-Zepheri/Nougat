@@ -370,6 +370,9 @@
     // Populate notifications
     [self _loadNotificationsIfNecessary];
 
+    // Fix some stupid bug that messes up my cell height
+    [self.tableViewController.tableView reloadData];
+
     // Notifications
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(_updateMedia) name:(__bridge_transfer NSString *)kMRMediaRemoteNowPlayingApplicationIsPlayingDidChangeNotification object:nil];
