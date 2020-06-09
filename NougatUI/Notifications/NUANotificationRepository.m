@@ -4,6 +4,13 @@
 
 @implementation NUANotificationRepository
 
+#pragma mark - Class Methods
+
++ (NSSet<NSString *> *)_excludedSectionIdentifiers {
+    // Set of exculded notification identifiers
+    return [NSSet setWithArray:@[@"com.apple.donotdisturb", @"com.apple.Passbook", @"com.apple.cmas"]];
+}
+
 #pragma mark - Init
 
 + (instancetype)defaultRepository {
@@ -137,14 +144,14 @@
 
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
     // Access notifications asynchronously
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups;
     BOOL containsSection = [self.notifications.allKeys containsObject:request.sectionIdentifier];
-    if (containsSection) {
-        // Check if contains thread
-        notificationGroups = self.notifications[request.sectionIdentifier];
+    if (!containsSection) {
+        // Doesn't even contain section
+        return NO;
     }
     
-    return (notificationGroups != nil) && [notificationGroups.allKeys containsObject:request.threadIdentifier];
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
+    return [notificationGroups.allKeys containsObject:request.threadIdentifier];
 }
 
 - (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
@@ -165,8 +172,7 @@
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [request.sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
-        // Exclude DND notification and wallet
+    if ([[self.class _excludedSectionIdentifiers] containsObject:request.sectionIdentifier]) {
         return NO;
     }
 
@@ -222,8 +228,7 @@
 }
 
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    if ([request.sectionIdentifier isEqualToString:@"com.apple.donotdisturb"] || [request.sectionIdentifier isEqualToString:@"com.apple.Passbook"] || [request.sectionIdentifier isEqualToString:@"com.apple.cmas"]) {
-        // Exclude DND notification and wallet
+    if ([[self.class _excludedSectionIdentifiers] containsObject:request.sectionIdentifier]) {
         return;
     }
 
