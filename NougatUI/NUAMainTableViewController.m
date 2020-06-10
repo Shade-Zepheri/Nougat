@@ -8,7 +8,7 @@
 #import <UIKitHelpers.h>
 
 @interface NUAMainTableViewController () {
-    NSMutableArray<NUACoalescedNotification *> *_expandedNotifications;
+    NSMutableSet<NUACoalescedNotification *> *_expandedNotifications;
     NSLayoutConstraint *_heightConstraint;
     NUACoalescedNotification *_mediaNotification;
 }
@@ -26,7 +26,7 @@
     if (self) {
         // Set defaults
         _notificationShadePreferences = notificationShadePreferences;
-        _expandedNotifications = [NSMutableArray array];
+        _expandedNotifications = [NSMutableSet set];
         _mediaNotification = [NUACoalescedNotification mediaNotification];
 
         // Determine unlock defaults
@@ -195,11 +195,17 @@
     [notifications removeObject:updatedNotification];
 
     NSUInteger insertIndex = [self _indexForAddingNewNotification:updatedNotification];
-    NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:insertIndex inSection:0];
-    [notifications insertObject:updatedNotification atIndex:insertIndex];
+    if (insertIndex >= notifications.count) {
+        // Simply add to end
+        insertIndex = notifications.count;
+        [notifications addObject:updatedNotification];
+    } else {
+        [notifications insertObject:updatedNotification atIndex:insertIndex];
+    }
     _notifications = [notifications copy];
 
     // Update table
+    NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:insertIndex inSection:0];
     [self.tableViewController.tableView beginUpdates];
     [self.tableViewController.tableView deleteRowsAtIndexPaths:@[oldIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -231,6 +237,7 @@
 
 - (void)_resizeTableForExpansion:(BOOL)expand forNotification:(BOOL)forNotification {
     // Calculate current heights
+    // TODO: Find out how much height should be added
     CGFloat proposedHeightToAdd = forNotification ? (expand ? 104.0 : -104.0) : (expand ? 38.0 : -38.0);
     CGFloat fullPanelHeight = [self.delegate tableViewControllerRequestsPanelContentHeight:self];
     CGFloat currentPanelHeight = ((fullPanelHeight - 150.0) * self.revealPercentage) + 150.0;
