@@ -17,6 +17,10 @@
 "USER_GUIDE" = "Handbuch";
 "SORT_ORDER" = "Sortierung";
 
+"COMPATIBILITY" = "COMPATIBILITY";
+"COMPATIBILITY_FOOTER" = "Enable if you have tweaks that cover up the status bar (e.g. Notchless or NoNotch). This hides the Nougat status bar module.";
+"HIDE_STATUS_BAR" = "Hide Status Bar";
+
 "SHARE_TEXT" = "Teste mal Nougat von Shade Zepheri. Damit kannst du das Benachrichtigungszentrum von Android benutzen, ohne Android haben zu müssen!";
 
 "SUPPORT" = "Support";

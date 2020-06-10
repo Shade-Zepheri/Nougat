@@ -17,6 +17,10 @@
 "USER_GUIDE" = "Hướng dẫn sử dụng";
 "SORT_ORDER" = "Sắp xếp thứ tự";
 
+"COMPATIBILITY" = "COMPATIBILITY";
+"COMPATIBILITY_FOOTER" = "Enable if you have tweaks that cover up the status bar (e.g. Notchless or NoNotch). This hides the Nougat status bar module.";
+"HIDE_STATUS_BAR" = "Hide Status Bar";
+
 "SHARE_TEXT" = "Thử ngay Nougat của Shade Zepheri. Sử dụng Trung tâm thông báo của Android trên HĐH iOS!";
 
 "SUPPORT" = "Hỗ trợ";

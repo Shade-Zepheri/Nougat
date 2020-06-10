@@ -17,6 +17,10 @@
 "USER_GUIDE" = "사용자 도움말";
 "SORT_ORDER" = "정렬 순서";
 
+"COMPATIBILITY" = "COMPATIBILITY";
+"COMPATIBILITY_FOOTER" = "Enable if you have tweaks that cover up the status bar (e.g. Notchless or NoNotch). This hides the Nougat status bar module.";
+"HIDE_STATUS_BAR" = "Hide Status Bar";
+
 "SHARE_TEXT" = "Shade Zepheri의 Nougat을 써봐요. 안드로이드 없이 안드로이드 알림 패널을 쓸 수 있어요!";
 
 "SUPPORT" = "지원";
