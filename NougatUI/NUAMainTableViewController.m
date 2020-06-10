@@ -190,26 +190,23 @@
     // Get old index
     NSIndexPath *oldIndexPath = [self indexPathForNotification:updatedNotification];
 
-    // Remove and insert into proper index
+    // Sort via date
+    // Since references, the notification in the array is already updated, all thats needed is to sort
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    [notifications removeObject:updatedNotification];
-
-    NSUInteger insertIndex = [self _indexForAddingNewNotification:updatedNotification];
-    if (insertIndex >= notifications.count) {
-        // Simply add to end
-        insertIndex = notifications.count;
-        [notifications addObject:updatedNotification];
-    } else {
-        [notifications insertObject:updatedNotification atIndex:insertIndex];
-    }
+    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+        return [notification1 compare:notification2];
+    }];
     _notifications = [notifications copy];
 
+    // Get new index
+    NSIndexPath *newIndexPath = [self indexPathForNotification:updatedNotification];
+    if (newIndexPath.row != oldIndexPath.row) {
+        // Move the cell
+        [self.tableViewController.tableView moveRowAtIndexPath:oldIndexPath toIndexPath:newIndexPath];
+    } 
+
     // Update table
-    NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:insertIndex inSection:0];
-    [self.tableViewController.tableView beginUpdates];
-    [self.tableViewController.tableView deleteRowsAtIndexPaths:@[oldIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableViewController.tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-    [self.tableViewController.tableView endUpdates];
+    [self.tableViewController.tableView reloadRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
 
 - (void)notificationRepositoryRemovedNotification:(NUACoalescedNotification *)removedNotification {
