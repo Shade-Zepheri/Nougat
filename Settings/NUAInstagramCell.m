@@ -23,16 +23,16 @@
 
 + (NSString *)_urlForUsername:(NSString *)user {
     // Because kirby does so
-	user = user.hb_stringByEncodingQueryPercentEscapes;
+    user = user.hb_stringByEncodingQueryPercentEscapes;
 
-	// wow, people still copy paste this code
+    // wow, people still copy paste this code
     // Yes, yes I do
-	if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram://"]]) {
+    if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"instagram://"]]) {
         // Has instagram app
-		return [@"instagram://user?username=" stringByAppendingString:user];
-	} else {
-		return [@"https://instagram.com/" stringByAppendingString:user];
-	}
+        return [@"instagram://user?username=" stringByAppendingString:user];
+    } else {
+        return [@"https://instagram.com/" stringByAppendingString:user];
+    }
 }
 
 
@@ -70,22 +70,19 @@
 #pragma mark - Avatar
 
 - (BOOL)shouldShowAvatar {
-	// HBLinkTableCell doesn’t want avatars by default, but we do. override its check method so that
-	// if showAvatar is unset, we return YES
-	return self.specifier.properties[@"showAvatar"] ? [super shouldShowAvatar] : YES;
+    // HBLinkTableCell doesn’t want avatars by default, but we do. override its check method so that
+    // if showAvatar is unset, we return YES
+    return self.specifier.properties[@"showAvatar"] ? [super shouldShowAvatar] : YES;
 }
 
 - (void)loadAvatarIfNeeded {
-	if (!self.username) {
-		return;
-	}
+    if (!self.username || self.avatarImage) {
+        // No username, or already has image
+        return;
+    }
 
-	if (self.avatarImage) {
-		return;
-	}
-
-	dispatch_async(_processingQueue, ^{
-		NSString *username = self.username.hb_stringByEncodingQueryPercentEscapes;
+    dispatch_async(_processingQueue, ^{
+        NSString *username = self.username.hb_stringByEncodingQueryPercentEscapes;
         NSURL *URL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.instagram.com/%@/?__a=1", username]];
 
         // Retrieve data
@@ -93,7 +90,7 @@
             // Pass to helper method
             [self _parseInstagramData:data];
         }];
-	});
+    });
 }
 
 - (void)_parseInstagramData:(NSData *)jsonData {
