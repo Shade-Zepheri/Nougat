@@ -54,11 +54,9 @@
         self.albumArtworkCache.countLimit = 23;
 
         // Create background queue to work on
-        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
+        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_CONCURRENT, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
         dispatch_queue_attr_t calloutAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INITIATED, 0);
         _processingQueue = dispatch_queue_create("com.shade.nougat.color-cache", calloutAttributes);
-
-        // TODO: Register for any app color changes
     }
 
     return self;
@@ -70,7 +68,7 @@
     CIImage *inputImage = image.CIImage ?: [CIImage imageWithCGImage:image.CGImage];
     if (!inputImage) {
         // No image, fallback
-        return UIColor.grayColor;
+        return [UIColor grayColor];
     }
 
     CIFilter *filter = [CIFilter filterWithName:@"CIAreaAverage" withInputParameters:@{kCIInputImageKey: inputImage, kCIInputExtentKey: [CIVector vectorWithCGRect:inputImage.extent]}];
