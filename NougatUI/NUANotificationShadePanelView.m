@@ -16,13 +16,13 @@
     if (self) {
         // Init properities
         _notificationShadePreferences = preferences;
-        self.inset = 0.0;
+        _inset = 0.0;
         self.backgroundColor = preferences.backgroundColor;
         self.translatesAutoresizingMaskIntoConstraints = NO;
 
         // Constraint
-        self.heightConstraint = [self.heightAnchor constraintEqualToConstant:150.0];
-        self.heightConstraint.active = YES;
+        _heightConstraint = [self.heightAnchor constraintEqualToConstant:150.0];
+        _heightConstraint.active = YES;
 
         // Notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];

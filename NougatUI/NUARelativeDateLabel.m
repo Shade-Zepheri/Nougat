@@ -21,7 +21,7 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Figure out what to do here
+        // Set defaults
         _timeZoneRelativeStartDate = [NSDate date];
 
         // Register for notification

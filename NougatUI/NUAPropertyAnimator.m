@@ -27,24 +27,24 @@
     self = [super init];
     if (self) {
         // Create defaults
-        self.animations = [NSMutableArray array];
-        self.completions = [NSMutableArray array];
-        self.totalSteps = [self _numberOfStepsForDuration:duration];
-        self.currentStep = 0;
+        _animations = [NSMutableArray array];
+        _completions = [NSMutableArray array];
+        _totalSteps = [self _numberOfStepsForDuration:duration];
+        _currentStep = 0;
 
         // Set defautls
         _duration = duration;
         _initialValue = initialValue;
         _finishedValue = finishedValue;
-        self.quantityToAdd = finishedValue - initialValue;
+        _quantityToAdd = finishedValue - initialValue;
 
         // Add blocks if exist
         if (animations) {
-            [self.animations addObject:[animations copy]];
+            [_animations addObject:[animations copy]];
         }
 
         if (completion) {
-            [self.completions addObject:[completion copy]];
+            [_completions addObject:[completion copy]];
         }
     }
 
@@ -67,7 +67,7 @@
 
 - (NSInteger)_numberOfStepsForDuration:(NSTimeInterval)duration {
     // We want the animation to last 1/3 sec, so the number of frames executed depends on the device refresh rate
-    UIScreen *mainScreen = UIScreen.mainScreen;
+    UIScreen *mainScreen = [UIScreen mainScreen];
     if ([mainScreen respondsToSelector:@selector(maximumFramesPerSecond)]) {
         // Actually applies
         NSInteger maximumFramesPerSecond = mainScreen.maximumFramesPerSecond;
@@ -130,7 +130,7 @@
 
     // Create and start timer
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(_displayLinkDidFire:)];
-    [self.displayLink addToRunLoop:NSRunLoop.mainRunLoop forMode:NSRunLoopCommonModes];
+    [self.displayLink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 - (void)_displayLinkDidFire:(CADisplayLink *)displayLink {

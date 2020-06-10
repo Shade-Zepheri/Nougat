@@ -15,10 +15,10 @@
     self = [super init];
     if (self) {
         // Get arbiter
-        self.interfaceStyleArbiter = [NSClassFromString(@"UIUserInterfaceStyleArbiter") sharedInstance];
+        _interfaceStyleArbiter = [NSClassFromString(@"UIUserInterfaceStyleArbiter") sharedInstance];
 
         // Register style changes
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(_styleModeDidChange) name:@"UIUserInterfaceStyleArbiterStyleChangedNotification" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_styleModeDidChange) name:@"UIUserInterfaceStyleArbiterStyleChangedNotification" object:nil];
     }
 
     return self;

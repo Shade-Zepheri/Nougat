@@ -1,4 +1,5 @@
 // Umbrella header for NougatUI.
+#import "NUAAttachmentNotificationTableViewCell.h"
 #import "NUABatteryView.h"
 #import "NUABrightnessModuleController.h"
 #import "NUADateLabelRepository.h"
@@ -20,7 +21,6 @@
 #import "NUANotificationShadePageContentProvider.h"
 #import "NUANotificationShadePanelView.h"
 #import "NUANotificationShadeViewController.h"
-#import "NUANotificationTableViewCell.h"
 #import "NUAPropertyAnimator.h"
 #import "NUARelativeDateLabel.h"
 #import "NUASettingsContentView.h"

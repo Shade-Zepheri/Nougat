@@ -4,7 +4,6 @@
 #import <CoverSheet/CoverSheet.h>
 #import <FrontBoard/FrontBoard.h>
 #import <NougatServices/NougatServices.h>
-#import <SpringBoard/SBIgnoredForAutorotationSecureWindow.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIKit+Private.h>
 

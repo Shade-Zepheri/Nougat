@@ -7,7 +7,7 @@
 
 + (BOOL)_isCompatibleWithVersion:(NSString *)version {
     // Check version number
-    NSString *currentVersion = UIDevice.currentDevice.systemVersion;
+    NSString *currentVersion = [UIDevice currentDevice].systemVersion;
     return [currentVersion compare:version options:NSNumericSearch] != NSOrderedAscending;
 }
 

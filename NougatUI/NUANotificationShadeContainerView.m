@@ -8,17 +8,17 @@
         // Create blur
         UIBlurEffect *darkeningBlur = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
         _darkeningView = [[UIVisualEffectView alloc] initWithEffect:darkeningBlur];
-        self.darkeningView.alpha = 0.0;
-        self.darkeningView.frame = frame;
-        self.darkeningView.userInteractionEnabled = YES;
-        self.darkeningView.translatesAutoresizingMaskIntoConstraints = NO;
-        [self addSubview:self.darkeningView];
+        _darkeningView.alpha = 0.0;
+        _darkeningView.frame = frame;
+        _darkeningView.userInteractionEnabled = YES;
+        _darkeningView.translatesAutoresizingMaskIntoConstraints = NO;
+        [self addSubview:_darkeningView];
 
         // Add constraints
-        [self.darkeningView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
-        [self.darkeningView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
-        [self.darkeningView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
-        [self.darkeningView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
+        [_darkeningView.topAnchor constraintEqualToAnchor:self.topAnchor].active = YES;
+        [_darkeningView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor].active = YES;
+        [_darkeningView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor].active = YES;
+        [_darkeningView.trailingAnchor constraintEqualToAnchor:self.trailingAnchor].active = YES;
     }
 
     return self;
