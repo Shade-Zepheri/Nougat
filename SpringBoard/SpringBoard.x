@@ -85,7 +85,7 @@ NUANotificationShadeController *notificationShade;
 
 %hook SBDismissOverlaysAnimationController
 
-- (void)_startAnimation  {
+- (void)_startAnimation {
     %orig;
 
     [notificationShade dismissAnimated:YES];
@@ -186,7 +186,7 @@ NUANotificationShadeController *notificationShade;
         // Gesture event
         NSNumber *gestureTypeWrapper = payload[@"kSBSAnalyticsSystemGestureType"];
         NSUInteger gestureType = gestureTypeWrapper.unsignedIntegerValue;
-        if (gestureType == 2323) {
+        if (gestureType == SBSystemGestureTypeShowNougat) {
             // Is Nougat, stop
             return;
         }
