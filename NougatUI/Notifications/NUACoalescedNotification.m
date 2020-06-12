@@ -241,7 +241,6 @@
 
         NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
         [entries insertObject:entry atIndex:insertionIndex];
-
         _entries = [entries copy];
     } else {
         // Modify existing one
@@ -264,8 +263,9 @@
         [entries replaceObjectAtIndex:insertionIndex withObject:entry];
     } else {
         // Remove old add new
-        [entries removeObjectAtIndex:existingIndex];
+        NUANotificationEntry *oldEntry = entries[existingIndex];
         [entries insertObject:entry atIndex:insertionIndex];
+        [entries removeObject:oldEntry];
     }
 
     _entries = [entries copy];
@@ -282,7 +282,6 @@
     // Remove object
     NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
     [entries removeObjectAtIndex:existingIndex];
-
     _entries = [entries copy];
 }
 
