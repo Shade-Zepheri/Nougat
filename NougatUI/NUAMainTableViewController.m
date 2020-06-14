@@ -163,13 +163,7 @@
     // Add new entry
     NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NSUInteger insertIndex = [self _indexForAddingNewNotification:newNotification];
-    if (insertIndex >= notifications.count) {
-        // Simply add to end
-        insertIndex = notifications.count;
-        [notifications addObject:newNotification];
-    } else {
-        [notifications insertObject:newNotification atIndex:insertIndex];
-    }
+    [notifications insertObject:newNotification atIndex:insertIndex];
     
     // Update ivar
     _notifications = [notifications copy];
