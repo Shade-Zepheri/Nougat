@@ -35,7 +35,7 @@
         [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
             return [entry1 compare:entry2];
         }];
-        _entries = entries;
+        _entries = [entries copy];
     }
 
     return self;
@@ -214,9 +214,7 @@
 }
 
 - (NSUInteger)_existingIndexForNotificationEntry:(NUANotificationEntry *)entry {
-    return [self.entries indexOfObjectPassingTest:^(NUANotificationEntry *obj, NSUInteger idx, BOOL *stop) {
-        return [obj isEqual:entry];
-    }];
+    return [self.entries indexOfObject:entry];
 }
 
 - (NSUInteger)_insertionIndexForNotificationEntry:(NUANotificationEntry *)entry {
