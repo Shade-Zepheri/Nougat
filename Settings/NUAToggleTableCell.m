@@ -2,12 +2,12 @@
 
 @implementation NUAToggleTableCell
 
-- (void)setToggleInfo:(NUAToggleInfo *)toggleInfo {
-    _toggleInfo = toggleInfo;
+- (void)setToggleDescription:(NUAToggleDescription *)toggleDescription {
+    _toggleDescription = toggleDescription;
 
     // Set label and imate
-    self.textLabel.text = toggleInfo.displayName;
-    self.imageView.image = toggleInfo.settingsIcon;
+    self.textLabel.text = toggleDescription.displayName;
+    self.imageView.image = toggleDescription.iconImage;
 }
 
 @end

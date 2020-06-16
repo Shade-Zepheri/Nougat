@@ -2,7 +2,13 @@
 #import <NougatServices/NougatServices.h>
 #import <Macros.h>
 
-@interface NUATogglesContentView ()
+@interface NUATogglesContentView () {
+    CGFloat _targetWidthConstant;
+
+    NSArray<NUAToggleButton *> *_topRow;
+    NSArray<NUAToggleButton *> *_middleRow;
+    NSArray<NUAToggleButton *> *_bottomRow;
+}
 @property (strong, nonatomic) NSMutableArray<NSLayoutConstraint *> *heightConstraints;
 @property (strong, nonatomic) NSMutableArray<NSLayoutConstraint *> *widthConstraints;
 @property (strong, nonatomic) NSLayoutConstraint *topLeftInsetConstraint;
@@ -20,16 +26,10 @@
 - (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
     self = [super initWithPreferences:preferences];
     if (self) {
-        // Load instance manager
-        _togglesProvider = [[NUAToggleInstancesProvider alloc] initWithPreferences:preferences];
-
         // Set properties
         _arranged = NO;
-        self.heightConstraints = [NSMutableArray array];
-        self.widthConstraints = [NSMutableArray array];
-
-        // Populate Toggles
-        [self _populateToggles];
+        _heightConstraints = [NSMutableArray array];
+        _widthConstraints = [NSMutableArray array];
     }
 
     return self;
@@ -37,23 +37,29 @@
 
 #pragma mark - Toggles management
 
-- (void)_populateToggles {
-    self.togglesArray = self.togglesProvider.toggleInstances;
+- (void)populateWithToggles:(NSArray<NUAToggleButton *> *)toggleButtons {
+    // Set array
+    _toggleButtons = toggleButtons;
 
-    for (NUAToggleButton *toggle in self.togglesArray) {
+    // Set delegate
+    for (NUAToggleButton *toggle in toggleButtons) {
         toggle.delegate = self;
     }
 
-    if (self.togglesArray.count > 6) {
-        _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
-        _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
-        _bottomRow = [self.togglesArray subarrayWithRange:NSMakeRange(6, self.togglesArray.count - 6)];
-    } else if (self.togglesArray.count > 3) {
-        _topRow = [self.togglesArray subarrayWithRange:NSMakeRange(0, 3)]; // First 3
-        _middleRow = [self.togglesArray subarrayWithRange:NSMakeRange(3 , self.togglesArray.count - 3)]; 
+    // Construct subarrays
+    if (toggleButtons.count > 6) {
+        _topRow = [toggleButtons subarrayWithRange:NSMakeRange(0, 3)]; // First 3
+        _middleRow = [toggleButtons subarrayWithRange:NSMakeRange(3 , 3)]; // Middle 3
+        _bottomRow = [toggleButtons subarrayWithRange:NSMakeRange(6, toggleButtons.count - 6)];
+    } else if (toggleButtons.count > 3) {
+        _topRow = [toggleButtons subarrayWithRange:NSMakeRange(0, 3)]; // First 3
+        _middleRow = [toggleButtons subarrayWithRange:NSMakeRange(3 , toggleButtons.count - 3)]; 
     } else {
-        _topRow = self.togglesArray;
+        _topRow = toggleButtons;
     }
+
+    // Layout
+    [self _layoutToggles];
 }
 
 - (void)_layoutToggles {
@@ -149,7 +155,7 @@
     }
 }
 
-- (void)refreshToggleLayout {
+- (void)tearDownCurrentToggles {
     _arranged = NO;
 
     // Reset arrays and views
@@ -164,10 +170,6 @@
     self.topStackView = nil;
     self.middleStackView = nil;
     self.bottomStackView = nil;
-
-    // Populate and relayout
-    [self _populateToggles];
-    [self _layoutToggles];
 }
 
 #pragma mark - Rearrangement
@@ -223,7 +225,7 @@ CGFloat easingYForT(CGFloat t) {
 
     // Delay appearance of labels
     CGFloat adjustedPercent = (percent - 0.75) * 4;
-    for (NUAToggleButton *toggle in self.togglesArray) {
+    for (NUAToggleButton *toggle in self.toggleButtons) {
         toggle.displayNameLabel.alpha = adjustedPercent;
 
         if (!_bottomRow || ![_bottomRow containsObject:toggle]) {

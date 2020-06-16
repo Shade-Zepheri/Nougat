@@ -1,10 +1,22 @@
 #import <NougatServices/NougatServices.h>
-#import "NUAToggleButton.h"
+#import "NUAToggleInstance.h"
+
+@class NUAToggleInstancesProvider;
+@protocol NUAToggleInstancesProviderObserver <NSObject>
+
+@required
+- (void)toggleInstancesChangedForToggleInstancesProvider:(NUAToggleInstancesProvider *)toggleInstancesProvider;
+
+@end
+
+typedef void (^NUAToggleInstancesProviderObserverBlock)(id<NUAToggleInstancesProviderObserver> observer);
 
 @interface NUAToggleInstancesProvider : NSObject
-@property (copy, readonly, nonatomic) NSArray<NUAToggleButton *> *toggleInstances;
-@property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+@property (copy, readonly, nonatomic) NSArray<NUAToggleInstance *> *toggleInstances;
 
 - (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences;
+
+- (void)addObserver:(id<NUAToggleInstancesProviderObserver>)observer;
+- (void)removeObserver:(id<NUAToggleInstancesProviderObserver>)observer;
 
 @end

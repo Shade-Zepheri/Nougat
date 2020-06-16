@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
-#import <NougatServices/NougatServices.h>
+#import "NUAToggleDescription.h"
 
 @interface NUAToggleTableCell : UITableViewCell
-@property (strong, nonatomic) NUAToggleInfo *toggleInfo;
+@property (strong, nonatomic) NUAToggleDescription *toggleDescription;
 
 @end

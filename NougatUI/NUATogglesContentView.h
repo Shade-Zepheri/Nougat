@@ -9,22 +9,14 @@
 
 @end
 
-@interface NUATogglesContentView : NUANotificationShadeModuleView <NUAToggleButtonDelegate> {
-    CGFloat _targetWidthConstant;
-
-    NSArray<NUAToggleButton *> *_topRow;
-    NSArray<NUAToggleButton *> *_middleRow;
-    NSArray<NUAToggleButton *> *_bottomRow;
-}
-
+@interface NUATogglesContentView : NUANotificationShadeModuleView <NUAToggleButtonDelegate>
 @property (weak, nonatomic) id<NUATogglesContentViewDelegate> delegate;
 @property (assign, nonatomic) CGFloat expandedPercent;
 @property (getter=isArranged, readonly, nonatomic) BOOL arranged;
 
-@property (strong, readonly, nonatomic) NUAToggleInstancesProvider *togglesProvider;
-@property (copy, nonatomic) NSArray<NUAToggleButton *> *togglesArray;
+@property (copy, readonly, nonatomic) NSArray<NUAToggleButton *> *toggleButtons;
 
-- (void)_layoutToggles;
-- (void)refreshToggleLayout;
+- (void)populateWithToggles:(NSArray<NUAToggleButton *> *)toggleButtons;
+- (void)tearDownCurrentToggles;
 
 @end

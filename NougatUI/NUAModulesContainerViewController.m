@@ -77,7 +77,7 @@
 #pragma mark - Properties
 
 - (CGFloat)fullyPresentedHeight {
-    NSUInteger togglesCount = self.notificationShadePreferences.enabledToggles.count;
+    NSUInteger togglesCount = self.notificationShadePreferences.enabledToggleIdentifiers.count;
     if (togglesCount > 6) {
         return 500.0;
     } else if (togglesCount > 3) {

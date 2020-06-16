@@ -1,14 +1,19 @@
 #import "NUAToggleInfo.h"
-#import <UIKit/UIImage+Private.h>
 
 @implementation NUAToggleInfo
 
 #pragma mark - Class Helpers
 
-+ (BOOL)_isCompatibleWithVersion:(NSString *)version {
-    // Check version number
-    NSString *currentVersion = [UIDevice currentDevice].systemVersion;
-    return [currentVersion compare:version options:NSNumericSearch] != NSOrderedAscending;
++ (NSSet<NSNumber *> *)_supportedDeviceFamiliesForBundleInfoDictionary:(NSDictionary<NSString *, id> *)infoDictionary {
+    // Get object for key
+    NSArray<NSNumber *> *supportedDeviceFamilies = infoDictionary[@"UIDeviceFamily"] ?: [NSArray array];
+    return [NSSet setWithArray:supportedDeviceFamilies];
+}
+
++ (NSSet<NSString *> *)_requiredCapabilitiesForInfoDictionary:(NSDictionary<NSString *, id> *)infoDictionary {
+    // Get object for key
+    NSArray<NSString *> *requiredDeviceCapabilities = infoDictionary[@"UIRequiredDeviceCapabilities"] ?: [NSArray array];
+    return [NSSet setWithArray:requiredDeviceCapabilities];
 }
 
 #pragma mark - Initialization
@@ -17,34 +22,27 @@
     // Do some checking first
     NSDictionary<NSString *, id> *infoDictionary = (__bridge_transfer NSDictionary *)CFBundleCopyInfoDictionaryInDirectory((__bridge CFURLRef)bundleURL);
     NSString *identifier = infoDictionary[@"CFBundleIdentifier"];
-    NSString *minimumVersion = infoDictionary[@"MinimumOSVersion"];
-    if (!identifier || ![self _isCompatibleWithVersion:minimumVersion]) {
+    if (!identifier) {
         // No identifier, or not supported
         return nil;
     } else {
         // Pass to init
-        return [[self alloc] _initWithIdentifier:identifier toggleBundleURL:bundleURL];
+        NSSet<NSNumber *> *supportedDeviceFamilies = [self _supportedDeviceFamiliesForBundleInfoDictionary:infoDictionary];
+        NSSet<NSString *> *requiredDeviceCapabilities = [self _requiredCapabilitiesForInfoDictionary:infoDictionary];
+        NSString *minimumVersion = infoDictionary[@"MinimumOSVersion"];
+        return [[self alloc] _initWithToggleIdentifier:identifier supportedDeviceFamilies:supportedDeviceFamilies requiredDeviceCapabilities:requiredDeviceCapabilities minimumVersion:minimumVersion toggleBundleURL:bundleURL];
     }
 }
 
-- (instancetype)_initWithIdentifier:(NSString *)identifier toggleBundleURL:(NSURL *)bundleURL {
+- (instancetype)_initWithToggleIdentifier:(NSString *)toggleIdentifier supportedDeviceFamilies:(NSSet<NSNumber *> *)supportedDeviceFamilies requiredDeviceCapabilities:(NSSet<NSString *> *)requiredDeviceCapabilities minimumVersion:(NSString *)minimumVersion toggleBundleURL:(NSURL *)toggleBundleURL {
     self = [super init];
     if (self) {
-        // Set defaults
-        _identifier = [identifier copy];
-        _bundleURL = [bundleURL copy];
-
-        // Get additional info from bundle
-        NSBundle *bundle = [NSBundle bundleWithURL:_bundleURL];
-        _displayName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
-
-        UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
-        if (!settingsIcon) {
-            // Provide fallback icon
-            settingsIcon = [UIImage imageNamed:@"FallbackSettingsIcon" inBundle:[NSBundle bundleForClass:self.class]];
-        }
-
-        _settingsIcon = settingsIcon;
+        // Set properties
+        _toggleIdentifier = [toggleIdentifier copy];
+        _supportedDeviceFamilies = [supportedDeviceFamilies copy];
+        _requiredDeviceCapabilities = [requiredDeviceCapabilities copy];
+        _minimumVersion = [minimumVersion copy];
+        _toggleBundleURL = [toggleBundleURL copy];
     }
 
     return self;

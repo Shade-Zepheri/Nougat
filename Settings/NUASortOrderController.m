@@ -1,8 +1,16 @@
 #import "NUASortOrderController.h"
 #import "NUASortOrderHeaderView.h"
 #import "NUAToggleTableCell.h"
+#import "NUAToggleDescription.h"
 #import <Cephei/HBPreferences.h>
-#import <HBLog.h>
+#import <UIKit/UIImage+Private.h>
+
+@interface NUASortOrderController ()
+@property (strong, nonatomic) NSMutableArray<NSString *> *enabledIdentifiers;
+@property (strong, nonatomic) NSMutableArray<NSString *> *disabledIdentifiers;
+@property (strong, nonatomic) NSMutableDictionary<NSString *, NUAToggleDescription *> *identifiersToDescription;
+
+@end
 
 @implementation NUASortOrderController
 
@@ -20,38 +28,68 @@
             self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
         }
 
+        // Create arrays
+        _enabledIdentifiers = [NSMutableArray array];
+        _disabledIdentifiers = [NSMutableArray array];
+        _identifiersToDescription = [NSMutableDictionary dictionary];
+
         // Refresh Installed
         _preferences = [NUAPreferenceManager sharedSettings];
         [self.preferences refreshToggleInfo];
 
-        // Load arrays
-        _enabledToggles = [self.preferences.enabledToggles mutableCopy];
-
-        NSArray<NSString *> *currentDisabledToggles = self.preferences.disabledToggles;
-        NSMutableArray<NSString *> *displayNamesArray = [NSMutableArray array];
-        for (NSString *identifier in currentDisabledToggles) {
-            NSString *displayName = [self _displayNameForIdentifier:identifier];
-            NSString *sortedNameEntry = [NSString stringWithFormat:@"%@|%@", displayName, identifier];
-            [displayNamesArray addObject:sortedNameEntry];
-        }
-
-        // Alphabetize
-        NSArray<NSString *> *sortedDisplayName = [displayNamesArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
-        NSMutableArray<NSString *> *sortedDisabledToggles = [NSMutableArray array];
-        for (NSString *entry in sortedDisplayName) {
-            // Get identifier from entry
-            NSArray<NSString *> *components = [entry componentsSeparatedByString:@"|"];
-            [sortedDisabledToggles addObject:components[1]];
-        }
-
-        _disabledToggles = sortedDisabledToggles;
-
         // Create tableview
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [_tableViewController setEditing:YES animated:NO];
+
+        // Populate data
+        [self _repopulateToggleData];
     }
 
     return self;
+}
+
+#pragma mark - Toggles
+
+- (void)_repopulateToggleData {
+    // Construct descriptions
+    for (NSString *identifier in self.preferences.loadableToggleIdentifiers) {
+        NUAToggleInfo *toggleInfo = [self.preferences toggleInfoForIdentifier:identifier];
+        NSBundle *toggleBundle = [NSBundle bundleWithURL:toggleInfo.toggleBundleURL];
+
+        NSString *displayName = [self _displayNameFromBundle:toggleBundle];
+        UIImage *settingsIcon = [self _iconFromBundle:toggleBundle];
+        NUAToggleDescription *toggleDescription = [NUAToggleDescription descriptionWithIdentifier:toggleInfo.toggleIdentifier displayName:displayName iconImage:settingsIcon];
+
+        self.identifiersToDescription[toggleDescription.identifier] = toggleDescription;
+    }
+
+    // Set enabled list
+    _enabledIdentifiers = [self.preferences.enabledToggleIdentifiers mutableCopy];
+
+    // Get disabled list
+    NSSet<NSString *> *tempEnabledSet = [NSSet setWithArray:[self.enabledIdentifiers copy]];
+    NSMutableSet<NSString *> *disabledIdentifiers = [self.preferences.loadableToggleIdentifiers mutableCopy];
+    [disabledIdentifiers minusSet:tempEnabledSet]; 
+
+    // Sort by display name
+    NSArray<NSString *> *currentDisabledToggles = disabledIdentifiers.allObjects;
+    NSMutableArray<NSString *> *displayNamesArray = [NSMutableArray array];
+    for (NSString *identifier in currentDisabledToggles) {
+        NSString *displayName = [self _displayNameForIdentifier:identifier];
+        NSString *sortedNameEntry = [NSString stringWithFormat:@"%@|%@", displayName, identifier];
+        [displayNamesArray addObject:sortedNameEntry];
+    }
+
+    // Alphabetize
+    NSArray<NSString *> *sortedDisplayName = [displayNamesArray sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    NSMutableArray<NSString *> *sortedDisabledToggles = [NSMutableArray array];
+    for (NSString *entry in sortedDisplayName) {
+        // Get identifier from entry
+        NSArray<NSString *> *components = [entry componentsSeparatedByString:@"|"];
+        [sortedDisabledToggles addObject:components[1]];
+    }
+
+    _disabledIdentifiers = sortedDisabledToggles;
 }
 
 #pragma mark - PSViewController
@@ -93,14 +131,14 @@
     [self _updateEnabledToggles];
 }
 
-#pragma mark - Helper methods
+#pragma mark - Helper Methods
 
 - (NSArray<NSString *> *)arrayForSection:(NSInteger)section {
-    return (section == 0) ? self.enabledToggles : self.disabledToggles;
+    return (section == 0) ? self.enabledIdentifiers : self.disabledIdentifiers;
 }
 
 - (NSString *)_displayNameForIdentifier:(NSString *)identifier {
-    return [self.preferences toggleInfoForIdentifier:identifier].displayName;
+    return [self _descriptionForIdentifier:identifier].displayName;
 }
 
 - (NSUInteger)_indexForInsertingItemWithIdentifier:(NSString *)identifier intoArray:(NSArray<NSString *> *)array {
@@ -110,6 +148,49 @@
 
         return [displayName1 compare:displayName2];
     }];
+}
+
+- (NSString *)_displayNameFromBundle:(NSBundle *)bundle {
+    NSString *displayName = [bundle objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    if (!displayName) {
+        // Fall back to bundle name
+        displayName = [bundle objectForInfoDictionaryKey:(__bridge_transfer NSString *)kCFBundleNameKey];
+    }
+
+    if (!displayName) {
+        // Fall back to executable name
+        displayName = [bundle objectForInfoDictionaryKey:(__bridge_transfer NSString *)kCFBundleExecutableKey];
+    }
+
+    if (!displayName) {
+        // Fall back to bundle identifier
+        displayName = bundle.bundleIdentifier;
+    }
+
+    return displayName;
+}
+
+- (UIImage *)_iconFromBundle:(NSBundle *)bundle {
+    UIImage *settingsIcon = [UIImage imageNamed:@"SettingsIcon" inBundle:bundle];
+    if (!settingsIcon) {
+        // Provide fallback icon
+        settingsIcon = [UIImage imageNamed:@"FallbackSettingsIcon" inBundle:[NSBundle bundleForClass:self.class]];
+    }
+
+    return settingsIcon;
+}
+
+- (NSString *)_identifierAtIndexPath:(NSIndexPath *)indexPath {
+    NSArray<NSString *> *sectionIdentifiers = [self arrayForSection:indexPath.section];
+    return sectionIdentifiers[indexPath.row];
+}
+
+- (NUAToggleDescription *)_descriptionForIdentifier:(NSString *)identifier {
+    return self.identifiersToDescription[identifier];
+}
+
+- (NUAToggleDescription *)_descriptionAtIndexPath:(NSIndexPath *)indexPath {
+    return [self _descriptionForIdentifier:[self _identifierAtIndexPath:indexPath]];
 }
 
 #pragma mark - UITableViewDataSource
@@ -126,15 +207,9 @@
     static NSString *cellIdentifier = @"NougatCell";
     NUAToggleTableCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
 
-    if (!cell) {
-        cell = [[NUAToggleTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-    }
-
-    NSString *identifier = [self arrayForSection:indexPath.section][indexPath.row];
-    NUAToggleInfo *info = [self.preferences toggleInfoForIdentifier:identifier];
-
     // Customize cell
-    cell.toggleInfo = info;
+    NUAToggleDescription *toggleDescription = [self _descriptionAtIndexPath:indexPath];
+    cell.toggleDescription = toggleDescription;
 
     return cell;
 }
@@ -153,16 +228,16 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleInsert) {
-        if (self.enabledToggles.count >= 9) {
+        if (self.enabledIdentifiers.count >= 9) {
             // Dont add more than 9 toggles
             return;
         }
 
         // Move from disabled to enabled
-        NSString *identifier = self.disabledToggles[indexPath.row];
-        NSUInteger insertIndex = self.enabledToggles.count;
-        [self.disabledToggles removeObject:identifier];
-        [self.enabledToggles addObject:identifier];
+        NSString *identifier = self.disabledIdentifiers[indexPath.row];
+        NSUInteger insertIndex = self.enabledIdentifiers.count;
+        [self.disabledIdentifiers removeObject:identifier];
+        [self.enabledIdentifiers addObject:identifier];
 
         // Update table
         [tableView beginUpdates];
@@ -173,11 +248,11 @@
         [tableView endUpdates];
     } else if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Move from enabled to disabled
-        NSString *identifier = self.enabledToggles[indexPath.row];
-        NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledToggles];
+        NSString *identifier = self.enabledIdentifiers[indexPath.row];
+        NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledIdentifiers];
 
-        [self.enabledToggles removeObject:identifier];
-        [self.disabledToggles insertObject:identifier atIndex:insertIndex];
+        [self.enabledIdentifiers removeObject:identifier];
+        [self.disabledIdentifiers insertObject:identifier atIndex:insertIndex];
 
         // Update table
         [tableView beginUpdates];
@@ -200,8 +275,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSMutableArray<NSString *> *sourceArray = (sourceIndexPath.section == 0) ? self.enabledToggles : self.disabledToggles;
-    NSMutableArray<NSString *> *destinationArray = (destinationIndexPath.section == 0) ? self.enabledToggles : self.disabledToggles;
+    NSMutableArray<NSString *> *sourceArray = [[self arrayForSection:sourceIndexPath.section] mutableCopy];
+    NSMutableArray<NSString *> *destinationArray = [[self arrayForSection:destinationIndexPath.section] mutableCopy];
     NSString *identifier = sourceArray[sourceIndexPath.row];
 
     [sourceArray removeObjectAtIndex:sourceIndexPath.row];
@@ -244,8 +319,8 @@
     }
 
     // Get index of proper alphabetical order
-    NSString *identifier = self.enabledToggles[sourceIndexPath.row];
-    NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledToggles];
+    NSString *identifier = self.enabledIdentifiers[sourceIndexPath.row];
+    NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledIdentifiers];
 
     return [NSIndexPath indexPathForRow:insertIndex inSection:1];
 }
@@ -255,7 +330,7 @@
 - (void)_updateEnabledToggles {
     // Update HBPreferences
     HBPreferences *preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
-    preferences[NUAPreferencesTogglesListKey] = [self.enabledToggles copy];
+    preferences[NUAPreferencesTogglesListKey] = [self.enabledIdentifiers copy];
 
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }

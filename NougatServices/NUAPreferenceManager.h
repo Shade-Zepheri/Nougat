@@ -39,8 +39,8 @@ static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
 @property (strong, readonly, nonatomic) UIColor *textColor;
 @property (getter=isUsingDark, readonly, nonatomic) BOOL usingDark;
 
-@property (copy, readonly, nonatomic) NSArray<NSString *> *enabledToggles;
-@property (copy, readonly, nonatomic) NSArray<NSString *> *disabledToggles;
+@property (copy, readonly, nonatomic) NSSet<NSString *> *loadableToggleIdentifiers;
+@property (copy, readonly, nonatomic) NSArray<NSString *> *enabledToggleIdentifiers;
 
 @property (assign, readonly, nonatomic) BOOL useExternalColor;
 @property (assign, readonly, nonatomic) BOOL usesSystemAppearance;
@@ -51,7 +51,6 @@ static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;
 
-- (NSArray<NSString *> *)_availableToggleIdentifiers;
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;
 - (void)refreshToggleInfo;
 

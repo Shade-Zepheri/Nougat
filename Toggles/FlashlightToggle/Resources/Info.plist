@@ -27,6 +27,10 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>camera-flash</string>
+	</array>
 	<key>NSPrincipalClass</key>
 	<string>NUAFlashlightToggle</string>
 	<key>CFBundleSupportedPlatforms</key>

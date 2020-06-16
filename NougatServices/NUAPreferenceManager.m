@@ -4,6 +4,7 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <CoreTelephony/CTCarrier.h>
 #import <LocalAuthentication/LocalAuthentication.h>
+#import <MobileGestalt/MobileGestalt.h>
 #import <UIKit/UIWindow+Private.h>
 
 @interface NUAPreferenceManager () {
@@ -45,7 +46,7 @@
         [_preferences registerBool:&_hideStatusBarModule default:NO forKey:NUAPreferencesHideStatusBarModuleKey];
 
         NSArray<NSString *> *defaultToggleOrder = [self.class _defaultEnabledToggles];
-        [_preferences registerObject:&_enabledToggles default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
+        [_preferences registerObject:&_enabledToggleIdentifiers default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];
 
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(preferencesWereUpdated) name:HBPreferencesDidChangeNotification object:_preferences];
@@ -156,57 +157,74 @@
 
 #pragma mark - Toggles
 
+- (BOOL)_isCompatibleWithCurrentVersion:(NSString *)version {
+    // Check version number
+    NSString *currentVersion = [UIDevice currentDevice].systemVersion;
+    return [currentVersion compare:version options:NSNumericSearch] != NSOrderedAscending;
+}
+
+- (BOOL)_requiredCapabilitesAreSupported:(NUAToggleInfo *)toggleInfo {
+    // Ask MobileGestalt
+    NSArray<NSString *> *capabilityQuestions = toggleInfo.requiredDeviceCapabilities.allObjects;
+    NSDictionary<NSString *, NSNumber *> *capabilitiesAnswers = (__bridge_transfer NSDictionary *)MGCopyMultipleAnswers((__bridge CFArrayRef)capabilityQuestions, 0);
+    return ![capabilitiesAnswers.allValues containsObject:@(NO)];
+}
+
+- (BOOL)_isToggleSupported:(NUAToggleInfo *)toggleInfo {
+    // Check if version is supported
+    BOOL supportsVersion = [self _isCompatibleWithCurrentVersion:toggleInfo.minimumVersion];
+    BOOL capabilitiesSupported = [self _requiredCapabilitesAreSupported:toggleInfo];
+    return supportsVersion && capabilitiesSupported;
+}
+
 - (void)refreshToggleInfo {
     NSError *error = nil;
     NSURL *togglesURL = [NSURL fileURLWithPath:@"/Library/Nougat/Toggles/"];
     NSArray<NSURL *> *bundleURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:togglesURL includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
     if (bundleURLs) {
         for (NSURL *bundleURL in bundleURLs) {
-            NUAToggleInfo *info = [NUAToggleInfo toggleInfoForBundleAtURL:bundleURL];
-            if (!info) {
+            NUAToggleInfo *toggleInfo = [NUAToggleInfo toggleInfoForBundleAtURL:bundleURL];
+            if (!toggleInfo) {
+                continue;
+            }
+
+            // Check if supported
+            if (![self _isToggleSupported:toggleInfo]) {
                 continue;
             }
 
             // Add to dict
-            _toggleInfoDictionary[info.identifier] = info;
+            _toggleInfoDictionary[toggleInfo.toggleIdentifier] = toggleInfo;
         }
     } else {
         // Error, return
-        HBLogError(@"%@", error);
+        HBLogError(@"Couldn't get folder contents, error = %@", error);
         return;
     }
 
-    // Construct disabled toggles
-    NSMutableArray<NSString *> *disabledToggles = [NSMutableArray array];
-    for (NSString *identifier in _toggleInfoDictionary.allKeys) {
-        if ([self.enabledToggles containsObject:identifier]) {
-            continue;
-        }
+    // Create loadable set
+    _loadableToggleIdentifiers = [NSSet setWithArray:_toggleInfoDictionary.allKeys];
 
-        [disabledToggles addObject:identifier];
-    }
-
-    _disabledToggles = [disabledToggles copy];
+    // Construct a proper enabled list
+    NSMutableSet<NSString *> *availableEnabledIdentifiers = [NSMutableSet setWithArray:self.enabledToggleIdentifiers];
+    [availableEnabledIdentifiers intersectSet:self.loadableToggleIdentifiers];
+    _enabledToggleIdentifiers = availableEnabledIdentifiers.allObjects;
 }
 
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier {
     return _toggleInfoDictionary[identifier];
 }
 
-- (NSArray<NSString *> *)_availableToggleIdentifiers {
-    return _toggleInfoDictionary.allKeys;
-}
-
 #pragma mark - Migration
 
 - (BOOL)_hasLegacyPrefs {
     // Check if toggles list has old keys
-    return [self.enabledToggles containsObject:@"do-not-disturb"];
+    return [self.enabledToggleIdentifiers containsObject:@"do-not-disturb"];
 }
 
 - (void)_migrateFromLegacyPrefs {
     // Change old keys into their new equivalent key
-    NSArray<NSString *> *oldTogglesList = self.enabledToggles;
+    NSArray<NSString *> *oldTogglesList = self.enabledToggleIdentifiers;
     NSMutableArray<NSString *> *newTogglesList = [NSMutableArray array];
     for (NSString *identifier in oldTogglesList) {
         // Exception for low power, data, wifi
@@ -241,12 +259,12 @@
 
 - (BOOL)_hasBrokenMigration {
     // Check if toggles list has old keys
-    return [self.enabledToggles containsObject:@"com.shade.nougat.CellularDataToggle"];
+    return [self.enabledToggleIdentifiers containsObject:@"com.shade.nougat.CellularDataToggle"];
 }
 
 - (void)_fixBrokenMigration {
     // Gotta fix my dumbness now
-    NSMutableArray<NSString *> *newTogglesList = [self.enabledToggles mutableCopy];
+    NSMutableArray<NSString *> *newTogglesList = [self.enabledToggleIdentifiers mutableCopy];
     [newTogglesList removeObject:@"com.shade.nougat.CellularDataToggle"];
     [newTogglesList removeObject:@"com.shade.nougat.LowPowerToggle"];
     [newTogglesList removeObject:@"com.shade.nougat.WifiToggle"];
