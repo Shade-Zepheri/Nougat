@@ -53,16 +53,26 @@
 #pragma mark - Toggles Provider
 
 - (void)_populateToggles {
-    // Get toggles list
+    // Construct a sorted toggles list
     NSArray<NUAToggleInstance *> *toggleInstances = self.togglesProvider.toggleInstances;
-    NSMutableArray<NUAToggleButton *> *toggleList = [NSMutableArray array];
+    NSArray<NSString *> *orderedEnabledIdentifiers = self.notificationShadePreferences.enabledToggleIdentifiers;
+
+    // Construct initial array
+    NSMutableArray<NUAToggleButton *> *sortedTogglesList = [NSMutableArray array];
     for (NUAToggleInstance *toggleInstance in toggleInstances) {
-        NUAToggleButton *toggle = toggleInstance.toggle;
-        [toggleList addObject:toggle];
+        [sortedTogglesList addObject:toggleInstance.toggle];
+    }
+
+    // Sort to be properly ordered
+    for (NUAToggleInstance *toggleInstance in toggleInstances) {
+        NUAToggleInfo *toggleInfo = toggleInstance.toggleInfo;
+        NSUInteger index = [orderedEnabledIdentifiers indexOfObject:toggleInfo.toggleIdentifier];
+
+        [sortedTogglesList replaceObjectAtIndex:index withObject:toggleInstance.toggle];
     }
 
     // Send to view
-    [[self _togglesContentView] populateWithToggles:[toggleList copy]];
+    [[self _togglesContentView] populateWithToggles:[sortedTogglesList copy]];
 }
 
 - (void)_tearDownCurrentToggles {

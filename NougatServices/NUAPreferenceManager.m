@@ -205,10 +205,17 @@
     // Create loadable set
     _loadableToggleIdentifiers = [NSSet setWithArray:_toggleInfoDictionary.allKeys];
 
-    // Construct a proper enabled list
-    NSMutableSet<NSString *> *availableEnabledIdentifiers = [NSMutableSet setWithArray:self.enabledToggleIdentifiers];
-    [availableEnabledIdentifiers intersectSet:self.loadableToggleIdentifiers];
-    _enabledToggleIdentifiers = availableEnabledIdentifiers.allObjects;
+    // Get list of unavailable enabled identifiers
+    NSMutableSet<NSString *> *unavailableEnabledIdentifiers = [NSMutableSet setWithArray:self.enabledToggleIdentifiers];
+    [unavailableEnabledIdentifiers minusSet:self.loadableToggleIdentifiers];
+
+    // Remove unavailable enabled identifiers
+    NSMutableArray<NSString *> *properEnabledList = [self.enabledToggleIdentifiers mutableCopy];
+    for (NSString *unavailableIdentifier in unavailableEnabledIdentifiers) {
+        [properEnabledList removeObject:unavailableIdentifier];
+    }
+
+    _enabledToggleIdentifiers = [properEnabledList copy];
 }
 
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier {
