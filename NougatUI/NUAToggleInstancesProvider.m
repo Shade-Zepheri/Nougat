@@ -69,6 +69,11 @@
             // Create dictionary
             for (NUAToggleInfo *toggleInfo in toggleInfoArray) {
                 NUAToggleInstance *toggleInstance = [self _instantiateToggleWithInfo:toggleInfo];
+                if (!toggleInstance) {
+                    // Couldn't generate
+                    continue;
+                }
+
                 self.toggleInstanceByIdentifier[toggleInfo.toggleIdentifier] = toggleInstance;
             }
 
@@ -88,7 +93,7 @@
         return nil;
     }
 
-    if (![bundle.principalClass isKindOfClass:[NUAToggleButton class]]) {
+    if (![bundle.principalClass isSubclassOfClass:[NUAToggleButton class]]) {
         // Not toggle class
         HBLogError(@"Toggle bundle's principal class is an unsupported class, will unload bundle");
         [bundle unload];
