@@ -108,6 +108,8 @@
         return nil;
     }
 
+    // Feed prefs to toggle
+    toggleButton.notificationShadePreferences = self.notificationShadePreferences;
     return [[NUAToggleInstance alloc] initWithToggleInfo:toggleInfo toggle:toggleButton];
 }
 
