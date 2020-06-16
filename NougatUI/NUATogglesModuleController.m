@@ -23,6 +23,9 @@
     [self.togglesProvider addObserver:self];
 
     [self _populateToggles];
+
+    // Register for notifications
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
 }
 
 - (NUATogglesContentView *)_togglesContentView {
@@ -51,6 +54,12 @@
 }
 
 #pragma mark - Toggles Provider
+
+- (void)_regenerateToggles {
+    // Repopulate the toggles
+    [self _tearDownCurrentToggles];
+    [self _populateToggles];
+}
 
 - (void)_populateToggles {
     // Construct a sorted toggles list
@@ -81,9 +90,15 @@
 }
 
 - (void)toggleInstancesChangedForToggleInstancesProvider:(NUAToggleInstancesProvider *)toggleInstancesProvider {
-    // Repopulate the toggles
-    [self _tearDownCurrentToggles];
-    [self _populateToggles];
+    // Refresh
+    [self _regenerateToggles];
+}
+
+#pragma mark - Notifications
+
+- (void)preferencesDidChange:(NSNotification *)notification {
+    // Refresh
+    [self _regenerateToggles];
 }
 
 @end
