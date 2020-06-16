@@ -1,7 +1,9 @@
 #import "NUAToggleInstancesProvider.h"
 #import <HBLog.h>
 
-@interface NUAToggleInstancesProvider ()
+@interface NUAToggleInstancesProvider () {
+    dispatch_queue_t _queue;
+}
 @property (strong, nonatomic) NSHashTable<id<NUAToggleInstancesProviderObserver>> *observers;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, NUAToggleInstance *> *toggleInstanceByIdentifier;
 @property (strong, nonatomic) NUAPreferenceManager *notificationShadePreferences;
@@ -19,6 +21,10 @@
         _notificationShadePreferences = preferences;
         _observers = [NSHashTable weakObjectsHashTable];
         _toggleInstanceByIdentifier = [NSMutableDictionary dictionary];
+
+        // Create thread
+        dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
+        _queue = dispatch_queue_create("com.shade.nougat.ToggleInstancesProvider", attributes);
 
         [self _populateToggles];
 
@@ -141,14 +147,16 @@
 
 - (void)_loadBundlesForToggleInfo:(NSArray<NUAToggleInfo *> *)toggleInfoArray withCompletionHandler:(void(^)(void))completionHandler {
     // Load bundles and call a completion
-    [self _loadBundlesForToggleInfo:toggleInfoArray];
+    dispatch_async(_queue, ^{
+        [self _loadBundlesForToggleInfo:toggleInfoArray];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!completionHandler) {
-            return;
-        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (!completionHandler) {
+                return;
+            }
 
-        completionHandler();
+            completionHandler();
+        });
     });
 }
 
@@ -180,7 +188,9 @@
 
 - (void)preferencesDidChange:(NSNotification *)notification {
     // Refresh toggles list
-    [self _populateToggles];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self _populateToggles];
+    });
 }
 
 @end
