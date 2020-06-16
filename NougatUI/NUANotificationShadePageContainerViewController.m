@@ -181,13 +181,7 @@
     BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
     UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
     BOOL isInLandscape = UIInterfaceOrientationIsLandscape(orientation);
-    return !(!isIPad && isInLandscape);
-}
-
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    // Only allow touch inside of panel
-    CGPoint location = [touch locationInView:self.view];
-    return CGRectContainsPoint(self.view.frame, location);
+    return isIPad || !isInLandscape;
 }
 
 #pragma mark - Property Animator
