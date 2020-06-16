@@ -155,8 +155,22 @@
     }
 }
 
+#pragma mark - Toggle Reset
+
+- (void)_resetToggleState {
+    // Reset alpha and remove
+    for (NUAToggleButton *toggle in self.toggleButtons) {
+        toggle.displayNameLabel.alpha = 0.0;
+        toggle.alpha = 1.0;
+        [toggle removeFromSuperview];
+    }
+}
+
 - (void)tearDownCurrentToggles {
     _arranged = NO;
+
+    // Reset toggles
+    [self _resetToggleState];
 
     // Reset arrays and views
     _topRow = nil;
