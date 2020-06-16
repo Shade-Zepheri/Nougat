@@ -186,13 +186,13 @@
     self.bottomStackView = nil;
 }
 
-#pragma mark - Rearrangement
+#pragma mark - Positioning
 
-CGFloat easingXForT(CGFloat t) {
+static inline CGFloat easingXForT(CGFloat t) {
     return (3 * (1 - t) * t * t * 0.2) + (t * t * t);
 }
 
-CGFloat easingYForT(CGFloat t) {
+static inline CGFloat easingYForT(CGFloat t) {
     return (3 * (1 - t) * t * t) + (t * t * t);
 }
 
