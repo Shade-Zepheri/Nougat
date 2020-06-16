@@ -133,7 +133,7 @@
 
 #pragma mark - Helper Methods
 
-- (NSArray<NSString *> *)arrayForSection:(NSInteger)section {
+- (NSMutableArray<NSString *> *)arrayForSection:(NSInteger)section {
     return (section == 0) ? self.enabledIdentifiers : self.disabledIdentifiers;
 }
 
@@ -181,7 +181,7 @@
 }
 
 - (NSString *)_identifierAtIndexPath:(NSIndexPath *)indexPath {
-    NSArray<NSString *> *sectionIdentifiers = [self arrayForSection:indexPath.section];
+    NSMutableArray<NSString *> *sectionIdentifiers = [self arrayForSection:indexPath.section];
     return sectionIdentifiers[indexPath.row];
 }
 
@@ -275,8 +275,8 @@
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    NSMutableArray<NSString *> *sourceArray = [[self arrayForSection:sourceIndexPath.section] mutableCopy];
-    NSMutableArray<NSString *> *destinationArray = [[self arrayForSection:destinationIndexPath.section] mutableCopy];
+    NSMutableArray<NSString *> *sourceArray = [self arrayForSection:sourceIndexPath.section];
+    NSMutableArray<NSString *> *destinationArray = [self arrayForSection:destinationIndexPath.section];
     NSString *identifier = sourceArray[sourceIndexPath.row];
 
     [sourceArray removeObjectAtIndex:sourceIndexPath.row];
