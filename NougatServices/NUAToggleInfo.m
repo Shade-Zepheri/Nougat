@@ -48,4 +48,35 @@
     return self;
 }
 
+#pragma mark - NSObject
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<%@: %p; Toggle Identifier: %@; Supported Device Families: %@; Required Device Capabilities: %@; Minimum Version: %@; Toggle Bundle URL: %@>", self.class, self, self.toggleIdentifier, self.supportedDeviceFamilies, self.requiredDeviceCapabilities, self.minimumVersion, self.toggleBundleURL];
+}
+
+- (BOOL)isEqual:(id)object {
+    if (object == self) {
+        // Same object
+        return YES;
+    }
+
+    if (![object isKindOfClass:self.class]) {
+        // Not the same class
+        return NO;
+    }
+
+    // Compare all properties
+    NUAToggleInfo *toggleInfo = (NUAToggleInfo *)object;
+    BOOL sameIdentifier = [toggleInfo.toggleIdentifier isEqualToString:self.toggleIdentifier];
+    BOOL sameSupportedDevices = [toggleInfo.supportedDeviceFamilies isEqualToSet:self.supportedDeviceFamilies];
+    BOOL sameRequiredCapabilities = [toggleInfo.requiredDeviceCapabilities isEqualToSet:self.requiredDeviceCapabilities];
+    BOOL sameMinimumVersion = [toggleInfo.minimumVersion isEqualToString:self.minimumVersion];
+    BOOL sameBundleURL = [toggleInfo.toggleBundleURL isEqual:self.toggleBundleURL];
+    return sameIdentifier && sameSupportedDevices && sameRequiredCapabilities && sameMinimumVersion && sameBundleURL;
+}
+
+- (id)copyWithZone:(NSZone *)zone {
+    return self;
+}
+
 @end

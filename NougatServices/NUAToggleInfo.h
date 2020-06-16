@@ -1,6 +1,6 @@
 #import <UIKit/UIKit.h>
 
-@interface NUAToggleInfo : NSObject
+@interface NUAToggleInfo : NSObject <NSCopying>
 @property (copy, readonly, nonatomic) NSString *toggleIdentifier;
 @property (copy, readonly, nonatomic) NSSet<NSNumber *> *supportedDeviceFamilies;
 @property (copy, readonly, nonatomic) NSSet<NSString *> *requiredDeviceCapabilities;
