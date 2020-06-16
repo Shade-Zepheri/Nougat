@@ -27,6 +27,10 @@
 		<integer>1</integer>
 		<integer>2</integer>
 	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>SupportsLowPowerMode</string>
+	</array>
 	<key>NSPrincipalClass</key>
 	<string>NUABatterySaverToggle</string>
 	<key>CFBundleSupportedPlatforms</key>
