@@ -23,6 +23,8 @@
 
 @implementation NUATogglesContentView
 
+#pragma mark - Initialization
+
 - (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
     self = [super initWithPreferences:preferences];
     if (self) {
@@ -35,7 +37,7 @@
     return self;
 }
 
-#pragma mark - Toggles management
+#pragma mark - Toggles Population
 
 - (void)populateWithToggles:(NSArray<NUAToggleButton *> *)toggleButtons {
     // Set array
@@ -232,11 +234,7 @@ static inline CGFloat easingYForT(CGFloat t) {
 
 #pragma mark - Properties
 
-- (void)setExpandedPercent:(CGFloat)percent {
-    _expandedPercent = percent;
-
-    [self rearrangeForPercent:percent];
-
+- (void)adjustToggleAlphaForPercent:(CGFloat)percent {
     // Delay appearance of labels
     CGFloat adjustedPercent = (percent - 0.75) * 4;
     for (NUAToggleButton *toggle in self.toggleButtons) {
@@ -248,6 +246,14 @@ static inline CGFloat easingYForT(CGFloat t) {
 
         toggle.alpha = adjustedPercent;
     }
+}
+
+- (void)setExpandedPercent:(CGFloat)percent {
+    _expandedPercent = percent;
+
+    // Rearrange and change alpaha
+    [self rearrangeForPercent:percent];
+    [self adjustToggleAlphaForPercent:percent];
 }
 
 @end
