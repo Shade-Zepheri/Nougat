@@ -16,7 +16,7 @@ typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> obs
 
 @interface NUANotificationRepository : NSObject <NCNotificationDestination>
 @property (class, strong, readonly) NUANotificationRepository *defaultRepository;
-@property (copy, readonly, nonatomic) NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications;
+@property (copy, readonly, nonatomic) NSSet<NUACoalescedNotification *> *notifications;
 
 @property (readonly, nonatomic) NSString *identifier;
 @property (weak, nonatomic) id<NCNotificationDestinationDelegate> delegate;

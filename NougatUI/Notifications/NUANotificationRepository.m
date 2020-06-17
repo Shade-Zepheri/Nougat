@@ -8,6 +8,8 @@
     dispatch_queue_t _callOutQueue;
 }
 
+@property (strong, nonatomic) NSMutableDictionary<NSString *, NSMutableDictionary<NSString *, NUACoalescedNotification *> *> *notificationByIdentifier;
+
 @end
 
 @implementation NUANotificationRepository
@@ -36,7 +38,7 @@
     if (self) {
         // Set defaults
         _observers = [NSHashTable weakObjectsHashTable];
-        _notifications = [NSMutableDictionary dictionary];
+        _notificationByIdentifier = [NSMutableDictionary dictionary];
 
         // Create threads
         dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
@@ -56,6 +58,22 @@
     return self;
 }
 
+#pragma mark - Properties
+
+- (NSSet<NUACoalescedNotification *> *)notifications {
+    // Dispatch onto queue
+    __block NSMutableSet<NUACoalescedNotification *> *notifications = [NSMutableSet set];
+    dispatch_sync(_queue, ^{
+        // Map down dictionary into array
+        for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notificationByIdentifier.allValues) {
+            NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
+            [notifications addObjectsFromArray:notificationThreads];
+        }
+    });
+
+    return [notifications copy];
+}
+
 #pragma mark -  NCNotificationDestination
 
 - (NSString *)identifier {
@@ -70,42 +88,42 @@
 - (void)postNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+        [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
     });
 }
 
 - (void)modifyNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+        [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
     });
 }
 
 - (void)withdrawNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self removeNotificationRequest:request forCoalescedNotification:coalescedNotification];
+        [self removeNotificationRequest:request forCoalescedNotification:coalescedNotification];
     });
 }
 
 - (void)postNotificationRequest:(NCNotificationRequest *)request {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self insertNotificationRequest:request forCoalescedNotification:nil];
+        [self insertNotificationRequest:request forCoalescedNotification:nil];
     });
 }
 
 - (void)modifyNotificationRequest:(NCNotificationRequest *)request {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self insertNotificationRequest:request forCoalescedNotification:nil];
+        [self insertNotificationRequest:request forCoalescedNotification:nil];
     });
 }
 
 - (void)withdrawNotificationRequest:(NCNotificationRequest *)request {
     // Ensure on queue, pass on
     dispatch_sync(_queue, ^{
-    [self removeNotificationRequest:request forCoalescedNotification:nil];
+        [self removeNotificationRequest:request forCoalescedNotification:nil];
     });
 }
 
@@ -172,13 +190,13 @@
     dispatch_assert_queue(_queue);
 
     // Access notifications asynchronously
-    BOOL containsSection = [self.notifications.allKeys containsObject:request.sectionIdentifier];
+    BOOL containsSection = [self.notificationByIdentifier.allKeys containsObject:request.sectionIdentifier];
     if (!containsSection) {
         // Doesn't even contain section
         return NO;
     }
     
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notificationByIdentifier[request.sectionIdentifier];
     return [notificationGroups.allKeys containsObject:request.threadIdentifier];
 }
 
@@ -201,7 +219,7 @@
     dispatch_assert_queue(_queue);
 
     // Get from dictionary
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
+    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notificationByIdentifier[request.sectionIdentifier];
     return notificationGroups[request.threadIdentifier];
 }
 
@@ -245,19 +263,15 @@
     }
 
     // Add to dictionary
-    NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
+    NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notificationByIdentifier[request.sectionIdentifier];
     if (!notificationGroups) {
         // Create if doesnt exist
-        notificationGroups = [NSDictionary dictionary];
+        notificationGroups = [NSMutableDictionary dictionary];
     }
 
     // Update dictionary
-    NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
-    mutableNotificationGroups[request.threadIdentifier] = notification;
-
-    NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [self.notifications mutableCopy];
-    notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
-    _notifications = [notifications copy];
+    notificationGroups[request.threadIdentifier] = notification;
+    self.notificationByIdentifier[request.sectionIdentifier] = notificationGroups;
 
     // Observer
     [self notifyObserversUsingBlock:^(id<NUANotificationsObserver> observer) {
@@ -288,14 +302,9 @@
     NUANotificationsObserverHandler handlerBlock = nil;
     if (notification.empty) {
         // Notification is empty, remove entirely
-        NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
-        NSMutableDictionary<NSString *, NUACoalescedNotification *> *mutableNotificationGroups = [notificationGroups mutableCopy];
-        [mutableNotificationGroups removeObjectForKey:request.threadIdentifier];
-
-        // Update main dict
-        NSMutableDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications = [self.notifications mutableCopy];
-        notifications[request.sectionIdentifier] = [mutableNotificationGroups copy];
-        _notifications = [notifications copy];
+        NSMutableDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notificationByIdentifier[request.sectionIdentifier];
+        [notificationGroups removeObjectForKey:request.threadIdentifier];
+        self.notificationByIdentifier[request.sectionIdentifier] = notificationGroups;
 
         // Adjust handler
         handlerBlock = ^(id<NUANotificationsObserver> observer) {
@@ -320,7 +329,7 @@
 
     // Query all requests
     NSMutableSet<NCNotificationRequest *> *allRequests = [NSMutableSet set];
-    for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notifications.allValues) {
+    for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notificationByIdentifier.allValues) {
         NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
         for (NUACoalescedNotification *coalescedNotification in notificationThreads) {
             for (NUANotificationEntry *entry in coalescedNotification.entries) {
@@ -335,14 +344,14 @@
 - (void)purgeAllNotifications {
     // Ensure on queue
     dispatch_sync(_queue, ^{
-    // Call to delegate
-    NSMutableSet<NCNotificationRequest *> *allRequests = [self _allNotificationRequests];
-    [self.delegate destination:self requestsClearingNotificationRequests:allRequests];
+        // Call to delegate
+        NSMutableSet<NCNotificationRequest *> *allRequests = [self _allNotificationRequests];
+        [self.delegate destination:self requestsClearingNotificationRequests:allRequests];
 
-    // Clear table and dict
-    for (NCNotificationRequest *request in allRequests) {
-        [self removeNotificationRequest:request forCoalescedNotification:nil];
-    }
+        // Clear table and dict
+        for (NCNotificationRequest *request in allRequests) {
+            [self removeNotificationRequest:request forCoalescedNotification:nil];
+        }
     });
 }
 

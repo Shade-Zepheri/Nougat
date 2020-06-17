@@ -58,16 +58,9 @@
         return;
     }
 
-    // Add all entries from repository
-    NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *allNotifications = self.notificationRepository.notifications;
-    NSMutableArray<NUACoalescedNotification *> *notifications = [NSMutableArray array];
-    for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in allNotifications.allValues) {
-        // Add all entries from each array
-        NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
-        [notifications addObjectsFromArray:notificationThreads];
-    }
-
-    // Sort via date
+    // Sort notifications
+    NSSet<NUACoalescedNotification *> *allNotifications = self.notificationRepository.notifications;
+    NSMutableArray<NUACoalescedNotification *> *notifications = [allNotifications.allObjects mutableCopy];
     [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
         return [notification1 compare:notification2];
     }];
