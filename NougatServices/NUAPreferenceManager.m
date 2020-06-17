@@ -63,7 +63,8 @@
         }
 
         // Get toggle info
-        [self refreshToggleInfo];
+        [self loadAllToggleInfo];
+        [self _fixUnavailableEnabledToggles];
     }
 
     return self;
@@ -144,9 +145,6 @@
 #pragma mark - Callbacks
 
 - (void)preferencesWereUpdated {
-    // Update toggle info
-    [self refreshToggleInfo];
-
     // Publish general updates
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUANotificationShadeChangedPreferences" object:nil userInfo:nil];
 
@@ -156,6 +154,21 @@
 }
 
 #pragma mark - Toggles
+
+- (void)_fixUnavailableEnabledToggles {
+    // Get list of unavailable enabled identifiers
+    NSMutableSet<NSString *> *unavailableEnabledIdentifiers = [NSMutableSet setWithArray:self.enabledToggleIdentifiers];
+    [unavailableEnabledIdentifiers minusSet:self.loadableToggleIdentifiers];
+
+    // Remove unavailable enabled identifiers
+    NSMutableArray<NSString *> *properEnabledList = [self.enabledToggleIdentifiers mutableCopy];
+    for (NSString *unavailableIdentifier in unavailableEnabledIdentifiers) {
+        [properEnabledList removeObject:unavailableIdentifier];
+    }
+
+    // Update prefs
+    _preferences[NUAPreferencesTogglesListKey] = [properEnabledList copy];
+}
 
 - (BOOL)_isCompatibleWithCurrentVersion:(NSString *)version {
     // Check version number
@@ -177,7 +190,7 @@
     return supportsVersion && capabilitiesSupported;
 }
 
-- (void)refreshToggleInfo {
+- (void)loadAllToggleInfo {
     NSError *error = nil;
     NSURL *togglesURL = [NSURL fileURLWithPath:@"/Library/Nougat/Toggles/"];
     NSArray<NSURL *> *bundleURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:togglesURL includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
@@ -209,18 +222,6 @@
 
     // Create loadable set
     _loadableToggleIdentifiers = [NSSet setWithArray:_toggleInfoDictionary.allKeys];
-
-    // Get list of unavailable enabled identifiers
-    NSMutableSet<NSString *> *unavailableEnabledIdentifiers = [NSMutableSet setWithArray:self.enabledToggleIdentifiers];
-    [unavailableEnabledIdentifiers minusSet:self.loadableToggleIdentifiers];
-
-    // Remove unavailable enabled identifiers
-    NSMutableArray<NSString *> *properEnabledList = [self.enabledToggleIdentifiers mutableCopy];
-    for (NSString *unavailableIdentifier in unavailableEnabledIdentifiers) {
-        [properEnabledList removeObject:unavailableIdentifier];
-    }
-
-    _enabledToggleIdentifiers = [properEnabledList copy];
 }
 
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier {

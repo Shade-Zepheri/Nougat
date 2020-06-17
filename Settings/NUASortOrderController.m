@@ -33,9 +33,8 @@
         _disabledIdentifiers = [NSMutableArray array];
         _identifiersToDescription = [NSMutableDictionary dictionary];
 
-        // Refresh Installed
+        // Set prefs
         _preferences = [NUAPreferenceManager sharedSettings];
-        [self.preferences refreshToggleInfo];
 
         // Create tableview
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];

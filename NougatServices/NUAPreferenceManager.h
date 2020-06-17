@@ -52,7 +52,6 @@ static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
 + (NSString *)carrierName;
 
 - (NUAToggleInfo *)toggleInfoForIdentifier:(NSString *)identifier;
-- (void)refreshToggleInfo;
 
 - (void)setHasBeenPrompted;
 
