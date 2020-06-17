@@ -183,6 +183,11 @@
     NSArray<NSURL *> *bundleURLs = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:togglesURL includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:&error];
     if (bundleURLs) {
         for (NSURL *bundleURL in bundleURLs) {
+            if (![bundleURL.pathExtension isEqualToString:@"bundle"]) {
+                // Not a bundle
+                continue;
+            }
+
             NUAToggleInfo *toggleInfo = [NUAToggleInfo toggleInfoForBundleAtURL:bundleURL];
             if (!toggleInfo) {
                 continue;
