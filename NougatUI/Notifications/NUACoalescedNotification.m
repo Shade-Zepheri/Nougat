@@ -102,6 +102,10 @@
     }
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    return self;
+}
+
 #pragma mark - Properties
 
 - (NSString *)title {

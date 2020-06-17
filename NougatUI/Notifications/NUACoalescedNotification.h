@@ -7,7 +7,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationType) {
     NUANotificationTypeMedia
 };
 
-@interface NUACoalescedNotification : NSObject
+@interface NUACoalescedNotification : NSObject <NSCopying>
 @property (copy, readonly, nonatomic) NSString *sectionID;
 @property (copy, readonly, nonatomic) NSString *threadID;
 @property (copy, readonly, nonatomic) NSString *title;

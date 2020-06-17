@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <UserNotificationsKit/UserNotificationsKit.h>
 
-@interface NUANotificationEntry : NSObject
+@interface NUANotificationEntry : NSObject <NSCopying>
 @property (strong, readonly, nonatomic) NCNotificationRequest *request;
 @property (copy, readonly, nonatomic) NSString *title;
 @property (copy, readonly, nonatomic) NSString *message;

@@ -61,4 +61,8 @@
     return [otherEntry.timestamp compare:self.timestamp];
 }
 
+- (id)copyWithZone:(NSZone *)zone {
+    return self;
+}
+
 @end
