@@ -2,6 +2,14 @@
 #import <FrontBoardServices/FrontBoardServices.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 
+@interface NUANotificationRepository () {
+    NSHashTable<id<NUANotificationsObserver>> *_observers;
+    dispatch_queue_t _queue;
+    dispatch_queue_t _callOutQueue;
+}
+
+@end
+
 @implementation NUANotificationRepository
 
 #pragma mark - Class Methods
@@ -32,6 +40,9 @@
 
         // Create threads
         dispatch_queue_attr_t attributes = dispatch_queue_attr_make_with_autorelease_frequency(DISPATCH_QUEUE_SERIAL, DISPATCH_AUTORELEASE_FREQUENCY_WORK_ITEM);
+        dispatch_queue_attr_t mainAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INITIATED, 0);
+        _queue = dispatch_queue_create("com.shade.nougat.notifications-provider", mainAttributes);
+
         dispatch_queue_attr_t calloutAttributes = dispatch_queue_attr_make_with_qos_class(attributes, QOS_CLASS_USER_INTERACTIVE, 0);
         _callOutQueue = dispatch_queue_create("com.shade.nougat.notifications-provider.call-out", calloutAttributes);
 
@@ -57,33 +68,45 @@
 }
 
 - (void)postNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+    });
 }
 
 - (void)modifyNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self insertNotificationRequest:request forCoalescedNotification:coalescedNotification];
+    });
 }
 
 - (void)withdrawNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self removeNotificationRequest:request forCoalescedNotification:coalescedNotification];
+    });
 }
 
 - (void)postNotificationRequest:(NCNotificationRequest *)request {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self insertNotificationRequest:request forCoalescedNotification:nil];
+    });
 }
 
 - (void)modifyNotificationRequest:(NCNotificationRequest *)request {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self insertNotificationRequest:request forCoalescedNotification:nil];
+    });
 }
 
 - (void)withdrawNotificationRequest:(NCNotificationRequest *)request {
-    // Pass to our methods
+    // Ensure on queue, pass on
+    dispatch_sync(_queue, ^{
     [self removeNotificationRequest:request forCoalescedNotification:nil];
+    });
 }
 
 #pragma mark - Notification Launching
@@ -128,10 +151,12 @@
 }
 
 - (void)notifyObserversUsingBlock:(NUANotificationsObserverHandler)handler {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     // Dispatch on calloutQueue
     dispatch_async(_callOutQueue, ^{
-        NSArray *observers = [_observers.allObjects copy];
-
+        NSArray<id<NUANotificationsObserver>> *observers = [_observers.allObjects copy];
         for (id<NUANotificationsObserver> observer in observers) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 handler(observer);
@@ -143,6 +168,9 @@
 #pragma mark - Notification Management
 
 - (BOOL)containsThreadForRequest:(NCNotificationRequest *)request {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     // Access notifications asynchronously
     BOOL containsSection = [self.notifications.allKeys containsObject:request.sectionIdentifier];
     if (!containsSection) {
@@ -155,6 +183,9 @@
 }
 
 - (BOOL)containsNotificationRequest:(NCNotificationRequest *)request {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     if (![self containsThreadForRequest:request]) {
         // Thread doesnt even exist
         return NO;
@@ -166,12 +197,18 @@
 }
 
 - (NUACoalescedNotification *)notificationForRequest:(NCNotificationRequest *)request {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     // Get from dictionary
     NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups = self.notifications[request.sectionIdentifier];
     return notificationGroups[request.threadIdentifier];
 }
 
 - (BOOL)insertNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     if ([[self.class _excludedSectionIdentifiers] containsObject:request.sectionIdentifier]) {
         return NO;
     }
@@ -195,6 +232,9 @@
 }
 
 - (BOOL)addNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     // Construct new notification
     NUACoalescedNotification *notification = nil;
     if (coalescedNotification) {
@@ -228,6 +268,9 @@
 }
 
 - (void)removeNotificationRequest:(NCNotificationRequest *)request forCoalescedNotification:(NCCoalescedNotification *)coalescedNotification {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     if ([[self.class _excludedSectionIdentifiers] containsObject:request.sectionIdentifier]) {
         return;
     }
@@ -272,6 +315,9 @@
 #pragma mark - Notification Clearing
 
 - (NSMutableSet<NCNotificationRequest *> *)_allNotificationRequests {
+    // Ensure on queue
+    dispatch_assert_queue(_queue);
+
     // Query all requests
     NSMutableSet<NCNotificationRequest *> *allRequests = [NSMutableSet set];
     for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notifications.allValues) {
@@ -287,6 +333,8 @@
 }
 
 - (void)purgeAllNotifications {
+    // Ensure on queue
+    dispatch_sync(_queue, ^{
     // Call to delegate
     NSMutableSet<NCNotificationRequest *> *allRequests = [self _allNotificationRequests];
     [self.delegate destination:self requestsClearingNotificationRequests:allRequests];
@@ -295,6 +343,7 @@
     for (NCNotificationRequest *request in allRequests) {
         [self removeNotificationRequest:request forCoalescedNotification:nil];
     }
+    });
 }
 
 @end

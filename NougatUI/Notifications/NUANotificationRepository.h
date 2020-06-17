@@ -14,11 +14,7 @@
 
 typedef void (^NUANotificationsObserverHandler)(id<NUANotificationsObserver> observer);
 
-@interface NUANotificationRepository : NSObject <NCNotificationDestination> {
-    NSHashTable *_observers;
-    dispatch_queue_t _callOutQueue;
-}
-
+@interface NUANotificationRepository : NSObject <NCNotificationDestination>
 @property (class, strong, readonly) NUANotificationRepository *defaultRepository;
 @property (copy, readonly, nonatomic) NSDictionary<NSString *, NSDictionary<NSString *, NUACoalescedNotification *> *> *notifications;
 
