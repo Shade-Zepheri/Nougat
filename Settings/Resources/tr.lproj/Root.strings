@@ -1,29 +1,29 @@
-"ENABLE" = "Enabled";
+"ENABLE" = "Etkin";
 
 "NEXUS" = "Nexus";
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
-"APPEARANCE" = "APPEARANCE";
-"USE_SYSTEM_APPEARANCE" = "Use System Appearance Setting";
-"USE_COLORFLOW" = "Use Colorflow Colors";
+"APPEARANCE" = "Görünüm";
+"USE_SYSTEM_APPEARANCE" = "Sistem Görünüm Ayarını Kullan";
+"USE_COLORFLOW" = "Colorflow Renklerini Kullan";
 
-"NOTIFICATIONS" = "NOTIFICATIONS";
-"SHOW_NOTIFICATION_PREVIEW" = "Show Previews";
-"ALWAYS" = "Always";
-"WHEN_UNLOCKED" = "When Unlocked";
-"NEVER" = "Never";
+"NOTIFICATIONS" = "Bildirimler";
+"SHOW_NOTIFICATION_PREVIEW" = "Önizlemeleri Göster";
+"ALWAYS" = "Daima";
+"WHEN_UNLOCKED" = "Kilitli Değilken";
+"NEVER" = "Asla";
 
-"USER_GUIDE" = "User Guide";
-"SORT_ORDER" = "Sort Order";
+"USER_GUIDE" = "Kullanıcı Rehberi";
+"SORT_ORDER" = "Sıralama Düzeni";
 
-"COMPATIBILITY" = "COMPATIBILITY";
-"COMPATIBILITY_FOOTER" = "Enable if you have tweaks that cover up the status bar (e.g. Notchless or NoNotch). This hides the Nougat status bar module.";
-"HIDE_STATUS_BAR" = "Hide Status Bar";
+"COMPATIBILITY" = "\"ALWAYS\"=\"Daima\";\n\"APPEARANCE\"=\"Görünüm\";\n\"COMPATIBILITY\"=\"Uyumluluk\";\n\"COMPATIBILITY_FOOTER\"=\"Durum çubuğunu için tweak'iniz varsa etkinleştirin (örn. Notchless veya NoNotch). Bu, Nougat durum çubuğu modülünü gizler.\";\n\"ENABLE\"=\"Etkin\";\n\"HELP_TRANSLATING\"=\"Tercüme Etmek İçin Yardım Et!\";\n\"HIDE_STATUS_BAR\"=\"Durum Çubuğunu Gizle\";\n\"NEVER\"=\"Asla\";\n\"NEXUS\"=\"Nexus\";\n\"NOTIFICATIONS\"=\"Bildirimler\";\n\"OREO\"=\"Oreo\";\n\"PIXEL\"=\"Pixel\";\n\"SHARE_TEXT\"=\"Shade Zepheri'den Nougat’a bir göz atın. Android kullanmadan Android bildirim panelini kullanabilirsiniz!\";\n\"SHOW_NOTIFICATION_PREVIEW\"=\"Önizlemeleri Göster\";\n\"SORT_ORDER\"=\"Sıralama Düzeni\";\n\"SOURCE_CODE\"=\"Kaynak Kodu\";\n\"SUPPORT\"=\"Destek\";\n\"TRANSLATORS\"=\"Tercümanlar\";\n\"USER_GUIDE\"=\"Kullanıcı Rehberi\";\n\"USE_COLORFLOW\"=\"Colorflow Renklerini Kullan\";\n\"USE_SYSTEM_APPEARANCE\"=\"Sistem Görünüm Ayarını Kullan\";\n\"WHEN_UNLOCKED\"=\"Kilit Açıldığında\";";
+"COMPATIBILITY_FOOTER" = "Eğer durum çubuğunu kullanan tweakleriniz (Notchless veya NoNotch v.b) varsa aktive edin. Bu Nougat’ın durum çubuğu modülünü gizler.";
+"HIDE_STATUS_BAR" = "Durum Çubuğunu Gizle";
 
-"SHARE_TEXT" = "Check out Nougat by Shade Zepheri. I can use the Android notification panel without using android!";
+"SHARE_TEXT" = "Shade Zepheri'den Nougat’a bir göz atın. Android kullanmadan Android bildirim panelini kullanabilirim!";
 
-"SUPPORT" = "Support";
-"TRANSLATORS" = "Translators";
-"HELP_TRANSLATING" = "Help With Translating!";
-"SOURCE_CODE" = "Source Code";
+"SUPPORT" = "Destek";
+"TRANSLATORS" = "Tercümanlar";
+"HELP_TRANSLATING" = "Tercüme Etmek İçin Yardım Et!";
+"SOURCE_CODE" = "Kaynak Kodu";
