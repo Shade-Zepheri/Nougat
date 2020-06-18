@@ -218,7 +218,9 @@
 }
 
 - (NSUInteger)_existingIndexForNotificationEntry:(NUANotificationEntry *)entry {
-    return [self.entries indexOfObject:entry];
+    return [self.orderedEntries indexOfObjectPassingTest:^(NUANotificationEntry *obj, NSUInteger idx, BOOL *stop) {
+        return [obj matchesEntry:entry];
+    }];
 }
 
 - (NSUInteger)_insertionIndexForNotificationEntry:(NUANotificationEntry *)entry {

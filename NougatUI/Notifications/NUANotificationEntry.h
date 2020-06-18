@@ -15,6 +15,7 @@
 
 + (instancetype)notificationEntryFromRequest:(NCNotificationRequest *)request;
 
+- (BOOL)matchesEntry:(NUANotificationEntry *)entry;
 - (NSComparisonResult)compare:(NUANotificationEntry *)otherEntry;
 
 @end

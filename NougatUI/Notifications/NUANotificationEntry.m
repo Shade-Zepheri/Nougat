@@ -36,8 +36,11 @@
     return self.customActions.count > 0;
 }
 
-- (BOOL)hasCustomActions {
-    return self.customActions.count > 0;
+#pragma mark - Comparisons
+
+- (BOOL)matchesEntry:(NUANotificationEntry *)entry {
+    // Simply check section, thread, and notificationID
+    return [entry.request matchesRequest:self.request];
 }
 
 #pragma mark - NSObject
@@ -52,9 +55,9 @@
         return NO;
     }
 
-    // Check if stored requests match, since isEqual is too picky
+    // Thorough comparison
     NUANotificationEntry *entry = (NUANotificationEntry *)object;
-    return [entry.request matchesRequest:self.request];
+    return [entry.request isEqual:self.request];
 }
 
 - (NSComparisonResult)compare:(NUANotificationEntry *)otherEntry {
