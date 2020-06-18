@@ -1,5 +1,5 @@
-"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sort Order";
-"CUSTOMIZE_TOGGLES_REMOVE" = "Remove";
-"DISABLED_MODULES_SECTION_TITLE" = "More Toggles";
-"ENABLED_MODULES_SECTION_TITLE" = "Include";
+"CUSTOMIZE_TOGGLES_DETAILS_HEADER" = "Nougat'ta görünmesi için ek geçişler ekleyin ve düzenleyin. Nougat en fazla 9 geçişe izin verir.";
+"CUSTOMIZE_TOGGLES_DETAILS_TITLE" = "Sıralama Düzeni";
+"CUSTOMIZE_TOGGLES_REMOVE" = "Kaldır";
+"DISABLED_MODULES_SECTION_TITLE" = "Daha Fazla Geçiş";
+"ENABLED_MODULES_SECTION_TITLE" = "Aktif Butonlar";
