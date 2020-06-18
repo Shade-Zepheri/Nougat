@@ -332,7 +332,7 @@
     for (NSDictionary<NSString *, NUACoalescedNotification *> *notificationGroups in self.notificationByIdentifier.allValues) {
         NSArray<NUACoalescedNotification *> *notificationThreads = notificationGroups.allValues;
         for (NUACoalescedNotification *coalescedNotification in notificationThreads) {
-            for (NUANotificationEntry *entry in coalescedNotification.entries) {
+            for (NUANotificationEntry *entry in coalescedNotification.allEntries) {
                 [allRequests addObject:entry.request];
             }
         }

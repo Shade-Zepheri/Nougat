@@ -1,6 +1,11 @@
 #import "NUACoalescedNotification.h"
 #import <UIKit/UIImage+Private.h>
 
+@interface NUACoalescedNotification ()
+@property (strong, nonatomic) NSMutableArray<NUANotificationEntry *> *orderedEntries;
+
+@end
+
 @implementation NUACoalescedNotification
 
 #pragma mark - Init
@@ -35,7 +40,7 @@
         [entries sortUsingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
             return [entry1 compare:entry2];
         }];
-        _entries = [entries copy];
+        _orderedEntries = entries;
     }
 
     return self;
@@ -55,7 +60,7 @@
 
         // Construct entry
         NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
-        _entries = @[entry];
+        _orderedEntries = [NSMutableArray arrayWithObject:entry];
     }
 
     return self;
@@ -64,7 +69,7 @@
 #pragma mark - NSObject
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@; entries = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message, self.entries];
+    return [NSString stringWithFormat:@"<%@: %p; sectionID = %@; threadID = %@; title = %@; message = %@; entries = %@>", self.class, self, self.sectionID, self.threadID, self.title, self.message, self.orderedEntries];
 }
 
 - (BOOL)isEqual:(id)object {
@@ -84,8 +89,7 @@
     BOOL sameThread = [notification.threadID isEqualToString:self.threadID];
     BOOL sameTitle = [notification.title isEqualToString:self.title];
     BOOL sameMessage = [notification.message isEqualToString:self.message];
-    BOOL sameEntries = [notification.entries isEqualToArray:self.entries];
-
+    BOOL sameEntries = [notification.orderedEntries isEqualToArray:self.orderedEntries];
     return sameSection && sameThread  && sameTitle && sameMessage && sameEntries;
 }
 
@@ -109,7 +113,7 @@
 #pragma mark - Properties
 
 - (NSString *)title {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         // No entries
         return nil;
     }
@@ -124,7 +128,7 @@
 }
 
 - (NSString *)message {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return @"Message";
     }
 
@@ -139,7 +143,7 @@
 
 - (UIImage *)icon {
     UIImage *backupIcon = [UIImage _applicationIconImageForBundleIdentifier:@"com.apple.Preferences" format:0 scale:[UIScreen mainScreen].scale];
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return backupIcon;
     }
 
@@ -153,7 +157,7 @@
 }
 
 - (BOOL)hasAttachmentImage {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return NO;
     }
 
@@ -161,7 +165,7 @@
 }
 
 - (UIImage *)attachmentImage {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return nil;
     }
 
@@ -169,7 +173,7 @@
 }
 
 - (NSDate *)timestamp {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return [NSDate date];
     }
 
@@ -183,7 +187,7 @@
 }
 
 - (NSTimeZone *)timeZone {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return nil;
     }
 
@@ -191,7 +195,7 @@
 }
 
 - (BOOL)hasCustomActions {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return NO;
     }
 
@@ -199,7 +203,7 @@
 }
 
 - (NSArray<NCNotificationAction *> *)customActions {
-    if (!self.entries || self.empty) {
+    if (!self.orderedEntries || self.empty) {
         return nil;
     }
 
@@ -207,14 +211,18 @@
 }
 
 - (BOOL)isEmpty {
-    return self.entries.count < 1;
+    return self.orderedEntries.count < 1;
+}
+
+- (NSArray<NUANotificationEntry *> *)allEntries {
+    return [self.orderedEntries copy];
 }
 
 #pragma mark - Entry Helpers
 
 - (NUANotificationEntry *)leadingNotificationEntry {
     // Simply return first object
-    return self.entries.firstObject;
+    return self.orderedEntries.firstObject;
 }
 
 - (NSUInteger)_existingIndexForNotificationEntry:(NUANotificationEntry *)entry {
@@ -224,7 +232,7 @@
 }
 
 - (NSUInteger)_insertionIndexForNotificationEntry:(NUANotificationEntry *)entry {
-    return [self.entries indexOfObject:entry inSortedRange:NSMakeRange(0, self.entries.count) options:(NSBinarySearchingFirstEqual | NSBinarySearchingInsertionIndex) usingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
+    return [self.orderedEntries indexOfObject:entry inSortedRange:NSMakeRange(0, self.orderedEntries.count) options:(NSBinarySearchingFirstEqual | NSBinarySearchingInsertionIndex) usingComparator:^(NUANotificationEntry *entry1, NUANotificationEntry *entry2) {
         return [entry1 compare:entry2];
     }];
 }
@@ -242,10 +250,7 @@
         // New request
         NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
         NSUInteger insertionIndex = [self _insertionIndexForNotificationEntry:entry];
-
-        NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-        [entries insertObject:entry atIndex:insertionIndex];
-        _entries = [entries copy];
+        [self.orderedEntries insertObject:entry atIndex:insertionIndex];
     } else {
         // Modify existing one
         [self modifyExistingEntryWithRequest:request];
@@ -253,26 +258,23 @@
 }
 
 - (void)modifyExistingEntryWithRequest:(NCNotificationRequest *)request {
-    NUANotificationEntry *entry = [NUANotificationEntry notificationEntryFromRequest:request];
-    NSUInteger existingIndex = [self _existingIndexForNotificationEntry:entry];
+    NUANotificationEntry *newEntry = [NUANotificationEntry notificationEntryFromRequest:request];
+    NSUInteger existingIndex = [self _existingIndexForNotificationEntry:newEntry];
     if (existingIndex == NSNotFound) {
         // Guess we never had it, strange
         return;
     }
 
-    NSUInteger insertionIndex = [self _insertionIndexForNotificationEntry:entry];
-    NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-    if (insertionIndex == existingIndex) {
+    NSUInteger insertionIndex = [self _insertionIndexForNotificationEntry:newEntry];
+    if (existingIndex == insertionIndex) {
         // Same indicies
-        [entries replaceObjectAtIndex:insertionIndex withObject:entry];
+        [self.orderedEntries replaceObjectAtIndex:existingIndex withObject:newEntry];
     } else {
         // Remove old add new
-        NUANotificationEntry *oldEntry = entries[existingIndex];
-        [entries insertObject:entry atIndex:insertionIndex];
-        [entries removeObject:oldEntry];
+        [self.orderedEntries removeObjectAtIndex:existingIndex];
+        NSUInteger newInsertionIndex = insertionIndex - @(existingIndex < insertionIndex).unsignedIntegerValue;
+        [self.orderedEntries insertObject:newEntry atIndex:newInsertionIndex];
     }
-
-    _entries = [entries copy];
 }
 
 - (void)removeRequest:(NCNotificationRequest *)request {
@@ -284,9 +286,7 @@
     }
 
     // Remove object
-    NSMutableArray<NUANotificationEntry *> *entries = [self.entries mutableCopy];
-    [entries removeObjectAtIndex:existingIndex];
-    _entries = [entries copy];
+    [self.orderedEntries removeObjectAtIndex:existingIndex];
 }
 
 @end
