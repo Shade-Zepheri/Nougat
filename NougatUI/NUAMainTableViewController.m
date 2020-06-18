@@ -12,7 +12,8 @@
     NSLayoutConstraint *_heightConstraint;
     NUACoalescedNotification *_mediaNotification;
 }
-
+@property (strong, nonatomic) MPUNowPlayingController *nowPlayingController;
+@property (strong, nonatomic) NSMutableArray<NUACoalescedNotification *> *notifications;
 @property (strong, nonatomic) NUARippleButton *clearAllButton;
 
 @end
@@ -66,7 +67,7 @@
     }];
 
     // Set notifications
-    _notifications = [notifications copy];
+    _notifications = notifications;
 
     // Reload data
     [self.tableViewController.tableView reloadData];
@@ -154,12 +155,8 @@
     }
 
     // Add new entry
-    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
     NSUInteger insertIndex = [self _indexForAddingNewNotification:newNotification];
-    [notifications insertObject:newNotification atIndex:insertIndex];
-    
-    // Update ivar
-    _notifications = [notifications copy];
+    [self.notifications insertObject:newNotification atIndex:insertIndex];
 
     // Update table
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -179,11 +176,9 @@
 
     // Sort via date
     // Since references, the notification in the array is already updated, all thats needed is to sort
-    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
+    [self.notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
         return [notification1 compare:notification2];
     }];
-    _notifications = [notifications copy];
 
     // Get new index
     NSIndexPath *newIndexPath = [self indexPathForNotification:updatedNotification];
@@ -208,9 +203,7 @@
 
     // Remove old and update
     NSIndexPath *oldIndexPath = [self indexPathForNotification:removedNotification];
-    NSMutableArray<NUACoalescedNotification *> *notifications = [self.notifications mutableCopy];
-    [notifications removeObjectAtIndex:oldIndexPath.row];
-    _notifications = [notifications copy];
+    [self.notifications removeObjectAtIndex:oldIndexPath.row];
 
     // Update table
     [self.tableViewController.tableView deleteRowsAtIndexPaths:@[oldIndexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -434,9 +427,7 @@
     }
 
     // Add dummie to backng array
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
-    [mutableNotifications insertObject:_mediaNotification atIndex:0];
-    _notifications = [mutableNotifications copy];
+    [self.notifications insertObject:_mediaNotification atIndex:0];
 
     // Insert row
     [self.tableViewController.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -455,9 +446,7 @@
     [self notification:_mediaNotification shouldExpand:NO reload:NO];
 
     // Remove media cell
-    NSMutableArray<NUACoalescedNotification *> *mutableNotifications = [self.notifications mutableCopy];
-    [mutableNotifications removeObject:_mediaNotification];
-    _notifications = [mutableNotifications copy];
+    [self.notifications removeObject:_mediaNotification];
 
     // Delete row
     [self.tableViewController.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
