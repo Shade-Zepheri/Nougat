@@ -267,7 +267,6 @@
 
     // Add to prefs
     _preferences[NUAPreferencesTogglesListKey] = [newTogglesList copy];
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 - (BOOL)_hasBrokenMigration {
@@ -284,7 +283,6 @@
 
     // Add to prefs
     _preferences[NUAPreferencesTogglesListKey] = [newTogglesList copy];
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 #pragma mark - First Time Helpers

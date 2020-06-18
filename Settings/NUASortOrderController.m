@@ -330,8 +330,6 @@
     // Update HBPreferences
     HBPreferences *preferences = [HBPreferences preferencesForIdentifier:@"com.shade.nougat"];
     preferences[NUAPreferencesTogglesListKey] = [self.enabledIdentifiers copy];
-
-    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), CFSTR("com.shade.nougat/ReloadPrefs"), NULL, NULL, YES);
 }
 
 @end
