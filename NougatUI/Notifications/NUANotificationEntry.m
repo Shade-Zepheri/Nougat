@@ -13,7 +13,6 @@
     if (self) {
         _request = request;
         _timestamp = request.timestamp;
-        _hasAttachmentImage = request.hasAttachments;
 
         // Get info from content
         NCNotificationContent *content = request.content;
@@ -31,6 +30,10 @@
 }
 
 #pragma mark - Properties
+
+- (BOOL)hasAttachmentImage {
+    return self.attachmentImage != nil;
+}
 
 - (BOOL)hasCustomActions {
     return self.customActions.count > 0;

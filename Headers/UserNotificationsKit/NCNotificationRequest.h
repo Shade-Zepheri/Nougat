@@ -1,7 +1,6 @@
 @class NCNotificationAction, NCNotificationContent;
 
 @interface NCNotificationRequest : NSObject
-@property (readonly, nonatomic) BOOL hasAttachments; 
 @property (copy, readonly, nonatomic) NSString *sectionIdentifier;
 @property (copy, readonly, nonatomic) NSString *notificationIdentifier;
 @property (copy, readonly, nonatomic) NSString *threadIdentifier;
