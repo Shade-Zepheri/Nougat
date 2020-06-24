@@ -30,8 +30,8 @@
         [self.layer insertSublayer:self.playerLayer atIndex:0];
 
         // Add tap to pause
-         UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
-        [self addGestureRecognizer:tapGesture];
+         UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapGesture:)];
+        [self.contentView addGestureRecognizer:tapGestureRecognizer];
 
         // Register for notification for loop
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playerDidReachEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:self.playerItem];
@@ -41,8 +41,7 @@
 }
 
 - (instancetype)initWithSpecifier:(PSSpecifier *)specifier {
-	self = [self initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil specifier:specifier];
-	return self;
+	return [self initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil specifier:specifier];
 }
 
 - (void)dealloc {
@@ -73,7 +72,11 @@
 
 #pragma mark - Gesture
 
-- (void)handleTapGesture:(UITapGestureRecognizer *)recognizer {
+- (void)handleTapGesture:(UITapGestureRecognizer *)gestureRecognizer {
+    if (gestureRecognizer.state != UIGestureRecognizerStateEnded) {
+        return;
+    }
+
     self.paused = !self.paused;
 }
 
