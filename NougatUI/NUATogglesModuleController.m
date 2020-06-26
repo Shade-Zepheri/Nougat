@@ -66,18 +66,17 @@
     NSArray<NUAToggleInstance *> *toggleInstances = self.togglesProvider.toggleInstances;
     NSArray<NSString *> *orderedEnabledIdentifiers = self.notificationShadePreferences.enabledToggleIdentifiers;
 
-    // Construct initial array
-    NSMutableArray<NUAToggleButton *> *sortedTogglesList = [NSMutableArray array];
-    for (NUAToggleInstance *toggleInstance in toggleInstances) {
-        [sortedTogglesList addObject:toggleInstance.toggle];
-    }
-
     // Sort to be properly ordered
-    for (NUAToggleInstance *toggleInstance in toggleInstances) {
-        NUAToggleInfo *toggleInfo = toggleInstance.toggleInfo;
-        NSUInteger index = [orderedEnabledIdentifiers indexOfObject:toggleInfo.toggleIdentifier];
+    NSMutableArray<NUAToggleInstance *> *sortedTogglesInstances = [toggleInstances mutableCopy];
+    [sortedTogglesInstances sortUsingComparator:^(NUAToggleInstance *instance1, NUAToggleInstance *instance2) {
+        NSNumber *firstIndex = @([orderedEnabledIdentifiers indexOfObject:instance1.toggleInfo.toggleIdentifier]);
+        NSNumber *secondIndex = @([orderedEnabledIdentifiers indexOfObject:instance2.toggleInfo.toggleIdentifier]);
+        return [firstIndex compare:secondIndex];
+    }];
 
-        [sortedTogglesList replaceObjectAtIndex:index withObject:toggleInstance.toggle];
+    NSMutableArray<NUAToggleButton *> *sortedTogglesList = [NSMutableArray array];
+    for (NUAToggleInstance *toggleInstance in sortedTogglesInstances) {
+        [sortedTogglesList addObject:toggleInstance.toggle];
     }
 
     // Send to view
