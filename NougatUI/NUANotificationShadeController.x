@@ -262,7 +262,7 @@
         [gestureManager gestureRecognizerOfType:SBSystemGestureTypePinPiPApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
     } else {
         SBMainDisplaySceneLayoutViewController *sceneLayoutViewController;
-        if ([%c(SBSceneLayoutViewController) instancesRespondToSelector:@selector(mainDisplaySceneLayoutViewController)]) {
+        if ([%c(SBSceneLayoutViewController) respondsToSelector:@selector(mainDisplaySceneLayoutViewController)]) {
             // iOS 11-12
             sceneLayoutViewController = [%c(SBSceneLayoutViewController) mainDisplaySceneLayoutViewController];
             [sceneLayoutViewController _requireUnpinPanSystemGestureRecognizerFailureForGestureRecognizer:_presentationGestureRecognizer];
