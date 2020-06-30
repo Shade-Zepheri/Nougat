@@ -77,7 +77,7 @@
 }
 
 - (void)_createBatteryView {
-    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel] * 100;
+    CGFloat currentPercent = [[UIDevice currentDevice] batteryLevel];
     _batteryView = [[NUABatteryView alloc] initWithFrame:CGRectZero andPercent:currentPercent preferences:self.notificationShadePreferences];
     [self addSubview:self.batteryView];
 
