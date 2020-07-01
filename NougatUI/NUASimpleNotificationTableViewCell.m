@@ -216,7 +216,6 @@
     NSString *messageText = (notification.title) ? notification.message : fallbackMessage;
     self.titleText = self.UILocked ? hiddenTitleText : titleText;
     self.messageText = messageText;
-    self.headerGlyph = notification.icon;
     self.timestamp = notification.timestamp;
 
     // Add actions if necessary
@@ -295,6 +294,10 @@
     }
 
     self.headerText = displayName;
+
+    // Get header icon
+    UIImage *appIconImage = [UIImage _applicationIconImageForBundleIdentifier:sectionID format:0 scale:[UIScreen mainScreen].scale];
+    self.headerGlyph = appIconImage;
 }
 
 #pragma mark - Date Label
