@@ -1,6 +1,7 @@
 #import "NUASimpleNotificationTableViewCell.h"
 #import "NUARippleButton.h"
 #import <MobileCoreServices/LSApplicationProxy.h>
+#import <UIKit/UIImage+Private.h>
 #import <Macros.h>
 
 @interface NUASimpleNotificationTableViewCell ()
