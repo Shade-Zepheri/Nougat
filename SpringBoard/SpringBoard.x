@@ -111,16 +111,16 @@ NUANotificationShadeController *notificationShade;
 
 %hook SBControlCenterController
 
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    BOOL shouldBegin = %orig;
+- (BOOL)allowShowTransitionSystemGesture {
+    BOOL allowGesture = %orig;
     if (!settings.enabled) {
         // Not enabled
-        return shouldBegin;
+        return allowGesture;
     }
 
     // Don't begin gesture if presented
     BOOL nougatPresented = notificationShade.presented;
-    return !nougatPresented && shouldBegin;
+    return !nougatPresented && allowGesture;
 }
 
 %end
