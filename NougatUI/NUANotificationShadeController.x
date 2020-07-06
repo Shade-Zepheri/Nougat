@@ -126,7 +126,7 @@
     }
 }
 
-#pragma mark - View management
+#pragma mark - View Management
 
 - (void)loadView {
     [super loadView];
@@ -223,7 +223,7 @@
     return YES;
 }
 
-#pragma mark Gesture Relationships
+#pragma mark - Gesture Relationships
 
 - (void)_setupGestureFailRelationships {
     // Coordinate with CoverSheet/NC
@@ -593,7 +593,7 @@
     return self.preferences;
 }
 
-#pragma mark - Dashboard participating
+#pragma mark - Dashboard Participating
 
 - (NSString *)dashBoardIdentifier {
     return NSStringFromClass(self.class);
@@ -607,7 +607,7 @@
     return self.visible ? 2 : 1;
 }
 
-#pragma mark - Behavior providing
+#pragma mark - Behavior Providing
 
 - (NSInteger)scrollingStrategy {
     return IS_IOS_OR_NEWER(iOS_11_0) ? 0 : 3;
@@ -637,7 +637,7 @@
     return 0;
 }
 
-#pragma mark - Presentation providing
+#pragma mark - Presentation Providing
 
 - (id<UICoordinateSpace>)presentationCoordinateSpace {
     return self.view;
@@ -661,7 +661,7 @@
     return nil;
 }
 
-#pragma mark - Appearance providing
+#pragma mark - Appearance Providing
 
 - (NSString *)appearanceIdentifier {
     return [self coverSheetIdentifier];
@@ -702,6 +702,18 @@
 
 - (UIColor *)backgroundColor {
     return nil;
+}
+
+#pragma mark - Overlay Presentation
+
+- (void)updateStatesForOverlayPresentation {
+    // Update window level
+    _window.windowLevel = 1034.1;
+}
+
+- (void)updateStatesForOverlayDismissal {
+    // Reset to original window level
+    _window.windowLevel = 1080;
 }
 
 #pragma mark - Notifications
@@ -878,10 +890,9 @@
 
 - (void)_setupViewForPresentation {
     // Create window if necessary
-    // _UISpringBoardLockScreenWindowLevel
     if (!_window) {
         _window = [[%c(SBIgnoredForAutorotationSecureWindow) alloc] initWithScreen:[UIScreen mainScreen] debugName:@"NougatWindow" rootViewController:self];
-        _window.windowLevel = IS_IOS_OR_NEWER(iOS_11_0) ? 1075 : 1092;
+        _window.windowLevel = 1080;
     }
 
     // Set orientation

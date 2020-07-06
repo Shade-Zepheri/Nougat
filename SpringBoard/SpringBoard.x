@@ -42,12 +42,20 @@ NUANotificationShadeController *notificationShade;
 %end
 
 // iOS 13
-%hook SBMainWorkspace
+%hook SBTransientOverlayPresentationManager
 
-- (void)transientOverlayPresentationManagerRequestsControlCenterDismissal:(id)presentationManager animated:(BOOL)animated {
+- (void)performPresentationRequest:(SBTransientOverlayPresentationRequest *)presentationRequest {
     %orig;
 
-    [notificationShade dismissAnimated:animated];
+    // Update window level
+    [notificationShade updateStatesForOverlayPresentation];
+} 
+
+- (void)performDismissalRequest:(SBTransientOverlayDismissalRequest *)dismissalRequest {
+    %orig;
+
+    // Reset window level
+    [notificationShade updateStatesForOverlayDismissal];
 }
 
 %end

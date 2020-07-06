@@ -44,4 +44,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
 - (void)dismissAnimated:(BOOL)animated;
 - (void)presentAnimated:(BOOL)animated;
 
+- (void)updateStatesForOverlayPresentation;
+- (void)updateStatesForOverlayDismissal;
+
 @end

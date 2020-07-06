@@ -38,10 +38,15 @@
 #import "SBReachabilityManager.h"
 #import "SBSceneManagerCoordinator.h"
 #import "SBScreenEdgePanGestureRecognizer+Private.h"
+#import "SBTransientOverlayDismissalRequest.h"
 #import "SBTransientOverlayPresentationManager.h"
+#import "SBTransientOverlayPresentationManagerDelegate.h"
+#import "SBTransientOverlayPresentationRequest.h"
+#import "SBTransientOverlayViewController.h"
 #import "SBUIController+Private.h"
 #import "SBWindow+Private.h"
 #import "SBWindowHidingManager.h"
+#import "SBWindowLevelAssertion.h"
 #import "SpringBoard+Private.h"
 
 #import <SpringBoard/SBWorkspace.h>
