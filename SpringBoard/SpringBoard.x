@@ -47,8 +47,12 @@ NUANotificationShadeController *notificationShade;
 - (void)performPresentationRequest:(SBTransientOverlayPresentationRequest *)presentationRequest {
     %orig;
 
-    // Update window level
+    // Update window level and/or dismiss
     [notificationShade updateStatesForOverlayPresentation];
+
+    if (presentationRequest.viewController.contentOpaque) {
+        [notificationShade dismissAnimated:YES];
+} 
 } 
 
 - (void)performDismissalRequest:(SBTransientOverlayDismissalRequest *)dismissalRequest {
