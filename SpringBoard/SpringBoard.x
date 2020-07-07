@@ -52,7 +52,7 @@ NUANotificationShadeController *notificationShade;
 
     if (presentationRequest.viewController.contentOpaque) {
         [notificationShade dismissAnimated:YES];
-} 
+    }
 } 
 
 - (void)performDismissalRequest:(SBTransientOverlayDismissalRequest *)dismissalRequest {
@@ -97,10 +97,24 @@ NUANotificationShadeController *notificationShade;
 
 %hook SBDismissOverlaysAnimationController
 
++ (BOOL)willDismissOverlaysForDismissOptions:(NSUInteger)dismissOptions {
+    BOOL willDismissOverlays = %orig;
+    if (!settings.enabled) {
+        // Not enabled
+        return willDismissOverlays;
+    }
+
+    // Make sure Nougat is included
+    return notificationShade.presented || willDismissOverlays;
+}
+
 - (void)_startAnimation {
     %orig;
 
-    [notificationShade dismissAnimated:YES];
+    // Dismiss Nougat if applicable
+    if (notificationShade.presented) {
+        [notificationShade dismissAnimated:YES];
+    }
 }
 
 %end
