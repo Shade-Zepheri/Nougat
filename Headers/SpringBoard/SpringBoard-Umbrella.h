@@ -19,6 +19,7 @@
 #import "SBDashBoardViewController.h"
 #import "SBDateTimeController.h"
 #import "SBDateTimeOverrideObserver.h"
+#import "SBDismissOverlaysAnimationController.h"
 #import "SBGrabberTongue.h"
 #import "SBIconController+Private.h"
 #import "SBIdleTimerGlobalCoordinator.h"

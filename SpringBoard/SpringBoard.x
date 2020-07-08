@@ -97,23 +97,31 @@ NUANotificationShadeController *notificationShade;
 
 %hook SBDismissOverlaysAnimationController
 
-+ (BOOL)willDismissOverlaysForDismissOptions:(NSUInteger)dismissOptions {
-    BOOL willDismissOverlays = %orig;
-    if (!settings.enabled) {
++ (SBDismissOverlaysOptions)_overlaysToDismissForOptions:(NSUInteger)dismissOptions {
+    SBDismissOverlaysOptions overlayDismissOptions = %orig;
+    if (!settings.enabled || !notificationShade.presented) {
         // Not enabled
-        return willDismissOverlays;
+        return overlayDismissOptions;
     }
 
     // Make sure Nougat is included
-    return notificationShade.presented || willDismissOverlays;
+    overlayDismissOptions |= SBDismissOverlaysOptionsNougat;
+    return overlayDismissOptions;
 }
 
 - (void)_startAnimation {
     %orig;
 
     // Dismiss Nougat if applicable
-    if (notificationShade.presented) {
-        [notificationShade dismissAnimated:YES];
+    SBDismissOverlaysOptions overlayDismissOptions = [self.class _overlaysToDismissForOptions:self.dismissOptions];
+    if (overlayDismissOptions & SBDismissOverlaysOptionsNougat) {
+        [self addMilestone:@"NotificationShadeDismissalMilestone"];
+
+        __weak __typeof(self) weakSelf = self;
+        [notificationShade dismissAnimated:YES completion:^ {
+            [weakSelf removeMilestone:@"NotificationShadeDismissalMilestone"];
+            [weakSelf _noteAnimationDidFinish];
+        }];
     }
 }
 

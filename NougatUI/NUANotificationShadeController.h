@@ -7,7 +7,7 @@
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIKit+Private.h>
 
-typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
+typedef NS_ENUM(NSInteger, NUANotificationShadeState) {
     NUANotificationShadeStateDismissed,
     NUANotificationShadeStatePresented
 };
@@ -42,6 +42,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadeState) {
 - (BOOL)handleMenuButtonTap;
 
 - (void)dismissAnimated:(BOOL)animated;
+- (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion;
 - (void)presentAnimated:(BOOL)animated;
 
 - (void)updateStatesForOverlayPresentation;

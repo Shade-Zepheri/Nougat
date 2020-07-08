@@ -749,8 +749,12 @@
 #pragma mark - Presentation
 
 - (void)dismissAnimated:(BOOL)animated {
+    [self dismissAnimated:animated completion:nil];
+}
+
+- (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion {
     // Dismiss completely
-    if (!self.presented) {
+    if (!self.presented || _isDismissing) {
         return;
     }
 
@@ -761,7 +765,7 @@
     // Pass to view controller
     __weak __typeof(self) weakSelf = self;
     [_viewController dismissAnimated:animated completion:^{
-        [weakSelf _finishAnimationWithCompletion:nil];
+        [weakSelf _finishAnimationWithCompletion:completion];
     }];
 }
 
