@@ -351,14 +351,14 @@
 - (void)updateColorInfoFromNotification:(NUACoalescedNotification *)notification {
     // Check if info is cached or not
     NUAImageColorCache *colorCache = [NUAImageColorCache sharedCache];
-    UIImage *iconImage = notification.icon;
-    if ([colorCache hasColorDataForImage:iconImage type:NUAImageColorInfoTypeAppIcon]) {
-        // Has data
-        NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImage:iconImage type:NUAImageColorInfoTypeAppIcon];
+    NSString *identifier = notification.sectionID;
+    if ([colorCache hasColorDataForImageIdentifier:identifier type:NUAImageColorInfoTypeAppIcon]) {
+        // Use cached info
+        NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImageIdentifier:identifier type:NUAImageColorInfoTypeAppIcon];
         [self _updateWithColorInfo:colorInfo];
     } else {
-        // Generate new info
-        [colorCache cacheColorInfoForImage:iconImage type:NUAImageColorInfoTypeAppIcon completion:^(NUAImageColorInfo *colorInfo) {
+        // Generate colorinfo
+        [colorCache cacheColorInfoForImage:self.headerGlyph identifier:identifier type:NUAImageColorInfoTypeAppIcon completion:^(NUAImageColorInfo *colorInfo) {
             [self _updateWithColorInfo:colorInfo];
         }];
     }
@@ -366,12 +366,12 @@
 
 - (void)_updateWithColorInfo:(NUAImageColorInfo *)colorInfo {
     // Update header
-    self.headerTint = colorInfo.primaryColor;
+    self.headerTint = colorInfo.textColor;
 
     // Update buttons
     NSArray<NUARippleButton *> *actionButtons = self.optionsButtonStack.arrangedSubviews;
     for (NUARippleButton *button in actionButtons) {
-        [button setTitleColor:colorInfo.primaryColor forState:UIControlStateNormal];
+        [button setTitleColor:colorInfo.textColor forState:UIControlStateNormal];
     }
 }
 

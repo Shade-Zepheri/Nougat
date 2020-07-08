@@ -59,14 +59,6 @@
 
 #pragma mark - Properties
 
-- (void)setTintColor:(UIColor *)color {
-    _tintColor = color;
-
-    // Update label tint
-    self.songLabel.textColor = color;
-    self.artistLabel.textColor = color;
-}
-
 - (void)setSong:(NSString *)song {
     _song = song;
 
@@ -77,6 +69,13 @@
     _artist = artist;
 
     self.artistLabel.text = artist;
+}
+
+#pragma mark - Color
+
+- (void)updateWithPrimaryColor:(UIColor *)primaryColor accentColor:(UIColor *)accentColor {
+    self.songLabel.textColor = primaryColor;
+    self.artistLabel.textColor = accentColor;
 }
 
 @end

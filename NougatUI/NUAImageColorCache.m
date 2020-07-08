@@ -1,31 +1,12 @@
 #import "NUAImageColorCache.h"
-#import "UIColor+Accent.h"
-
-@implementation NUAImageColorInfo
-
-#pragma mark - Initialization
-
-+ (instancetype)colorInfoWithPrimaryColor:(UIColor *)primaryColor accentColor:(UIColor *)accentColor {
-    return [[self alloc] initWithPrimaryColor:primaryColor accentColor:accentColor];
-}
-
-- (instancetype)initWithPrimaryColor:(UIColor *)primaryColor accentColor:(UIColor *)accentColor {
-    self = [super init];
-    if (self) {
-        // Simply set properties
-        _primaryColor = primaryColor;
-        _accentColor = accentColor;
-    }
-
-    return self;
-}
-
-@end
-
+#import <UIKit/UIImage+Private.h>
 
 @interface NUAImageColorCache () {
     dispatch_queue_t _processingQueue;
 }
+
+@property (strong, nonatomic) NSCache<NSString *, NUAImageColorInfo *> *iconCache;
+@property (strong, nonatomic) NSCache<NSString *, NUAImageColorInfo *> *albumArtworkCache;
 
 @end
 
@@ -64,64 +45,46 @@
 
 #pragma mark - Helper Methods
 
-- (UIColor *)_averageColorForImage:(UIImage *)image {
-    CIImage *inputImage = image.CIImage ?: [CIImage imageWithCGImage:image.CGImage];
-    if (!inputImage) {
-        // No image, fallback
-        return [UIColor grayColor];
-    }
-
-    CIFilter *filter = [CIFilter filterWithName:@"CIAreaAverage" withInputParameters:@{kCIInputImageKey: inputImage, kCIInputExtentKey: [CIVector vectorWithCGRect:inputImage.extent]}];
-    CIImage *outputImage = filter.outputImage;
-
-    UInt8 bitmap[4];
-    CIContext *context = [CIContext contextWithOptions:@{kCIContextWorkingColorSpace: [NSNull null]}];
-    CGRect bounds  = CGRectMake(0, 0, 1, 1);
-    [context render:outputImage toBitmap:&bitmap rowBytes:4 bounds:bounds format:kCIFormatRGBA8 colorSpace:nil];
-    return [UIColor colorWithRed:bitmap[0] / 255.0 green:bitmap[1] / 255.0 blue:bitmap[2] / 255.0 alpha:bitmap[3] / 255.0];
-}
-
-- (void)_analyzeImage:(UIImage *)image completion:(NUAImageColorCacheCompletion)completion {
+- (void)_analyzeImage:(UIImage *)image type:(NUAImageColorInfoType)type completion:(NUAImageColorCacheCompletion)completion {
     dispatch_async(_processingQueue, ^{
-        // Create entry
-        UIColor *primaryColor = [self _averageColorForImage:image];
-        UIColor *accentColor = primaryColor.accentColor;
-
-        NUAImageColorInfo *entry = [NUAImageColorInfo colorInfoWithPrimaryColor:primaryColor accentColor:accentColor];
+        // Get image colors
+        UIImageResizeQuality resizeQuality = (type == NUAImageColorInfoTypeAppIcon) ? UIImageResizeQualityMedium : UIImageResizeQualityLow;
+        UIImageColorPalette *colorPalette = [image retrieveColorPaletteWithQuality:resizeQuality];
+        NUAImageColorInfo *colorInfo = [NUAImageColorInfo colorInfoFromPalette:colorPalette];
 
         // Completion
         dispatch_async(dispatch_get_main_queue(), ^{
-            completion(entry);
+            completion(colorInfo);
         });
     });
 }
 
 #pragma mark - Cache Management
 
-- (BOOL)hasColorDataForImage:(UIImage *)image type:(NUAImageColorInfoType)type {
-    return [self cachedColorInfoForImage:image type:type] != nil;
+- (BOOL)hasColorDataForImageIdentifier:(NSString *)identifier type:(NUAImageColorInfoType)type {
+    return [self cachedColorInfoForImageIdentifier:identifier type:type] != nil;
 }
 
-- (NUAImageColorInfo *)cachedColorInfoForImage:(UIImage *)image type:(NUAImageColorInfoType)type {
+- (NUAImageColorInfo *)cachedColorInfoForImageIdentifier:(NSString *)identifier type:(NUAImageColorInfoType)type {
     // Type determines what cache we use
     switch (type) {
         case NUAImageColorInfoTypeAppIcon:
-           return [self.iconCache objectForKey:image];
+           return [self.iconCache objectForKey:identifier];
         case NUAImageColorInfoTypeAlbumArtwork:
-            return [self.albumArtworkCache objectForKey:image];
+            return [self.albumArtworkCache objectForKey:identifier];
     }
 }
 
-- (void)cacheColorInfoForImage:(UIImage *)image type:(NUAImageColorInfoType)type completion:(NUAImageColorCacheCompletion)completion {
+- (void)cacheColorInfoForImage:(UIImage *)image identifier:(NSString *)identifier type:(NUAImageColorInfoType)type completion:(NUAImageColorCacheCompletion)completion {
     // Dispatch on our queue
-    [self _analyzeImage:image completion:^(NUAImageColorInfo *colorInfo) {
+    [self _analyzeImage:image type:type completion:^(NUAImageColorInfo *colorInfo) {
         // Type determines what cache we add to
         switch (type) {
             case NUAImageColorInfoTypeAppIcon:
-                [self.iconCache setObject:colorInfo forKey:image];
+                [self.iconCache setObject:colorInfo forKey:identifier];
                 break;
             case NUAImageColorInfoTypeAlbumArtwork:
-                [self.albumArtworkCache setObject:colorInfo forKey:image];
+                [self.albumArtworkCache setObject:colorInfo forKey:identifier];
                 break;
         }
 
@@ -134,7 +97,7 @@
 
 - (void)queryColorInfoForImage:(UIImage *)image completion:(NUAImageColorCacheCompletion)completion {
     // Simply call our helper method
-    [self _analyzeImage:image completion:completion];
+    [self _analyzeImage:image type:NUAImageColorInfoTypeAlbumArtwork completion:completion];
 }
 
 @end

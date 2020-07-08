@@ -3,6 +3,7 @@
 @interface NUAMediaHeaderView : UIView
 @property (copy, nonatomic) NSString *song;
 @property (copy, nonatomic) NSString *artist;
-@property (strong, nonatomic) UIColor *tintColor;
+
+- (void)updateWithPrimaryColor:(UIColor *)primaryColor accentColor:(UIColor *)accentColor;
 
 @end

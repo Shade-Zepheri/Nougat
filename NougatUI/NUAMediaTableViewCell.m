@@ -178,7 +178,6 @@
     _nowPlayingArtwork = nowPlayingArtwork;
 
     self.artworkView.image = nowPlayingArtwork;
-    [self updateTintsFromImage:nowPlayingArtwork];
     [self setNeedsLayout];
 }
 
@@ -223,6 +222,7 @@
     self.nowPlayingAppDisplayID = nowPlayingController.nowPlayingAppDisplayID;
     self.playing = nowPlayingController.isPlaying;
 
+    [self updateTintsFromImageIfNecessary];
     [self setNeedsLayout];
 }
 
@@ -266,8 +266,9 @@
         self.nowPlayingArtwork = controller.currentNowPlayingArtwork;
         self.metadata = controller.currentNowPlayingMetadata;
 
-        // Get liking state
+        // Update information
         [self updateLikingCapability:nowPlayingInfo];
+        [self updateTintsFromImageIfNecessary];
     });
 }
 
@@ -289,7 +290,13 @@
 
 #pragma mark - Colors
 
-- (void)updateTintsFromImage:(UIImage *)artworkImage {
+- (void)updateTintsFromImageIfNecessary {
+    if (!self.nowPlayingArtwork || !self.metadata) {
+        // No metadata or arkwork
+        return;
+    }
+
+    UIImage *artworkImage = self.nowPlayingArtwork;
     if (self.notificationShadePreferences.useExternalColor && NSClassFromString(@"CFWBucket")) {
         // Only use colorflow if it exists and selected
         [self updateTintsUsingColorfow:artworkImage];
@@ -302,26 +309,29 @@
 - (void)updateTintsUsingCache:(UIImage *)artworkImage {
     // Use our own cache
     NUAImageColorCache *colorCache = [NUAImageColorCache sharedCache];
-    if ([colorCache hasColorDataForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork]) {
+    NSString *identifier = self.metadata.album;
+    if ([colorCache hasColorDataForImageIdentifier:identifier type:NUAImageColorInfoTypeAlbumArtwork]) {
         // Has data
-        NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork];
-        [self _updateTintsWithBackgroundColor:colorInfo.primaryColor tintColor:colorInfo.accentColor];
+        NUAImageColorInfo *colorInfo = [colorCache cachedColorInfoForImageIdentifier:identifier type:NUAImageColorInfoTypeAlbumArtwork];
+        [self _updateWithBackgroundColor:colorInfo.primaryColor primaryColor:colorInfo.secondaryColor accentColor:colorInfo.accentColor];
     } else {
-        // Generate
-        [colorCache cacheColorInfoForImage:artworkImage type:NUAImageColorInfoTypeAlbumArtwork completion:^(NUAImageColorInfo *colorInfo) {
-            [self _updateTintsWithBackgroundColor:colorInfo.primaryColor tintColor:colorInfo.accentColor];
+        // Generate colorinfo
+        [colorCache cacheColorInfoForImage:artworkImage identifier:identifier type:NUAImageColorInfoTypeAlbumArtwork completion:^(NUAImageColorInfo *colorInfo) {
+            [self _updateWithBackgroundColor:colorInfo.primaryColor primaryColor:colorInfo.secondaryColor accentColor:colorInfo.accentColor];
         }];
     }
 }
 
-- (void)_updateTintsWithBackgroundColor:(UIColor *)backgroundColor tintColor:(UIColor *)tintColor {
+- (void)_updateWithBackgroundColor:(UIColor *)backgroundColor primaryColor:(UIColor *)primaryColor accentColor:(UIColor *)accentColor {
     [self _updateBackgroundGradientWithColor:backgroundColor];
 
     // Set tint color
-    self.headerTint = tintColor;
-    self.albumLabel.textColor = tintColor;
-    self.headerView.tintColor = tintColor;
-    self.controlsView.tintColor = tintColor;
+    self.headerTint = primaryColor;
+    self.albumLabel.textColor = accentColor;
+
+    // Update other views
+    [self.headerView updateWithPrimaryColor:primaryColor accentColor:accentColor];
+    self.controlsView.tintColor = primaryColor;
 }
 
 - (void)_updateBackgroundGradientWithColor:(UIColor *)color {
@@ -338,7 +348,7 @@
     AnalyzedInfo info = [NSClassFromString(@"CFWBucket") analyzeImage:artworkImage resize:YES];
     CFWColorInfo *colorInfo = [NSClassFromString(@"CFWColorInfo") colorInfoWithAnalyzedInfo:info];
 
-    [self _updateTintsWithBackgroundColor:colorInfo.backgroundColor tintColor:colorInfo.primaryColor];
+    [self _updateWithBackgroundColor:colorInfo.backgroundColor primaryColor:colorInfo.primaryColor accentColor:colorInfo.secondaryColor];
 }
 
 #pragma mark - Song Liking

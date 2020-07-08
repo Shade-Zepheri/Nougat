@@ -1,6 +1,6 @@
 Package: com.shade.nougat
 Name: Nougat
-Depends: firmware (>= 10.0), mobilesubstrate, preferenceloader, ws.hbang.common, com.a3tweaks.flipswitch (>= 1.0.16)
+Depends: firmware (>= 10.0), mobilesubstrate, preferenceloader, ws.hbang.common, com.a3tweaks.flipswitch (>= 1.0.16), com.shade.libpalette
 Version: 1.1.2
 Architecture: iphoneos-arm
 Description: Android NC for iOS
