@@ -42,6 +42,14 @@
             <key>cellClass</key>
             <string>HBTwitterCell</string>
             <key>label</key>
+            <string>Greek: Dimitris</string>
+            <key>user</key>
+            <string>djimi_kons</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
             <string>Hebrew: Aran Shavit</string>
             <key>user</key>
             <string>Aranshavit</string>
@@ -59,6 +67,12 @@
             <string>PSTitleValueCell</string>
             <key>label</key>
             <string>Japanese: Onoue Ryotaro</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTitleValueCell</string>
+            <key>label</key>
+            <string>Korean: brian2535</string>
         </dict>
         <dict>
             <key>cellClass</key>
@@ -110,7 +124,35 @@
             <key>cell</key>
             <string>PSTitleValueCell</string>
             <key>label</key>
+            <string>Turkish: da Minci</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Turkish: serif61</string>
+            <key>user</key>
+            <string>CelikSerif61</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>HBTwitterCell</string>
+            <key>label</key>
+            <string>Turkish: Mehmet Akif Şimşek</string>
+            <key>user</key>
+            <string>m_akif_simsek</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTitleValueCell</string>
+            <key>label</key>
             <string>Vietnamese: Tiến Anh</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSTitleValueCell</string>
+            <key>label</key>
+            <string>Vietnamese: Nguyễn Thiện Hoàn</string>
         </dict>
         <dict>
             <key>cell</key>

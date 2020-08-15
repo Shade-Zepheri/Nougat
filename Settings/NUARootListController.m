@@ -2,7 +2,6 @@
 #import "PSSegmentTableCell+Enable.h"
 #import <CepheiPrefs/HBAppearanceSettings.h>
 #import <CepheiPrefs/HBSupportController.h>
-#import <LocalAuthentication/LocalAuthentication.h>
 #import <Preferences/Preferences.h>
 #import <TechSupport/TSContactViewController.h>
 #import <UIKit/UIKit+Private.h>
@@ -117,7 +116,7 @@
 #pragma mark - Support
 
 - (void)showSupportEmailController {
-    TSContactViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
+    UIViewController *supportController = [HBSupportController supportViewControllerForBundle:[NSBundle bundleForClass:self.class] preferencesIdentifier:@"com.shade.nougat"];
     [self.navigationController pushViewController:supportController animated:YES];
 }
 
