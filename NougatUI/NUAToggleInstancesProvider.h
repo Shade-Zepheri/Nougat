@@ -12,7 +12,7 @@
 typedef void (^NUAToggleInstancesProviderObserverBlock)(id<NUAToggleInstancesProviderObserver> observer);
 
 @interface NUAToggleInstancesProvider : NSObject
-@property (copy, readonly, nonatomic) NSArray<NUAToggleInstance *> *toggleInstances;
+@property (readonly, nonatomic) NSArray<NUAToggleInstance *> *toggleInstances;
 
 - (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences;
 

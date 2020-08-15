@@ -188,9 +188,7 @@
 
 - (void)preferencesDidChange:(NSNotification *)notification {
     // Refresh toggles list
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self _populateToggles];
-    });
+    [self _populateToggles];
 }
 
 @end

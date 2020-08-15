@@ -1,13 +1,13 @@
 #import <UIKit/UIKit.h>
 #import "NUAToggleInfo.h"
 
-typedef NS_ENUM(NSUInteger, NUADrawerTheme) {
+typedef NS_ENUM(NSInteger, NUADrawerTheme) {
     NUADrawerThemeNexus,
     NUADrawerThemePixel,
     NUADrawerThemeOreo
 };
 
-typedef NS_ENUM(NSUInteger, NUANotificationPreviewSetting) {
+typedef NS_ENUM(NSInteger, NUANotificationPreviewSetting) {
     NUANotificationPreviewSettingAlways,
     NUANotificationPreviewSettingWhenUnlocked,
     NUANotificationPreviewSettingNever
