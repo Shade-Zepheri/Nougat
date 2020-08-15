@@ -39,10 +39,10 @@
 
         [_preferences registerBool:&_enabled default:YES forKey:NUAPreferencesEnabledKey];
         [_preferences registerBool:&_firstTimeUser default:YES forKey:NUAPreferencesFirstTimeUserKey];
-        [_preferences registerUnsignedInteger:&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
+        [_preferences registerInteger:&_currentTheme default:NUADrawerThemeNexus forKey:NUAPreferencesCurrentThemeKey];
         [_preferences registerBool:&_useExternalColor default:NO forKey:NUAPreferencesUsesExternalColorKey];
         [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
-        [_preferences registerUnsignedInteger:&_notificationPreviewSetting default:NUANotificationPreviewSettingAlways forKey:NUAPreferencesNotificationPreviewSettingKey];
+        [_preferences registerInteger:&_notificationPreviewSetting default:NUANotificationPreviewSettingAlways forKey:NUAPreferencesNotificationPreviewSettingKey];
         [_preferences registerBool:&_hideStatusBarModule default:NO forKey:NUAPreferencesHideStatusBarModuleKey];
 
         NSArray<NSString *> *defaultToggleOrder = [self.class _defaultEnabledToggles];
