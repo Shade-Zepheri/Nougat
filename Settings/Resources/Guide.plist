@@ -12,7 +12,7 @@
             <key>cellClass</key>
             <string>NUAVideoTableCell</string>
             <key>label</key>
-            <string>Invoke</string>
+            <string>InvokeGuide</string>
             <key>height</key>
 			<integer>300</integer>
         </dict>
@@ -30,7 +30,7 @@
             <key>cellClass</key>
             <string>NUAVideoTableCell</string>
             <key>label</key>
-            <string>Behavior</string>
+            <string>GestureGuide</string>
             <key>height</key>
 			<integer>300</integer>
         </dict>
@@ -48,7 +48,7 @@
             <key>cellClass</key>
             <string>NUAVideoTableCell</string>
             <key>label</key>
-            <string>Features</string>
+            <string>FeaturesGuide</string>
             <key>height</key>
 			<integer>300</integer>
         </dict>
@@ -57,6 +57,24 @@
             <string>NUADetailedTextCell</string>
             <key>label</key>
             <string>FEATURES_TEXT</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSGroupCell</string>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUAVideoTableCell</string>
+            <key>label</key>
+            <string>NotificationsGuide</string>
+            <key>height</key>
+			<integer>300</integer>
+        </dict>
+        <dict>
+            <key>cellClass</key>
+            <string>NUADetailedTextCell</string>
+            <key>label</key>
+            <string>NOTIFICATIONS_TEXT</string>
         </dict>
     </array>
     <key>title</key>

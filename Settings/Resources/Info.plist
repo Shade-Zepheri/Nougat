@@ -10,6 +10,8 @@
 	<string>com.shade.nougat</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>Nougat</string>
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
@@ -18,6 +20,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>HBPackageIdentifier</key>
+	<string>com.shade.nougat</string>
 	<key>NSPrincipalClass</key>
 	<string>NUARootListController</string>
 </dict>
