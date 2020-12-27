@@ -228,10 +228,16 @@
 - (void)_setupGestureFailRelationships {
     // Coordinate with CoverSheet/NC
     if (%c(SBCoverSheetPresentationManager)) {
-        // iOS 11-13
         SBCoverSheetPrimarySlidingViewController *coverSheetSlidingViewController = [[%c(SBCoverSheetPresentationManager) sharedInstance] coverSheetSlidingViewController];
-        UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
-        [self _requirePresentGestureRecognizerToFailForGestureRecognizer:edgePullGestureRecognizer];
+        if (%c(SBIndirectPanGestureRecognizer)) {
+            // iOS 14
+            UIGestureRecognizer *indirectPresentGestureRecognizer = coverSheetSlidingViewController.indirectPresentGestureRecognizer;
+            [self _requirePresentGestureRecognizerToFailForGestureRecognizer:indirectPresentGestureRecognizer];
+        } else {
+            // iOS 11-13
+            UIGestureRecognizer *edgePullGestureRecognizer = [coverSheetSlidingViewController.grabberTongue edgePullGestureRecognizer];
+            [self _requirePresentGestureRecognizerToFailForGestureRecognizer:edgePullGestureRecognizer];
+        }
     } else {
         // iOS 10
         SBNotificationCenterController *notificationCenterController = [%c(SBNotificationCenterController) sharedInstance];
@@ -341,7 +347,8 @@
     if ([mainWorkspace respondsToSelector:@selector(transientOverlayPresentationManager)]) {
         // iOS 13
         SBTransientOverlayPresentationManager *transientOverlayPresentationManager = mainWorkspace.transientOverlayPresentationManager;
-        if (transientOverlayPresentationManager.shouldDisableControlCenter || transientOverlayPresentationManager.shouldDisableCoverSheet) {
+        BOOL shouldDisableCoverSheet = [transientOverlayPresentationManager respondsToSelector:@selector(shouldDisableCoverSheetGesture)] ? transientOverlayPresentationManager.shouldDisableCoverSheetGesture : transientOverlayPresentationManager.shouldDisableCoverSheet;
+        if (transientOverlayPresentationManager.shouldDisableControlCenter || shouldDisableCoverSheet) {
             // Overlay prevents either CC or Coversheet, so we shall disable too
             return NO;
         }

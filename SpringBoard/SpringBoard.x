@@ -18,8 +18,15 @@ NUANotificationShadeController *notificationShade;
     [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
 }
 
-// iOS 11+
+// iOS 11-13
 - (void)toggleSearchWithWillBeginHandler:(void(^)(void))beginHandler completionHandler:(void(^)(void))completionHandler {
+    [notificationShade dismissAnimated:YES];
+
+    %orig;
+}
+
+// iOS 14
+- (void)toggleSearchFromBreadcrumbSource:(BOOL)breadcrumbSource withWillBeginHandler:(void(^)(void))beginHandler completionHandler:(void(^)(void))completionHandler {
     [notificationShade dismissAnimated:YES];
 
     %orig;
@@ -41,7 +48,7 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-// iOS 13
+// iOS 13+
 %hook SBTransientOverlayPresentationManager
 
 - (void)performPresentationRequest:(SBTransientOverlayPresentationRequest *)presentationRequest {
@@ -73,8 +80,16 @@ NUANotificationShadeController *notificationShade;
     [notificationShade dismissAnimated:animated];
 }
 
+// iOS 14
+- (void)_presentForMainScreenAnimated:(BOOL)animated options:(id)options completion:(id)completion {
+    %orig;
+
+    [notificationShade dismissAnimated:animated];
+}
+
 %end
 
+// CHANGED FOR IOS 14
 %hook SBStarkRelockUIAlert
 
 - (void)activate {
@@ -85,6 +100,7 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
+// CHANGED FOR IOS 14
 %hook SBUIAnimationFadeAlertToRemoteAlert
 
 - (void)_animationFinished {
@@ -118,7 +134,7 @@ NUANotificationShadeController *notificationShade;
         [self addMilestone:@"NotificationShadeDismissalMilestone"];
 
         __weak __typeof(self) weakSelf = self;
-        [notificationShade dismissAnimated:YES completion:^ {
+        [notificationShade dismissAnimated:YES completion:^{
             [weakSelf removeMilestone:@"NotificationShadeDismissalMilestone"];
             [weakSelf _noteAnimationDidFinish];
         }];
