@@ -72,7 +72,7 @@
 
     // Constrain width on ipads or set width on phones to device width;
     CGFloat portraitScreenWidth = CGRectGetWidth([UIScreen mainScreen]._referenceBounds);
-    CGFloat desiredWidth = MIN(414, portraitScreenWidth);
+    CGFloat desiredWidth = MIN(428, portraitScreenWidth);
     [_containerViewController.view.widthAnchor constraintEqualToConstant:desiredWidth].active = YES;
 
     // Do something special with top because slide in from top
