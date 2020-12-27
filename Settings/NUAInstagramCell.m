@@ -6,7 +6,7 @@
 
 @interface HBLinkTableCell ()
 
-- (BOOL)shouldShowAvatar;
+- (BOOL)shouldShowIcon;
 
 @end
 
@@ -69,14 +69,14 @@
 
 #pragma mark - Avatar
 
-- (BOOL)shouldShowAvatar {
-    // HBLinkTableCell doesn’t want avatars by default, but we do. override its check method so that
-    // if showAvatar is unset, we return YES
-    return self.specifier.properties[@"showAvatar"] ? [super shouldShowAvatar] : YES;
+- (BOOL)shouldShowIcon {
+	// HBLinkTableCell doesn’t want avatars by default, but we do. Override its check method so that
+	// if showAvatar and showIcon are unset, we return YES.
+	return self.specifier.properties[@"showAvatar"] || self.specifier.properties[@"showIcon"] ? [super shouldShowIcon] : YES;
 }
 
 - (void)loadAvatarIfNeeded {
-    if (!self.username || self.avatarImage) {
+    if (!self.username || self.iconImage) {
         // No username, or already has image
         return;
     }
@@ -133,7 +133,7 @@
             // Set image
             UIImage *image = [UIImage imageWithData:data];
             dispatch_async(dispatch_get_main_queue(), ^{
-                self.avatarImage = image;
+                self.iconImage = image;
             });
         }];
     });
