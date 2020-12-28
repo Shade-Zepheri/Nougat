@@ -263,9 +263,15 @@
     // Coordinate with PiP/Side Apps
     SBSystemGestureManager *gestureManager = [%c(SBSystemGestureManager) mainDisplayManager];
     if ([gestureManager respondsToSelector:@selector(gestureRecognizerOfType:shouldBeRequiredToFailByGestureRecognizer:)]) {
-        // iOS 13+
-        [gestureManager gestureRecognizerOfType:SBSystemGestureTypeUnpinSideApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
-        [gestureManager gestureRecognizerOfType:SBSystemGestureTypePinPiPApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+        if (%c(SBIndirectPanGestureRecognizer)) {
+            // iOS 14
+            [gestureManager gestureRecognizerOfType:(SBSystemGestureTypeUnpinSideApp + 6) shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+            [gestureManager gestureRecognizerOfType:(SBSystemGestureTypePinPiPApp + 6) shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+        } else {
+            // iOS 13
+            [gestureManager gestureRecognizerOfType:SBSystemGestureTypeUnpinSideApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+            [gestureManager gestureRecognizerOfType:SBSystemGestureTypePinPiPApp shouldBeRequiredToFailByGestureRecognizer:_presentationGestureRecognizer];
+        }
     } else {
         SBMainDisplaySceneLayoutViewController *sceneLayoutViewController;
         if ([%c(SBSceneLayoutViewController) respondsToSelector:@selector(mainDisplaySceneLayoutViewController)]) {
