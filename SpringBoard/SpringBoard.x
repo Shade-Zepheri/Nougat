@@ -12,12 +12,6 @@ NUANotificationShadeController *notificationShade;
 
 %hook SpringBoard
 
-- (void)batteryStatusDidChange:(NSDictionary *)info {
-    %orig;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
-}
-
 // iOS 11-13
 - (void)toggleSearchWithWillBeginHandler:(void(^)(void))beginHandler completionHandler:(void(^)(void))completionHandler {
     [notificationShade dismissAnimated:YES];
@@ -89,7 +83,7 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-// CHANGED FOR IOS 14
+// iOS 10-12
 %hook SBStarkRelockUIAlert
 
 - (void)activate {
@@ -100,7 +94,7 @@ NUANotificationShadeController *notificationShade;
 
 %end
 
-// CHANGED FOR IOS 14
+// iOS 10-12
 %hook SBUIAnimationFadeAlertToRemoteAlert
 
 - (void)_animationFinished {

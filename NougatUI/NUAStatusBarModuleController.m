@@ -1,7 +1,5 @@
 #import "NUAStatusBarModuleController.h"
 #import "NUAStatusBarContentView.h"
-#import <SpringBoard/SpringBoard-Umbrella.h>
-#import <SpringBoardUIServices/SpringBoardUIServices.h>
 
 @implementation NUAStatusBarModuleController
 
@@ -38,7 +36,9 @@
     [super viewWillAppear:animated];
 
     // Register for battery updates
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:@"NUABatteryStatusDidChangeNotification" object:nil];
+    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:UIDeviceBatteryLevelDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:UIDeviceBatteryStateDidChangeNotification object:nil];
 
     // Start updates
     [self _setDisablesUpdates:NO];
@@ -49,15 +49,17 @@
     CGFloat currentPercent = [UIDevice currentDevice].batteryLevel;
     [self statusBarView].currentPercent = currentPercent;
 
-    BOOL isCharging = [[%c(SBUIController) sharedInstance] isBatteryCharging];
+    BOOL isCharging = ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull);
     [self statusBarView].charging = isCharging;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
-    // Deregister from notification
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUABatteryStatusDidChangeNotification" object:nil];
+    // Stop battery updates
+    [UIDevice currentDevice].batteryMonitoringEnabled = NO;
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryLevelDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryStateDidChangeNotification object:nil];
 
     // Stop updates
     [self _setDisablesUpdates:YES];
@@ -122,15 +124,8 @@
 }
 
 - (void)_updateBatteryState:(NSNotification *)notification {
-    NSDictionary<NSString *, NSNumber *> *userInfo = notification.userInfo;
-
-    BOOL isCharging = userInfo[@"IsCharging"].boolValue;
-    CGFloat currentCapacity = userInfo[@"CurrentCapacity"].floatValue;
-    CGFloat maxCapacity = userInfo[@"MaxCapacity"].floatValue;
-    CGFloat currentPercent = (currentCapacity / maxCapacity);
-
-    [self statusBarView].currentPercent = currentPercent;
-    [self statusBarView].charging = isCharging;
+    [self statusBarView].currentPercent = [UIDevice currentDevice].batteryLevel;
+    [self statusBarView].charging = ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull);
 }
 
 - (void)preferencesDidChange:(NSNotification *)notification {
