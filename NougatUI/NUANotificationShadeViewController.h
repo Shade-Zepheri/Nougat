@@ -23,10 +23,15 @@
     UITapGestureRecognizer *_tapGesture;
 }
 @property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+@property (strong, readonly, nonatomic) id<NUASystemServicesProvider> systemServicesProvider;
 @property (strong, readonly, nonatomic) NUAMainTableViewController *tableViewController;
 @property (weak, nonatomic) id<NUANotificationShadeViewControllerDelegate> delegate;
 @property (assign, nonatomic) CGFloat presentedHeight;
 @property (assign, readonly, nonatomic) CGFloat fullyPresentedHeight;
+
++ (void)notifyNotificationShade:(NSString *)message didActivate:(BOOL)activated;
+
+- (instancetype)initWithSystemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider;
 
 - (void)dismissAnimated:(BOOL)animated completion:(void(^)(void))completion;
 - (void)updateToFinalPresentedHeight:(CGFloat)finalHeight completion:(void(^)(void))completion;

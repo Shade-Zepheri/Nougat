@@ -5,11 +5,27 @@
 
 @implementation NUANotificationShadeViewController
 
++ (void)notifyNotificationShade:(NSString *)message didActivate:(BOOL)activated {
+    if (!message) {
+        return;
+    }
+
+    // Determine if activated or not and send message
+    NSString *notificationName = activated ? @"NUANotificationShadeDidActivate" : @"NUANotificationShadeDidDeactivate";
+    NSDictionary *userInfo = @{@"NUANotificationShadeControlName" : message};
+
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center postNotificationName:notificationName object:nil userInfo:userInfo];
+}
+
 #pragma mark - Initialization
 
-- (instancetype)init {
+- (instancetype)initWithSystemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
     self = [super init];
     if (self) {
+        // Set properties
+        _systemServicesProvider = systemServicesProvider;
+
         //Register for notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_noteNotificationShadeControlDidActivate:) name:@"NUANotificationShadeDidActivate" object:nil];
@@ -83,7 +99,7 @@
 }
 
 - (void)_loadExtensionsTable {
-    _tableViewController = [[NUAMainTableViewController alloc] initWithPreferences:self.notificationShadePreferences];
+    _tableViewController = [[NUAMainTableViewController alloc] initWithPreferences:self.notificationShadePreferences systemServicesProvider:self.systemServicesProvider];
     self.tableViewController.delegate = self;
 
     // Add as child

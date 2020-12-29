@@ -1,6 +1,6 @@
 #import "NUAAlertItem.h"
+#import "NUANotificationShadeController.h"
 #import <NougatServices/NougatServices.h>
-#import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UserNotificationsKit/UserNotificationsKit.h>
 #import <version.h>

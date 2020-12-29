@@ -1,5 +1,5 @@
 #import "NUABrightnessModuleController.h"
-#import "NUANotificationShadeController.h"
+#import "NUANotificationShadeViewController.h"
 #import <UIKit/UIImage+Private.h>
 
 @implementation NUABrightnessModuleController
@@ -92,7 +92,7 @@
 #pragma mark - Slider Delegate
 
 - (void)sliderDidBeginTracking:(UISlider *)slider {
-    [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:YES];
+    [NUANotificationShadeViewController notifyNotificationShade:@"brightness" didActivate:YES];
 }
 
 - (void)sliderValueDidChange:(UISlider *)slider {
@@ -110,7 +110,7 @@
 
     CFRelease(_brightnessTransaction);
     _brightnessTransaction = nil;
-    [NUANotificationShadeController notifyNotificationShade:@"brightness" didActivate:NO];
+    [NUANotificationShadeViewController notifyNotificationShade:@"brightness" didActivate:NO];
 }
 
 #pragma mark - Notifications

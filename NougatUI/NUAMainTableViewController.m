@@ -1,9 +1,8 @@
 #import "NUAMainTableViewController.h"
 #import "NUAMediaTableViewCell.h"
 #import "NUARippleButton.h"
+#import <FrontBoardServices/FBSSystemService.h>
 #import <MediaRemote/MediaRemote.h>
-#import <SpringBoard/SpringBoard-Umbrella.h>
-#import <SpringBoardFoundation/SpringBoardFoundation.h>
 #import <Macros.h>
 #import <UIKitHelpers.h>
 
@@ -22,16 +21,14 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPreferences:(NUAPreferenceManager *)notificationShadePreferences {
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)notificationShadePreferences systemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
     self = [super init];
     if (self) {
         // Set defaults
         _notificationShadePreferences = notificationShadePreferences;
+        _systemServicesProvider = systemServicesProvider;
         _expandedNotifications = [NSMutableSet set];
         _mediaNotification = [NUACoalescedNotification mediaNotification];
-
-        // Determine unlock defaults
-        [self _evaluateLockState:nil];
 
         // Create tableview controller
         _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -41,13 +38,17 @@
         _nowPlayingController = [[NSClassFromString(@"MPUNowPlayingController") alloc] init];
 
         // Notifications
-        _notificationRepository = [NUANotificationRepository defaultRepository];
-        [_notificationRepository addObserver:self];
+        _notificationsProvider = systemServicesProvider.notificationsProvider;
+        [_notificationsProvider addObserver:self];
+
+        // Setup authentication defaults
+        _authenticationProvider = systemServicesProvider.authenticationProvider;
+        [_authenticationProvider addObserver:self];
+        [self _evaluateLockState];
 
         // Register for notifications
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-        [center addObserver:self selector:@selector(_evaluateLockState:) name:@"SBFUserAuthenticationStateDidChangeNotification" object:nil];
-        [center addObserver:self selector:@selector(_evaluateLockState:) name:@"NUANotificationShadeChangedPreferences" object:nil];
+        [center addObserver:self selector:@selector(_evaluateLockState) name:@"NUANotificationShadeChangedPreferences" object:nil];
     }
 
     return self;
@@ -60,7 +61,7 @@
     }
 
     // Sort notifications
-    NSSet<NUACoalescedNotification *> *allNotifications = self.notificationRepository.notifications;
+    NSSet<NUACoalescedNotification *> *allNotifications = self.notificationsProvider.notifications;
     NSMutableArray<NUACoalescedNotification *> *notifications = [allNotifications.allObjects mutableCopy];
     [notifications sortUsingComparator:^(NUACoalescedNotification *notification1, NUACoalescedNotification *notification2) {
         return [notification1 compare:notification2];
@@ -130,7 +131,7 @@
 #pragma mark - Screen Bounds Helpers
 
 - (CGFloat)_bottomSafeArea {
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    UIInterfaceOrientation currentOrientation = self.systemServicesProvider.activeInterfaceOrientation;
     CGFloat currentScreenHeight = NUAGetScreenHeightForOrientation(currentOrientation);
     return currentScreenHeight - 100.0;
 }
@@ -284,7 +285,7 @@
     }
 
     // Call the repository
-    [self.notificationRepository executeAction:action forNotificationRequest:request];
+    [self.notificationsProvider executeAction:action forNotificationRequest:request];
 
     if (![type isEqualToString:@"default"]) {
         return;
@@ -292,6 +293,11 @@
 
     // Dismiss if needed
     [self.delegate tableViewControllerWantsDismissal:self];
+}
+
+- (void)_openApplication:(NSString *)bundleIdentifier {
+    FBSSystemService *systemService = [FBSSystemService sharedService];
+    [systemService openApplication:bundleIdentifier options:@{FBSOpenApplicationOptionKeyUnlockDevice: @(YES)} withResult:nil];
 }
 
 #pragma mark - UIViewController
@@ -381,6 +387,12 @@
     return YES;
 }
 
+#pragma mark - Authentication Observer
+
+- (void)userAuthenticationStateChanged:(BOOL)isAuthenticated {
+    [self _evaluateLockState];
+}
+
 #pragma mark - Notifications
 
 - (void)_updateMedia {
@@ -390,15 +402,14 @@
     });
 }
 
-- (void)_evaluateLockState:(NSNotification *)notification {
+- (void)_evaluateLockState {
     // Change UILock settings
     switch (self.notificationShadePreferences.notificationPreviewSetting) {
         case NUANotificationPreviewSettingAlways:
             self.UILocked = NO;
             break;
         case NUANotificationPreviewSettingWhenUnlocked: {
-            SBFUserAuthenticationController *authenticationController = ((SpringBoard *)[UIApplication sharedApplication]).authenticationController;
-            self.UILocked = ![authenticationController isAuthenticated];
+            self.UILocked = !self.authenticationProvider.authenticated;
             break;
         }
         case NUANotificationPreviewSettingNever:
@@ -467,7 +478,7 @@
         }
 
         // Launch music playing app
-        [(SpringBoard *)[UIApplication sharedApplication] launchApplicationWithIdentifier:nowPlayingID suspended:NO];
+        [self _openApplication:nowPlayingID];
 
         // Dismiss nougat
         [self.delegate tableViewControllerWantsDismissal:self];
@@ -593,7 +604,7 @@
 
 - (void)notificationTableViewCell:(NUASimpleNotificationTableViewCell *)tableViewCell requestsExecuteAction:(NCNotificationAction *)action fromNotificationRequest:(NCNotificationRequest *)request {
     // Call the repository
-    [self.notificationRepository executeAction:action forNotificationRequest:request];
+    [self.notificationsProvider executeAction:action forNotificationRequest:request];
 
     // Dismiss
     [self.delegate tableViewControllerWantsDismissal:self];
@@ -608,7 +619,7 @@
     }
 
     // Clear all notifications
-    [self.notificationRepository purgeAllNotifications];
+    [self.notificationsProvider purgeAllNotifications];
 }
 
 @end

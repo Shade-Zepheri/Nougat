@@ -41,6 +41,11 @@
         _state = NUANotificationShadeStateDismissed;
         _preferences = [NUAPreferenceManager sharedSettings];
 
+        // Create repo and agent
+        _notificationRepository = [[NUANotificationRepository alloc] init];
+        _authenticationManager = [[NUAUserAuthenticationManager alloc] init];
+        _systemAgent = [[NUASystemAgent alloc] initWithNotificationsProvider:_notificationRepository authenticationProvider:_authenticationManager];
+
         // Registering for same notifications that NC does
         NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
         [center addObserver:self selector:@selector(_handleBacklightFadeFinished:) name:@"SBBacklightFadeFinishedNotification" object:nil];
@@ -135,7 +140,7 @@
     self.view.frame = [UIScreen mainScreen].bounds;
     self.view.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
-    _viewController = [[NUANotificationShadeViewController alloc] init];
+    _viewController = [[NUANotificationShadeViewController alloc] initWithSystemServicesProvider:self.systemAgent];
     _viewController.delegate = self;
     [_viewController view];
 }

@@ -2,7 +2,6 @@ include $(THEOS)/makefiles/common.mk
 
 # Get Sources
 SOURCES  = $(shell find . -name '*.m')
-SOURCES += $(shell find . -name '*.x')
 HEADERS = $(shell find . -name '*.h') 
 
 FRAMEWORK_NAME = NougatUI

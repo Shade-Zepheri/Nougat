@@ -1,9 +1,12 @@
 #import <UIKit/UIKit.h>
-#import "NUANotificationShadeViewController.h"
+#import "NUANotificationRepository.h"
+#import "NUASystemAgent.h"
+#import "NUAUserAuthenticationManager.h"
 #import <BaseBoard/BaseBoard.h>
 #import <CoverSheet/CoverSheet.h>
 #import <FrontBoard/FrontBoard.h>
 #import <NougatServices/NougatServices.h>
+#import <NougatUI/NougatUI.h>
 #import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIKit+Private.h>
 
@@ -24,6 +27,9 @@ typedef NS_ENUM(NSInteger, NUANotificationShadeState) {
 }
 
 @property (strong, readonly, nonatomic) NUAPreferenceManager *preferences;
+@property (strong, readonly, nonatomic) NUANotificationRepository *notificationRepository;
+@property (strong, readonly, nonatomic) NUAUserAuthenticationManager *authenticationManager;
+@property (strong, readonly, nonatomic) NUASystemAgent *systemAgent;
 @property (nonatomic) NUANotificationShadeState state;
 
 @property (strong, nonatomic) SBAsynchronousRenderingAssertion *asynchronousRenderingAssertion;
