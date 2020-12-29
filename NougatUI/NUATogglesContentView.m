@@ -25,8 +25,8 @@
 
 #pragma mark - Initialization
 
-- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
-    self = [super initWithPreferences:preferences];
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences systemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
+    self = [super initWithPreferences:preferences systemServicesProvider:systemServicesProvider];
     if (self) {
         // Set properties
         _arranged = NO;

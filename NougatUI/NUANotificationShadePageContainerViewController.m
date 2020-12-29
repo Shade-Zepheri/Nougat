@@ -1,6 +1,5 @@
 #import "NUANotificationShadePageContainerViewController.h"
 #import "NUAPropertyAnimator.h"
-#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
@@ -19,11 +18,10 @@
     if (self) {
         // Set defaults
         self.dismissing = NO;
+        self.delegate = delegate;
 
         _contentViewController = viewController;
         _contentViewController.delegate = self;
-
-        self.delegate = delegate;
     }
 
     return self;
@@ -34,7 +32,7 @@
     [self _stopAnimating];
 }
 
-#pragma mark - View management
+#pragma mark - View Management
 
 - (void)loadView {
     NUANotificationShadePanelView *panelView = [[NUANotificationShadePanelView alloc] initWithPreferences:self.notificationShadePreferences];
@@ -136,7 +134,11 @@
 }
 
 - (NUAPreferenceManager *)notificationShadePreferences {
-    return [self.delegate notificationShadePreferences];
+    return self.delegate.notificationShadePreferences;
+}
+
+- (id<NUASystemServicesProvider>)systemServicesProvider {
+    return self.delegate.systemServicesProvider;
 }
 
 #pragma mark - Gestures
@@ -179,7 +181,7 @@
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
     // Prevent on iPhones when in landscape
     BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    UIInterfaceOrientation orientation = self.systemServicesProvider.activeInterfaceOrientation;
     BOOL isInLandscape = UIInterfaceOrientationIsLandscape(orientation);
     return isIPad || !isInLandscape;
 }

@@ -2,7 +2,7 @@
 
 @implementation NUAModulesContainerViewController
 
-#pragma mark - View management
+#pragma mark - View Management
 
 - (void)loadView {
     _moduleList = [NSMutableArray array];
@@ -111,7 +111,11 @@
 }
 
 - (NUAPreferenceManager *)notificationShadePreferences {
-    return [self.delegate notificationShadePreferences];
+    return self.delegate.notificationShadePreferences;
+}
+
+- (id<NUASystemServicesProvider>)systemServicesProvider {
+    return self.delegate.systemServicesProvider;
 }
 
 @end

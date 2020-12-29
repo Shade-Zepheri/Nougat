@@ -2,14 +2,15 @@
 #import <Macros.h>
 #import <FrontBoardServices/FBSSystemService.h>
 #import <NougatServices/NougatServices.h>
-#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIImage+Private.h>
 #import <version.h>
 
 @implementation NUASettingsContentView
 
-- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
-    self = [super initWithPreferences:preferences];
+#pragma mark - Init
+
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences systemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
+    self = [super initWithPreferences:preferences systemServicesProvider:systemServicesProvider];
     if (self) {
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
@@ -26,7 +27,7 @@
     return self;
 }
 
-#pragma mark - View creation
+#pragma mark - View Creation
 
 - (void)_createDivider {
     _dividerView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -98,7 +99,7 @@
     [horizontalStackView addArrangedSubview:self.arrowView];
 }
 
-#pragma mark - Custom image
+#pragma mark - Custom Image
 
 - (UIImageView *)_imageViewForImageName:(NSString *)imageName {
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
@@ -181,7 +182,7 @@
 
 - (void)_toggleNotificationShadeState {
     BOOL isIPad = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad;
-    UIInterfaceOrientation orientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    UIInterfaceOrientation orientation = self.systemServicesProvider.activeInterfaceOrientation;
     BOOL isInLandscape = UIInterfaceOrientationIsLandscape(orientation);
     if (!isIPad && isInLandscape) {
         // Dont allow expansion on landscape iPhones

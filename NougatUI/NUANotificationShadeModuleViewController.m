@@ -20,8 +20,7 @@
 #pragma mark - UIViewController
 
 - (void)loadView {
-    NUAPreferenceManager *notificationShadePreferences = self.notificationShadePreferences;
-    NUANotificationShadeModuleView *view = [[[self.class viewClass] alloc] initWithPreferences:notificationShadePreferences];
+    NUANotificationShadeModuleView *view = [[[self.class viewClass] alloc] initWithPreferences:self.notificationShadePreferences systemServicesProvider:self.systemServicesProvider];
     view.translatesAutoresizingMaskIntoConstraints = NO;
     self.view = view;
 }
@@ -43,7 +42,11 @@
 #pragma mark - Properties
 
 - (NUAPreferenceManager *)notificationShadePreferences {
-    return [self.delegate notificationShadePreferences];
+    return self.delegate.notificationShadePreferences;
+}
+
+- (id<NUASystemServicesProvider>)systemServicesProvider {
+    return self.delegate.systemServicesProvider;
 }
 
 @end

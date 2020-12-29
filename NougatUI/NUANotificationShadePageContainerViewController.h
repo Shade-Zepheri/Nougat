@@ -1,17 +1,20 @@
 #import <UIKit/UIKit.h>
 #import "NUANotificationShadePageContentProvider.h"
 #import "NUANotificationShadePanelView.h"
+#import "NUASystemServicesProvider.h"
 
 @class NUANotificationShadePageContainerViewController;
 
 @protocol NUANotificationShadePageContainerViewControllerDelegate <NSObject>
 @property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+@property (strong, readonly, nonatomic) id<NUASystemServicesProvider> systemServicesProvider;
 @required
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController;
 - (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedPresentedHeight:(CGFloat)presentedHeight;
 - (void)containerViewController:(NUANotificationShadePageContainerViewController *)containerViewController updatedRevealPercentage:(CGFloat)revealPercentage;
 - (NUAPreferenceManager *)notificationShadePreferences;
+- (id<NUASystemServicesProvider>)systemServicesProvider;
 
 @end
 
@@ -24,6 +27,7 @@ typedef NS_ENUM(NSUInteger, NUANotificationShadePanelState) {
     CGFloat _initialHeight;
 }
 @property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+@property (strong, readonly, nonatomic) id<NUASystemServicesProvider> systemServicesProvider;
 @property (weak, nonatomic) id<NUANotificationShadePageContainerViewControllerDelegate> delegate;
 @property (readonly, nonatomic) UIViewController<NUANotificationShadePageContentProvider> *contentViewController;
 @property (strong, readonly, nonatomic) UIPanGestureRecognizer *panGesture;

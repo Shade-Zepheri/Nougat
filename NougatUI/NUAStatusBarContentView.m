@@ -1,7 +1,6 @@
 #import "NUAStatusBarContentView.h"
 #import <BaseBoard/BaseBoard.h>
 #import <NougatServices/NougatServices.h>
-#import <SpringBoard/SpringBoard-Umbrella.h>
 #import <UIKit/UIKit+Private.h>
 #import <UIKit/UIStatusBar.h>
 #import <UIKit/UIApplication+Private.h>
@@ -16,8 +15,10 @@
 
 @implementation NUAStatusBarContentView
 
-- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
-    self = [super initWithPreferences:preferences];
+#pragma mark - Init
+
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences systemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
+    self = [super initWithPreferences:preferences systemServicesProvider:systemServicesProvider];
     if (self) {
         // Register for notification
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backgroundColorDidChange:) name:@"NUANotificationShadeChangedBackgroundColor" object:nil];
@@ -184,7 +185,7 @@
 }
 
 - (CGFloat)_leadingNotchInsetWidth {
-    UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
+    UIInterfaceOrientation currentOrientation = self.systemServicesProvider.activeInterfaceOrientation;
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);
 
     UIStatusBar *statusBar = [UIApplication sharedApplication].statusBar;

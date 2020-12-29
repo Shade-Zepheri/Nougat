@@ -2,11 +2,14 @@
 
 @implementation NUANotificationShadeModuleView
 
-- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences {
+#pragma mark - Init
+
+- (instancetype)initWithPreferences:(NUAPreferenceManager *)preferences systemServicesProvider:(id<NUASystemServicesProvider>)systemServicesProvider {
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        // Pretty barebones class, just set our property
+        // Pretty barebones class, just set our properties
         _notificationShadePreferences = preferences;
+        _systemServicesProvider = systemServicesProvider;
     }
 
     return self;

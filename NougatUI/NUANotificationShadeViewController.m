@@ -35,7 +35,7 @@
     return self;
 }
 
-#pragma mark - View management
+#pragma mark - View Management
 
 - (void)loadView {
     // Just like SB (create container view and make it self.view)
@@ -163,7 +163,7 @@
     _containerView.changingBrightness = NO;
 }
 
-#pragma mark - Page container view controller delegate
+#pragma mark - Page Container View Controller Delegate
 
 - (void)containerViewControllerWantsDismissal:(NUANotificationShadePageContainerViewController *)containerViewController {
     [self.delegate notificationShadeViewControllerWantsDismissal:self];
@@ -184,7 +184,7 @@
     return [self.delegate preferencesForNotificationShadeViewController:self];
 }
 
-#pragma mark - Table view delegate
+#pragma mark - Table View Delegate
 
 - (void)tableViewControllerWantsDismissal:(NUAMainTableViewController *)tableViewController {
     [self.delegate notificationShadeViewControllerWantsDismissal:self];

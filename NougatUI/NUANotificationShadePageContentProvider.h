@@ -1,13 +1,16 @@
 #import <UIKit/UIKit.h>
+#import "NUASystemServicesProvider.h"
 #import <NougatServices/NougatServices.h>
 
 @protocol NUANotificationShadePageContentViewControllerDelegate <NSObject>
 @property (strong, readonly, nonatomic) NUAPreferenceManager *notificationShadePreferences;
+@property (strong, readonly, nonatomic) id<NUASystemServicesProvider> systemServicesProvider;
 @required
 
 - (void)contentViewControllerWantsDismissal:(UIViewController *)contentViewController completely:(BOOL)completely;
 - (void)contentViewControllerWantsExpansion:(UIViewController *)contentViewController;
 - (NUAPreferenceManager *)notificationShadePreferences;
+- (id<NUASystemServicesProvider>)systemServicesProvider;
 
 @end
 
