@@ -1,5 +1,6 @@
 #import "NUAStatusBarModuleController.h"
 #import "NUAStatusBarContentView.h"
+#import <SpringBoard/SpringBoard-Umbrella.h>
 #import <SpringBoardUIServices/SpringBoardUIServices.h>
 
 @implementation NUAStatusBarModuleController
@@ -25,33 +26,24 @@
     [center addObserver:self selector:@selector(_updateFormat) name:@"BSDateTimeCacheChangedNotification" object:nil];
     [center addObserver:self selector:@selector(preferencesDidChange:) name:@"NUANotificationShadeChangedPreferences" object:nil];
 
-    // Register for time updates    
-    SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
-    [controller addObserver:self];
-
-    NSDate *overrideDate = controller.overrideDate;
-    if (overrideDate) {
-        [self statusBarView].date = overrideDate;
-    } else {
-        Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-        [self statusBarView].date = [clockTimerClass now];
-        if (!_disablesUpdates) {
-            [self _startUpdateTimer];
-        }
+    // Register for time updates
+    _timeManager = [NUAPreciseTimerManager sharedManager];
+    [self statusBarView].date = [NSDate date];
+    if (!_disablesUpdates) {
+        [self _startTimeUpdates];
     }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
-    // Register for more notifications
+    // Register for battery updates
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:@"NUABatteryStatusDidChangeNotification" object:nil];
 
     // Start updates
     [self _setDisablesUpdates:NO];
 
-    SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
-    [self statusBarView].date = controller.currentDate;
+    [self statusBarView].date = [NSDate date];
 
     // Update Battery label
     CGFloat currentPercent = [UIDevice currentDevice].batteryLevel;
@@ -75,19 +67,11 @@
     return (NUAStatusBarContentView *)self.view;
 }
 
-#pragma mark - Time management
+#pragma mark - Time Management
 
-- (void)controller:(SBDateTimeController *)controller didChangeOverrideDateFromDate:(NSDate *)date {
-    NSDate *overrideDate = controller.overrideDate;
-    if (overrideDate) {
-        [self _stopUpdateTimer];
-    } else if (!_disablesUpdates) {
-        [self _startUpdateTimer];
-    }
-
-    if (!_disablesUpdates) {
-        [self _updateFormat];
-    }
+- (void)managerUpdatedWithDate:(NSDate *)date {
+    // Pass to label
+    [self _updateLabelWithDate:date];
 }
 
 - (void)_setDisablesUpdates:(BOOL)disablesUpdates {
@@ -98,60 +82,30 @@
     _disablesUpdates = disablesUpdates;
 
     if (_disablesUpdates) {
-        [self _stopUpdateTimer];
+        [self _stopTimeUpdates];
     } else {
-        SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
-        NSDate *overrideDate = controller.overrideDate;
-        if (overrideDate) {
-            return;
-        }
-
-        [self _startUpdateTimer];
+        [self _startTimeUpdates];
     }
 }
 
-- (void)_stopUpdateTimer {
-    if (!_timerToken) {
-        return;
-    }
-
-    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
-    [timer stopMinuteUpdatesForToken:_timerToken];
-    _timerToken = nil;
+- (void)_stopTimeUpdates {
+    // Remove self as observer
+    [self.timeManager removeObserver:self];
 }
 
-- (void)_startUpdateTimer {
-    if (_timerToken) {
-        return;
-    }
-
-    Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-    SBPreciseClockTimer *timer = [clockTimerClass sharedInstance];
-    // Probably not a retain cycle but lets play it safe
-    __weak __typeof(self) weakSelf = self;
-    _timerToken = [timer startMinuteUpdatesWithHandler:^{
-        [weakSelf _updateTime];
-    }];
+- (void)_startTimeUpdates {
+    // Add self as observer
+    [self.timeManager addObserver:self];
 }
 
-#pragma mark - View management
+#pragma mark - View Management
 
-- (void)_updateTime {
+- (void)_updateLabelWithDate:(NSDate *)date {
     if (_disablesUpdates) {
-      [self _stopUpdateTimer];
+      [self _stopTimeUpdates];
     } else {
-        SBDateTimeController *controller = [%c(SBDateTimeController) sharedInstance];
-        [controller addObserver:self];
-
-        NSDate *overrideDate = controller.overrideDate;
-        if (overrideDate) {
-            [self statusBarView].date = overrideDate;
-        } else {
-            Class clockTimerClass = %c(SBUIPreciseClockTimer) ?: %c(SBPreciseClockTimer);
-            [self statusBarView].date = [clockTimerClass now];
-            [self _startUpdateTimer];
-        }
+        [self statusBarView].date = date;
+        [self _startTimeUpdates];
     }
 }
 
@@ -164,7 +118,7 @@
 
     [[self statusBarView] updateFormat];
 
-    [self _updateTime];
+    [self _updateLabelWithDate:[NSDate date]];
 }
 
 - (void)_updateBatteryState:(NSNotification *)notification {

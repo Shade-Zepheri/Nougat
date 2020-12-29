@@ -1,10 +1,8 @@
 #import "NUANotificationShadeModuleViewController.h"
-#import <SpringBoard/SpringBoard-Umbrella.h>
+#import "NUAPreciseTimerManager.h"
 
-@interface NUAStatusBarModuleController : NUANotificationShadeModuleViewController <SBDateTimeOverrideObserver> {
-    //Really just copying SBLockScreenDateViewController
-    NSNumber *_timerToken;
-    BOOL _disablesUpdates;
-}
+@interface NUAStatusBarModuleController : NUANotificationShadeModuleViewController <NUAPreciseTimerManagerObserver>
+@property (strong, readonly, nonatomic) NUAPreciseTimerManager *timeManager;
+@property (nonatomic) BOOL disablesUpdates;
 
 @end

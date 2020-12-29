@@ -1,6 +1,5 @@
 #import "NUANotificationShadeViewController.h"
 #import "NUAModulesContainerViewController.h"
-#import <SpringBoard/SpringBoard+Private.h>
 #import <UIKit/UIKit+Private.h>
 #import <Macros.h>
 
