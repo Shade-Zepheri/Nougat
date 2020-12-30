@@ -1,6 +1,4 @@
 #import "NUASortOrderController.h"
-#import "NUASortOrderHeaderView.h"
-#import "NUAToggleTableCell.h"
 #import "NUAToggleDescription.h"
 #import <Cephei/HBPreferences.h>
 #import <UIKit/UIImage+Private.h>
@@ -10,24 +8,49 @@
 @property (strong, nonatomic) NSMutableArray<NSString *> *disabledIdentifiers;
 @property (strong, nonatomic) NSMutableDictionary<NSString *, NUAToggleDescription *> *identifiersToDescription;
 
+@property (strong, nonatomic) PSSpecifier *enabledTogglesSectionSpecifier;
+@property (strong, nonatomic) PSSpecifier *disabledTogglesSectionSpecifier;
+
 @end
 
 @implementation NUASortOrderController
+
+#pragma mark - PSListController
+
+- (NSMutableArray<PSSpecifier *> *)specifiers {
+    if (!_specifiers) {
+        NSMutableArray<PSSpecifier *> *specifiers = [self loadSpecifiersFromPlistName:@"SortOrder" target:self];
+
+        // Add enabled toggles section
+        NSBundle *bundle = [NSBundle bundleForClass:self.class];
+        NSString *enabledSectionTitle = [bundle localizedStringForKey:@"ENABLED_MODULES_SECTION_TITLE" value:@"Include" table:@"SortOrder"];
+        self.enabledTogglesSectionSpecifier = [PSSpecifier groupSpecifierWithName:enabledSectionTitle];
+        [specifiers addObject:self.enabledTogglesSectionSpecifier];
+
+        // Add enabled toggles
+        NSMutableArray<PSSpecifier *> *enabledToggles = [self _specifiersForIdentifiers:self.enabledIdentifiers];
+        [specifiers addObjectsFromArray:enabledToggles];
+
+        // Add disabled section
+        NSString *disabledSectionTitle = [bundle localizedStringForKey:@"DISABLED_MODULES_SECTION_TITLE" value:@"More Toggles" table:@"SortOrder"];
+        PSSpecifier *disabledSectionSpecifier = [PSSpecifier groupSpecifierWithName:disabledSectionTitle];
+        [specifiers addObject:disabledSectionSpecifier];
+
+        // Add disabled toggles
+        NSMutableArray<PSSpecifier *> *disabledToggles = [self _specifiersForIdentifiers:self.disabledIdentifiers];
+        [specifiers addObjectsFromArray:disabledToggles];
+
+        _specifiers = specifiers;
+    }
+
+    return _specifiers;
+}
 
 #pragma mark - Init
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Configure viewcontroller
-        NSBundle *bundle = [NSBundle bundleForClass:self.class];
-        self.title = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_TITLE" value:@"Sort Order" table:@"SortOrder"];
-
-        if (@available(iOS 11, *)) {
-            // iOS 11 only
-            self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeNever;
-        }
-
         // Create arrays
         _enabledIdentifiers = [NSMutableArray array];
         _disabledIdentifiers = [NSMutableArray array];
@@ -35,10 +58,6 @@
 
         // Set prefs
         _preferences = [NUAPreferenceManager sharedSettings];
-
-        // Create tableview
-        _tableViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        [_tableViewController setEditing:YES animated:NO];
 
         // Populate data
         [self _repopulateToggleData];
@@ -91,36 +110,25 @@
     _disabledIdentifiers = sortedDisabledToggles;
 }
 
+- (NSMutableArray<PSSpecifier *> *)_specifiersForIdentifiers:(NSMutableArray<NSString *> *)identifiers {
+    // Create specifiers from display names of identifiers
+    NSMutableArray<PSSpecifier *> *specifiers = [NSMutableArray array];
+    for (NSString *identifier in identifiers) {
+        NSString *displayName = [self _displayNameForIdentifier:identifier];
+        PSSpecifier *specifier = [PSSpecifier preferenceSpecifierNamed:displayName target:self set:NULL get:NULL detail:NULL cell:PSListItemCell edit:NULL];
+        [specifiers addObject:specifier];
+    }
+
+    return specifiers;
+}
+
 #pragma mark - PSViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Create header view
-    NUASortOrderHeaderView *headerView = [[NUASortOrderHeaderView alloc] initWithFrame:CGRectZero];
-    NSBundle *bundle = [NSBundle bundleForClass:self.class];
-    NSString *fallbackText = @"Add and organize additional toggles to appear in Nougat. Nougat allows up to a maximum of 9 toggles.";
-    headerView.text = [bundle localizedStringForKey:@"CUSTOMIZE_TOGGLES_DETAILS_HEADER" value:fallbackText table:@"SortOrder"];
-
-    // Configure tableView
-    [self addChildViewController:self.tableViewController];
-    self.tableViewController.tableView.dataSource = self;
-    self.tableViewController.tableView.delegate = self;
-    self.tableViewController.tableView.estimatedRowHeight = [UIFont preferredFontForTextStyle:UIFontTextStyleBody].lineHeight;
-
-    // Register custom cell class
-    [self.tableViewController.tableView registerClass:[NUAToggleTableCell class] forCellReuseIdentifier:@"NougatCell"];
-
-    // Update insets
-    CGFloat topInset = CGRectGetHeight(self.navigationController.navigationBar.frame);
-    UIEdgeInsets oldInsets = self.tableViewController.tableView.contentInset;
-    self.tableViewController.tableView.contentInset = UIEdgeInsetsMake(topInset, oldInsets.left, oldInsets.bottom, oldInsets.right);
-
-    // Add header view
-    self.tableViewController.tableView.tableHeaderView = headerView;
-    [headerView sizeToFit];
-
-    [self.view addSubview:self.tableViewController.tableView];
+    // Set editing
+    [[self table] setEditing:YES animated:NO];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -133,7 +141,14 @@
 #pragma mark - Helper Methods
 
 - (NSMutableArray<NSString *> *)arrayForSection:(NSInteger)section {
-    return (section == 0) ? self.enabledIdentifiers : self.disabledIdentifiers;
+    switch (section) {
+        case 1:
+            return self.enabledIdentifiers;
+        case 2:
+            return self.disabledIdentifiers;
+        default:
+            return nil;
+    }
 }
 
 - (NSString *)_displayNameForIdentifier:(NSString *)identifier {
@@ -194,35 +209,14 @@
 
 #pragma mark - UITableViewDataSource
 
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self arrayForSection:section].count;
-}
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    static NSString *cellIdentifier = @"NougatCell";
-    NUAToggleTableCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-
-    // Customize cell
-    NUAToggleDescription *toggleDescription = [self _descriptionAtIndexPath:indexPath];
-    cell.toggleDescription = toggleDescription;
+    UITableViewCell *cell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
+    if (indexPath.section != 0) {
+        NUAToggleDescription *description = [self _descriptionAtIndexPath:indexPath];
+        cell.imageView.image = description.iconImage;
+    }
 
     return cell;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    NSBundle *bundle = [NSBundle bundleForClass:self.class];
-    switch (section) {
-        case 0:
-            return [bundle localizedStringForKey:@"ENABLED_MODULES_SECTION_TITLE" value:@"Include" table:@"SortOrder"];
-        case 1:
-            return [bundle localizedStringForKey:@"DISABLED_MODULES_SECTION_TITLE" value:@"More Toggles" table:@"SortOrder"];
-        default:
-            return @"";
-    }
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -235,42 +229,51 @@
         // Move from disabled to enabled
         NSString *identifier = self.disabledIdentifiers[indexPath.row];
         NSUInteger insertIndex = self.enabledIdentifiers.count;
+        NSUInteger disabledSectionIndex = [self indexOfSpecifier:self.disabledTogglesSectionSpecifier];
+
+        NSUInteger specifierInsertIndex = insertIndex + [self indexOfSpecifier:self.enabledTogglesSectionSpecifier] + 1;
+        PSSpecifier *specifier = [self specifierAtIndex:disabledSectionIndex + indexPath.row + 1]; 
+
         [self.disabledIdentifiers removeObject:identifier];
         [self.enabledIdentifiers addObject:identifier];
 
         // Update table
-        [tableView beginUpdates];
+        [self beginUpdates];
 
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:0]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self removeSpecifierAtIndex:disabledSectionIndex + indexPath.row + 1 animated:YES];
+        [self insertSpecifier:specifier atIndex:specifierInsertIndex animated:YES];
 
-        [tableView endUpdates];
+        [self endUpdates];
     } else if (editingStyle == UITableViewCellEditingStyleDelete) {
         // Move from enabled to disabled
         NSString *identifier = self.enabledIdentifiers[indexPath.row];
         NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledIdentifiers];
+        NSUInteger enabledSectionIndex = [self indexOfSpecifier:self.enabledTogglesSectionSpecifier];
+
+        NSUInteger specifierInsertIndex = [self indexOfSpecifier:self.disabledTogglesSectionSpecifier] + insertIndex;
+        PSSpecifier *specifier = [self specifierAtIndex:enabledSectionIndex + indexPath.row + 1];
 
         [self.enabledIdentifiers removeObject:identifier];
         [self.disabledIdentifiers insertObject:identifier atIndex:insertIndex];
 
         // Update table
-        [tableView beginUpdates];
+        [self beginUpdates];
 
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        [tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:insertIndex inSection:1]] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self removeSpecifierAtIndex:enabledSectionIndex + indexPath.row + 1 animated:YES];
+        [self insertSpecifier:specifier atIndex:specifierInsertIndex animated:YES];
 
-        [tableView endUpdates];
+        [self endUpdates];
     }
 
     [self _updateEnabledToggles];
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    return (indexPath.section != 0);
 }
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return (indexPath.section == 0);
+    return (indexPath.section == 1);
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
@@ -281,21 +284,25 @@
     [sourceArray removeObjectAtIndex:sourceIndexPath.row];
     [destinationArray insertObject:identifier atIndex:destinationIndexPath.row];
 
-    [self.tableViewController.tableView reloadData];
+    [self reloadSpecifiers];
     [self _updateEnabledToggles];
 }
 
 #pragma mark - UITableViewDelegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+- (BOOL)tableView:(UITableView *)tableView shouldHighlightRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (indexPath.section != 0) {
+        return NO;
+    } else {
+        return [super tableView:tableView shouldHighlightRowAtIndexPath:indexPath];
+    }
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {
     switch (indexPath.section) {
-        case 0:
-            return UITableViewCellEditingStyleDelete;
         case 1:
+            return UITableViewCellEditingStyleDelete;
+        case 2:
             return UITableViewCellEditingStyleInsert;
         default:
             return UITableViewCellEditingStyleNone;
@@ -312,7 +319,7 @@
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView targetIndexPathForMoveFromRowAtIndexPath:(NSIndexPath *)sourceIndexPath toProposedIndexPath:(NSIndexPath *)proposedDestinationIndexPath {
-    if (proposedDestinationIndexPath.section != 1) {
+    if (proposedDestinationIndexPath.section != 2) {
         // Inserting into enabled, no need to alphabetize
         return proposedDestinationIndexPath;
     }
@@ -321,7 +328,7 @@
     NSString *identifier = self.enabledIdentifiers[sourceIndexPath.row];
     NSUInteger insertIndex = [self _indexForInsertingItemWithIdentifier:identifier intoArray:self.disabledIdentifiers];
 
-    return [NSIndexPath indexPathForRow:insertIndex inSection:1];
+    return [NSIndexPath indexPathForRow:insertIndex inSection:2];
 }
 
 #pragma mark - Preferences

@@ -1,8 +1,7 @@
-#import <Preferences/PSViewController.h>
+#import <Preferences/Preferences.h>
 #import <NougatServices/NougatServices.h>
 
-@interface NUASortOrderController : PSViewController <UITableViewDataSource, UITableViewDelegate>
+@interface NUASortOrderController : PSListController
 @property (strong, readonly, nonatomic) NUAPreferenceManager *preferences;
-@property (strong, readonly, nonatomic) UITableViewController *tableViewController;
 
 @end
