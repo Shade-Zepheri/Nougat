@@ -36,9 +36,7 @@
     [super viewWillAppear:animated];
 
     // Register for battery updates
-    [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:UIDeviceBatteryLevelDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:UIDeviceBatteryStateDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:@"NUABatteryStatusDidChangeNotification" object:nil];
 
     // Start updates
     [self _setDisablesUpdates:NO];
@@ -57,9 +55,7 @@
     [super viewDidDisappear:animated];
 
     // Stop battery updates
-    [UIDevice currentDevice].batteryMonitoringEnabled = NO;
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryLevelDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceBatteryStateDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUABatteryStatusDidChangeNotification" object:nil];
 
     // Stop updates
     [self _setDisablesUpdates:YES];
@@ -124,8 +120,15 @@
 }
 
 - (void)_updateBatteryState:(NSNotification *)notification {
-    [self statusBarView].currentPercent = [UIDevice currentDevice].batteryLevel;
-    [self statusBarView].charging = ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull);
+    NSDictionary<NSString *, NSNumber *> *userInfo = notification.userInfo;
+
+    BOOL isCharging = userInfo[@"IsCharging"].boolValue;
+    CGFloat currentCapacity = userInfo[@"CurrentCapacity"].floatValue;
+    CGFloat maxCapacity = userInfo[@"MaxCapacity"].floatValue;
+    CGFloat currentPercent = (currentCapacity / maxCapacity);
+
+    [self statusBarView].currentPercent = currentPercent;
+    [self statusBarView].charging = isCharging;
 }
 
 - (void)preferencesDidChange:(NSNotification *)notification {
