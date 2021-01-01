@@ -265,6 +265,7 @@
         [self endUpdates];
     }
 
+    [self reloadSpecifiers];
     [self _updateEnabledToggles];
 }
 
