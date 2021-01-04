@@ -1,6 +1,11 @@
 #import "NUAStatusBarModuleController.h"
 #import "NUAStatusBarContentView.h"
 
+@interface NUAStatusBarModuleController ()
+@property (strong, nonatomic) BCBatteryDeviceController *batteryDeviceController;
+
+@end
+
 @implementation NUAStatusBarModuleController
 
 + (Class)viewClass {
@@ -19,6 +24,9 @@
     // Hide/Show view
     self.view.alpha = self.notificationShadePreferences.hideStatusBarModule ? 0.0 : 1.0;
 
+    // Create battery controller
+    _batteryDeviceController = [[BCBatteryDeviceController alloc] init];
+
     // Register for notifications
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver:self selector:@selector(_updateFormat) name:@"BSDateTimeCacheChangedNotification" object:nil];
@@ -36,26 +44,35 @@
     [super viewWillAppear:animated];
 
     // Register for battery updates
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_updateBatteryState:) name:@"NUABatteryStatusDidChangeNotification" object:nil];
+    if ([self.batteryDeviceController respondsToSelector:@selector(addBatteryDeviceObserver:queue:)]) {
+        // iOS 14
+        [self.batteryDeviceController addBatteryDeviceObserver:self queue:dispatch_get_main_queue()];
+    } else {
+        // iOS 10-13
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_connectedDevicesDidChange:) name:self.batteryDeviceController.connectedDevicesDidChangeNotificationName object:nil];
+
+        // Manually pass first update
+        BCBatteryDevice *internalDevice = [self _internalDevice];
+        [self _updateBatteryStateWithDevice:internalDevice];
+    }
 
     // Start updates
     [self _setDisablesUpdates:NO];
 
     [self statusBarView].date = [NSDate date];
-
-    // Update Battery label
-    CGFloat currentPercent = [UIDevice currentDevice].batteryLevel;
-    [self statusBarView].currentPercent = currentPercent;
-
-    BOOL isCharging = ([UIDevice currentDevice].batteryState == UIDeviceBatteryStateCharging || [UIDevice currentDevice].batteryState == UIDeviceBatteryStateFull);
-    [self statusBarView].charging = isCharging;
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
     // Stop battery updates
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"NUABatteryStatusDidChangeNotification" object:nil];
+    if ([self.batteryDeviceController respondsToSelector:@selector(removeBatteryDeviceObserver:)]) {
+        // iOS 14
+        [self.batteryDeviceController removeBatteryDeviceObserver:self];
+    } else {
+        // iOS 10-13
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:self.batteryDeviceController.connectedDevicesDidChangeNotificationName object:nil];
+    }
 
     // Stop updates
     [self _setDisablesUpdates:YES];
@@ -107,6 +124,34 @@
     }
 }
 
+#pragma mark - Battery Management
+
+- (BCBatteryDevice *)_internalDevice {
+    NSArray<BCBatteryDevice *> *connectedDevices = self.batteryDeviceController.connectedDevices;
+    NSUInteger internalDeviceIndex = [connectedDevices indexOfObjectPassingTest:^(BCBatteryDevice *device, NSUInteger idx, BOOL *stop) {
+        return device.internal;
+    }];
+    return connectedDevices[internalDeviceIndex];
+}
+
+- (void)_updateBatteryStateWithDevice:(BCBatteryDevice *)device {
+    [self statusBarView].currentPercent = device.percentCharge / 100.0;
+    [self statusBarView].charging = device.charging;
+}
+
+#pragma mark - BCBatteryDeviceObserving
+
+- (void)connectedDevicesDidChange:(NSArray<BCBatteryDevice *> *)connectedDevices {
+    // Get internal device
+    NSUInteger internalDeviceIndex = [connectedDevices indexOfObjectPassingTest:^(BCBatteryDevice *device, NSUInteger idx, BOOL *stop) {
+        return device.internal;
+    }];
+    BCBatteryDevice *internalDevice = connectedDevices[internalDeviceIndex];
+
+    // Update info
+    [self _updateBatteryStateWithDevice:internalDevice];
+}
+
 #pragma mark - Notifications
 
 - (void)_updateFormat {
@@ -119,21 +164,15 @@
     [self _updateLabelWithDate:[NSDate date]];
 }
 
-- (void)_updateBatteryState:(NSNotification *)notification {
-    NSDictionary<NSString *, NSNumber *> *userInfo = notification.userInfo;
-
-    BOOL isCharging = userInfo[@"IsCharging"].boolValue;
-    CGFloat currentCapacity = userInfo[@"CurrentCapacity"].floatValue;
-    CGFloat maxCapacity = userInfo[@"MaxCapacity"].floatValue;
-    CGFloat currentPercent = (currentCapacity / maxCapacity);
-
-    [self statusBarView].currentPercent = currentPercent;
-    [self statusBarView].charging = isCharging;
-}
-
 - (void)preferencesDidChange:(NSNotification *)notification {
     // Hide/Show view
     self.view.alpha = self.notificationShadePreferences.hideStatusBarModule ? 0.0 : 1.0;
+}
+
+- (void)_connectedDevicesDidChange:(NSNotification *)notification {
+    // Pass latest state
+    BCBatteryDevice *internalDevice = [self _internalDevice];
+    [self _updateBatteryStateWithDevice:internalDevice];
 }
 
 @end

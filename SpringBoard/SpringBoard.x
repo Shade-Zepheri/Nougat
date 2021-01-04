@@ -12,12 +12,6 @@ NUANotificationShadeController *notificationShade;
 
 %hook SpringBoard
 
-- (void)batteryStatusDidChange:(NSDictionary *)info {
-    %orig;
-
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"NUABatteryStatusDidChangeNotification" object:nil userInfo:info];
-}
-
 // iOS 11-13
 - (void)toggleSearchWithWillBeginHandler:(void(^)(void))beginHandler completionHandler:(void(^)(void))completionHandler {
     [notificationShade dismissAnimated:YES];
