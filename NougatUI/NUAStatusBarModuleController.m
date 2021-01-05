@@ -8,6 +8,8 @@
 
 @implementation NUAStatusBarModuleController
 
+#pragma mark - NUANotificationShadeModuleViewController
+
 + (Class)viewClass {
     return NUAStatusBarContentView.class;
 }
@@ -51,6 +53,18 @@
         // iOS 10-13
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_connectedDevicesDidChange:) name:self.batteryDeviceController.connectedDevicesDidChangeNotificationName object:nil];
 
+        // Add handler
+        __weak __typeof(self) weakSelf = self;
+        [self.batteryDeviceController addDeviceChangeHandler:^(BCBatteryDevice *device) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (!device.internal) {
+                    return;
+                }
+
+                [weakSelf _updateBatteryStateWithDevice:device];
+            });
+        } withIdentifier:self.moduleIdentifier];
+
         // Manually pass first update
         BCBatteryDevice *internalDevice = [self _internalDevice];
         [self _updateBatteryStateWithDevice:internalDevice];
@@ -72,6 +86,8 @@
     } else {
         // iOS 10-13
         [[NSNotificationCenter defaultCenter] removeObserver:self name:self.batteryDeviceController.connectedDevicesDidChangeNotificationName object:nil];
+
+        [self.batteryDeviceController removeDeviceChangeHandlerWithIdentifier:self.moduleIdentifier];
     }
 
     // Stop updates
