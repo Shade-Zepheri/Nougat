@@ -4,6 +4,9 @@
 "PIXEL" = "פיקסל";
 "OREO" = "אוראו";
 
+"BEHAVIOR" = "Behavior";
+"DISABLE_GESTURES" = "Disable CC/NC Gestures";
+
 "APPEARANCE" = "מראה";
 "USE_SYSTEM_APPEARANCE" = "השתמש בהגדרות תצוגת המערכת";
 "USE_COLORFLOW" = "השתמש בצבעי Colorflow";
