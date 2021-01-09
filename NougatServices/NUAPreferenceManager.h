@@ -26,6 +26,7 @@ static NSString *const NUAPreferencesUsesExternalColorKey = @"colorflowEnabled";
 static NSString *const NUAPreferencesUsesSystemAppearanceKey = @"usesSystemAppearance";
 static NSString *const NUAPreferencesNotificationPreviewSettingKey = @"notificationPreviewSetting";
 static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
+static NSString *const NUAPreferencesDisableGesturesKey = @"disableGestures";
 
 @interface NUAPreferenceManager : NSObject
 @property (class, strong, readonly) NUAPreferenceManager *sharedSettings;
@@ -47,6 +48,7 @@ static NSString *const NUAPreferencesHideStatusBarModuleKey = @"hideStatusBar";
 @property (assign, readonly, nonatomic) NUANotificationPreviewSetting notificationPreviewSetting;
 
 @property (assign, readonly, nonatomic) BOOL hideStatusBarModule;
+@property (assign, readonly, nonatomic) BOOL disableGestures;
 
 + (BOOL)_deviceHasNotch;
 + (NSString *)carrierName;

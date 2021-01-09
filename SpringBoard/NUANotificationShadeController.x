@@ -444,6 +444,11 @@
 }
 
 - (BOOL)_isLocationXWithinNotchRegion:(CGPoint)location {
+    // If gestures disabled, just have it work for the entire region
+    if (self.preferences.disableGestures) {
+        return YES;
+    }
+
     // Get proper width
     UIInterfaceOrientation currentOrientation = [(SpringBoard *)[UIApplication sharedApplication] activeInterfaceOrientation];
     CGFloat currentScreenWidth = NUAGetScreenWidthForOrientation(currentOrientation);

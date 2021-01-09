@@ -44,6 +44,7 @@
         [_preferences registerBool:&_usesSystemAppearance default:NO forKey:NUAPreferencesUsesSystemAppearanceKey];
         [_preferences registerInteger:&_notificationPreviewSetting default:NUANotificationPreviewSettingAlways forKey:NUAPreferencesNotificationPreviewSettingKey];
         [_preferences registerBool:&_hideStatusBarModule default:NO forKey:NUAPreferencesHideStatusBarModuleKey];
+        [_preferences registerBool:&_disableGestures default:NO forKey:NUAPreferencesDisableGesturesKey];
 
         NSArray<NSString *> *defaultToggleOrder = [self.class _defaultEnabledToggles];
         [_preferences registerObject:&_enabledToggleIdentifiers default:defaultToggleOrder forKey:NUAPreferencesTogglesListKey];

@@ -156,6 +156,11 @@ NUANotificationShadeController *notificationShade;
 %hook SBControlCenterController
 
 - (BOOL)allowShowTransitionSystemGesture {
+    // Check if we override
+    if (settings.disableGestures) {
+        return NO;
+    }
+
     BOOL allowGesture = %orig;
     if (!settings.enabled) {
         // Not enabled
@@ -173,6 +178,11 @@ NUANotificationShadeController *notificationShade;
 %hook SBNotificationCenterController
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // Check if we override
+    if (settings.disableGestures) {
+        return NO;
+    }
+
     BOOL shouldBegin = %orig;
     if (!settings.enabled) {
         return shouldBegin;
@@ -190,6 +200,11 @@ NUANotificationShadeController *notificationShade;
 %hook SBCoverSheetSystemGesturesDelegate
 
 - (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
+    // Check if we override
+    if (settings.disableGestures) {
+        return NO;
+    }
+
     BOOL shouldBegin = %orig;
     if (!settings.enabled) {
         // Only override present gesture
