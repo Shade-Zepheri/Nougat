@@ -5,18 +5,21 @@
 An near 1:1 recreation of the Android notification shade from Android Nougat for iOS. Built to support iOS 10 up to iOS 13.5 on iPhones and iPads.
 
 ## Installation
+
 ### From an APT Repo
+
 Nougat is availble for purchase on [Chariz](https://chariz.com/buy/nougat).
 
 In the future, Nougat will be available on one of the default repo for purchase.
 
 ### Compiling from source
+
 If you want to compile Nougat for yourself, you will need to have theos installed (If you don't have `theos` already installed on your computer, follow the steps located [here](https://github.com/theos/theos/wiki/Installation)), then follow these steps:
 
 1. Clone this repository using `git clone https://github.com/Shade-Zepheri/Nougat.git` or your preferred method
 2. `cd` into the cloned `Nougat` folder
-4. run `make do` 
-5. Done! 
+3. run `make do`
+4. Done!
 
 ## Bug Reports
 
@@ -33,6 +36,7 @@ Nougat supports localizations for several languages, but help is needed to cover
 If you are familiar enough with a language and want to help translate (if it hasn't already been done), you can do so by following these steps:
 
 Crowdin is used in order to streamline and simplify the translating process.
+
 - First, if your desired language isn't already among the supported list (found [here](https://crwd.in/nougat)), please file an issue [here](https://github.com/Shade-Zepheri/Nougat/issues/new?assignees=&labels=enhancement%2C+localization&template=localization-support.md&title=) to let me know what language you would like added. Once added, you can start translating at [https://crowdin.com/project/nougat](https://crowdin.com/project/nougat)
 - If your language is already support, head to [https://crowdin.com/project/nougat](https://crowdin.com/project/nougat), select the desired language and begin translating.
 
