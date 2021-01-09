@@ -2,7 +2,7 @@
 
 ![Build Nougat](https://github.com/Shade-Zepheri/Nougat/workflows/Build%20Nougat/badge.svg?branch=master&event=push) [![Build Status](https://travis-ci.org/Shade-Zepheri/Nougat.svg?branch=master)](https://travis-ci.org/Shade-Zepheri/Nougat) [![Crowdin](https://badges.crowdin.net/nougat/localized.svg)](https://crowdin.com/project/nougat)
 
-An near 1:1 recreation of the Android notification shade from Android Nougat for iOS. Built to support iOS 10 up to iOS 13.5 on iPhones and iPads.
+An near 1:1 recreation of the Android notification shade from Android Nougat for iOS. Built to support iOS 10 up to iOS 14.3 on iPhones and iPads.
 
 ## Installation
 
