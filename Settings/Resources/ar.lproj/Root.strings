@@ -4,6 +4,9 @@
 "PIXEL" = "بكسل";
 "OREO" = "أوريو";
 
+"BEHAVIOR" = "Behavior";
+"DISABLE_GESTURES" = "Disable CC/NC Gestures";
+
 "APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "استخدام إعداد مظهر النظام";
 "USE_COLORFLOW" = "استخدم ألوان Colorflow";
