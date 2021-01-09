@@ -4,6 +4,9 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"BEHAVIOR" = "Behavior";
+"DISABLE_GESTURES" = "Disable CC/NC Gestures";
+
 "APPEARANCE" = "APPEARANCE";
 "USE_SYSTEM_APPEARANCE" = "Use System Appearance Setting";
 "USE_COLORFLOW" = "Use Colorflow Colors";
