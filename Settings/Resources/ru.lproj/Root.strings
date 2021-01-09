@@ -4,6 +4,9 @@
 "PIXEL" = "Pixel";
 "OREO" = "Oreo";
 
+"BEHAVIOR" = "Behavior";
+"DISABLE_GESTURES" = "Disable CC/NC Gestures";
+
 "APPEARANCE" = "ВНЕШНИЙ ВИД";
 "USE_SYSTEM_APPEARANCE" = "Использовать системное оформление";
 "USE_COLORFLOW" = "Использовать цвета Colorflow";
